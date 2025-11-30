@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8" />
     <title>Dashboard | Admin Dashboard Template</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,52 +11,43 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('backend/assets/images/favicon.ico') }}">
 
-    <!-- App css -->
+    <!-- Core CSS -->
     <link href="{{ asset('backend/assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style" />
-
-    <!-- Icons -->
     <link href="{{ asset('backend/assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
-</head>
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
 
-<!-- body start -->
+    <!-- Datatables CSS -->
+    <link href="{{ asset('backend/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/libs/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/libs/datatables.net-keytable-bs5/css/keyTable.bootstrap5.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('backend/assets/libs/datatables.net-select-bs5/css/select.bootstrap5.min.css') }}" rel="stylesheet" />
+</head>
 
 <body data-menu-color="light" data-sidebar="default">
 
     <!-- Begin page -->
     <div id="app-layout">
 
-
-        <!-- Topbar Start -->
+        <!-- Topbar -->
         @include('admin.body.header')
-        <!-- end Topbar -->
 
-        <!-- Left Sidebar Start -->
+        <!-- Sidebar -->
         @include('admin.body.sidebar')
-        <!-- Left Sidebar End -->
 
-        <!-- ============================================================== -->
-        <!-- Start Page Content here -->
-        <!-- ============================================================== -->
-
+        <!-- Content -->
         <div class="content-page">
-
             @yield('admin')
-            <!-- content -->
 
-            <!-- Footer Start -->
+            <!-- Footer -->
             @include('admin.body.footer')
-            <!-- end Footer -->
-
         </div>
-        <!-- ============================================================== -->
-        <!-- End Page content -->
-        <!-- ============================================================== -->
-
     </div>
     <!-- END wrapper -->
 
-    <!-- Vendor -->
+    <!-- Vendor JS -->
     <script src="{{ asset('backend/assets/libs/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/simplebar/simplebar.min.js') }}"></script>
@@ -67,18 +56,48 @@
     <script src="{{ asset('backend/assets/libs/jquery.counterup/jquery.counterup.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/feather-icons/feather.min.js') }}"></script>
 
-    <!-- Apexcharts JS -->
+    <!-- Apexcharts -->
     <script src="{{ asset('backend/assets/libs/apexcharts/apexcharts.min.js') }}"></script>
-
-    <!-- for basic area chart -->
     <script src="https://apexcharts.com/samples/assets/stock-prices.js"></script>
 
-    <!-- Widgets Init Js -->
+    <!-- Dashboard Init -->
     <script src="{{ asset('backend/assets/js/pages/analytics-dashboard.init.js') }}"></script>
 
-    <!-- App js-->
+    <!-- App JS -->
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
 
-</body>
+    <!-- Datatables JS -->
+    <script src="{{ asset('backend/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('backend/assets/js/pages/datatable.init.js') }}"></script>
 
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="{{ asset('backend/assets/js/code.js') }}"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- Toastr Alert -->
+    <script>
+        @if(Session::has('message'))
+            var type = "{{ Session::get('alert-type','info') }}";
+            switch(type){
+                case 'info':
+                    toastr.info("{{ Session::get('message') }}");
+                    break;
+                case 'success':
+                    toastr.success("{{ Session::get('message') }}");
+                    break;
+                case 'warning':
+                    toastr.warning("{{ Session::get('message') }}");
+                    break;
+                case 'error':
+                    toastr.error("{{ Session::get('message') }}");
+                    break;
+            }
+        @endif
+    </script>
+</body>
 </html>
