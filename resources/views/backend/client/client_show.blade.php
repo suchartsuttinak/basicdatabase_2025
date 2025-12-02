@@ -70,19 +70,18 @@
                     @endif
                 </td>
                 <td>
-                    <a title="Edit" href="" 
+                    <a title="Edit" href="{{ route('client.edit', $client->id) }}" 
                         class="btn btn-success btn-sm">
                         <span class="mdi mdi-book-edit-outline mdi-18px"></span>
                     </a>
-                    <a title="Delete" href="" 
+                    <a title="Delete" href="{{ route('client.delete', $client->id) }}" 
                         class="btn btn-danger btn-sm" id="delete">
                         <span class="mdi mdi-trash-can-outline mdi-18px"></span>
-            </a>
-                    <a title="add" href="" 
+                    </a>
+                    <a title="Main" href="{{ route('admin.index', $client->id) }}" 
                         class="btn btn-primary btn-sm">
                             <span class="mdi mdi-eye-circle mdi-18px"></span></a>
-
-            </a>
+                    </a>
                 </td>
                         </tr>
                     @endforeach
@@ -96,8 +95,5 @@
 
     </div> <!-- end container-fluid -->
 </div> <!-- end content -->
-
-
-
 
 @endsection

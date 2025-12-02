@@ -24,6 +24,7 @@
             </div>
 
             <ul id="side-menu">
+                <h1 class="text-danger text-center">{{ $client->id }}</h1>
 
                 <li class="menu-title">Menu</li>
 
@@ -39,8 +40,11 @@
                                 <a href="{{ route('client.show') }}" class="tp-link">ทะเบียนผู้รับ</a>
                             </li>
                             <li>
-                                <a href="ecommerce.html" class="tp-link">E-commerce</a>
+                                 <a href="{{ route('client.report', $client->id) }}" class="tp-link">
+                                    รายงานการช่วยเหลือ 
+                                </a>
                             </li>
+                           
                         </ul>
                     </div>
                 </li>

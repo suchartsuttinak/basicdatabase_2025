@@ -24,8 +24,10 @@
 
     <div class="container-fluid py-4">
         <!-- เปิดฟอร์ม -->
-       <form action="{{ route('client.store') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('client.update') }}" method="POST" enctype="multipart/form-data">
     @csrf
+    <input type="hidden" name="id" value="{{ $client->id }}">
+
             <div class="row">
             <!-- Card ฝั่งซ้าย -->
             <div class="col-lg-6 col-xl-6 mb-4">
@@ -39,12 +41,12 @@
                 </div>
           <div class="card-body">
 
-         <div class="form-group col-md-3 mb-3">
+            <div class="form-group col-md-3 mb-3">
                 <div class="form-group w-100">
                     <label for="register_number" class="form-label">เลขทะเบียน</label>
                     <input type="text" name="register_number" id="register_number"
                         class="form-control @error('register_number') is-invalid @enderror"
-                        value="{{ old('register_number') }}">
+                        value="{{ old('register_number', $client->register_number) }}">
                     {{-- ✅ แสดง error ใต้ input --}}
                     @error('register_number')
                         <small class="text-danger error-message" id="error-register_number">{{ $message }}</small>
@@ -52,29 +54,33 @@
                 </div>
             </div>
 
-            <div class="form-group mb-3 row">
-              <div class="col-lg-12 col-xl-12">
-                    <label class="form-label d-block">เพศ : <span class="text-danger">*</span></label>
+           <div class="form-group mb-3 row">
+                    <div class="col-lg-12 col-xl-12">
+                        <label class="form-label d-block">เพศ : <span class="text-danger">*</span></label>
+
                         <div class="form-check form-check-inline">
                             <input class="form-check-input @error('gender') is-invalid @enderror"
                                 type="radio" name="gender" id="genderMale"
-                                value="male" {{ old('gender') == 'male' ? 'checked' : '' }}>
+                                value="male"
+                                {{ old('gender', $client?->gender) == 'male' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderMale">ชาย</label>
                         </div>
 
                         <div class="form-check form-check-inline">
                             <input class="form-check-input @error('gender') is-invalid @enderror"
                                 type="radio" name="gender" id="genderFemale"
-                                value="female" {{ old('gender') == 'female' ? 'checked' : '' }}>
+                                value="female"
+                                {{ old('gender', $client?->gender) == 'female' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderFemale">หญิง</label>
                         </div>
 
-                    {{-- ✅ แสดง error ใต้ radio --}}
-                    @error('gender')
-                        <small class="text-danger d-block error-message" id="error-gender">{{ $message }}</small>
-                    @enderror
+                        {{-- ✅ แสดง error ใต้ radio --}}
+                        @error('gender')
+                            <small class="text-danger d-block error-message" id="error-gender">{{ $message }}</small>
+                        @enderror
+                    </div>
                 </div>
-            </div>
+
 
             <div class="row">
                {{-- คำนำหน้าชื่อ --}}
@@ -86,7 +92,7 @@
                             <option value="">--เลือกคำนำหน้าชื่อ--</option>
                             @foreach ($titles as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('title_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('title_id', $client?->title_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->title_name }}
                                 </option>
                             @endforeach
@@ -98,14 +104,14 @@
                     </div>
                 </div>
 
-             <div class="form-group col-md-8 mb-3">
-                    <div class="form-group w-100">
-              <label for="nick_name" class="form-label">ชื่อเล่น</label>
-                <input type="text" name="nick_name" class="form-control" 
-                value="{{ old('nick_name') }}">
-            </div>
-        </div>
-     </div>
+                            <div class="form-group col-md-8 mb-3">
+                                    <div class="form-group w-100">
+                            <label for="nick_name" class="form-label">ชื่อเล่น</label>
+                                <input type="text" name="nick_name" class="form-control" 
+                                value="{{ old('nick_name', $client?->nick_name) }}">
+                            </div>
+                        </div>
+                    </div>
 
             <div class="row">
                 {{-- ชื่อ --}}
@@ -114,20 +120,20 @@
                         <label for="first_name" class="form-label">ชื่อ : <span class="text-danger">*</span></label>
                         <input type="text" name="first_name" id="first_name"
                             class="form-control @error('first_name') is-invalid @enderror"
-                            value="{{ old('first_name') }}">
+                            value="{{ old('first_name', $client?->first_name) }}">
                         @error('first_name')
-                            <small class="text-danger error-message" id="error-first_name">{{ $message }}</small>
+                            <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
                 </div>
 
                 {{-- นามสกุล --}}
-                <div class="form-group col-md-6 mb-3">
+             <div class="form-group col-md-6 mb-3">
                     <div class="form-group w-100">
                         <label for="last_name" class="form-label">นามสกุล : <span class="text-danger">*</span></label>
                         <input type="text" name="last_name" id="last_name"
                             class="form-control @error('last_name') is-invalid @enderror"
-                            value="{{ old('last_name') }}">
+                            value="{{ old('last_name', $client?->last_name) }}">
                         @error('last_name')
                             <small class="text-danger error-message" id="error-last_name">{{ $message }}</small>
                         @enderror
@@ -136,45 +142,44 @@
             </div>
                
             <div class="row">
-                  <div class="form-group col-md-6 mb-3">
+                 <div class="form-group col-md-6 mb-3">
                         <div class="form-group w-100">
-                            <label for="id_card" class="form-label">เลขประจําตัวประชาชน</label>
+                            <label for="id_card" class="form-label">เลขประจําตัวประชาชน : <span class="text-danger">*</span></label>
                             <input type="text" name="id_card" id="id_card"
                                 class="form-control @error('id_card') is-invalid @enderror"
-                                value="{{ old('id_card') }}">
+                                value="{{ old('id_card', $client?->id_card) }}">
                             @error('id_card')
                                 <div class="invalid-feedback" id="error-id_card">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
-               <div class="form-group col-md-6 mb-3">
-                        <div class="form-group w-100">
-                            <div class="col-lg-12 col-xl-12">
-                                <label for="birth_date" class="form-label">วันเกิด <span class="text-danger">*</span></label>
-                                <input type="date" name="birth_date" id="birth_date"
-                                    class="form-control @error('birth_date') is-invalid @enderror"
-                                    value="{{ old('birth_date') }}">
-                                {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
-                                @error('birth_date')
-                                    <div class="invalid-feedback" id="error-birth_date">{{ $message }}</div>
-                                @enderror
-                            </div>
+
+                <div class="form-group col-md-6 mb-3">
+                    <div class="form-group w-100">
+                        <div class="col-lg-12 col-xl-12">
+                            <label for="birth_date" class="form-label">วันเกิด <span class="text-danger">*</span></label>
+                            <input type="date" name="birth_date" id="birth_date"
+                                class="form-control @error('birth_date') is-invalid @enderror"
+                                value="{{ old('birth_date', $client?->birth_date) }}">
+                            {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
+                            @error('birth_date')
+                                <div class="invalid-feedback" id="error-birth_date">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
-
-
+                </div>
             </div>
 
             <div class="row">
-                <div class="form-group col-md-6 mb-3">
-                        <div class="form-group w-100">
+                 <div class="form-group col-md-6 mb-3">
+                       <div class="form-group w-100">
                             <label class="form-label" for="national_id">สัญชาติ : <span class="text-danger">*</span></label>
                             <select name="national_id" id="national_id"
                                     class="form-control form-select @error('national_id') is-invalid @enderror">
                                 <option value="">--เลือกสัญชาติ--</option>
                                 @foreach ($nations as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ old('national_id') == $item->id ? 'selected' : '' }}>
+                                        {{ old('national_id', $client?->national_id) == $item->id ? 'selected' : '' }}>
                                         {{ $item->national_name }}
                                     </option>
                                 @endforeach
@@ -188,36 +193,36 @@
                     </div>
 
                 <div class="form-group col-md-6 mb-3">
-                    <div class="form-group w-100">
-                        <label class="form-label" for="religion_id">ศาสนา : <span class="text-danger">*</span></label>
-                        <select name="religion_id" id="religion_id"
-                                class="form-control form-select @error('religion_id') is-invalid @enderror">
-                            <option value="">--เลือกศาสนา--</option>
-                            @foreach ($religions as $item)
-                                <option value="{{ $item->id }}"
-                                    {{ old('religion_id') == $item->id ? 'selected' : '' }}>
-                                    {{ $item->religion_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                   <div class="form-group w-100">
+                            <label class="form-label" for="religion_id">ศาสนา : <span class="text-danger">*</span></label>
+                            <select name="religion_id" id="religion_id"
+                                    class="form-control form-select @error('religion_id') is-invalid @enderror">
+                                <option value="">--เลือกศาสนา--</option>
+                                @foreach ($religions as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ old('religion_id', $client?->religion_id) == $item->id ? 'selected' : '' }}>
+                                        {{ $item->religion_name }}
+                                    </option>
+                                @endforeach
+                            </select>
 
-                        {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
-                        @error('religion_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                            {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
+                            @error('religion_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                 </div>
             </div>
 
                    <div class="form-group mb-3 row">
-                        <div class="col-lg-12 col-xl-12">
+                       <div class="col-lg-12 col-xl-12">
                             <label class="form-label" for="marital_id">สถานะ : <span class="text-danger">*</span></label>
                             <select name="marital_id" id="marital_id"
                                     class="form-control form-select @error('marital_id') is-invalid @enderror">
                                 <option value="">--สถานะการสมรส--</option>
                                 @foreach ($maritals as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ old('marital_id') == $item->id ? 'selected' : '' }}>
+                                        {{ old('marital_id', $client?->marital_id) == $item->id ? 'selected' : '' }}>
                                         {{ $item->marital_name }}
                                     </option>
                                 @endforeach
@@ -233,18 +238,19 @@
            <div class="row">
                 {{-- อาชีพ --}}
                 <div class="form-group col-md-6 mb-3">
-                    <div class="form-group w-100">
+                   <div class="form-group w-100">
                         <label class="form-label" for="occupation_id">อาชีพ : <span class="text-danger">*</span></label>
                         <select name="occupation_id" id="occupation_id"
                                 class="form-control form-select @error('occupation_id') is-invalid @enderror">
                             <option value="">--อาชีพ--</option>
                             @foreach ($occupations as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('occupation_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('occupation_id', $client?->occupation_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->occupation_name }}
                                 </option>
                             @endforeach
                         </select>
+
                         {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
                         @error('occupation_id')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -261,7 +267,7 @@
                             <option value="">--รายได้เฉลี่ย--</option>
                             @foreach ($incomes as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('income_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('income_id', $client?->income_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->income_name }}
                                 </option>
                             @endforeach
@@ -283,12 +289,11 @@
                             <option value="">--การศึกษา--</option>
                             @foreach ($educations as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('education_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('education_id', $client?->education_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->education_name }}
                                 </option>
                             @endforeach
                         </select>
-
                         {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
                         @error('education_id')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -301,7 +306,7 @@
                             <label for="scholl" class="form-label">ชื่อโรงเรียน</label>
                     <input type="text" name="scholl" id="scholl" 
                         class="form-control" 
-                        value="{{ old('scholl') }}">
+                        value="{{ old('scholl', $client?->scholl) }}">
                     @error('scholl')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -310,28 +315,32 @@
                  </div>
 
         
-            <div class="col-md-12 mb-3">
-                <label class="form-label">ปัญหาที่พบ : <span class="text-danger">* (เลือกได้มากกว่า 1 รายการ)</span></label>
-                <div class="row">
-                    @foreach($problems as $problem)
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                name="problems[]" value="{{ $problem->id }}" id="problem{{ $problem->id }}">
-                                <label  class="form-check-label" for="problem{{ $problem->id }}">
-                                    {{ $problem->name }}
-                                </label>
-                            </div>
-                        </div>        
-                    @endforeach
-                    
-                        </div>           
-                    </div>  
+                <div class="col-md-12 mb-3">
+                        <label class="form-label">ปัญหาที่พบ : <span class="text-danger">* (เลือกได้มากกว่า 1 รายการ)</span></label>
+                        <div class="row">
+                            @foreach($problems as $problem)
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            name="problems[]" value="{{ $problem->id }}" id="problem{{ $problem->id }}"
+                                            {{ in_array($problem->id, old('problems', $client?->problems->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="problem{{ $problem->id }}">
+                                            {{ $problem->name }}
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        {{-- ✅ แสดงข้อความ error ภาษาไทย --}}
+                        @error('problems')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
              </div>
         </div>
 
-
+        <!-- --------------------------------------------------- -->
 
         <!-- Card ฝั่งขวา -->
         <div class="col-lg-6 col-xl-6 mb-4">
@@ -351,7 +360,7 @@
                     <label for="address" class="form-label">ที่อยู่เลขที่</label>
                     <input type="text" name="address" id="address" 
                         class="form-control" 
-                        value="{{ old('address') }}">
+                        value="{{ old('address', $client?->address) }}">
                     @error('address')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -363,7 +372,7 @@
              <label for="address" class="form-label">หมู่ที่</label>
                 <input type="text" name="moo" id="moo" 
                     class="form-control" 
-                    value="{{ old('moo') }}">
+                    value="{{ old('moo', $client?->moo) }}">
                 @error('moo')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -377,7 +386,7 @@
                  <label for="soi" class="form-label">ตรอก/ซอย</label>
                 <input type="text" name="soi" id="soi" 
                     class="form-control" 
-                    value="{{ old('soi') }}">
+                    value="{{ old('soi', $client?->soi) }}">
                 @error('soi')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -389,7 +398,7 @@
                 <label for="road" class="form-label">ถนน</label>
                 <input type="text" name="road" id="road" 
                     class="form-control" 
-                    value="{{ old('road') }}">
+                    value="{{ old('road', $client?->road) }}">
                 @error('road')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -402,7 +411,7 @@
              <label for="village" class="form-label">หมู่บ้าน</label>
                 <input type="text" name="village" id="village" 
                     class="form-control" 
-                    value="{{ old('village') }}">
+                    value="{{ old('village', $client?->village) }}">
                 @error('village')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -413,30 +422,30 @@
                       <div class="form-group col-md-12 mb-3">
                      <div class="form-group w-100">
                     <label class="form-label" for="province">จังหวัด</label>
-                    <select name="province_id" id="province" class="form-select">
+                     <select name="province_id" id="province" class="form-select">
                         <option value="">--เลือกจังหวัด--</option>
                         @foreach($provinces as $province)
-                            <option value="{{ $province->id }}" 
-                                {{ old('province_id') == $province->id ? 'selected' : '' }}>
+                            <option value="{{ $province->id }}"
+                                {{ old('province_id', $client?->province_id) == $province->id ? 'selected' : '' }}>
                                 {{ $province->prov_name }}
                             </option>
                         @endforeach
-                    </select>                   
+                    </select>
                 </div>
             </div>
 
-        <div class="form-group col-md-12 mb-3">
+                <div class="form-group col-md-12 mb-3">
                      <div class="form-group w-100">
                     <label class="form-label" for="district">เขต/อำเภอ</label>
-                    <select name="district_id" id="district" class="form-control form-select">
+                                    <select name="district_id" id="district" class="form-select">
                         <option value="">--เลือกอำเภอ--</option>
                         @foreach($districts as $district)
-                            <option value="{{ $district->id }}" 
-                                {{ old('district_id') == $district->id ? 'selected' : '' }}>
+                            <option value="{{ $district->id }}"
+                                {{ old('district_id', $client?->district_id) == $district->id ? 'selected' : '' }}>
                                 {{ $district->dist_name }}
                             </option>
                         @endforeach
-                    </select>                   
+                    </select> 
                 </div>
             </div>
          
@@ -445,40 +454,43 @@
            <div class="form-group col-md-12 mb-3">
                      <div class="form-group w-100">
                     <label class="form-label" for="subdistrict">แขวง/ตำบล</span></label>
-                    <select name="sub_district_id" id="subdistrict" class="form-select">
-                        <option value="">-- เลือกตำบล --</option>
-                        @foreach($sub_districts as $subdistrict)
-                            <option value="{{ $subdistrict->id }}" 
-                                {{ old('sub_district_id', $recipient->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                                {{ $subdistrict->subdist_name }}
-                            </option>
-                        @endforeach
-                    </select>
+                   <select name="sub_district_id" id="subdistrict" class="form-select">
+        <option value="">--เลือกตำบล--</option>
+        @foreach($sub_districts as $subdistrict)
+            <option value="{{ $subdistrict->id }}"
+                {{ old('sub_district_id', $client?->sub_district_id) == $subdistrict->id ? 'selected' : '' }}>
+                {{ $subdistrict->subd_name }}
+            </option>
+        @endforeach
+    </select>
                     @error('sub_district_id')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
             </div>
 
+      
             <div class="row">
-                 <div class="form-group col-md-4 mb-3">
+                
+                    <div class="form-group col-md-4 mb-3">
                      <div class="form-group w-100">
-                <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
+                    <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
                     <input type="text" name="zipcode" id="zipcode" 
                         class="form-control" 
-                        value="{{ old('zipcode') }}">
+                        value="{{ old('zipcode', $client?->zipcode) }}">
                     @error('zipcode')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
-                </div>
+           
             </div>
+        </div>
 
           <div class="form-group col-md-8 mb-3">
                      <div class="form-group w-100">
                 <label for="phone" class="form-label">โทรศัพท์</label>
                     <input type="text" name="phone" id="phone" 
                         class="form-control" 
-                        value="{{ old('phone') }}">
+                        value="{{ old('phone', $client?->phone) }}">
                     @error('phone')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -496,7 +508,7 @@
                             <option value="">--กลุ่มเป้าหมาย--</option>
                             @foreach ($targets as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('target_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('target_id', $client?->target_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->target_name }}
                                 </option>
                             @endforeach
@@ -515,7 +527,7 @@
                             <option value="">--การติดต่อ--</option>
                             @foreach ($contacts as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('contact_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('contact_id', $client?->contact_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->contact_name }}
                                 </option>
                             @endforeach
@@ -536,7 +548,7 @@
                         <option value="">--หน่วยงาน--</option>
                         @foreach ($projects as $item)
                             <option value="{{ $item->id }}"
-                                {{ old('project_id') == $item->id ? 'selected' : '' }}>
+                                {{ old('project_id', $client?->project_id) == $item->id ? 'selected' : '' }}>
                                 {{ $item->project_name }}
                             </option>
                         @endforeach
@@ -555,7 +567,7 @@
                         <option value="">--สถานที่--</option>
                         @foreach ($houses as $item)
                             <option value="{{ $item->id }}"
-                                {{ old('house_id') == $item->id ? 'selected' : '' }}>
+                                {{ old('house_id', $client?->house_id) == $item->id ? 'selected' : '' }}>
                                 {{ $item->house_name }}
                             </option>
                         @endforeach
@@ -576,7 +588,7 @@
                             <option value="">--สถานะผู้เข้ารับ--</option>
                             @foreach ($statuses as $item)
                                 <option value="{{ $item->id }}"
-                                    {{ old('status_id') == $item->id ? 'selected' : '' }}>
+                                    {{ old('status_id', $client?->status_id) == $item->id ? 'selected' : '' }}>
                                     {{ $item->status_name }}
                                 </option>
                             @endforeach
@@ -587,29 +599,28 @@
                     </div>
                 </div>
 
-               <div class="form-group col-md-6 mb-3">
+             <div class="form-group col-md-6 mb-3">
                     <label for="arrival_date" class="form-label">วันที่รับเข้า <span class="text-danger">*</span></label>
                     <input type="date" name="arrival_date" id="arrival_date"
                         class="form-control @error('arrival_date') is-invalid @enderror"
-                        value="{{ old('arrival_date') }}">
+                        value="{{ old('arrival_date', $client->arrival_date ?? '') }}">
                     @error('arrival_date')
                         <small class="text-danger error-message" id="error-arrival_date">{{ $message }}</small>
                     @enderror
                 </div>
-            </div>
 
-            <div class="col-md-12 mb-3">
-                <label for="case_resident" class="form-label">สถานะอยู่อาศัย <span class="text-danger">*</span></label>
+                <div class="col-md-12 mb-3">
+                    <label for="case_resident" class="form-label">สถานะอยู่อาศัย <span class="text-danger">*</span></label>
                     <select name="case_resident" id="case_resident"
                         class="form-select @error('case_resident') is-invalid @enderror" required>
                         <option value="">-- เลือกสถานะ --</option>
-                        <option value="Active" {{ old('case_resident', 'Active') == 'Active' ? 'selected' : '' }}>อยู่อาศัย</option>
-                        <option value="Inactive" {{ old('case_resident') == 'Inactive' ? 'selected' : '' }}>ไม่อยู่อาศัย</option>
+                        <option value="Active" {{ old('case_resident', $client->case_resident ?? '') == 'Active' ? 'selected' : '' }}>อยู่อาศัย</option>
+                        <option value="Inactive" {{ old('case_resident', $client->case_resident ?? '') == 'Inactive' ? 'selected' : '' }}>ไม่อยู่อาศัย</option>
                     </select>
                     @error('case_resident')
                         <small class="text-danger error-message" id="error-case_resident">{{ $message }}</small>
                     @enderror
-            </div>
+                </div>
 
                 <!-- Image -->
                 <div class="row">
@@ -620,31 +631,25 @@
 
                     <div class="col-md-6">
                         <label for="image" class="form-label">ภาพถ่าย</label>
-                        <img id="showImage" 
-                            src="{{ !empty($profileData->image) ? asset($profileData->image) : asset('upload/no_image.jpg') }}"
+                        <img id="showImage"
+                            src="{{ !empty($client->image) ? asset('upload/client_images/'.$client->image) : asset('upload/no_image.jpg') }}"
                             class="rounded-circle avatar-xxl img-thumbnail float-start" alt="image profile">
                     </div>
-                </div>  
-                <!-- Image -->
-                    <div div class="text-start">
-                        <button type="submit" class="btn btn-success">บันทึกข้อมูล</button>
-                    </div> 
-            </form>
-        </div>
-    </div>
-</div>
+                </div>
+                                <!-- Image -->
+                                    <div div class="text-start">
+                                        <button type="submit" class="btn btn-success">บันทึกข้อมูล</button>
+                                    </div> 
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
 
-<!-- จังหวัด อำเภอ ตำบล รหัสไปรษณีย์ -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+ <!-- จังหวัด อำเภอ ตําบล รหัสไปรษณีย์ -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function () {
-    // เคลียร์ค่าเริ่มต้นทุก dropdown ตอนโหลดหน้า
-    $('#district').empty().append('<option value="">--เลือกอำเภอ--</option>');
-    $('#subdistrict').empty().append('<option value="">--เลือกตำบล--</option>');
-    $('#zipcode').val('');
-
+$(function () {
     // เมื่อเลือกจังหวัด
     $('#province').on('change', function () {
         let province_id = $(this).val();
@@ -662,46 +667,43 @@ $(document).ready(function () {
                 $('#subdistrict').empty().append('<option value="">--เลือกตำบล--</option>');
                 $('#zipcode').val('');
             });
-        } else {
-            // ถ้าไม่ได้เลือกจังหวัด ให้เคลียร์ dropdown
-            $('#district').empty().append('<option value="">--เลือกอำเภอ--</option>');
-            $('#subdistrict').empty().append('<option value="">--เลือกตำบล--</option>');
-            $('#zipcode').val('');
         }
     });
 
     // เมื่อเลือกอำเภอ
     $('#district').on('change', function () {
         let district_id = $(this).val();
+        console.log("Selected district ID:", district_id);
 
         if (district_id) {
             $.get('/get-subdistricts/' + district_id, function (data) {
+                console.log("Subdistricts loaded:", data);
+
                 $('#subdistrict').empty().append('<option value="">--เลือกตำบล--</option>');
                 $.each(data, function (key, value) {
                     $('#subdistrict').append('<option value="' + value.id + '">' + value.subd_name + '</option>');
                 });
+
                 $('#zipcode').val('');
             });
-        } else {
-            $('#subdistrict').empty().append('<option value="">--เลือกตำบล--</option>');
-            $('#zipcode').val('');
         }
     });
 
     // เมื่อเลือกตำบล
     $('#subdistrict').on('change', function () {
         let subdistrict_id = $(this).val();
+        console.log("Selected subdistrict ID:", subdistrict_id);
 
         if (subdistrict_id) {
             $.get('/get-zipcode/' + subdistrict_id, function (data) {
+                console.log("Zipcode loaded:", data);
                 $('#zipcode').val(data.zipcode);
             });
-        } else {
-            $('#zipcode').val('');
         }
     });
 });
 </script>
+<!-- จังหวัด อำเภอ ตําบล รหัสไปรษณีย์ -->
 
 <!-- show image -->
         <script type="text/javascript">
@@ -716,9 +718,7 @@ $(document).ready(function () {
             });
         </script>
         <!-- end show image --> 
-        
-    
-        
+          
         <!-- validation input --> 
         <script>
         document.addEventListener('DOMContentLoaded', function () {

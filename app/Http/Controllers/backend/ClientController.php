@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator; // ✅ ต้องมีบรรทัดนี้
 
 use App\Models\House;
 use App\Models\Income;
@@ -31,10 +32,10 @@ use Intervention\Image\Drivers\Gd\Driver;
 class ClientController extends Controller
 {
    
-    public function ClientAll()
+    public function ClientShow()
     {
         $clients = Client::with('problems')->get();
-        return view('backend.client.client_all', compact('clients'));   
+        return view('backend.client.client_show', compact('clients'));   
     }
    
     public function ClientAdd()
@@ -76,26 +77,29 @@ class ClientController extends Controller
             'titles'
         ));
 }
+//สิ้นสุด method show
 
 //จังหวัด อำเภอ ตำบล รหัสไปรษณีย์
 // RecipientController.php
 
 public function getDistricts($province_id)
 {
-    $districts = District::where('province_id', $province_id)->get(['id', 'dist_name']);
-    return response()->json($districts);
+        return response()->json(
+        District::where('province_id', $province_id)->get(['id', 'dist_name'])
+    );
 }
 
 public function getSubdistricts($district_id)
 {
-    $subdistricts = SubDistrict::where('district_id', $district_id)->get(['id', 'subd_name']);
-    return response()->json($subdistricts);
+        return response()->json(
+        SubDistrict::where('district_id', $district_id)->get(['id', 'subd_name'])
+    );
 }
 
 public function getZipcode($subdistrict_id)
 {
-    $subdistrict = SubDistrict::find($subdistrict_id);
-    return response()->json(['zipcode' => $subdistrict ? $subdistrict->zipcode : null]);
+        $subdistrict = SubDistrict::find($subdistrict_id);
+        return response()->json(['zipcode' => $subdistrict ? $subdistrict->zipcode : null]);
 }
 //สิ้นสุด จังหวัด อำเภอ ตำบล รหัสไปรษณีย์
 
@@ -103,19 +107,19 @@ public function getZipcode($subdistrict_id)
 public function ClientStore(Request $request)
 {
     $validated = $request->validate([
-        'register_number' => 'nullable|string|max:255',
+        'register_number' => 'nullable|string|max:255|unique:clients,register_number',
         'title_id'        => 'required|integer',
         'nick_name'       => 'nullable|string|max:255',
         'first_name'      => 'required|string|max:255',
         'last_name'       => 'required|string|max:255',
         'gender'          => 'required|in:male,female',
-        'birth_date'      => 'nullable|date',
+        'birth_date'      => 'required|date',
         'id_card'         => 'nullable|string|max:13|unique:clients,id_card',
         'national_id'     => 'required|integer',
         'religion_id'     => 'required|integer',
         'marital_id'      => 'required|integer',
         'occupation_id'   => 'required|integer',
-        'income_id'       => 'nullable|integer',
+        'income_id'       => 'required|integer',
         'education_id'    => 'required|integer',
         'scholl'          => 'nullable|string|max:255',
         'address'         => 'nullable|string|max:255',
@@ -132,12 +136,50 @@ public function ClientStore(Request $request)
         'target_id'       => 'required|integer',
         'contact_id'      => 'required|integer',
         'project_id'      => 'required|integer',
-        'house_id'        => 'nullable|integer',
+        'house_id'        => 'required|integer',
         'status_id'       => 'required|integer',
         'case_resident'   => 'required|in:Active,Not Active',
         'problems'        => 'nullable|array',
         'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ], [
+        
+        // ✅ ข้อความภาษาไทยสำหรับ register_number
+        'register_number.required' => 'กรุณากรอกเลขทะเบียน',
+        'register_number.string'   => 'เลขทะเบียนต้องเป็นตัวอักษร',
+        'register_number.max'      => 'เลขทะเบียนต้องไม่เกิน 255 ตัวอักษร',
+        'register_number.unique'   => 'เลขทะเบียนนี้ถูกใช้แล้ว',
+
+    // ✅ ข้อความภาษาไทย
+        'title_id.required'     => 'กรุณาเลือกคำนำหน้า',
+        'first_name.required'   => 'กรุณากรอกชื่อ',
+        'last_name.required'    => 'กรุณากรอกนามสกุล',
+        'gender.required'       => 'กรุณาเลือกเพศ',
+        'gender.in'             => 'ค่าเพศไม่ถูกต้อง',
+        'birth_date.required' => 'กรุณากรอกวัน/เดือน/ปีเกิด',
+        'birth_date.date'     => 'วันเกิดต้องเป็นรูปแบบวันที่ที่ถูกต้อง',
+        'id_card.max'           => 'เลขบัตรประชาชนต้องไม่เกิน 13 หลัก',
+        'id_card.unique'        => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
+        'national_id.required'  => 'กรุณาเลือกสัญชาติ',
+        'religion_id.required'  => 'กรุณาเลือกศาสนา',
+        'marital_id.required'   => 'กรุณาเลือกสถานภาพสมรส',
+        'occupation_id.required'=> 'กรุณาเลือกอาชีพ',
+        'income_id.required'    => 'กรุณาเลือกรายได้',
+        'education_id.required' => 'กรุณาเลือกการศึกษา',
+        'arrival_date.required' => 'กรุณากรอกวันที่เข้ารับบริการ',
+        'arrival_date.required' => 'กรุณากรอกวันที่เข้ารับบริการ',
+        'arrival_date.date'     => 'วันที่เข้ารับบริการต้องเป็นรูปแบบวันที่',
+        'target_id.required'    => 'กรุณาเลือกเป้าหมาย',
+        'contact_id.required'   => 'กรุณาเลือกผู้ติดต่อ',
+        'project_id.required'   => 'กรุณาเลือกโครงการ',
+        'house_id.required'     => 'กรุณาเลือกบ้าน',
+        'status_id.required'    => 'กรุณาเลือกสถานะ',
+        'case_resident.required'=> 'กรุณาเลือกสถานะการอยู่อาศัย',
+        'case_resident.in'      => 'สถานะการอยู่อาศัยไม่ถูกต้อง',
+        'image.image'           => 'ไฟล์ต้องเป็นรูปภาพ',
+        'image.mimes'           => 'รูปภาพต้องเป็นไฟล์ประเภท jpeg, png, jpg, gif หรือ svg',
+        'image.max'             => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
     ]);
+
 
     // ✅ จัดการไฟล์ภาพ
     if ($request->hasFile('image')) {
@@ -160,18 +202,161 @@ public function ClientStore(Request $request)
         $client->problems()->attach($problems);
     }
 
-     
-
     $notification = [
         'message' => 'บันทึกข้อมูลเรียบร้อย',
         'alert-type' => 'success'
     ];
 
-    return redirect()->route('client.all')->with($notification);
+    return redirect()->route('client.show')->with($notification);
+}
+//สิ้นสุด method store
+
+public function ClientEdit($id )
+{
+        $client = Client::findOrFail($id);
+        $problems    = Problem::all();
+        $provinces   = Province::all();
+        $districts   = District::all();
+        $sub_districts = SubDistrict::all();
+        $nations     = National::all();
+        $religions   = Religion::all();
+        $maritals    = Marital::all();
+        $occupations = Occupation::all();
+        $incomes     = Income::all();
+        $educations  = Education::all();
+        $contacts    = Contact::all();
+        $projects    = Project::all();
+        $statuses    = Status::all();
+        $houses      = House::all(); 
+        $targets     = Target::all(); 
+        $titles      = Title::all(); 
+
+        return view('backend.client.client_edit', compact(
+            'client',
+            'problems',
+            'provinces',
+            'districts',
+            'sub_districts',
+            'nations',
+            'religions',
+            'maritals',
+            'occupations',
+            'incomes',
+            'educations',
+            'contacts',
+            'projects',
+            'statuses',
+            'houses',
+            'targets',
+            'titles'
+        ));
+        
 }
 
+public function ClientUpdate(Request $request)
+{
+    // ✅ ดึงข้อมูล จากฟอร์ม และตรวจสอบ
+    $id = $request->id;
 
+    $validated = $request->validate([
+        'register_number' => 'nullable|unique:clients,register_number,' . $id,
+        'id_card' => 'nullable|unique:clients,id_card,' . $id,
+        'title_id'        => 'required|integer',
+        'nick_name'       => 'nullable|string|max:255',
+        'first_name'      => 'required|string|max:255',
+        'last_name'       => 'required|string|max:255',
+        'gender'          => 'required|in:male,female',
+        'birth_date'      => 'required|date',
+        'national_id'     => 'required|integer',
+        'religion_id'     => 'required|integer',
+        'marital_id'      => 'required|integer',
+        'occupation_id'   => 'required|integer',
+        'income_id'       => 'required|integer',
+        'education_id'    => 'required|integer',
+        'scholl'          => 'nullable|string|max:255',
+        'address'         => 'nullable|string|max:255',
+        'moo'             => 'nullable|string|max:255',
+        'soi'             => 'nullable|string|max:255',
+        'road'            => 'nullable|string|max:255',
+        'village'         => 'nullable|string|max:255',
+        'province_id'     => 'nullable|integer',
+        'district_id'     => 'nullable|integer',
+        'sub_district_id' => 'nullable|integer',
+        'zipcode'         => 'nullable|integer',
+        'phone'           => 'nullable|string|max:50',
+        'arrival_date'    => 'required|date',
+        'target_id'       => 'required|integer',
+        'contact_id'      => 'required|integer',
+        'project_id'      => 'required|integer',
+        'house_id'        => 'required|integer',
+        'status_id'       => 'required|integer',
+        'case_resident'   => 'required|in:Active,Not Active',
+        'problems'        => 'nullable|array',
+        'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ], [
+        'register_number.unique' => 'เลขทะเบียนนี้ถูกใช้แล้ว',
+        'register_number.string' => 'เลขทะเบียนต้องเป็นตัวอักษร',
+        'register_number.max'    => 'เลขทะเบียนต้องไม่เกิน 255 ตัวอักษร',
+        'id_card.unique'         => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
+        'id_card.string'         => 'เลขบัตรประชาชนต้องเป็นตัวอักษร',
+        'id_card.max'            => 'เลขบัตรประชาชนต้องไม่เกิน 13 หลัก',
+        // ข้อความอื่น ๆ ตามที่คุณเขียนไว้
+    ]);
+
+    // จัดการไฟล์ภาพ
+    if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('upload/client_images'), $filename);
+        $validated['image'] = $filename;
+    }
+
+    // ดึง problems ออกมาแยก
+    $problems = $validated['problems'] ?? [];
+    unset($validated['problems']);
+
+    // บันทึก Client
+    $client = Client::findOrFail($id);
+    $client->update($validated);
+
+    // แนบ problems (many-to-many)
+    $client->problems()->sync($problems);
+
+    $notification = [
+        'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
+
+    return redirect()->route('client.show', $client->id)->with($notification);
 }
 
+        public function ClientDelete($id)
+        {
+            // ดึงข้อมูล Client ถ้าไม่เจอจะ throw 404
+            $client = Client::findOrFail($id);
 
+            // ถ้ามีการแนบ problems (many-to-many) → ลบความสัมพันธ์ออกก่อน
+            $client->problems()->detach();
+
+            // ถ้ามีรูปภาพ → ลบไฟล์ออกจากโฟลเดอร์
+            if (!empty($client->image)) {
+                $imagePath = public_path('upload/client_images/' . $client->image);
+                if (file_exists($imagePath)) {
+                    @unlink($imagePath);
+                }
+            }
+
+            // ลบข้อมูล Recipient
+            $client->delete();
+
+            // แจ้งเตือน
+            $notification = [
+                'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
+                'alert-type' => 'success'
+            ];
+
+            return redirect()->route('client.show')->with($notification);    
+            }
+
+}
 
