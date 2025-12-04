@@ -63,7 +63,7 @@
                                 <a href="{{ route('institution.all') }}" class="tp-link">รายการสถานศึกษา</a>
                             </li>
                             <li>
-                                <a href="auth-register.html" class="tp-link">Register</a>
+                              <a href="{{ route('factfinding.add', $client->id) }}" class="tp-link">สอบข้อเท็จจริง</a>
                             </li>
                             <li>
                                 <a href="auth-recoverpw.html" class="tp-link">Recover Password</a>
