@@ -7,6 +7,9 @@ use App\Http\Controllers\backend\ClientController;
 use App\Http\Controllers\backend\InstitutionController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\FactfindingController;
+use App\Http\Controllers\Frontend\FamilyController;
+
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -82,10 +85,19 @@ Route::middleware('auth')->group(function () {
     // บันทึก factfinding
    Route::post('/factfinding/update/{id}', [FactfindingController::class, 'FactfindingUpdate'])
      ->name('factfinding.update');
-
-
-
 });
 
 
-        
+    // Family Route All
+    Route::middleware('auth')->group(function () {
+    Route::get('/family/add/{client_id}', [FamilyController::class, 'FamilyAdd'])->name('family.add'); 
+    Route::post('/family/store', [FamilyController::class, 'FamilyStore'])->name('family.store');
+   
+
+
+   // Ajax Route All จังหวัด-อำเภอ-ตำบล
+    Route::get('/get-districts/{province_id}', [FamilyController::class, 'getDistricts']);
+    Route::get('/get-subdistricts/{district_id}', [FamilyController::class, 'getSubdistricts']);
+    Route::get('/get-zipcode/{subdistrict_id}', [FamilyController::class, 'getZipcode']);
+
+});

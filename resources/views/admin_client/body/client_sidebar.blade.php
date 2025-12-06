@@ -66,7 +66,7 @@
                               <a href="{{ route('factfinding.add', $client->id) }}" class="tp-link">สอบข้อเท็จจริง</a>
                             </li>
                             <li>
-                                <a href="auth-recoverpw.html" class="tp-link">Recover Password</a>
+                                <a href="{{ route('family.add', $client->id) }}" class="tp-link">บันทึกครอบครัว</a>
                             </li>
                             <li>
                                 <a href="auth-lock-screen.html" class="tp-link">Lock Screen</a>

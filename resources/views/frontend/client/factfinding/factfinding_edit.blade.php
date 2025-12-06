@@ -351,8 +351,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันทีเมื่อพิมพ์
             this.classList.remove('is-invalid'); // ลบกรอบแดง
 });
-
-
         </script>
  {{-- JavaScript สําหรับการตรวจสอบข้อมูล --}}
 

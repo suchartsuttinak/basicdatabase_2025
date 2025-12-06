@@ -74,4 +74,11 @@ class Client extends Model
         return $this->belongsToMany(Problem::class, 'client_problem', 'client_id', 'problem_id')
                     ->withTimestamps();
     }
+
+    //ตาราง บิดา มารดา สามี/ภรรยา และญาติ
+     public function father()       { return $this->hasOne(Father::class);}
+     public function mother()       { return $this->hasOne(Mother::class);}
+     public function spouse()       { return $this->hasOne(Spouse::class);}
+     public function relative()     { return $this->hasOne(Relative::class);}
+
 }

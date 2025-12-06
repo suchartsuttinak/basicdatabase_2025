@@ -44,9 +44,13 @@ class FactfindingController extends Controller
     'hygiene'     => 'nullable|string',
     'oral_health' => 'nullable|string',
     'injury'      => 'nullable|string',
-    'case_history' => ['required', 'regex:/^[ก-๙a-zA-Z\s]+$/u'],
-    'recorder'    => 'required|string',
 
+   'case_history' => [
+    'required',
+    'regex:/^(?=.*[ก-๙a-zA-Z])[ก-๙a-zA-Z0-9\s]+$/u'
+    ],
+
+    'recorder'    => 'required|string',
     'active'      => 'nullable|boolean',
 
     'documents'   => 'nullable|array',
@@ -60,9 +64,7 @@ class FactfindingController extends Controller
     'fact_name.required' => 'กรุณากรอก ชื่อข้อเท็จจริง',
 
     'case_history.required' => 'กรุณากรอก ประวัติความเป็นมา',
-    'case_history.regex'    => 'ประวัติความเป็นมา ต้องเป็นตัวอักษรเท่านั้น',
-
-
+    'case_history.regex'    => 'ประวัติความเป็นมา ต้องไม่เป็นตัวเลขอย่างเดียว',
 
     'recorder.required' => 'กรุณากรอก ผู้บันทึก',
 
@@ -101,7 +103,7 @@ class FactfindingController extends Controller
 ]);
     //End validation rules thai
 
-    // ✅ ดึงข้อมูล Recipient
+    // ✅ ดึงข้อมูล Client
     $client = Client::findOrFail($validated['client_id']);
 
      // 3. ตรวจสอบว่ามี factfinding อยู่แล้วหรือไม่ (One-to-One)
@@ -110,7 +112,7 @@ class FactfindingController extends Controller
         // ✅ ถ้ามีแล้ว → redirect กลับพร้อมแจ้งเตือน
         return redirect()
             ->route('factfinding.edit', $validated['client_id'])
-            ->with('error', 'มีข้อมูล Factfinding ของผู้รับรายนี้อยู่แล้ว กรุณาแก้ไขแทนการบันทึกใหม่');
+            ->with('error', 'มีข้อมูลของผู้รับรายนี้อยู่แล้ว ท่านสามารถแก้ไขแทนการบันทึกใหม่ได้');
     }
 
     // ✅ บันทึก factfinding
@@ -162,7 +164,7 @@ $documents = \App\Models\FactFindingDocument::with('document')
     ->get();
 
      $notification = [
-                'message' => 'Recipient Deleted Successfully',
+                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
                 'alert-type' => 'success'
             ];
 
@@ -171,7 +173,7 @@ return view('frontend.client.factfinding.factfinding_add', [
     'factFinding' => $factFinding,
     'documents'   => $documents,   // ตอน loop ใน blade ใช้ $doc->document->ชื่อฟิลด์
     'client'  => $client,
-]);
+])->with($notification);
 
 }
 
@@ -223,7 +225,12 @@ return view('frontend.client.factfinding.factfinding_add', [
     'hygiene'     => 'nullable|string',
     'oral_health' => 'nullable|string',
     'injury'      => 'nullable|string',
-    'case_history' => ['required', 'regex:/^[ก-๙a-zA-Z\s]+$/u'],
+   
+    'case_history' => [
+    'required',
+    'regex:/^(?=.*[ก-๙a-zA-Z])[ก-๙a-zA-Z0-9\s]+$/u'
+    ],
+
     'recorder'    => 'required|string',
 
     'active'      => 'nullable|boolean',
@@ -240,12 +247,8 @@ return view('frontend.client.factfinding.factfinding_add', [
     'fact_name.string'   => 'ชื่อผู้นำส่ง ต้องเป็นตัวอักษร',
     'fact_name.max'      => 'ชื่อผู้นำส่ง ต้องไม่เกิน 255 ตัวอักษร',
 
-
-
     'case_history.required' => 'กรุณากรอก ประวัติความเป็นมา',
-    'case_history.regex'    => 'ประวัติความเป็นมา ต้องเป็นตัวอักษรเท่านั้น',
-
-
+    'case_history.regex'    => 'ประวัติความเป็นมา ต้องไม่เป็นตัวเลขอย่างเดียว',
 
     'recorder.required' => 'กรุณากรอก ผู้บันทึก',
 
@@ -339,7 +342,4 @@ return view('frontend.client.factfinding.factfinding_add', [
             ->route('factfinding.edit', $clientId) // หรือเปลี่ยนเป็น edit/index ตามที่เหมาะสม
             ->with($notification);
     }
-
-
-
 }
