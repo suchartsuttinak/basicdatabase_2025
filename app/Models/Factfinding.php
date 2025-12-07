@@ -14,4 +14,9 @@ class Factfinding extends Model
         return $this->belongsToMany(Document::class, 'factfinding_documents', 'factfinding_id', 'document_id')
                     ->withTimestamps();
     }
+
+      public function marital()   
+      { return $this->belongsTo(Marital::class, 'marital_id'); 
+    
+    }
 }

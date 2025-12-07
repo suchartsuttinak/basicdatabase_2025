@@ -8,23 +8,28 @@ use App\Models\Factfinding;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\FactFindingDocument;
+use App\Models\Marital;
+
 
 
 class FactfindingController extends Controller
 {
     public function FactfindingAdd($client_id)
     {
+        $maritals = Marital::all();
         $documents = Document::all();
         $client = Client::findOrFail($client_id);
 
-        return view('frontend.client.factfinding.factfinding_add', compact('client', 'documents'));
+        return view('frontend.client.factfinding.factfinding_add', compact('client', 'documents', 'maritals'));
     }
 
     public function FactfindingStore(Request $request)
 {
+
    $validated = $request->validate([
     'client_id'   => 'required|integer',
     'date' => 'required|date',
+    'receive_date' => 'required|date',
     'fact_name'   => 'required|string|max:255',
 
     'appearance'  => 'nullable|string',
@@ -45,6 +50,18 @@ class FactfindingController extends Controller
     'oral_health' => 'nullable|string',
     'injury'      => 'nullable|string',
 
+    'marital_id' => 'required|integer',
+    'relation_parent'  => 'nullable|string',
+    'relation_family'  => 'nullable|string',
+    'relation_child'  => 'nullable|string',
+    'ex_conditions'  => 'nullable|string',
+    'in_conditions' => 'nullable|string',
+    'environment' => 'nullable|string',
+    'cause_problem'=> 'nullable|string',
+    'need'   => 'nullable|string',
+    'information' => 'nullable|string',
+    'diagnosis' => 'nullable|string',
+   
    'case_history' => [
     'required',
     'regex:/^(?=.*[ก-๙a-zA-Z])[ก-๙a-zA-Z0-9\s]+$/u'
@@ -61,6 +78,9 @@ class FactfindingController extends Controller
     'date.required' => 'กรุณากรอก วันที่บันทึก',
     'date.date'     => 'วันที่บันทึก ต้องเป็นรูปแบบวันที่ที่ถูกต้อง',
 
+    'receive_date.required' => 'กรุณากรอก วันที่บันทึก',
+    'receive_date.date'     => 'วันที่บันทึก ต้องเป็นรูปแบบวันที่ที่ถูกต้อง',
+
     'fact_name.required' => 'กรุณากรอก ชื่อข้อเท็จจริง',
 
     'case_history.required' => 'กรุณากรอก ประวัติความเป็นมา',
@@ -75,12 +95,14 @@ class FactfindingController extends Controller
     'weight.numeric'  => 'น้ำหนัก ต้องเป็นตัวเลข',
     'height.required' => 'กรุณากรอก ส่วนสูง',
     'height.numeric'  => 'ส่วนสูง ต้องเป็นตัวเลข',
+    'marital_id.required' => 'กรุณาเลือก สถานภาพสมรส',
 
 ], [
     // custom attributes ภาษาไทย มีไว้เพื่อแสดงชื่อฟิลด์เป็นภาษาไทยในข้อความ error → ทำให้ผู้ใช้เข้าใจง่ายขึ้น
 
     'client_id'   => 'รหัสลูกค้า',
     'date'        => 'วันที่บันทึก',
+    'receive_date'        => 'วันที่รับเข้า',
     'fact_name'   => 'ชื่อข้อเท็จจริง',
     'appearance'  => 'รูปลักษณ์',
     'skin'        => 'สีผิว',
@@ -96,6 +118,17 @@ class FactfindingController extends Controller
     'hygiene'     => 'สุขอนามัย',
     'oral_health' => 'สุขภาพช่องปาก',
     'injury'      => 'การบาดเจ็บ',
+    'marital_id'  => 'สถานะสมรส',
+    'relation_parent'  => 'ความสัมพันธ์กับบิดา',
+    'relation_family'  => 'ความสัมพันธ์กับครอบครัว',
+    'relation_child'  => 'ความสัมพันธ์กับเด็ก',
+    'ex_conditions'   => 'สภาพที่อยู่อาศัยภายนอก',
+    'in_conditions'   => 'สภาพที่อยู่อาศัยภายใน',
+    'environment'   => 'สภาพแวดล้อม',
+    'cause_problem'=> 'สาเหตุของปัญหา',
+    'need'   => 'ความต้องการ',
+    'information'   => 'ข้อเท็จจริงอื่น ๆ',
+    'diagnosis'   => 'การวินิจฉัยปัญหา',
     'case_history'=> 'ประวัติกรณี',
     'recorder'    => 'ผู้บันทึก',
     'active'      => 'สถานะ',
@@ -119,6 +152,7 @@ class FactfindingController extends Controller
     $payload = [
         'client_id'   => (int)$validated['client_id'],
         'date'        => $validated['date'],
+        'receive_date'        => $validated['receive_date'],
         'fact_name'   => $validated['fact_name'],
         'appearance'  => $validated['appearance'] ?? 'ไม่ระบุ',
         'skin'        => $validated['skin'] ?? 'ไม่ระบุ',
@@ -134,6 +168,19 @@ class FactfindingController extends Controller
         'hygiene'     => $validated['hygiene'] ?? 'ไม่ระบุ',
         'oral_health' => $validated['oral_health'] ?? 'ไม่ระบุ',
         'injury'      => $validated['injury'] ?? 'ไม่ระบุ',
+
+        'marital_id' => $validated['marital_id'] ?? 0,
+        'relation_parent' => $validated['relation_parent'] ?? '',
+        'relation_family' => $validated['relation_family'] ?? '',
+        'relation_child' => $validated['relation_child'] ?? '',
+        'ex_conditions' => $validated['ex_conditions'] ?? '',
+        'in_conditions' => $validated['in_conditions'] ?? '',
+        'environment' => $validated['environment'] ?? '',
+        'cause_problem'=> $validated['cause_problem'] ?? '',
+        'need'   => $validated['need'] ?? '',
+        'information' => $validated['information'] ?? '',
+        'diagnosis' => $validated['diagnosis'] ?? '',
+
         'case_history'=> $validated['case_history'] ?? '',
         'recorder'    => $validated['recorder'] ?? '',
         'active'      => $validated['active'] ?? 1,
@@ -168,11 +215,13 @@ $documents = \App\Models\FactFindingDocument::with('document')
                 'alert-type' => 'success'
             ];
 
+$maritals = Marital::all();
 
 return view('frontend.client.factfinding.factfinding_add', [
     'factFinding' => $factFinding,
     'documents'   => $documents,   // ตอน loop ใน blade ใช้ $doc->document->ชื่อฟิลด์
     'client'  => $client,
+    'maritals' => $maritals
 ])->with($notification);
 
 }
@@ -187,6 +236,7 @@ return view('frontend.client.factfinding.factfinding_add', [
 
     // 3. ดึงเอกสารทั้งหมด
     $documents = Document::all();
+    $maritals = Marital::all();
 
     // 4. ดึงเอกสารที่เลือกไว้แล้ว (pivot relation)
     // ✅ ระบุ table ให้ชัดเจนเพื่อแก้ ambiguous column
@@ -197,15 +247,17 @@ return view('frontend.client.factfinding.factfinding_add', [
         'client',
         'factFinding',
         'documents',
-        'selectedDocs'
+        'selectedDocs',
+        'maritals'
     ));
   }
 
   public function FactfindingUpdate(Request $request, $id)
   {
-    $validated = $request->validate([
+   $validated = $request->validate([
     'client_id'   => 'required|integer',
     'date' => 'required|date',
+    'receive_date' => 'required|date',
     'fact_name'   => 'required|string|max:255',
 
     'appearance'  => 'nullable|string',
@@ -225,14 +277,25 @@ return view('frontend.client.factfinding.factfinding_add', [
     'hygiene'     => 'nullable|string',
     'oral_health' => 'nullable|string',
     'injury'      => 'nullable|string',
+
+    'marital_id' => 'required|integer',
+    'relation_parent'  => 'nullable|string',
+    'relation_family'  => 'nullable|string',
+    'relation_child'  => 'nullable|string',
+    'ex_conditions'  => 'nullable|string',
+    'in_conditions' => 'nullable|string',
+    'environment' => 'nullable|string',
+    'cause_problem'=> 'nullable|string',
+    'need'   => 'nullable|string',
+    'information' => 'nullable|string',
+    'diagnosis' => 'nullable|string',
    
-    'case_history' => [
+   'case_history' => [
     'required',
     'regex:/^(?=.*[ก-๙a-zA-Z])[ก-๙a-zA-Z0-9\s]+$/u'
     ],
 
     'recorder'    => 'required|string',
-
     'active'      => 'nullable|boolean',
 
     'documents'   => 'nullable|array',
@@ -243,9 +306,10 @@ return view('frontend.client.factfinding.factfinding_add', [
     'date.required' => 'กรุณากรอก วันที่บันทึก',
     'date.date'     => 'วันที่บันทึก ต้องเป็นรูปแบบวันที่ที่ถูกต้อง',
 
-    'fact_name.required' => 'กรุณากรอก ชื่อผู้นำส่ง',
-    'fact_name.string'   => 'ชื่อผู้นำส่ง ต้องเป็นตัวอักษร',
-    'fact_name.max'      => 'ชื่อผู้นำส่ง ต้องไม่เกิน 255 ตัวอักษร',
+    'receive_date.required' => 'กรุณากรอก วันที่บันทึก',
+    'receive_date.date'     => 'วันที่บันทึก ต้องเป็นรูปแบบวันที่ที่ถูกต้อง',
+
+    'fact_name.required' => 'กรุณากรอก ชื่อข้อเท็จจริง',
 
     'case_history.required' => 'กรุณากรอก ประวัติความเป็นมา',
     'case_history.regex'    => 'ประวัติความเป็นมา ต้องไม่เป็นตัวเลขอย่างเดียว',
@@ -259,12 +323,14 @@ return view('frontend.client.factfinding.factfinding_add', [
     'weight.numeric'  => 'น้ำหนัก ต้องเป็นตัวเลข',
     'height.required' => 'กรุณากรอก ส่วนสูง',
     'height.numeric'  => 'ส่วนสูง ต้องเป็นตัวเลข',
+    'marital_id.required' => 'กรุณาเลือก สถานภาพสมรส',
 
 ], [
     // custom attributes ภาษาไทย มีไว้เพื่อแสดงชื่อฟิลด์เป็นภาษาไทยในข้อความ error → ทำให้ผู้ใช้เข้าใจง่ายขึ้น
 
     'client_id'   => 'รหัสลูกค้า',
     'date'        => 'วันที่บันทึก',
+    'receive_date'        => 'วันที่รับเข้า',
     'fact_name'   => 'ชื่อข้อเท็จจริง',
     'appearance'  => 'รูปลักษณ์',
     'skin'        => 'สีผิว',
@@ -280,12 +346,22 @@ return view('frontend.client.factfinding.factfinding_add', [
     'hygiene'     => 'สุขอนามัย',
     'oral_health' => 'สุขภาพช่องปาก',
     'injury'      => 'การบาดเจ็บ',
+    'marital_id'  => 'สถานะสมรส',
+    'relation_parent'  => 'ความสัมพันธ์กับบิดา',
+    'relation_family'  => 'ความสัมพันธ์กับครอบครัว',
+    'relation_child'  => 'ความสัมพันธ์กับเด็ก',
+    'ex_conditions'   => 'สภาพที่อยู่อาศัยภายนอก',
+    'in_conditions'   => 'สภาพที่อยู่อาศัยภายใน',
+    'environment'   => 'สภาพแวดล้อม',
+    'cause_problem'=> 'สาเหตุของปัญหา',
+    'need'   => 'ความต้องการ',
+    'information'   => 'ข้อเท็จจริงอื่น ๆ',
+    'diagnosis'   => 'การวินิจฉัยปัญหา',
     'case_history'=> 'ประวัติกรณี',
     'recorder'    => 'ผู้บันทึก',
     'active'      => 'สถานะ',
     'documents'   => 'เอกสาร',
 ]);
-    //End validation rules thai
     //End validation rules thai
 
     $clientId = (int) $validated['client_id'];
@@ -296,6 +372,7 @@ return view('frontend.client.factfinding.factfinding_add', [
     $payload = [
         'client_id'   => (int)$validated['client_id'],
         'date'        => $validated['date'],
+        'receive_date'        => $validated['receive_date'],
         'fact_name'   => $validated['fact_name'],
         'appearance'  => $validated['appearance'] ?? 'ไม่ระบุ',
         'skin'        => $validated['skin'] ?? 'ไม่ระบุ',
@@ -303,7 +380,7 @@ return view('frontend.client.factfinding.factfinding_add', [
         'disability'  => $validated['disability'] ?? 'ไม่ระบุ',
         'evidence'    => $validated['evidence'] ?? '',
         'sick'        => $validated['sick'] ?? 0,
-        'sick_detail' => $validated['sick_detail'] ?? '',
+        'sick_detail' => $validated['sick_detail'] ?? 'ไม่ระบุ',
         'treatment'   => $validated['treatment'] ?? '',
         'hospital'    => $validated['hospital'] ?? '',
         'weight'      => isset($validated['weight']) ? (float)$validated['weight'] : 0,
@@ -311,6 +388,19 @@ return view('frontend.client.factfinding.factfinding_add', [
         'hygiene'     => $validated['hygiene'] ?? 'ไม่ระบุ',
         'oral_health' => $validated['oral_health'] ?? 'ไม่ระบุ',
         'injury'      => $validated['injury'] ?? 'ไม่ระบุ',
+
+        'marital_id' => $validated['marital_id'] ?? 0,
+        'relation_parent' => $validated['relation_parent'] ?? '',
+        'relation_family' => $validated['relation_family'] ?? '',
+        'relation_child' => $validated['relation_child'] ?? '',
+        'ex_conditions' => $validated['ex_conditions'] ?? '',
+        'in_conditions' => $validated['in_conditions'] ?? '',
+        'environment' => $validated['environment'] ?? '',
+        'cause_problem'=> $validated['cause_problem'] ?? '',
+        'need'   => $validated['need'] ?? '',
+        'information' => $validated['information'] ?? '',
+        'diagnosis' => $validated['diagnosis'] ?? '',
+
         'case_history'=> $validated['case_history'] ?? '',
         'recorder'    => $validated['recorder'] ?? '',
         'active'      => $validated['active'] ?? 1,

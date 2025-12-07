@@ -29,6 +29,15 @@ return new class extends Migration
             $table->string('hygiene')->nullable()->comment('ความสะอาด');
             $table->string('oral_health')->nullable()->comment('สุขภาพช่องปาก');
             $table->string('injury')->nullable()->comment('การบาดเจ็บ/บาดแผล');
+            $table->unsignedBigInteger('marital_id'); // สถานะภาพการสมรส
+            $table->text('relation_parent')->nullable()->comment('ความสัมพันธ์ระหว่างบิดามารดา');
+            $table->text('relation_family')->nullable()->comment('ความสัมพันธ์ระหว่างบุคคลในครอบครัว');
+            $table->text('relation_child')->nullable()->comment('ความสัมพันธ์ระหว่างเด็กกับบุคคลในครอบครัว');
+            $table->text('ex_conditions')->nullable()->comment('สภาพที่อยู่อาศัยภายนอก');
+            $table->text('in_conditions')->nullable()->comment('สภาพที่อยู่อาศัยภายใน');
+            $table->text('environment')->nullable()->comment('สภาพแวดล้อม');
+            $table->text('information')->nullable()->comment('ข้อเท็จจริงอื่น');
+            $table->text('diagnosis')->nullable()->comment('การวินิจฉัยปัญหา');
             $table->text('case_history')->nullable()->comment('ประวัติความเป็นมา');
             $table->string('recorder')->nullable()->comment('ผู้บันทึก');
             // One-to-One: recipient_id ต้องไม่ซ้ำ
