@@ -56,10 +56,10 @@
                     <div class="collapse" id="sidebarAuth">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('institution.all') }}" class="tp-link">รายการสถานศึกษา</a>
+                                <a href="{{ route('institution.all') }}" class="tp-link">ชื่อสถานศึกษา</a>
                             </li>
                             <li>
-                                <a href="auth-register.html" class="tp-link">Register</a>
+                                <a href="{{ route('subject.show') }}" class="tp-link">วิชาเรียน</a>
                             </li>
                             <li>
                                 <a href="auth-recoverpw.html" class="tp-link">Recover Password</a>

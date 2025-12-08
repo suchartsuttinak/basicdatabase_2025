@@ -4,10 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\backend\ClientController;
-use App\Http\Controllers\backend\InstitutionController;
-use App\Http\Controllers\ClientAdmin\AdminClientController;
-use App\Http\Controllers\Frontend\FactfindingController;
+use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\FamilyController;
+use App\Http\Controllers\backend\InstitutionController;
+use App\Http\Controllers\Frontend\FactfindingController;
+use App\Http\Controllers\ClientAdmin\AdminClientController;
+use App\Http\Controllers\Frontend\EducationRecordController;
 
 
 
@@ -45,6 +47,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/update/institution', [InstitutionController::class, 'UpdateInstitution'])->name('institution.update');
     Route::get('/delete/institution/{id}', [InstitutionController::class, 'DeleteInstitution'])->name('institution.delete');
 });
+
+// Subject Modal Route All
+Route::middleware('auth')->group(function () {
+    Route::get('/subject', [SubjectController::class, 'SubjectShow'])->name('subject.show');
+    Route::post('/store/subject', [SubjectController::class, 'SubjectStore'])->name('subject.store');
+    Route::get('/edit/subject/{id}', [SubjectController::class, 'EditSubject']);
+    Route::post('/update/subject', [SubjectController::class, 'UpdateSubject'])->name('subject.update');
+    Route::get('/delete/subject/{id}', [SubjectController::class, 'DeleteSubject'])->name('subject.delete');
+});
+
 
 
 // Client Route All
@@ -101,3 +113,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-zipcode/{subdistrict_id}', [FamilyController::class, 'getZipcode']);
 
 });
+
+Route::middleware('auth')->group(function () {
+    // เปิดฟอร์ม (GET)
+    Route::get('/education_record/add/{client_id}', 
+        [EducationRecordController::class, 'EducationRecordAdd']
+    )->name('education_record.add');  
+
+    // บันทึกข้อมูล (POST)
+    Route::post('/education_record/store', 
+        [EducationRecordController::class, 'EducationRecordStore']
+    )->name('education_record.store');  
+});
+
+
+
