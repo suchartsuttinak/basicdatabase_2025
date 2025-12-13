@@ -24,28 +24,23 @@
     <link href="{{ asset('backend/assets/libs/datatables.net-keytable-bs5/css/keyTable.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-select-bs5/css/select.bootstrap5.min.css') }}" rel="stylesheet" />
+
+    <!-- ✅ Datepicker CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 </head>
 
 <body data-menu-color="light" data-sidebar="default">
 
     <!-- Begin page -->
     <div id="app-layout">
-
-        <!-- Topbar -->
         @include('admin_client.body.client_header')
-
-        <!-- Sidebar -->
         @include('admin_client.body.client_sidebar')
 
-        <!-- Content -->
         <div class="content-page">
             @yield('content')
-
-            <!-- Footer -->
             @include('admin_client.body.client_footer')
         </div>
     </div>
-    <!-- END wrapper -->
 
     <!-- Vendor JS -->
     <script src="{{ asset('backend/assets/libs/jquery/jquery.min.js') }}"></script>
@@ -79,23 +74,54 @@
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+    <!-- ✅ Datepicker JS + Thai locale -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
+
+    <!-- ✅ Init Datepicker Thai -->
+ <script>
+$(function() {
+    $('.datepicker-th').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'th',
+        thaiyear: true,
+        autoclose: true,
+        todayHighlight: true
+    }).on('show', function() {
+        setTimeout(function() {
+            // เปลี่ยนหัวปฏิทินให้เป็น พ.ศ.
+            $('.datepicker-switch').each(function() {
+                const text = $(this).text();
+                const match = text.match(/(\d{4})$/);
+                if (match) {
+                    const year = parseInt(match[1]);
+                    if (year < 2500) {
+                        $(this).text(text.replace(year, year + 543));
+                    }
+                }
+            });
+
+            // เปลี่ยนรายการปีให้เป็น พ.ศ.
+            $('.datepicker-years .year').each(function() {
+                const year = parseInt($(this).text());
+                if (year < 2500) {
+                    $(this).text(year + 543);
+                }
+            });
+        }, 10);
+    });
+});
+</script>
+
     <!-- Toastr Alert -->
     <script>
         @if(Session::has('message'))
             var type = "{{ Session::get('alert-type','info') }}";
             switch(type){
-                case 'info':
-                    toastr.info("{{ Session::get('message') }}");
-                    break;
-                case 'success':
-                    toastr.success("{{ Session::get('message') }}");
-                    break;
-                case 'warning':
-                    toastr.warning("{{ Session::get('message') }}");
-                    break;
-                case 'error':
-                    toastr.error("{{ Session::get('message') }}");
-                    break;
+                case 'info': toastr.info("{{ Session::get('message') }}"); break;
+                case 'success': toastr.success("{{ Session::get('message') }}"); break;
+                case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
+                case 'error': toastr.error("{{ Session::get('message') }}"); break;
             }
         @endif
     </script>

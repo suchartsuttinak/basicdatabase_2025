@@ -49,23 +49,34 @@
     
 </style>
 
-
+@if(session('info'))
+    <div class="alert alert-info">
+        {{ session('info') }}
+    </div>
+@endif
 
 @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
 @endif
 
 @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
 @endif
 
 
    <div class="container-fluid py-4">
     <!-- เปิดฟอร์ม -->
-    <form action="{{ route('factfinding.update', $client->id) }}" method="POST" class="row g-3">
-        @csrf
-          <!-- ส่ง id ไปด้วย -->
-            <input type="hidden" name="client_id" value="{{$client->id}}">
+    <form action="{{ route('factfinding.update', $factFinding->id) }}" method="POST" class="row g-3">
+    @csrf
+    <input type="hidden" name="client_id" value="{{ $client->id }}">
+
+
+
+
         <div class="row">
             <!-- Card ฝั่งซ้าย -->
             <div class="col-lg-6 col-xl-6 mb-4">

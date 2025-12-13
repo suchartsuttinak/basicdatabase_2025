@@ -1,5 +1,5 @@
-@extends('admin.admin_master')
-@section('admin')
+@extends('admin_client.admin_client')
+@section('content')
 
 <style>
     /* ปรับ input และ select ให้มีพื้นหลังสีเทาอ่อน และตัวอักษรสีดำ */

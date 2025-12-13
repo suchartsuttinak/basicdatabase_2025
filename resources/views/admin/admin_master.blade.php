@@ -24,6 +24,9 @@
     <link href="{{ asset('backend/assets/libs/datatables.net-keytable-bs5/css/keyTable.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-select-bs5/css/select.bootstrap5.min.css') }}" rel="stylesheet" />
+
+    <!-- ✅ Datepicker CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 </head>
 
 <body data-menu-color="light" data-sidebar="default">
@@ -79,23 +82,71 @@
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+    <!-- ✅ Datepicker JS + Thai locale -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
+
+   <!-- ✅ Init Datepicker Thai + แปลงปี พ.ศ. ในช่อง input -->
+<script>
+$(function() {
+    $('.datepicker-th').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'th',
+        thaiyear: true,
+        autoclose: true,
+        todayHighlight: true
+    }).on('show', function() {
+        setTimeout(function() {
+            // บังคับให้ label ปีเป็น พ.ศ.
+            $('.datepicker-switch').each(function() {
+                const text = $(this).text();
+                const match = text.match(/(\d{4})$/);
+                if (match) {
+                    const year = parseInt(match[1]);
+                    if (year < 2500) {
+                        $(this).text(text.replace(year, year + 543));
+                    }
+                }
+            });
+            $('.datepicker-years .year').each(function() {
+                const year = parseInt($(this).text());
+                if (year < 2500) {
+                    $(this).text(year + 543);
+                }
+            });
+        }, 10);
+    }).on('changeDate', function(e) {
+        let date = e.date;
+        if (date) {
+            let day = ('0' + date.getDate()).slice(-2);
+            let month = ('0' + (date.getMonth() + 1)).slice(-2);
+            let yearBE = date.getFullYear() + 543;
+
+            // ✅ แสดงปี พ.ศ. ในช่อง input ที่ผู้ใช้เห็น
+            let displayDate = `${day}/${month}/${yearBE}`;
+            $(this).val(displayDate);
+
+            // ✅ แปลงกลับเป็นปี ค.ศ. สำหรับ hidden input
+            let yearAD = date.getFullYear(); // ใช้ค่าเดิมจาก JS Date (ค.ศ.)
+            let isoDate = `${yearAD}-${month}-${day}`;
+
+            // hidden input ต้องตั้ง id ให้ตรง เช่น birth_date_display → birth_date
+            let hiddenInputId = $(this).attr('id').replace('_display', '');
+            $('#' + hiddenInputId).val(isoDate);
+        }
+    });
+});
+</script>
+
     <!-- Toastr Alert -->
     <script>
         @if(Session::has('message'))
             var type = "{{ Session::get('alert-type','info') }}";
             switch(type){
-                case 'info':
-                    toastr.info("{{ Session::get('message') }}");
-                    break;
-                case 'success':
-                    toastr.success("{{ Session::get('message') }}");
-                    break;
-                case 'warning':
-                    toastr.warning("{{ Session::get('message') }}");
-                    break;
-                case 'error':
-                    toastr.error("{{ Session::get('message') }}");
-                    break;
+                case 'info': toastr.info("{{ Session::get('message') }}"); break;
+                case 'success': toastr.success("{{ Session::get('message') }}"); break;
+                case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
+                case 'error': toastr.error("{{ Session::get('message') }}"); break;
             }
         @endif
     </script>

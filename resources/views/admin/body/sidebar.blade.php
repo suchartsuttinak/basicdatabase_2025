@@ -107,44 +107,7 @@
                     </div>
                 </li>
 
-                <li>
-                    <a href="#sidebarExpages" data-bs-toggle="collapse">
-                        <i data-feather="file-text"></i>
-                        <span> Utility </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarExpages">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="pages-starter.html" class="tp-link">Starter</a>
-                            </li>
-                            <li>
-                                <a href="pages-profile.html" class="tp-link">Profile</a>
-                            </li>
-                            <li>
-                                <a href="pages-pricing.html" class="tp-link">Pricing</a>
-                            </li>
-                            <li>
-                                <a href="pages-timeline.html" class="tp-link">Timeline</a>
-                            </li>
-                            <li>
-                                <a href="pages-invoice.html" class="tp-link">Invoice</a>
-                            </li>
-                            <li>
-                                <a href="pages-faqs.html" class="tp-link">FAQs</a>
-                            </li>
-                            <li>
-                                <a href="pages-gallery.html" class="tp-link">Gallery</a>
-                            </li>
-                            <li>
-                                <a href="pages-maintenance.html" class="tp-link">Maintenance</a>
-                            </li>
-                            <li>
-                                <a href="pages-coming-soon.html" class="tp-link">Coming Soon</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+               
 
                 <li>
                     <a href="calendar.html" class="tp-link">
@@ -155,83 +118,7 @@
 
                 <li class="menu-title mt-2">General</li>
 
-                <li>
-                    <a href="#sidebarBaseui" data-bs-toggle="collapse">
-                        <i data-feather="package"></i>
-                        <span> Components </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarBaseui">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="ui-accordions.html" class="tp-link">Accordions</a>
-                            </li>
-                            <li>
-                                <a href="ui-alerts.html" class="tp-link">Alerts</a>
-                            </li>
-                            <li>
-                                <a href="ui-badges.html" class="tp-link">Badges</a>
-                            </li>
-                            <li>
-                                <a href="ui-breadcrumb.html" class="tp-link">Breadcrumb</a>
-                            </li>
-                            <li>
-                                <a href="ui-buttons.html" class="tp-link">Buttons</a>
-                            </li>
-                            <li>
-                                <a href="ui-cards.html" class="tp-link">Cards</a>
-                            </li>
-                            <li>
-                                <a href="ui-collapse.html" class="tp-link">Collapse</a>
-                            </li>
-                            <li>
-                                <a href="ui-dropdowns.html" class="tp-link">Dropdowns</a>
-                            </li>
-                            <li>
-                                <a href="ui-video.html" class="tp-link">Embed Video</a>
-                            </li>
-                            <li>
-                                <a href="ui-grid.html" class="tp-link">Grid</a>
-                            </li>
-                            <li>
-                                <a href="ui-images.html" class="tp-link">Images</a>
-                            </li>
-                            <li>
-                                <a href="ui-list.html" class="tp-link">List Group</a>
-                            </li>
-                            <li>
-                                <a href="ui-modals.html" class="tp-link">Modals</a>
-                            </li>
-                            <li>
-                                <a href="ui-placeholders.html" class="tp-link">Placeholders</a>
-                            </li>
-                            <li>
-                                <a href="ui-pagination.html" class="tp-link">Pagination</a>
-                            </li>
-                            <li>
-                                <a href="ui-popovers.html" class="tp-link">Popovers</a>
-                            </li>
-                            <li>
-                                <a href="ui-progress.html" class="tp-link">Progress</a>
-                            </li>
-                            <li>
-                                <a href="ui-scrollspy.html" class="tp-link">Scrollspy</a>
-                            </li>
-                            <li>
-                                <a href="ui-spinners.html" class="tp-link">Spinners</a>
-                            </li>
-                            <li>
-                                <a href="ui-tabs.html" class="tp-link">Tabs</a>
-                            </li>
-                            <li>
-                                <a href="ui-tooltips.html" class="tp-link">Tooltips</a>
-                            </li>
-                            <li>
-                                <a href="ui-typography.html" class="tp-link">Typography</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+             
 
                 <li>
                     <a href="widgets.html" class="tp-link">
@@ -324,71 +211,7 @@
                     </div>
                 </li>
 
-                <li>
-                    <a href="#sidebarCharts" data-bs-toggle="collapse">
-                        <i data-feather="pie-chart"></i>
-                        <span> Apex Charts </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarCharts">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href='charts-line.html'>Line</a>
-                            </li>
-                            <li>
-                                <a href='charts-area.html'>Area</a>
-                            </li>
-                            <li>
-                                <a href='charts-column.html'>Column</a>
-                            </li>
-                            <li>
-                                <a href='charts-bar.html'>Bar</a>
-                            </li>
-                            <li>
-                                <a href='charts-mixed.html'>Mixed</a>
-                            </li>
-                            <li>
-                                <a href='charts-timeline.html'>Timeline</a>
-                            </li>
-                            <li>
-                                <a href='charts-rangearea.html'>Range Area</a>
-                            </li>
-                            <li>
-                                <a href='charts-funnel.html'>Funnel</a>
-                            </li>
-                            <li>
-                                <a href='charts-candlestick.html'>Candlestick</a>
-                            </li>
-                            <li>
-                                <a href='charts-boxplot.html'>Boxplot</a>
-                            </li>
-                            <li>
-                                <a href='charts-bubble.html'>Bubble</a>
-                            </li>
-                            <li>
-                                <a href='charts-scatter.html'>Scatter</a>
-                            </li>
-                            <li>
-                                <a href='charts-heatmap.html'>Heatmap</a>
-                            </li>
-                            <li>
-                                <a href='charts-treemap.html'>Treemap</a>
-                            </li>
-                            <li>
-                                <a href='charts-pie.html'>Pie</a>
-                            </li>
-                            <li>
-                                <a href='charts-radialbar.html'>Radialbar</a>
-                            </li>
-                            <li>
-                                <a href='charts-radar.html'>Radar</a>
-                            </li>
-                            <li>
-                                <a href='charts-polararea.html'>Polar</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+                
 
                 <li>
                     <a href="#sidebarMaps" data-bs-toggle="collapse">

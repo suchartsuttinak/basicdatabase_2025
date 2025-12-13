@@ -453,7 +453,7 @@
                                 </div>
 
                                 <div class="text-start">
-                                <button type="submit" class="btn btn-success">แก้ไขข้อมูล</button>
+                                <button type="submit" class="btn btn-success">บันทึกข้อมูล</button>
                                 </div>
                         </div>                      
                     </div>

@@ -11,15 +11,26 @@ class EducationRecord extends Model
     
     public function subjects()
 {
-    return $this->belongsToMany(Subject::class, 'education_record_subjects')
-                ->withPivot('score', 'grade')
+   return $this->belongsToMany(Subject::class, 'education_record_subjects')
+                ->withPivot('score','grade')
                 ->withTimestamps();
-}
 
- public function client() {
-        return $this->belongsTo(Client::class);
+}
+/**
+     * ความสัมพันธ์กับ client
+     */
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    /**
+     * ความสัมพันธ์กับ education (ระดับการศึกษา)
+     */
+    public function education() {
+        return $this->belongsTo(Education::class, 'education_id');
     }
 
 
-
 }
+

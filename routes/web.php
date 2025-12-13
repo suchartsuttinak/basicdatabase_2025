@@ -9,6 +9,7 @@ use App\Http\Controllers\Frontend\FamilyController;
 use App\Http\Controllers\backend\InstitutionController;
 use App\Http\Controllers\Frontend\FactfindingController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
+use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
 
 
@@ -91,8 +92,10 @@ Route::middleware('auth')->group(function () {
         ->name('factfinding.store');
 
     // แก้ไข factfinding
-        Route::get('/factfinding/edit/{client_id}', [FactfindingController::class, 'FactfindingEdit'])
-        ->name('factfinding.edit');
+       Route::get('/factfinding/edit/{factfinding_id}', [FactfindingController::class, 'FactfindingEdit'])
+    ->name('factfinding.edit');
+
+
 
     // บันทึก factfinding
    Route::post('/factfinding/update/{id}', [FactfindingController::class, 'FactfindingUpdate'])
@@ -114,6 +117,7 @@ Route::middleware('auth')->group(function () {
 
 });
 
+// Education Record Route All
 Route::middleware('auth')->group(function () {
     // เปิดฟอร์ม (GET)
     Route::get('/education_record/add/{client_id}', 
@@ -121,10 +125,37 @@ Route::middleware('auth')->group(function () {
     )->name('education_record.add');  
 
     // บันทึกข้อมูล (POST)
-    Route::post('/education_record/store', 
-        [EducationRecordController::class, 'EducationRecordStore']
-    )->name('education_record.store');  
+    Route::post('/education_record/store', [EducationRecordController::class, 'EducationRecordStore']
+        )->name('education_record.store');  
+
+    // แสดงข้อมูลการศึกษา (GET)
+    Route::get('/education_record/show/{client_id}', 
+        [EducationRecordController::class, 'EducationRecordShow']
+        )->name('education_record_show');
+
+    // แก้ไขข้อมูลการศึกษา (GET)
+    Route::get('/education_record/edit/{id}', 
+        [EducationRecordController::class, 'EducationRecordEdit']
+        )->name('education_record.edit');
+
+    // บันทึกข้อมูลการศึกษา (POST)
+    Route::post('/education_record/update/{id}', 
+        [EducationRecordController::class, 'EducationRecordUpdate']
+        )->name('education_record_update');
 });
+
+Route::middleware('auth')->group(function () {
+    // เปิดฟอร์ม (GET)
+    Route::get('/school_followup/add/{client_id}', 
+        [SchoolFollowupController::class, 'SchoolFollowupAdd']
+    )->name('school_followup.add');  
+
+    // บันทึกข้อมูล (POST)
+    Route::post('/school_followup/store', 
+        [SchoolFollowupController::class, 'SchoolFollowupStore']
+    )->name('school_followup.store');  // ✅ แก้ชื่อ route ให้ถูก
+});
+
 
 
 

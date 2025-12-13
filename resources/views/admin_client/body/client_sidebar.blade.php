@@ -93,13 +93,13 @@
                     <div class="collapse" id="sidebarError">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('education_record.add', $client->id) }}" class="tp-link">ประวัติการศึกษา</a>
+                                <a href="{{ route('education_record.add', $client->id) }}" class="tp-link">บันทึกผลการเรียน</a>
                             </li>
                             <li>
-                                <a href="error-500.html" class="tp-link">Error 500</a>
+                                <a href="{{ route('education_record_show', $client->id) }}" class="tp-link">แสดงผลการเรียน</a>
                             </li>
                             <li>
-                                <a href="error-503.html" class="tp-link">Error 503</a>
+                                <a href="{{ route('school_followup.add', $client->id) }}" class="tp-link">ติดตามการศึกษา</a>
                             </li>
                             <li>
                                 <a href="error-429.html" class="tp-link">Error 429</a>
