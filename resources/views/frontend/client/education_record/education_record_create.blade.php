@@ -23,21 +23,21 @@
             <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i> บันทึกผลการเรียน</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('education_record.store') }}" method="POST">
+            <form action="{{ route('education_record_store') }}" method="POST" novalidate>
                 @csrf
                 <input type="hidden" name="client_id" value="{{ $client->id }}">
 
-                <!-- ชื่อ-นามสกุลนักเรียน -->
+                <!-- นักเรียน + ระดับการศึกษา -->
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold">นักเรียน</label>
-                        <input type="text" class="form-control bg-light" 
+                        <input type="text" class="form-control bg-light"
                                value="{{ $client->full_name }}" readonly>
                     </div>
                     <div class="col-md-6">
                         <label for="education_id" class="form-label fw-bold">ระดับการศึกษา <span class="text-danger">*</span></label>
                         <select name="education_id" id="education_id"
-                                class="form-select @error('education_id') is-invalid @enderror">
+                                class="form-select @error('education_id') is-invalid @enderror" required>
                             <option value="">-- เลือกการศึกษา --</option>
                             @foreach ($educations as $item)
                                 <option value="{{ $item->id }}" {{ old('education_id') == $item->id ? 'selected' : '' }}>
@@ -55,39 +55,57 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="semester" class="form-label fw-bold">ภาคเรียน</label>
-                        <input type="text" name="semester" id="semester" class="form-control" placeholder="เช่น 1/2568" required>
+                        <input type="text"
+                               name="semester"
+                               id="semester"
+                               class="form-control @error('semester') is-invalid @enderror"
+                               placeholder="เช่น 1/2568"
+                               maxlength="10"
+                               value="{{ old('semester') }}"
+                               required>
+                        @error('semester')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
+
                     <div class="col-md-8">
                         <label for="school_name" class="form-label fw-bold">สถานศึกษา</label>
-                        <input type="text" name="school_name" id="school_name" class="form-control" required>
+                        <input type="text"
+                               name="school_name"
+                               id="school_name"
+                               class="form-control @error('school_name') is-invalid @enderror"
+                               value="{{ old('school_name') }}"
+                               required>
+                        @error('school_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
-                <!-- วันที่บันทึก -->   
-                   
-                          <div class="row mb-3">
+                <!-- วันที่บันทึก -->
+                <div class="row mb-3">
                     <div class="col-md-3">
-                            <label for="record_date" class="form-label fw-bold">วันที่บันทึก</label>
-                            <input type="date" 
-                                name="record_date" 
-                                id="record_date" 
-                                class="form-control @error('record_date') is-invalid @enderror"
-                                value="{{ old('record_date') }}"
-                                required>
-                            @error('record_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        <label for="record_date" class="form-label fw-bold">วันที่บันทึก</label>
+                        <input type="date"
+                               name="record_date"
+                               id="record_date"
+                               class="form-control @error('record_date') is-invalid @enderror"
+                               value="{{ old('record_date') }}"
+                               required>
+                        @error('record_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
-                                  
-                <!-- วิชา -->
-              <div id="subject-container" class="mb-3">
+
+                <!-- รายละเอียดวิชา -->
+                <div id="subject-container" class="mb-3">
                     <div class="border rounded p-3 bg-light subject-item">
                         <h6 class="fw-bold text-secondary mb-3">รายละเอียดวิชา</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">วิชา</label>
-                                <select name="subjects[0][subject_id]" class="form-select" required>
+                                <select name="subjects[0][subject_id]" class="form-select">
                                     <option value="">-- เลือกวิชา --</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}">{{ $subject->subject_name }}</option>
@@ -96,55 +114,68 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">คะแนน</label>
-                                <input type="number" name="subjects[0][score]" class="form-control" min="0" max="100" required>
+                                <input type="number" name="subjects[0][score]" class="form-control" min="0" max="100">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">เกรด</label>
                                 <select name="subjects[0][grade]" class="form-select">
                                     <option value="">-- เลือกเกรด --</option>
-                                    <option value="4">4</option>
-                                    <option value="3">3</option>
-                                    <option value="2">2</option>
-                                    <option value="1">1</option>
-                                    <option value="0">0</option>
+                                    <option value="4">4.00</option>
+                                    <option value="3.5">3.50</option>
+                                    <option value="3">3.00</option>
+                                    <option value="2.5">2.50</option>
+                                    <option value="2">2.00</option>
+                                    <option value="1.5">1.50</option>
+                                    <option value="1">1.00</option>
+                                    <option value="0">0.00</option>
                                 </select>
                             </div>
                             <div class="col-md-1 d-flex align-items-end justify-content-end">
-                                <button type="button" class="btn btn-outline-danger btn-sm remove-subject d-flex align-items-center gap-1">
-                                    <i class="bi bi-x-circle-fill"></i> <span>ลบ</span>
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-subject">
+                                    <i class="bi bi-x-circle-fill"></i> ลบ
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-
-              <!-- เกรดเฉลี่ย -->
-                    <div class="row mb-3">
-                        <div class="col-md-2 ms-auto">
-                            <label for="grade_average" class="form-label fw-bold">เกรดเฉลี่ย</label>
-                            <input type="number" step="0.01" name="grade_average" id="grade_average"
-                                class="form-control text-end @error('grade_average') is-invalid @enderror"
-                                value="{{ old('grade_average') }}">
-                            @error('grade_average')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                <!-- เกรดเฉลี่ย -->
+                <div class="row mb-3">
+                    <div class="col-md-2 ms-auto">
+                        <label for="grade_average" class="form-label fw-bold">เกรดเฉลี่ย</label>
+                        <input type="number" step="0.01" name="grade_average" id="grade_average"
+                               class="form-control text-end @error('grade_average') is-invalid @enderror"
+                               value="{{ old('grade_average') }}">
+                        @error('grade_average')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
+                </div>
 
-                    <!-- ปุ่ม -->
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button type="button" class="btn btn-outline-secondary" id="add-subject">
-                            <i class="bi bi-plus-circle me-1"></i> เพิ่มวิชา
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-save me-1"></i> บันทึกผล
-                        </button>
-                    </div>
+                <!-- ปุ่ม -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-secondary" id="add-subject">
+                        <i class="bi bi-plus-circle me-1"></i> เพิ่มวิชา
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> บันทึกผล
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
+
+
+<script>
+document.getElementById('semester').addEventListener('input', function() {
+    if (this.value.length > 5) {
+        this.classList.add('is-invalid');
+    } else {
+        this.classList.remove('is-invalid');
+    }
+});
+</script>
 {{-- ✅ Script สำหรับเพิ่มช่องวิชา --}}
 {{-- ✅ Script สำหรับเพิ่ม/ลบช่องวิชา --}}
 <script>
@@ -200,5 +231,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+
+<script>
+document.getElementById('semester').addEventListener('input', function() {
+    if (this.value.length < 6) {
+        this.classList.add('is-invalid');   // เปลี่ยน input เป็นสีแดง
+    } else {
+        this.classList.remove('is-invalid'); // กลับเป็นปกติ
+    }
+});
+</script>
+
+
 
 @endsection

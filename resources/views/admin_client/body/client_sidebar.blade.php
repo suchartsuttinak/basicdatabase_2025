@@ -93,7 +93,11 @@
                     <div class="collapse" id="sidebarError">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('education_record.add', $client->id) }}" class="tp-link">บันทึกผลการเรียน</a>
+                               <a href="{{ route('education_record_add', ['client_id' => $client->id]) }}" class="tp-link">
+    บันทึกผลการเรียน
+</a>
+
+
                             </li>
                             <li>
                                 <a href="{{ route('education_record_show', $client->id) }}" class="tp-link">แสดงผลการเรียน</a>

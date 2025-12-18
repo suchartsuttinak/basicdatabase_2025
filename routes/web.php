@@ -144,17 +144,47 @@ Route::middleware('auth')->group(function () {
         )->name('education_record_update');
 });
 
+
+
+
 Route::middleware('auth')->group(function () {
-    // เปิดฟอร์ม (GET)
+
+    // 🏫 บันทึกการติดตามโรงเรียน
     Route::get('/school_followup/add/{client_id}', 
         [SchoolFollowupController::class, 'SchoolFollowupAdd']
-    )->name('school_followup.add');  
+    )->name('school_followup.add');
 
-    // บันทึกข้อมูล (POST)
     Route::post('/school_followup/store', 
         [SchoolFollowupController::class, 'SchoolFollowupStore']
-    )->name('school_followup.store');  // ✅ แก้ชื่อ route ให้ถูก
-});
+    )->name('school_followup.store');
+
+
+    
+
+    // 📚 บันทึกผลการเรียน
+     // 📚 บันทึกผลการเรียน
+    Route::get('/education-record/add/{client_id}', 
+        [EducationRecordController::class, 'EducationRecordAdd']
+    )->name('education_record_add');
+
+    Route::post('/education-record/store', 
+        [EducationRecordController::class, 'EducationRecordStore']
+    )->name('education_record_store');
+
+    Route::get('/education-record/{client_id}', 
+        [EducationRecordController::class, 'EducationRecordShow']
+    )->name('education_record_show');
+
+    Route::get('/education-record/edit/{id}', 
+        [EducationRecordController::class, 'EducationRecordEdit']
+    )->name('education_record_edit');
+
+    Route::post('/education-record/update/{id}', 
+        [EducationRecordController::class, 'EducationRecordUpdate']
+    )->name('education_record_update');
+
+}); // ✅ ปิด group ให้ครบ
+
 
 
 
