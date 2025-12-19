@@ -11,17 +11,8 @@ class SchoolFollowup extends Model
 
     protected $table = 'school_followups';
 
- protected $fillable = [
-    'client_id',
-    'education_record_id',
-    'follow_date',
-    'teacher_name',
-    'tel',
-    'follow_type',
-    'result',
-    'remark',
-    'contact_name',
-    'follo_no', // ✅ เพิ่มตรงนี้
+ protected $guarded = [
+   
 ];
 
     // ความสัมพันธ์

@@ -146,7 +146,6 @@ Route::middleware('auth')->group(function () {
 
 
 
-
  // 🏫 บันทึกการติดตามโรงเรียน
     Route::prefix('school_followup')->group(function () {
         Route::get('/add/{client_id}', 
@@ -175,6 +174,7 @@ Route::middleware('auth')->group(function () {
     });
 
 
+    
     // 📚 บันทึกผลการเรียน
     Route::prefix('education-record')->group(function () {
         Route::get('/add/{client_id}', 
