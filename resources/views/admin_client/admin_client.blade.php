@@ -79,39 +79,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
 
     <!-- ✅ Init Datepicker Thai -->
- <script>
-$(function() {
-    $('.datepicker-th').datepicker({
-        format: 'dd/mm/yyyy',
-        language: 'th',
-        thaiyear: true,
-        autoclose: true,
-        todayHighlight: true
-    }).on('show', function() {
-        setTimeout(function() {
-            // เปลี่ยนหัวปฏิทินให้เป็น พ.ศ.
-            $('.datepicker-switch').each(function() {
-                const text = $(this).text();
-                const match = text.match(/(\d{4})$/);
-                if (match) {
-                    const year = parseInt(match[1]);
-                    if (year < 2500) {
-                        $(this).text(text.replace(year, year + 543));
+    <script>
+    $(function() {
+        $('.datepicker-th').datepicker({
+            format: 'dd/mm/yyyy',
+            language: 'th',
+            thaiyear: true,
+            autoclose: true,
+            todayHighlight: true
+        }).on('show', function() {
+            setTimeout(function() {
+                // เปลี่ยนหัวปฏิทินให้เป็น พ.ศ.
+                $('.datepicker-switch').each(function() {
+                    const text = $(this).text();
+                    const match = text.match(/(\d{4})$/);
+                    if (match) {
+                        const year = parseInt(match[1]);
+                        if (year < 2500) {
+                            $(this).text(text.replace(year, year + 543));
+                        }
                     }
-                }
-            });
+                });
 
-            // เปลี่ยนรายการปีให้เป็น พ.ศ.
-            $('.datepicker-years .year').each(function() {
-                const year = parseInt($(this).text());
-                if (year < 2500) {
-                    $(this).text(year + 543);
-                }
-            });
-        }, 10);
+                // เปลี่ยนรายการปีให้เป็น พ.ศ.
+                $('.datepicker-years .year').each(function() {
+                    const year = parseInt($(this).text());
+                    if (year < 2500) {
+                        $(this).text(year + 543);
+                    }
+                });
+            }, 10);
+        });
     });
-});
-</script>
+    </script>
 
     <!-- Toastr Alert -->
     <script>
@@ -125,5 +125,9 @@ $(function() {
             }
         @endif
     </script>
+
+    <!-- ✅ จุดสำคัญ: ให้ Blade ลูกสามารถ push script ได้ -->
+    @stack('scripts')
+
 </body>
 </html>

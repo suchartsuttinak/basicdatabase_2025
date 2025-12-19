@@ -147,45 +147,58 @@ Route::middleware('auth')->group(function () {
 
 
 
-Route::middleware('auth')->group(function () {
+ // 🏫 บันทึกการติดตามโรงเรียน
+    Route::prefix('school_followup')->group(function () {
+        Route::get('/add/{client_id}', 
+            [SchoolFollowupController::class, 'SchoolFollowupAdd']
+        )->name('school_followup_add');
 
-    // 🏫 บันทึกการติดตามโรงเรียน
-    Route::get('/school_followup/add/{client_id}', 
-        [SchoolFollowupController::class, 'SchoolFollowupAdd']
-    )->name('school_followup.add');
+        Route::post('/store', 
+            [SchoolFollowupController::class, 'SchoolFollowupStore']
+        )->name('school_followup_store');
 
-    Route::post('/school_followup/store', 
-        [SchoolFollowupController::class, 'SchoolFollowupStore']
-    )->name('school_followup.store');
+        Route::get('/{client_id}', 
+            [SchoolFollowupController::class, 'SchoolFollowupShow']
+        )->name('school_followup.show');
 
+        Route::get('/edit/{id}', 
+            [SchoolFollowupController::class, 'SchoolFollowupEdit']
+        )->name('school_followup.edit');
 
-    
+        Route::put('/update/{id}', 
+            [SchoolFollowupController::class, 'SchoolFollowupUpdate']
+        )->name('school_followup.update');
+
+        Route::delete('/delete/{id}', 
+            [SchoolFollowupController::class, 'SchoolFollowupDelete']
+        )->name('school_followup.delete');
+    });
+
 
     // 📚 บันทึกผลการเรียน
-     // 📚 บันทึกผลการเรียน
-    Route::get('/education-record/add/{client_id}', 
-        [EducationRecordController::class, 'EducationRecordAdd']
-    )->name('education_record_add');
+    Route::prefix('education-record')->group(function () {
+        Route::get('/add/{client_id}', 
+            [EducationRecordController::class, 'EducationRecordAdd']
+        )->name('education_record_add');
 
-    Route::post('/education-record/store', 
-        [EducationRecordController::class, 'EducationRecordStore']
-    )->name('education_record_store');
+        Route::post('/store', 
+            [EducationRecordController::class, 'EducationRecordStore']
+        )->name('education_record_store');
 
-    Route::get('/education-record/{client_id}', 
-        [EducationRecordController::class, 'EducationRecordShow']
-    )->name('education_record_show');
+        Route::get('/{client_id}', 
+            [EducationRecordController::class, 'EducationRecordShow']
+        )->name('education_record_show');
 
-    Route::get('/education-record/edit/{id}', 
-        [EducationRecordController::class, 'EducationRecordEdit']
-    )->name('education_record_edit');
+        Route::get('/edit/{id}', 
+            [EducationRecordController::class, 'EducationRecordEdit']
+        )->name('education_record_edit');
 
-    Route::post('/education-record/update/{id}', 
-        [EducationRecordController::class, 'EducationRecordUpdate']
-    )->name('education_record_update');
+        Route::put('/update/{id}', 
+            [EducationRecordController::class, 'EducationRecordUpdate']
+        )->name('education_record_update');
 
-}); // ✅ ปิด group ให้ครบ
-
-
-
-
+        Route::delete('/delete/{id}', 
+            [EducationRecordController::class, 'EducationRecordDelete']
+        )->name('education_record_delete');
+    });
 

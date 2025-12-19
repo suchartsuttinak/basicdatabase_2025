@@ -123,16 +123,18 @@
                                     value="{{ $subject->pivot->score }}" required>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">เกรด</label>
-                                <select name="subjects[{{ $index }}][grade]" class="form-select">
-                                    <option value="">-- เลือกเกรด --</option>
-                                    <option value="4" {{ $subject->pivot->grade == '4' ? 'selected' : '' }}>4</option>
-                                    <option value="3" {{ $subject->pivot->grade == '3' ? 'selected' : '' }}>3</option>
-                                    <option value="2" {{ $subject->pivot->grade == '2' ? 'selected' : '' }}>2</option>
-                                    <option value="1" {{ $subject->pivot->grade == '1' ? 'selected' : '' }}>1</option>
-                                    <option value="0" {{ $subject->pivot->grade == '0' ? 'selected' : '' }}>0</option>
-                                </select>
-                            </div>
+                            <label class="form-label">เกรด</label>
+                            <select name="subjects[{{ $index }}][grade]" class="form-select">
+                                <option value="4"   {{ $subject->pivot->grade == 4   ? 'selected' : '' }}>4.00</option>
+                                <option value="3.5" {{ $subject->pivot->grade == 3.5 ? 'selected' : '' }}>3.50</option>
+                                <option value="3"   {{ $subject->pivot->grade == 3   ? 'selected' : '' }}>3.00</option>
+                                <option value="2.5" {{ $subject->pivot->grade == 2.5 ? 'selected' : '' }}>2.50</option>
+                                <option value="2"   {{ $subject->pivot->grade == 2   ? 'selected' : '' }}>2.00</option>
+                                <option value="1.5" {{ $subject->pivot->grade == 1.5 ? 'selected' : '' }}>1.50</option>
+                                <option value="1"   {{ $subject->pivot->grade == 1   ? 'selected' : '' }}>1.00</option>
+                                <option value="0"   {{ $subject->pivot->grade == 0   ? 'selected' : '' }}>0.00</option>
+                            </select>
+                        </div>
                             <div class="col-md-1 d-flex align-items-end justify-content-end">
                                 <button type="button" class="btn btn-outline-danger btn-sm remove-subject d-flex align-items-center gap-1">
                                     <i class="bi bi-x-circle-fill"></i> <span>ลบ</span>

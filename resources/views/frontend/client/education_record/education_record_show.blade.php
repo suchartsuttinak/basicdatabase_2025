@@ -81,7 +81,7 @@
                             <tr>
                                 <td>{{ $subject->subject_name }}</td>
                                 <td class="text-center">{{ $subject->pivot->score }}</td>
-                                <td class="text-center">{{ $subject->pivot->grade }}</td>
+                                <td class="text-center">{{ number_format($subject->pivot->grade, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

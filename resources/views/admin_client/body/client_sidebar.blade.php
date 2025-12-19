@@ -103,7 +103,7 @@
                                 <a href="{{ route('education_record_show', $client->id) }}" class="tp-link">แสดงผลการเรียน</a>
                             </li>
                             <li>
-                                <a href="{{ route('school_followup.add', $client->id) }}" class="tp-link">ติดตามการศึกษา</a>
+                                <a href="{{ route('school_followup_add', $client->id) }}" class="tp-link">ติดตามการศึกษา</a>
                             </li>
                             <li>
                                 <a href="error-429.html" class="tp-link">Error 429</a>
