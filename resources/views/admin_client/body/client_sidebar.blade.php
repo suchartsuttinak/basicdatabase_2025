@@ -106,7 +106,7 @@
                                 <a href="{{ route('school_followup_add', $client->id) }}" class="tp-link">ติดตามการศึกษา</a>
                             </li>
                             <li>
-                                <a href="error-429.html" class="tp-link">Error 429</a>
+                                <a href="{{ route('absent.add', $client->id) }}" class="tp-link">บันทึกการขาดเรียน</a>
                             </li>
                             <li>
                                 <a href="offline-page.html" class="tp-link">Offline Page</a>

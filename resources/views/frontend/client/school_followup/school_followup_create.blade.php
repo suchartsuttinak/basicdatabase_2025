@@ -72,7 +72,7 @@
                             <i class="bi bi-clipboard-check me-2"></i> ข้อมูลการติดตาม
                         </div>
                         @if(isset($followup))
-                            <a href="{{ route('school_followup_add', $client->id) }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('school_followup_add', $client->id) }}" class="btn btn-primary btn-md">
                                 <i class="bi bi-plus-circle"></i> เพิ่มข้อมูล
                             </a>
                         @endif
@@ -136,7 +136,7 @@
                                     value="{{ old('contact_name', $followup->contact_name ?? '') }}">
                             </div>
                             <div class="col-md-6 mt-3 d-flex justify-content align-items-end">
-                                <button type="submit" class="btn btn-success px-4">
+                                <button type="submit" class="btn btn-success px-3">
                                     <i class="bi bi-save me-1"></i>
                                     {{ isset($followup) ? 'อัปเดตข้อมูล' : 'บันทึกผล' }}
                                 </button>
@@ -201,12 +201,11 @@
                                 onclick="confirmDelete({{ $followup->id }})">
                             <i class="bi bi-trash"></i> ลบ
                         </button>
-                        {{-- ✅ ปุ่มรายงาน --}}
-                        <a href="" 
+                     <a href="{{ route('school_followup.report', $followup->id) }}" 
                         class="btn btn-sm btn-info">
                             <i class="bi bi-file-earmark-text"></i> รายงาน
                         </a>
-                </td>
+                    </td>
                     </tr>
                 @empty
                     <tr>
@@ -234,7 +233,7 @@
         });
     </script>
 
-
+    <!-- SweetAlert2 สำหรับยืนยันการลบ -->
             <script>
             function confirmDelete(id) {
                 Swal.fire({

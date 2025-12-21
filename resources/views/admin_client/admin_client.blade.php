@@ -27,10 +27,45 @@
 
     <!-- ✅ Datepicker CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+    <!-- ✅ Google Fonts (Kanit) -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- ✅ Custom Font Style -->
+   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- ✅ Custom Font Style -->
+<style>
+    body {
+        font-family: 'Kanit', sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #212529;
+    }
+    h1, h2, h3, .card-header, .navbar-brand {
+        font-weight: 300;
+    }
+    table td, table th {
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    .btn {
+        font-weight: 400;
+        letter-spacing: 0.5px;
+    }
+
+    /* ✅ ทำให้ข้อความในช่อง input/textarea เป็นสีอ่อน */
+    .form-control {
+        color: #6c757d; /* เทาอ่อน */
+    }
+    .form-control::placeholder {
+        color: #adb5bd; /* สี placeholder อ่อนกว่า */
+        opacity: 1;     /* ให้แสดงชัดเจน */
+    }
+</style>
 </head>
 
 <body data-menu-color="light" data-sidebar="default">
-
     <!-- Begin page -->
     <div id="app-layout">
         @include('admin_client.body.client_header')

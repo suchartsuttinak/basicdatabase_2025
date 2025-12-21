@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\EducationRecord;
 use App\Models\SchoolFollowup;
+use Carbon\Carbon;   // ✅ เพิ่มบรรทัดนี้
+
+
 
 class SchoolFollowupController extends Controller
 {
@@ -68,34 +71,43 @@ class SchoolFollowupController extends Controller
 
     SchoolFollowup::create($validated);
 
+     $notification = [
+        'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
+
     return redirect()
         ->route('school_followup_add', $request->client_id)
-        ->with('success', 'บันทึกข้อมูลการติดตามเรียบร้อยแล้ว');
+        ->with($notification);
 }
     /**
      * แสดงประวัติการติดตาม
      */
-    public function SchoolFollowupShow($client_id)
-    {
-        $client = Client::findOrFail($client_id);
+    public function SchoolFollowupReport($followup_id)
+{
+    $followup = SchoolFollowup::with(['educationRecord.education'])->findOrFail($followup_id);
 
-        $educationRecord = EducationRecord::with('education')
-            ->where('client_id', $client_id)
-            ->orderByDesc('record_date')
-            ->first();
+    $client = Client::findOrFail($followup->client_id);
 
-        $followups = SchoolFollowup::with(['educationRecord.education'])
-            ->where('client_id', $client_id)
-            ->orderByDesc('follow_date')
-            ->get();
+    $educationRecord = EducationRecord::with('education')
+        ->where('client_id', $client->id)
+        ->orderByDesc('record_date')
+        ->first();
 
-        return view('frontend.client.school_followup.school_followup_show', [
-            'client'          => $client,
-            'educationRecord' => $educationRecord,
-            'followups'       => $followups,
-        ]);
-    }
+    $age = $client->birth_date 
+        ? \Carbon\Carbon::parse($client->birth_date)->age 
+        : 'ไม่พบข้อมูล';
 
+    return view('frontend.client.school_followup.school_followup_report', [
+        'client'          => $client,
+        'educationRecord' => $educationRecord,
+        'followup'        => $followup,
+        'school_name'     => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
+        'education_name'  => optional(optional($educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล',
+        'term'            => optional($educationRecord)->semester ?? 'ไม่พบข้อมูล',
+        'age'             => $age,
+    ]);
+}
     /**
      * เปิดฟอร์มแก้ไขการติดตาม
      */
@@ -140,9 +152,14 @@ class SchoolFollowupController extends Controller
         $followup = SchoolFollowup::findOrFail($id);
         $followup->update($validated);
 
+         $notification = [
+        'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
+
         return redirect()
             ->route('school_followup_add', $followup->client_id)
-            ->with('success', 'แก้ไขข้อมูลการติดตามเรียบร้อยแล้ว');
+            ->with($notification);
     }
 
     /**

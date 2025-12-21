@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\backend\ClientController;
 use App\Http\Controllers\backend\SubjectController;
+use App\Http\Controllers\Frontend\AbsentController;
 use App\Http\Controllers\Frontend\FamilyController;
 use App\Http\Controllers\backend\InstitutionController;
 use App\Http\Controllers\Frontend\FactfindingController;
@@ -144,37 +145,6 @@ Route::middleware('auth')->group(function () {
         )->name('education_record_update');
 });
 
-
-
- // 🏫 บันทึกการติดตามโรงเรียน
-    Route::prefix('school_followup')->group(function () {
-        Route::get('/add/{client_id}', 
-            [SchoolFollowupController::class, 'SchoolFollowupAdd']
-        )->name('school_followup_add');
-
-        Route::post('/store', 
-            [SchoolFollowupController::class, 'SchoolFollowupStore']
-        )->name('school_followup_store');
-
-        Route::get('/{client_id}', 
-            [SchoolFollowupController::class, 'SchoolFollowupShow']
-        )->name('school_followup.show');
-
-        Route::get('/edit/{id}', 
-            [SchoolFollowupController::class, 'SchoolFollowupEdit']
-        )->name('school_followup.edit');
-
-        Route::put('/update/{id}', 
-            [SchoolFollowupController::class, 'SchoolFollowupUpdate']
-        )->name('school_followup.update');
-
-        Route::delete('/delete/{id}', 
-            [SchoolFollowupController::class, 'SchoolFollowupDelete']
-        )->name('school_followup.delete');
-    });
-
-
-    
     // 📚 บันทึกผลการเรียน
     Route::prefix('education-record')->group(function () {
         Route::get('/add/{client_id}', 
@@ -202,3 +172,33 @@ Route::middleware('auth')->group(function () {
         )->name('education_record_delete');
     });
 
+
+    
+// 🏫 บันทึกการติดตามเด็กในโรงเรียน
+Route::prefix('school_followup')->group(function () {
+    Route::get('/add/{client_id}', [SchoolFollowupController::class, 'SchoolFollowupAdd'])->name('school_followup_add');
+    Route::post('/store', [SchoolFollowupController::class, 'SchoolFollowupStore'])->name('school_followup_store');
+    Route::get('/edit/{id}', [SchoolFollowupController::class, 'SchoolFollowupEdit'])->name('school_followup.edit');
+    Route::put('/update/{id}', [SchoolFollowupController::class, 'SchoolFollowupUpdate'])->name('school_followup.update');
+    Route::delete('/delete/{id}', [SchoolFollowupController::class, 'SchoolFollowupDelete'])->name('school_followup.delete');
+
+    // ✅ รายงานตาม followup_id
+    Route::get('/{followup_id}', [SchoolFollowupController::class, 'SchoolFollowupReport'])
+        ->whereNumber('followup_id')
+        ->name('school_followup.report');
+});
+
+
+// 🏫 บันทึกการขาดเรียนของเด็ก
+Route::prefix('absent')->name('absent.')->group(function () {
+    Route::get('/add/{client_id}', [AbsentController::class, 'AbsentAdd'])->name('add');
+    Route::post('/store', [AbsentController::class, 'AbsentStore'])->name('store');
+    Route::get('/edit/{id}', [AbsentController::class, 'AbsentEdit'])->name('edit');
+    Route::put('/update/{id}', [AbsentController::class, 'AbsentUpdate'])->name('update');
+    Route::delete('/delete/{id}', [AbsentController::class, 'AbsentDelete'])->name('delete');
+
+    // ✅ รายงานการขาดเรียน
+    Route::get('/report/{absent_id}', [AbsentController::class, 'AbsentReport'])
+        ->whereNumber('absent_id')
+        ->name('report');
+});
