@@ -3,8 +3,7 @@
 
  <style>
     body {
-        font-family: 'TH Sarabun New', sans-serif;
-        font-size: 18px;
+        font-size: 16px;
         line-height: 1.8;
         background-color: #fff;
         color: #333;
@@ -73,14 +72,14 @@
     .problem-item {
         display: flex;
         align-items: center;
-        font-size: 18px;
+        font-size: 14px;
         background: #f9f9f9;
         padding: 6px 10px;
         border-radius: 4px;
     }
 
     .problem-item .checkbox {
-        font-size: 20px;
+        font-size: 18px;
         margin-right: 8px;
         color: #555;
     }

@@ -25,12 +25,12 @@
 
             <ul id="side-menu">
 
-                <li class="menu-title">Menu</li>
+                <li class="menu-title">ทะเบียนประวัติ</li>
 
                 <li>
                     <a href="#sidebarDashboards" data-bs-toggle="collapse">
                         <i data-feather="home"></i>
-                        <span> บันทึกการช่วยเหลือ </span>
+                        <span> บันทึกข้อมูลแรกเข้า </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarDashboards">
@@ -45,7 +45,7 @@
                     </div>
                 </li>
 
-                <li class="menu-title">Pages</li>
+                <li class="menu-title">กระบวนการ</li>
 
                 <li>
                     <a href="#sidebarAuth" data-bs-toggle="collapse">

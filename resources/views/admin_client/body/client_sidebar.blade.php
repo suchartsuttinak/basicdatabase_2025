@@ -26,12 +26,12 @@
             <ul id="side-menu">
                 <h1 class="text-danger text-center">{{ $client->id }}</h1>
 
-                <li class="menu-title">Menu</li>
+                <li class="menu-title">ทะเบียนประวัติ</li>
 
                 <li>
                     <a href="#sidebarDashboards" data-bs-toggle="collapse">
-                        <i data-feather="home"></i>
-                        <span> บันทึกการช่วยเหลือ </span>
+                        <i data-feather="home"></i
+                        <span> บันทึกข้อมูลแรกเข้า </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarDashboards">
@@ -49,7 +49,7 @@
                     </div>
                 </li>
 
-                <li class="menu-title">Pages</li>
+                <li class="menu-title">กระบวนการ</li>
 
                 <li>
                     <a href="#sidebarAuth" data-bs-toggle="collapse">
@@ -85,19 +85,17 @@
                 </li>
 
                 <li>
-                    <a href="#sidebarError" data-bs-toggle="collapse">
+                    <a href="#sidebareducationRecord" data-bs-toggle="collapse">
                         <i data-feather="alert-octagon"></i>
                         <span> ข้อมูลการศึกษา </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarError">
+                    <div class="collapse" id="sidebareducationRecord">
                         <ul class="nav-second-level">
                             <li>
                                <a href="{{ route('education_record_add', ['client_id' => $client->id]) }}" class="tp-link">
-    บันทึกผลการเรียน
-</a>
-
-
+                                    บันทึกผลการเรียน
+                                </a>
                             </li>
                             <li>
                                 <a href="{{ route('education_record_show', $client->id) }}" class="tp-link">แสดงผลการเรียน</a>
@@ -116,19 +114,17 @@
                 </li>
 
                 <li>
-                    <a href="#sidebarExpages" data-bs-toggle="collapse">
+                    <a href="#sidebaraccident" data-bs-toggle="collapse">
                         <i data-feather="file-text"></i>
-                        <span> Utility </span>
+                        <span> ข้อมูลสุขภาพ </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarExpages">
+                    <div class="collapse" id="sidebaraccident">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="pages-starter.html" class="tp-link">Starter</a>
+                                <a href="{{ route('accident.add', $client->id) }}" class="tp-link">บันทึกการบาดเจ็บ</a>
                             </li>
-                            <li>
-                                <a href="pages-profile.html" class="tp-link">Profile</a>
-                            </li>
+                            
                             <li>
                                 <a href="pages-pricing.html" class="tp-link">Pricing</a>
                             </li>

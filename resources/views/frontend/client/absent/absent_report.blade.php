@@ -3,7 +3,6 @@
 @section('content')
 <style>
     .report-container {
-        font-family: "TH Sarabun New", "Sarabun", sans-serif;
         font-size: 14px;
         line-height: 1.8;
         color: #000;
@@ -59,12 +58,14 @@
 </style>
 
 <div class="report-container">
-    {{-- ปุ่มกลับหน้าหลัก --}}
-    <div class="back-button">
-        <a href="{{ route('absent.add', $client->id) }}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-arrow-left-circle"></i> กลับหน้าหลัก
-        </a>
-    </div>
+   {{-- ปุ่มกลับหน้าหลัก --}}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('absent.add', $client->id) }}" class="btn btn-primary btn-md px-3 shadow-sm">
+        <i class="bi bi-arrow-left-circle"></i> กลับหน้าหลัก
+    </a>
+</div>
+
+
 
     {{-- ส่วนหัวรายงาน --}}
     <div class="report-header">
