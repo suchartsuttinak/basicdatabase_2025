@@ -190,20 +190,15 @@ Route::prefix('school_followup')->group(function () {
 });
 
 
-// 🏫 บันทึกการขาดเรียนของเด็ก
+/// 🏫 บันทึกการขาดเรียนของเด็ก
 Route::prefix('absent')->name('absent.')->group(function () {
     Route::get('/add/{client_id}', [AbsentController::class, 'AbsentAdd'])->name('add');
     Route::post('/store', [AbsentController::class, 'AbsentStore'])->name('store');
     Route::get('/edit/{id}', [AbsentController::class, 'AbsentEdit'])->name('edit');
     Route::put('/update/{id}', [AbsentController::class, 'AbsentUpdate'])->name('update');
     Route::delete('/delete/{id}', [AbsentController::class, 'AbsentDelete'])->name('delete');
-
-    // ✅ รายงานการขาดเรียน
-    Route::get('/report/{absent_id}', [AbsentController::class, 'AbsentReport'])
-        ->whereNumber('absent_id')
-        ->name('report');
+    Route::get('/report/{id}', [AbsentController::class, 'AbsentReport'])->name('report');
 });
-
 
 // 🏫 บันทึกการบาดเจ็บของเด็ก
 Route::prefix('accident')->name('accident.')->group(function () {

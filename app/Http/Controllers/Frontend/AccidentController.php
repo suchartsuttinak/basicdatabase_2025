@@ -13,8 +13,10 @@ class AccidentController extends Controller
     public function AccidentAdd($client_id)
     {
         $client = Client::findOrFail($client_id);
-        $accidents = Accident::where('client_id', $client_id)->latest()->get();
-        $accident = null; // สำหรับเพิ่มใหม่
+        $accidents = Accident::where('client_id', $client->id)
+        ->orderBy('incident_date', 'desc') // เรียงวันที่ล่าสุดก่อน
+        ->get();
+         $accident = null; // สำหรับเพิ่มใหม่
 
         return view('frontend.client.accident.accident_create', compact('client', 'client_id', 'accidents', 'accident'));
     }
@@ -86,6 +88,8 @@ class AccidentController extends Controller
     }
 
     $accident->update($validated);
+
+    
 
     return redirect()
         ->route('accident.add', $accident->client_id)

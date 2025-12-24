@@ -2,15 +2,11 @@
 @section('content')
 
  <div class="container-fluid mt-4">
-     <form action="{{ isset($absent) && $absent instanceof \App\Models\Absent 
-    ? route('absent.update', $absent->id) 
-    : route('absent.store') }}" method="POST">
-    @csrf
-    @if(isset($absent) && $absent instanceof \App\Models\Absent)
-        @method('PUT')
-    @endif
-
-
+    <form action="{{ isset($absent) ? route('absent.update', $absent->id) : route('absent.store') }}" method="POST">
+        @csrf
+        @if(isset($absent))
+            @method('PUT')
+        @endif
 
         {{-- ✅ hidden fields --}}
         <input type="hidden" name="client_id" value="{{ $client->id }}">
@@ -111,6 +107,7 @@
             </div>
         </div>
     </div>
+    </form>
 </div>
        @if($absents->isNotEmpty())
     <div class="card mt-2 shadow-sm rounded border-0">
@@ -148,36 +145,40 @@
                                     </a>
 
                                     <button type="button" class="btn btn-sm btn-danger"
-                                            onclick="confirmDelete({{ $absent->id }})">
-                                        <i class="bi bi-trash"></i> ลบ
-                                    </button>
+                                    onclick="confirmDelete({{ $absent->id }})">
+                                <i class="bi bi-trash"></i> ลบ
+                            </button>
+
+
 
                                     <a href="{{ route('absent.report', $absent->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-file-earmark-text"></i> รายงาน
                                     </a>
                                 </div>
-
-                                <form id="delete-form-{{ $absent->id }}"
-                                      action="{{ route('absent.delete', $absent->id) }}"
-                                      method="POST" style="display: none;">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
+                         
+                                {{-- ฟอร์มลบแบบซ่อน --}}
+                                 <form id="delete-form-{{ $absent->id }}"
+                                action="{{ route('absent.delete', $absent->id) }}"
+                                method="POST" style="display:none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted small">
+                            <td colspan="9" class="text-center text-muted small">
                                 <i class="bi bi-info-circle"></i> ยังไม่มีข้อมูลการติดตาม
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table>    
         </div>
     </div>
 </div>
 @endif
+
 @endsection
 
 @push('scripts')
@@ -210,5 +211,4 @@
                 });
             }
             </script>
-
 @endpush

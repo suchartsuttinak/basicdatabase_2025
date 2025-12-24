@@ -112,6 +112,7 @@ class AbsentController extends Controller
 
     public function AbsentUpdate(Request $request, $id)
     {
+        
         $validated = $request->validate([
             'client_id'           => 'required|integer|exists:clients,id',
             'education_record_id' => 'nullable|integer',
