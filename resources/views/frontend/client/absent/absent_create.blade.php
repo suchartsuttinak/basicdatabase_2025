@@ -148,9 +148,6 @@
                                     onclick="confirmDelete({{ $absent->id }})">
                                 <i class="bi bi-trash"></i> ลบ
                             </button>
-
-
-
                                     <a href="{{ route('absent.report', $absent->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-file-earmark-text"></i> รายงาน
                                     </a>

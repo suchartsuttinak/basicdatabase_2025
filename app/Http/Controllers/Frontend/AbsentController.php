@@ -11,15 +11,26 @@ use Carbon\Carbon;
 
 class AbsentController extends Controller
 {
-    public function AbsentAdd($client_id)
-    {
-        $client = Client::findOrFail($client_id);
+  public function AbsentAdd($client_id)
+{
+    $client = Client::findOrFail($client_id);
 
+    // ตรวจสอบว่ามีข้อมูลการศึกษาเด็กหรือไม่
     $educationRecord = EducationRecord::with('education')
         ->where('client_id', $client_id)
         ->orderByDesc('record_date')
         ->first();
 
+    if (!$educationRecord) {
+        // ถ้าไม่มีข้อมูลการศึกษา → redirect ไปหน้าเพิ่มการศึกษาเด็ก
+        return redirect()->route('education_record.add', $client_id)
+            ->with([
+                'message' => 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการขาดเรียน',
+                'alert-type' => 'warning'
+            ]);
+    }
+
+    // ถ้ามีข้อมูลการศึกษาแล้ว → ดึงข้อมูลการขาดเรียน
     $absents = Absent::where('client_id', $client_id)
         ->orderByDesc('absent_date')
         ->get();
@@ -33,9 +44,7 @@ class AbsentController extends Controller
         'absents'         => $absents, // ✅ สำหรับ list
         'absent'          => null,     // ✅ สำหรับ form
     ]);
-
-
-    }
+}
 
     public function AbsentStore(Request $request)
     {

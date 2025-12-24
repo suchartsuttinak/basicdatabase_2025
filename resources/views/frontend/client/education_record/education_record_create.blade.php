@@ -22,6 +22,7 @@
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i> บันทึกผลการเรียน</h5>
         </div>
+        
         <div class="card-body">
             <form action="{{ route('education_record_store') }}" method="POST" novalidate>
                 @csrf

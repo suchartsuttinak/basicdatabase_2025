@@ -16,28 +16,39 @@ class SchoolFollowupController extends Controller
     /**
      * เปิดฟอร์มเพิ่มการติดตาม
      */
-    public function SchoolFollowupAdd($client_id)
-    {
-        $client = Client::findOrFail($client_id);
+   public function SchoolFollowupAdd($client_id)
+{
+    $client = Client::findOrFail($client_id);
 
-        $educationRecord = EducationRecord::with('education')
-            ->where('client_id', $client_id)
-            ->orderByDesc('record_date')
-            ->first();
+    // ตรวจสอบว่ามีข้อมูลการศึกษาเด็กหรือไม่
+    $educationRecord = EducationRecord::with('education')
+        ->where('client_id', $client_id)
+        ->orderByDesc('record_date')
+        ->first();
 
-        $followups = SchoolFollowup::where('client_id', $client_id)
-            ->orderByDesc('follow_date')
-            ->get();
-
-        return view('frontend.client.school_followup.school_followup_create', [
-            'client'          => $client,
-            'educationRecord' => $educationRecord,
-            'client_id'       => $client_id,
-            'school_name'     => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
-            'education_name'  => optional(optional($educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล',
-            'followups'       => $followups,
-        ]);
+    if (!$educationRecord) {
+        // ถ้าไม่มีข้อมูลการศึกษา → redirect ไปหน้าเพิ่มการศึกษาเด็ก
+        return redirect()->route('education_record.add', $client_id)
+            ->with([
+                'message' => 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการติดตาม',
+                'alert-type' => 'warning'
+            ]);
     }
+
+    // ถ้ามีข้อมูลการศึกษาแล้ว → ดึงข้อมูลการติดตาม
+    $followups = SchoolFollowup::where('client_id', $client_id)
+        ->orderByDesc('follow_date')
+        ->get();
+
+    return view('frontend.client.school_followup.school_followup_create', [
+        'client'          => $client,
+        'educationRecord' => $educationRecord,
+        'client_id'       => $client_id,
+        'school_name'     => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
+        'education_name'  => optional(optional($educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล',
+        'followups'       => $followups,
+    ]);
+}
  /**
      * บันทึกข้อมูลการติดตาม
      */
