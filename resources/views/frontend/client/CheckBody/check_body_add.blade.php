@@ -1,19 +1,34 @@
 @extends('admin_client.admin_client')
 @section('content')
-<div class="container-fluid mt-3">
-    <div class="card shadow-sm border-secondary">
-        <div class="card-header bg-dark text-white text-center py-2">
-            <h4 class="mb-0">แบบฟอร์มบันทึกการตรวจสุขภาพเบื้องต้น</h4>
-        </div>
-        <div class="card-body p-3">
-            <!-- ปุ่มบันทึก/ล้าง มุมขวาบน -->
-           <form action="{{ isset($checkbody) ? route('check_body.update', $checkbody->id) : 
-                 route('check_body.store') }}" method="POST" class="position-relative">
-          @csrf
-                @if(isset($checkbody))
-                    @method('PUT')
-                @endif
 
+  <<div class="container-fluid mt-1">
+    <div class="card shadow-sm border-secondary">
+        <!-- Header พร้อมปุ่ม toggle -->
+        <div class="card-header bg-dark text-white text-center py-2 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">แบบฟอร์มบันทึกการตรวจสุขภาพเบื้องต้น</h4>
+            <!-- ปุ่ม toggle health -->
+        <button id="toggleHealthBtn"
+                class="btn btn-sm btn-light d-flex align-items-center"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#healthForm"
+                aria-expanded="{{ isset($checkbody) ? 'true' : 'false' }}"
+                aria-controls="healthForm">
+            <i class="bi {{ isset($checkbody) ? 'bi-chevron-up' : 'bi-chevron-down' }}"></i>
+            <span class="ms-1">
+                {{ isset($checkbody) ? 'ซ่อน/ฟอร์ม' : 'เพิ่มข้อมูล' }}
+            </span>
+        </button>
+        </div>
+
+        <!-- ฟอร์มซ่อน/แสดง -->
+        <div id="healthForm" class="collapse {{ isset($checkbody) ? 'show' : '' }}">
+            <div class="card-body p-3">
+                <form action="{{ isset($checkbody) ? route('check_body.update', $checkbody->id) : route('check_body.store') }}" method="POST" class="position-relative">
+                    @csrf
+                    @if(isset($checkbody))
+                        @method('PUT')
+                    @endif
                 <!-- ปุ่มมุมขวาบน ภายในฟอร์ม -->
                 <div class="d-flex justify-content-end mb-3">
                 <button type="submit" class="btn btn-sm btn-success px-3 me-2">
@@ -46,24 +61,24 @@
                     </div>
 
                     <!-- พัฒนาการ -->
-                    <div class="col-12 col-md-5 ms-md-5">
+                   <div class="col-12 col-md-5 ms-md-5">
                         <label class="form-label">พัฒนาการ</label>
                         <div class="d-flex flex-wrap gap-3 mt-1">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="development" value="สมวัย"
-                                       {{ old('development', $checkbody->development ?? '') == 'สมวัย' ? 'checked' : '' }}
-                                       onclick="toggleDetail(false)">
+                                    {{ old('development', $checkbody->development ?? 'สมวัย') == 'สมวัย' ? 'checked' : '' }}
+                                    onclick="toggleDetail(false)">
                                 <label class="form-check-label">สมวัย</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="development" value="ไม่สมวัย"
-                                       {{ old('development', $checkbody->development ?? '') == 'ไม่สมวัย' ? 'checked' : '' }}
-                                       onclick="toggleDetail(true)">
+                                    {{ old('development', $checkbody->development ?? 'สมวัย') == 'ไม่สมวัย' ? 'checked' : '' }}
+                                    onclick="toggleDetail(true)">
                                 <label class="form-check-label">ไม่สมวัย</label>
                             </div>
                         </div>
                     </div>
-                </div>
+                 </div>
 
                 <!-- รายละเอียด -->
                 <div class="row mb-3" id="detailField" style="{{ old('development', $checkbody->development ?? '') == 'ไม่สมวัย' ? '' : 'display:none;' }}">
@@ -170,21 +185,21 @@
         </div> <!-- ปิด card-body -->
     </div> <!-- ปิด card -->
 </div> <!-- ปิด container -->
-
+</div>
   @if($checkbodies->isNotEmpty())
 <!-- ตารางติดกับฟอร์ม -->
-<div class="card shadow-sm rounded-1 border-0 ms-1 me-1 mt-0">
+<div class="card mt-1 shadow-sm rounded-1 border-0 ms-2 me-2">
     <div class="card-body p-2">
         <div class="table-responsive">
             <table id="datatable-checkbody" class="table table-sm table-striped table-hover align-middle w-100 mb-0">
                 <thead class="table-primary text-center small">
-                    <tr>
-                        <th>ลำดับ</th>
-                        <th>วันที่ตรวจ</th>
-                        <th>น้ำหนัก</th>
-                        <th>ส่วนสูง</th>
-                        <th>สุขภาพอนามัย</th>
-                        <th>จัดการ</th>
+                     <tr>
+                        <th style="width: 5%;">ลำดับ</th>
+                        <th style="width: 12%;">วันที่ตรวจ</th>
+                        <th style="width: 10%;">น้ำหนัก</th>
+                        <th style="width: 10%;">ส่วนสูง</th>
+                        <th style="width: 25%;">สุขภาพอนามัย</th>
+                        <th style="width: 18%;">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody class="small">
@@ -273,4 +288,26 @@
             document.getElementById('detailField').style.display = show ? 'block' : 'none';
         }
     </script>
+
+        <!-- Script toggle ซ่อน/แสดง form สุขภาพ -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const collapseHealth = document.getElementById('healthForm');
+                const toggleHealthBtn = document.getElementById('toggleHealthBtn');
+
+                if (collapseHealth && toggleHealthBtn) {
+                    collapseHealth.addEventListener('shown.bs.collapse', function () {
+                        toggleHealthBtn.querySelector('i').className = 'bi bi-chevron-up';
+                        toggleHealthBtn.querySelector('span').textContent = 'ซ่อน/ฟอร์ม';
+                    });
+
+                    collapseHealth.addEventListener('hidden.bs.collapse', function () {
+                        toggleHealthBtn.querySelector('i').className = 'bi bi-chevron-down';
+                        toggleHealthBtn.querySelector('span').textContent = 'เพิ่มข้อมูล';
+                    });
+                }
+            });
+        </script>
+
+
 @endpush

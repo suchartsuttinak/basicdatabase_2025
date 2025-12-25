@@ -7,6 +7,7 @@ use App\Http\Controllers\backend\ClientController;
 use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\AbsentController;
 use App\Http\Controllers\Frontend\FamilyController;
+use App\Http\Controllers\Frontend\MedicalController;
 use App\Http\Controllers\Frontend\AccidentController;
 use App\Http\Controllers\Frontend\CheckBodyController;
 use App\Http\Controllers\backend\InstitutionController;
@@ -244,7 +245,28 @@ Route::prefix('check_body')->name('check_body.')->group(function () {
     Route::get('/report/{id}', [CheckBodyController::class, 'CheckBodyReport'])->name('report');
 });
 
+
+// 🏫 บันทึกการการรักษาพยาบาลในหน่วยงาน
+Route::prefix('medical')->name('medical.')->group(function () {
+    // แสดงฟอร์มเพิ่มข้อมูล (client_id จำเป็น)
+    Route::get('/add/{client_id}', [MedicalController::class, 'MedicalAdd'])->name('add');
+
     // บันทึกข้อมูลใหม่
+    Route::post('/store', [MedicalController::class, 'MedicalStore'])->name('store');
+
+    // ใช้ฟอร์มเดิมในการแก้ไข (ส่ง accident id)
+    Route::get('/edit/{id}', [MedicalController::class, 'MedicalEdit'])->name('edit');
+
+    // อัปเดตข้อมูล (PUT)
+    Route::put('/update/{id}', [MedicalController::class, 'MedicalUpdate'])->name('update');
+
+    // ลบข้อมูล
+    Route::delete('/delete/{id}', [MedicalController::class, 'MedicalDelete'])->name('delete');
+
+    // ✅ เพิ่ม route สำหรับรายงาน (ตรงกับปุ่มใน view)
+    Route::get('/report/{id}', [MedicalController::class, 'MedicalReport'])->name('report');
+});
+
 
 
 

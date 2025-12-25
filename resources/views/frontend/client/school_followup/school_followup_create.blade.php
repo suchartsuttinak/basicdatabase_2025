@@ -1,24 +1,37 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-      <div class="container-fluid mt-4">
-    <form action="{{ isset($followup) ? route('school_followup.update', $followup->id) : route('school_followup_store') }}" method="POST">
-        @csrf
-        @if(isset($followup))
-            @method('PUT')
-        @endif
+            <div class="container-fluid mt-4">
+                <div class="card shadow-sm border-secondary">
+                    <!-- Header พร้อมปุ่ม toggle -->
+                <div class="card-header bg-dark text-white py-2 px-3 position-relative text-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-journal-text me-2"></i>
+                    {{ isset($followup) ? 'แก้ไขการติดตามผลการศึกษาเด็กในโรงเรียน' : 'บันทึกติดตามผลการศึกษาเด็กในโรงเรียน' }}
+                </h4>
+                    <button id="toggleFollowupBtn"
+                    class="btn btn-sm btn-light position-absolute end-0 top-50 translate-middle-y me-3"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#followupForm"
+                    aria-expanded="{{ isset($followup) ? 'true' : 'false' }}" aria-controls="followupForm">
+                    <i class="bi bi-chevron-down"></i> {{ isset($followup) ? 'ซ่อน/ฟอร์ม' : 'เพิ่มข้อมูล' }}
+                </button>
+            </div>
+
+        <!-- ฟอร์มซ่อน/แสดง -->
+        <div id="followupForm" class="collapse {{ isset($followup) ? 'show' : '' }}">
+            <div class="card-body p-3">
+                <form action="{{ isset($followup) ? route('school_followup.update', $followup->id) : route('school_followup_store') }}" method="POST">
+                    @csrf
+                    @if(isset($followup))
+                        @method('PUT')
+                    @endif
+
 
         {{-- ✅ hidden fields --}}
         <input type="hidden" name="client_id" value="{{ $client->id }}">
         <input type="hidden" name="education_record_id" value="{{ optional($educationRecord)->id }}">
 
-       {{-- 🏫 หัวฟอร์ม --}}
-            <div class="mb-4 text-center">
-                <h4 class="fw-bold text-dark">
-                    <i class="bi bi-journal-text me-2"></i>
-                    {{ isset($followup) ? 'แก้ไขการติดตามผลการศึกษาเด็กในโรงเรียน' : 'บันทึกติดตามผลการศึกษาเด็กในโรงเรียน' }}
-                </h4>
-            </div>
+      
 
         {{-- 🔒 Layout 2 คอลัมน์ --}}
  <div class="row gx-1 gy-1 align-items-stretch">
@@ -70,7 +83,7 @@
                 <div><i class="bi bi-clipboard-check me-2"></i> ข้อมูลการติดตาม</div>
                 @if(isset($followup))
                     <a href="{{ route('school_followup_add', $client->id) }}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-plus-circle"></i> เพิ่มข้อมูล
+                        <i class="bi bi-plus-circle"></i> กลับหน้าหลัก
                     </a>
                 @endif
             </div>
@@ -144,6 +157,7 @@
     </div> {{-- end col-md-9 --}}
 </div> {{-- end row --}}
 </form>
+</div>
 </div>
            @if($followups->isNotEmpty())
 <div class="card mt-2 shadow-sm rounded-1 border-0 ms-2 me-2">
@@ -255,4 +269,22 @@
             }
             </script>
 
+             <!-- Script สำหรับเปิด-ซ่อนฟอร์ม -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const collapseEl = document.getElementById('followupForm');
+            const toggleBtn = document.getElementById('toggleFollowupBtn');
+
+            collapseEl.addEventListener('shown.bs.collapse', function () {
+                toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i> ซ่อน/ฟอร์ม';
+            });
+
+            collapseEl.addEventListener('hidden.bs.collapse', function () {
+                toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i> เพิมข้อมูล';
+            });
+        });
+        </script>
+
+
 @endpush
+       

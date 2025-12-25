@@ -129,7 +129,7 @@
                                 <a href="{{ route('check_body.add', $client->id) }}" class="tp-link">ตรวจสุขภาพเบื้องต้น</a>
                             </li>
                             <li>
-                                <a href="pages-timeline.html" class="tp-link">Timeline</a>
+                                <a href="{{ route('medical.add', $client->id) }}" class="tp-link">การรักษาพยาบาล</a>
                             </li>
                             <li>
                                 <a href="pages-invoice.html" class="tp-link">Invoice</a>
