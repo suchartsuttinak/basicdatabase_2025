@@ -75,6 +75,14 @@ class Client extends Model
                     ->withTimestamps();
     }
 
+     // ความสัมพันธ์กับ Vaccination
+    public function vaccinations()
+    {
+        return $this->hasMany(Vaccination::class, 'client_id');
+    }
+
+
+
     //ตาราง บิดา มารดา สามี/ภรรยา และญาติ
      public function father()       { return $this->hasOne(Father::class);}
      public function mother()       { return $this->hasOne(Mother::class);}

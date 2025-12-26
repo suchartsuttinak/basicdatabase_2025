@@ -132,7 +132,7 @@
                                 <a href="{{ route('medical.add', $client->id) }}" class="tp-link">การรักษาพยาบาล</a>
                             </li>
                             <li>
-                                <a href="pages-invoice.html" class="tp-link">Invoice</a>
+                                <a href="{{ route('vaccine.index', $client->id) }}" class="tp-link">ประวัติการรับวัคซีน</a>
                             </li>
                             <li>
                                 <a href="pages-faqs.html" class="tp-link">FAQs</a>

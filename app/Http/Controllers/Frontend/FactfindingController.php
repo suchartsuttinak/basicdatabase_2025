@@ -169,6 +169,13 @@ class FactfindingController extends Controller
     // ✅ ดึง factfinding ตาม factfinding_id
     $factFinding = Factfinding::findOrFail($factfinding_id);
 
+      // ✅ ถ้า sick = 0 ให้ลบค่า sick_detail
+    if ($validated['sick'] == 0) {
+        $validated['sick_detail'] = null;
+    }
+
+
+
     // ✅ เตรียม payload
     $payload = [
         'client_id'   => (int)$validated['client_id'],

@@ -1,7 +1,7 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-  <<div class="container-fluid mt-1">
+  <div class="container-fluid mt-1">
     <div class="card shadow-sm border-secondary">
         <!-- Header พร้อมปุ่ม toggle -->
         <div class="card-header bg-dark text-white text-center py-2 d-flex justify-content-between align-items-center">

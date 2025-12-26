@@ -1,37 +1,37 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-   <div class="container-fluid mt-2">
-    {{-- ปุ่มเพิ่ม --}}
-    <div class="d-flex justify-content-end mb-2">
-        <!-- ปุ่ม toggle medical -->
-        <button id="toggleMedicalBtn"
-                class="btn btn-sm btn-primary d-flex align-items-center"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#medicalForm"
-                aria-expanded="{{ isset($medical) ? 'true' : 'false' }}"
-                aria-controls="medicalForm">
-            <i class="bi {{ isset($medical) ? 'bi-dash-circle me-1' : 'bi-plus-circle me-1' }}"></i>
-            <span>
-                {{ isset($medical) ? 'ซ่อน/ฟอร์ม' : 'เพิ่มข้อมูล' }}
-            </span>
-        </button>
-    </div>
-
-    {{-- ฟอร์ม: ใช้ Bootstrap Collapse แทน display:none --}}
-    <div id="medicalForm" class="collapse {{ isset($medical) ? 'show' : '' }}">
-        <div class="card shadow-sm border-0 w-100 mb-2">
-            <div class="card-header bg-light fw-bold text-dark py-2 px-3">
+  <div class="container-fluid mt-2">
+    <!-- ฟอร์ม -->
+    <div class="card shadow-sm border-0 w-100 mb-0">
+        <!-- Header พร้อมปุ่ม toggle -->
+        <div class="card-header bg-light fw-bold text-dark py-2 px-3 d-flex justify-content-between align-items-center">
+            <div>
                 <i class="bi bi-hospital me-2"></i> บันทึกข้อมูลการรักษาพยาบาลเด็ก
             </div>
+            <!-- ปุ่ม toggle medical -->
+            <button id="toggleMedicalBtn"
+                    class="btn btn-sm btn-primary d-flex align-items-center"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#medicalForm"
+                    aria-expanded="{{ isset($medical) ? 'true' : 'false' }}"
+                    aria-controls="medicalForm">
+                <i class="bi {{ isset($medical) ? 'bi-chevron-up' : 'bi-chevron-down' }}"></i>
+                <span class="ms-1">
+                    {{ isset($medical) ? 'ซ่อน/ฟอร์ม' : 'เพิ่มข้อมูล' }}
+                </span>
+            </button>
+        </div>
+
+        <!-- ฟอร์มซ่อน/แสดง -->
+        <div id="medicalForm" class="collapse {{ isset($medical) ? 'show' : '' }}">
             <div class="card-body p-3">
-                <form action="{{ isset($medical) ? route('medical.update', $medical->id) : route('medical.store') }}" method="POST">
+                <form action="{{ $medical ? route('medical.update', $medical->id) : route('medical.store') }}" method="POST">
                     @csrf
-                    @if(isset($medical))
+                    @if($medical)
                         @method('PUT')
                     @endif
-
 
                     <input type="hidden" name="client_id" value="{{ $client->id }}">
 
@@ -120,11 +120,11 @@
         <div class="card mt-1 shadow-sm rounded-1 border-0 ms-2 me-2">
 
         {{-- กรณีซ่อนฟอร์ม → แสดงหัวข้อไว้เหมือนเดิม --}}
-                @if(!isset($medical))
+                {{-- @if(!isset($medical))
                 <div class="card-header bg-light fw-bold text-dark py-2 px-3">
                     <i class="bi bi-hospital me-2"></i> ข้อมูลการรักษาพยาบาลเด็ก
                 </div>
-                @endif
+                @endif --}}
 
             <div class="card-body p-2">
                 <div class="table-responsive">

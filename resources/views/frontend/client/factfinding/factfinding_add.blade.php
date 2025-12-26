@@ -189,7 +189,7 @@
                          </div>
 
                     <div class="form-group col-md-6 mb-3">
-                            <label for="hospital" class="form-label">โรงพยาบาล</label>
+                            <label for="hospital" class="form-label">สถานพยาบาล</label>
                             <input type="text" name="hospital" class="form-control" 
                             value="{{ old('hospital') }}">
                             @error('hospital')
