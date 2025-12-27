@@ -99,8 +99,13 @@ class VaccinationController extends Controller
         $client_id = $vaccination->client_id;
         $vaccination->delete();
 
+         $notification = [
+            'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('vaccine.index', $client_id)
-                         ->with('success', 'ลบข้อมูลวัคซีนเรียบร้อยแล้ว');
+                         ->with($notification);
     }
 }
 

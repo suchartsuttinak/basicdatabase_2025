@@ -34,8 +34,16 @@ class ClientController extends Controller
    
     public function ClientShow()
     {
-        $clients = Client::with('problems')->get();
-        return view('backend.client.client_show', compact('clients'));   
+    // ✅ ดึงเฉพาะ clients ที่ยัง active (release_status = 'show')
+            $clients = Client::with('problems')
+        ->where('release_status', 'show')
+        ->get();
+
+    // ✅ ส่งข้อมูลไปยัง view
+    return view('backend.client.client_show', compact('clients'));
+
+
+
     }
    
     public function ClientAdd()
@@ -142,44 +150,31 @@ public function ClientStore(Request $request)
         'problems'        => 'nullable|array',
         'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ], [
-        
-        // ✅ ข้อความภาษาไทยสำหรับ register_number
-        'register_number.required' => 'กรุณากรอกเลขทะเบียน',
-        'register_number.string'   => 'เลขทะเบียนต้องเป็นตัวอักษร',
-        'register_number.max'      => 'เลขทะเบียนต้องไม่เกิน 255 ตัวอักษร',
+        // ✅ ข้อความภาษาไทยสำหรับ validation
         'register_number.unique'   => 'เลขทะเบียนนี้ถูกใช้แล้ว',
-
-    // ✅ ข้อความภาษาไทย
-        'title_id.required'     => 'กรุณาเลือกคำนำหน้า',
-        'first_name.required'   => 'กรุณากรอกชื่อ',
-        'last_name.required'    => 'กรุณากรอกนามสกุล',
-        'gender.required'       => 'กรุณาเลือกเพศ',
-        'gender.in'             => 'ค่าเพศไม่ถูกต้อง',
-        'birth_date.required' => 'กรุณากรอกวัน/เดือน/ปีเกิด',
-        'birth_date.date'     => 'วันเกิดต้องเป็นรูปแบบวันที่ที่ถูกต้อง',
-        'id_card.max'           => 'เลขบัตรประชาชนต้องไม่เกิน 13 หลัก',
-        'id_card.unique'        => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
-        'national_id.required'  => 'กรุณาเลือกสัญชาติ',
-        'religion_id.required'  => 'กรุณาเลือกศาสนา',
-        'marital_id.required'   => 'กรุณาเลือกสถานภาพสมรส',
-        'occupation_id.required'=> 'กรุณาเลือกอาชีพ',
-        'income_id.required'    => 'กรุณาเลือกรายได้',
-        'education_id.required' => 'กรุณาเลือกการศึกษา',
-        'arrival_date.required' => 'กรุณากรอกวันที่เข้ารับบริการ',
-        'arrival_date.required' => 'กรุณากรอกวันที่เข้ารับบริการ',
-        'arrival_date.date'     => 'วันที่เข้ารับบริการต้องเป็นรูปแบบวันที่',
-        'target_id.required'    => 'กรุณาเลือกเป้าหมาย',
-        'contact_id.required'   => 'กรุณาเลือกผู้ติดต่อ',
-        'project_id.required'   => 'กรุณาเลือกโครงการ',
-        'house_id.required'     => 'กรุณาเลือกบ้าน',
-        'status_id.required'    => 'กรุณาเลือกสถานะ',
-        'case_resident.required'=> 'กรุณาเลือกสถานะการอยู่อาศัย',
-        'case_resident.in'      => 'สถานะการอยู่อาศัยไม่ถูกต้อง',
-        'image.image'           => 'ไฟล์ต้องเป็นรูปภาพ',
-        'image.mimes'           => 'รูปภาพต้องเป็นไฟล์ประเภท jpeg, png, jpg, gif หรือ svg',
-        'image.max'             => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
+        'title_id.required'        => 'กรุณาเลือกคำนำหน้า',
+        'first_name.required'      => 'กรุณากรอกชื่อ',
+        'last_name.required'       => 'กรุณากรอกนามสกุล',
+        'gender.required'          => 'กรุณาเลือกเพศ',
+        'birth_date.required'      => 'กรุณากรอกวัน/เดือน/ปีเกิด',
+        'id_card.unique'           => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
+        'national_id.required'     => 'กรุณาเลือกสัญชาติ',
+        'religion_id.required'     => 'กรุณาเลือกศาสนา',
+        'marital_id.required'      => 'กรุณาเลือกสถานภาพสมรส',
+        'occupation_id.required'   => 'กรุณาเลือกอาชีพ',
+        'income_id.required'       => 'กรุณาเลือกรายได้',
+        'education_id.required'    => 'กรุณาเลือกการศึกษา',
+        'arrival_date.required'    => 'กรุณากรอกวันที่เข้ารับบริการ',
+        'target_id.required'       => 'กรุณาเลือกเป้าหมาย',
+        'contact_id.required'      => 'กรุณาเลือกผู้ติดต่อ',
+        'project_id.required'      => 'กรุณาเลือกโครงการ',
+        'house_id.required'        => 'กรุณาเลือกบ้าน',
+        'status_id.required'       => 'กรุณาเลือกสถานะ',
+        'case_resident.required'   => 'กรุณาเลือกสถานะการอยู่อาศัย',
+        'image.image'              => 'ไฟล์ต้องเป็นรูปภาพ',
+        'image.mimes'              => 'รูปภาพต้องเป็นไฟล์ประเภท jpeg, png, jpg, gif หรือ svg',
+        'image.max'                => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
     ]);
-
 
     // ✅ จัดการไฟล์ภาพ
     if ($request->hasFile('image')) {
@@ -193,9 +188,11 @@ public function ClientStore(Request $request)
     $problems = $validated['problems'] ?? [];
     unset($validated['problems']);
 
+    // ✅ กำหนดค่า release_status ให้เป็น 'show' เสมอเมื่อสร้างใหม่
+    $validated['release_status'] = 'show';
+
     // ✅ บันทึก Client
     $client = Client::create($validated);
-
 
     // ✅ แนบ problems (many-to-many)
     if (!empty($problems)) {
@@ -317,6 +314,8 @@ public function ClientUpdate(Request $request)
 
     // บันทึก Client
     $client = Client::findOrFail($id);
+    // ✅ กำหนดค่า release_status ให้คงเป็น 'show' เสมอเมื่อมีการแก้ไข
+    $validated['release_status'] = 'show';
     $client->update($validated);
 
     // แนบ problems (many-to-many)
@@ -330,33 +329,27 @@ public function ClientUpdate(Request $request)
     return redirect()->route('client.show', $client->id)->with($notification);
 }
 
-        public function ClientDelete($id)
-        {
-            // ดึงข้อมูล Client ถ้าไม่เจอจะ throw 404
-            $client = Client::findOrFail($id);
+       public function ClientDelete($id)
+{
+    // ดึงข้อมูล Client ถ้าไม่เจอจะ throw 404
+    $client = Client::findOrFail($id);
 
-            // ถ้ามีการแนบ problems (many-to-many) → ลบความสัมพันธ์ออกก่อน
-            $client->problems()->detach();
+    // ❌ ไม่ต้อง detach ความสัมพันธ์ problems
+    // ❌ ไม่ต้อง unlink รูปภาพ ถ้าใช้ soft delete
 
-            // ถ้ามีรูปภาพ → ลบไฟล์ออกจากโฟลเดอร์
-            if (!empty($client->image)) {
-                $imagePath = public_path('upload/client_images/' . $client->image);
-                if (file_exists($imagePath)) {
-                    @unlink($imagePath);
-                }
-            }
+    // ✅ เปลี่ยนสถานะ release_status เป็น refer
+    $client->update(['release_status' => 'refer']);
 
-            // ลบข้อมูล Recipient
-            $client->delete();
+    // แจ้งเตือน
+    $notification = [
+        'message' => 'เปลี่ยนสถานะเป็น refer เรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
 
-            // แจ้งเตือน
-            $notification = [
-                'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success'
-            ];
+    return redirect()->route('client.show')->with($notification);
+}
+    
 
-            return redirect()->route('client.show')->with($notification);    
-            }
 
 }
 

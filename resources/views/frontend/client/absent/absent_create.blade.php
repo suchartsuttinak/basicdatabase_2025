@@ -47,7 +47,7 @@
                                     <i class="bi bi-arrow-left-circle me-1"></i> กลับไปหน้าเพิ่ม
                                 </a>
                             @endif
-                        </div>
+                        </div>         
 
                     <!-- hidden fields -->
                     <input type="hidden" name="client_id" value="{{ $client->id }}">
@@ -148,7 +148,7 @@
                             <th>การดำเนินงาน</th>
                             <th>สถานศึกษา</th>
                             <th>ระดับชั้น</th>
-                            <th>การจัดการ</th>
+                            <th>การจัดการ</th>                           
                         </tr>
                     </thead>
                 <tbody class="small">
@@ -200,6 +200,7 @@
         </div>
     </div>
 </div>
+
 @endif
 
 @endsection

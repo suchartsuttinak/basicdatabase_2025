@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\backend\ClientController;
 use App\Http\Controllers\backend\SubjectController;
+use App\Http\Controllers\backend\PsychoController;
 use App\Http\Controllers\Frontend\AbsentController;
 use App\Http\Controllers\Frontend\FamilyController;
 use App\Http\Controllers\Frontend\MedicalController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
 use App\Http\Controllers\Frontend\VaccinationController;
+
 
 
 
@@ -64,6 +66,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/delete/subject/{id}', [SubjectController::class, 'DeleteSubject'])->name('subject.delete');
 });
 
+// Psycho Modal Route All
+Route::middleware('auth')->group(function () {
+    Route::get('/psycho', [PsychoController::class, 'PsychoShow'])->name('psycho.show');
+    Route::post('/store/psycho', [PsychoController::class, 'PsychoStore'])->name('psycho.store');
+    Route::get('/edit/psycho/{id}', [PsychoController::class, 'EditPsycho']);
+    Route::post('/update/psycho', [PsychoController::class, 'UpdatePsycho'])->name('psycho.update');
+    Route::get('/delete/psycho/{id}', [PsychoController::class, 'DeletePsycho'])->name('psycho.delete');
+
+});
+
+
+
 
 
 // Client Route All
@@ -74,6 +88,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/client/edit/{id}', [ClientController::class, 'ClientEdit'])->name('client.edit');
     Route::post('/client/update', [ClientController::class, 'ClientUpdate'])->name('client.update');
     Route::get('/client/delete/{id}', [ClientController::class, 'ClientDelete'])->name('client.delete');
+    
+
+    
  
 // Ajax Route All จังหวัด-อําเภอ-ตําบล
     Route::get('/get-districts/{province_id}', [ClientController::class, 'getDistricts']);

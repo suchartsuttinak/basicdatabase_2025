@@ -1,6 +1,9 @@
 @extends('admin_client.admin_client')
 @section('content')
 
+
+    
+@endauth
          <div class="container-fluid mt-4">
     <div class="card shadow-sm border-secondary">
         <!-- Header พร้อมปุ่ม toggle -->
@@ -182,7 +185,7 @@
                         <th>ผลการติดตาม</th>
                         <th>สถานศึกษา</th>
                         <th>ระดับชั้น</th>
-                        <th>จัดการ</th>
+                        <th>จัดการ</th>             
                     </tr>
                 </thead>
                 <tbody class="small">

@@ -17,7 +17,9 @@ class Client extends Model
         'birth_date','id_card','national_id','religion_id','marital_id','occupation_id',
         'income_id','education_id','scholl','address','moo','soi','road','village',
         'province_id','district_id','sub_district_id','zipcode','phone','arrival_date',
-        'target_id','contact_id','project_id','house_id','status_id','case_resident','image'
+        'target_id','contact_id','project_id','house_id','status_id','case_resident','image', 'release_status' // ✅ ต้องเพิ่มตรงนี้
+
+
     ];
 
     protected $dates = ['birth_date', 'arrival_date'];

@@ -28,7 +28,7 @@
         <table id="datatable-vaccine" class="table table-bordered table-striped align-middle">
             <thead class="table-primary">
                 <tr>
-                    <th scope="col">วันที่</th>
+                    <th scope="col">วันที่รับวัคซีน</th>
                     <th scope="col">ชนิดวัคซีน</th>
                     <th scope="col">สถานพยาบาล</th>
                     <th scope="col">หมายเหตุ</th>
@@ -144,8 +144,8 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-         <div class="mb-3">
-    <label class="form-label">วันที่</label>
+         <div class="mb-3 col-4">
+    <label class="form-label">วันที่รับวัคซีน</label>
     <input type="date" 
            name="date" 
            id="edit_date" 
