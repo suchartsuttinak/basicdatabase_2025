@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Validator; // ✅ ต้องมีบรรท�
 
 class PsychoController extends Controller
 {
-    public function PsychoShow(){
+    public function ShowPsycho(){
        $psycho = Psycho::latest()->get();
             return view('backend.psycho.psycho_show',compact('psycho'));
     }
-    public function PsychoStore(Request $request){
+    public function StorePsycho(Request $request){
         // ตรวจสอบชื่อห้ามซ้ำ
         $validator = Validator::make($request->all(), [
             'psycho_name' => 'required|unique:psychos,psycho_name'
         ], [
-            'psycho_name.required' => 'กรุณากรอกชื่อโรค',
-            'psycho_name.unique' => 'ชื่อวิชาเรียนนี้มีอยู่แล้วในระบบ'
+            'psycho_name.required' => 'กรุณากรอกชื่อโรคทางจิตเวช',
+            'psycho_name.unique' => 'ชื่อนี้มีอยู่แล้วในระบบ'
         ]);
 
         // ถ้ามี error → กลับไปพร้อม error message
@@ -31,7 +31,7 @@ class PsychoController extends Controller
         }
         // ถ้าไม่ซ้ำ → บันทึกข้อมูล
         Psycho::create([
-            'psycho_name' => $request->subject_name
+            'psycho_name' => $request->psycho_name
         ]);
 
         $notification = array(
@@ -42,22 +42,22 @@ class PsychoController extends Controller
         }
         //End Method
 
-        public function EditSubject($id)
+        public function EditPsycho($id)
         {
-            $subject = Subject::find($id);
-            return response()->json($subject);
+            $psycho = Psycho::find($id);
+            return response()->json($psycho);
         }
         //End Method
 
-         public function UpdateSubject(Request $request)
+         public function UpdatePsycho(Request $request)
     {
-        $sub_id = $request->sub_id; // ใช้ชื่อให้ตรงกับ hidden input
+        $psycho_id = $request->psycho_id; // ใช้ชื่อให้ตรงกับ hidden input
 
         $validator = Validator::make($request->all(), [
-            'subject_name' => 'required|unique:subjects,subject_name,' . $sub_id,
+            'psycho_name' => 'required|unique:psychos,psycho_name,' . $psycho_id,
         ], [
-            'subject_name.required' => 'กรุณากรอกชื่อวิชาเรียน',
-            'subject_name.unique' => 'ชื่อวิชาเรียนนี้มีอยู่แล้วในระบบ',
+            'psycho_name.required' => 'กรุณากรอกชื่อโรคทางจิตเวช',
+            'psycho_name.unique' => 'ชื่อนี้มีอยู่แล้วในระบบ',
         ]);
 
         if ($validator->fails()) {
@@ -66,8 +66,8 @@ class PsychoController extends Controller
                              ->withInput();
         }
 
-        Subject::findOrFail($sub_id)->update([
-            'subject_name' => $request->subject_name,
+        Psycho::findOrFail($psycho_id)->update([
+            'psycho_name' => $request->psycho_name,
         ]);
 
         $notification = [
@@ -78,10 +78,10 @@ class PsychoController extends Controller
         return redirect()->back()->with($notification);
     }
       //End Method
-        public function DeleteSubject($id)
+        public function DeletePsycho($id)
             {
-                $subject = Subject::find($id);
-                $subject->delete();
+                $psycho = Psycho::find($id);
+                $psycho->delete();
     
         return redirect()->back();
             }

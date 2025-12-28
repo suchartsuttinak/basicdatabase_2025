@@ -135,10 +135,10 @@
                                 <a href="{{ route('vaccine.index', $client->id) }}" class="tp-link">ประวัติการรับวัคซีน</a>
                             </li>
                             <li>
-                                <a href="pages-faqs.html" class="tp-link">FAQs</a>
+                                <a href="{{ route('psychiatric.create', $client->id) }}" class="tp-link">การวินิจฉัยทางจิตเวช</a>
                             </li>
                             <li>
-                                <a href="pages-gallery.html" class="tp-link">Gallery</a>
+                                <a href="{{ route('addictive.create', $client->id) }}" class="tp-link">การตรวจสารเสพติด</a>
                             </li>
                             <li>
                                 <a href="pages-maintenance.html" class="tp-link">Maintenance</a>

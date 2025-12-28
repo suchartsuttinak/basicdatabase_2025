@@ -4,19 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\backend\ClientController;
-use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\backend\PsychoController;
+use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\AbsentController;
 use App\Http\Controllers\Frontend\FamilyController;
 use App\Http\Controllers\Frontend\MedicalController;
 use App\Http\Controllers\Frontend\AccidentController;
+use App\Http\Controllers\Frontend\AddictiveController;
 use App\Http\Controllers\Frontend\CheckBodyController;
 use App\Http\Controllers\backend\InstitutionController;
 use App\Http\Controllers\Frontend\FactfindingController;
+use App\Http\Controllers\Frontend\PsychiatricController;
+use App\Http\Controllers\Frontend\VaccinationController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
-use App\Http\Controllers\Frontend\VaccinationController;
 
 
 
@@ -68,17 +70,13 @@ Route::middleware('auth')->group(function () {
 
 // Psycho Modal Route All
 Route::middleware('auth')->group(function () {
-    Route::get('/psycho', [PsychoController::class, 'PsychoShow'])->name('psycho.show');
-    Route::post('/store/psycho', [PsychoController::class, 'PsychoStore'])->name('psycho.store');
+    Route::get('/psycho', [PsychoController::class, 'ShowPsycho'])->name('psycho.show');
+    Route::post('/store/psycho', [PsychoController::class, 'StorePsycho'])->name('psycho.store');
     Route::get('/edit/psycho/{id}', [PsychoController::class, 'EditPsycho']);
     Route::post('/update/psycho', [PsychoController::class, 'UpdatePsycho'])->name('psycho.update');
     Route::get('/delete/psycho/{id}', [PsychoController::class, 'DeletePsycho'])->name('psycho.delete');
 
 });
-
-
-
-
 
 // Client Route All
     Route::middleware('auth')->group(function () {
@@ -89,9 +87,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/client/update', [ClientController::class, 'ClientUpdate'])->name('client.update');
     Route::get('/client/delete/{id}', [ClientController::class, 'ClientDelete'])->name('client.delete');
     
-
-    
- 
 // Ajax Route All จังหวัด-อําเภอ-ตําบล
     Route::get('/get-districts/{province_id}', [ClientController::class, 'getDistricts']);
     Route::get('/get-subdistricts/{district_id}', [ClientController::class, 'getSubdistricts']);
@@ -193,9 +188,7 @@ Route::middleware('auth')->group(function () {
             [EducationRecordController::class, 'EducationRecordDelete']
         )->name('education_record_delete');
     });
-
-
-    
+  
 // 🏫 บันทึกการติดตามเด็กในโรงเรียน
 Route::prefix('school_followup')->group(function () {
     Route::get('/add/{client_id}', [SchoolFollowupController::class, 'SchoolFollowupAdd'])->name('school_followup_add');
@@ -209,7 +202,6 @@ Route::prefix('school_followup')->group(function () {
         ->whereNumber('followup_id')
         ->name('school_followup.report');
 });
-
 
 /// 🏫 บันทึกการขาดเรียนของเด็ก
 Route::prefix('absent')->name('absent.')->group(function () {
@@ -303,3 +295,23 @@ Route::prefix('vaccine')->name('vaccine.')->group(function () {
     // ลบข้อมูลวัคซีน (ต้องใช้ DELETE)
     Route::delete('/delete/{id}', [VaccinationController::class, 'VaccineDelete'])->name('delete');
 });
+
+// บันทึกการตรวจวินิจฉัยทางจิตเวช
+Route::prefix('psychiatric')->group(function(){
+    Route::get('/add/{client_id}', [PsychiatricController::class, 'AddPsychiatric'])->name('psychiatric.create');
+    Route::post('/store', [PsychiatricController::class, 'StorePsychiatric'])->name('psychiatric.store');
+    Route::get('/edit/{id}', [PsychiatricController::class, 'EditPsychiatric'])->name('psychiatric.edit');
+    Route::put('/update/{id}', [PsychiatricController::class, 'UpdatePsychiatric'])->name('psychiatric.update');
+    Route::delete('/delete/{id}', [PsychiatricController::class, 'DeletePsychiatric'])->name('psychiatric.delete');
+});
+
+// บันทึกการตรวจสารเสพติด
+Route::prefix('addictive')->group(function(){
+    Route::get('/add/{client_id}', [AddictiveController::class, 'AddAddictive'])->name('addictive.create');
+    Route::post('/store', [AddictiveController::class, 'StoreAddictive'])->name('addictive.store');
+    Route::get('/edit/{id}', [AddictiveController::class, 'EditAddictive'])->name('addictive.edit');
+    Route::put('/update/{id}', [AddictiveController::class, 'UpdateAddictive'])->name('addictive.update');
+    Route::delete('/delete/{id}', [AddictiveController::class, 'DeleteAddictive'])->name('addictive.delete');
+   
+});
+

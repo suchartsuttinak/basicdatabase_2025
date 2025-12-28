@@ -62,7 +62,7 @@
                                 <a href="{{ route('subject.show') }}" class="tp-link">วิชาเรียน</a>
                             </li>
                             <li>
-                                <a href="auth-recoverpw.html" class="tp-link">Recover Password</a>
+                                <a href="{{ route('psycho.show') }}" class="tp-link">โรคทางจิตเวช</a>
                             </li>
                             <li>
                                 <a href="auth-lock-screen.html" class="tp-link">Lock Screen</a>
