@@ -65,7 +65,7 @@
                                 <a href="{{ route('psycho.show') }}" class="tp-link">โรคทางจิตเวช</a>
                             </li>
                             <li>
-                                <a href="auth-lock-screen.html" class="tp-link">Lock Screen</a>
+                                <a href="{{ route('misbehavior.show') }}" class="tp-link">บันทึกพฤติกรรม</a>
                             </li>
                             <li>
                                 <a href="auth-confirm-mail.html" class="tp-link">Confirm Mail</a>

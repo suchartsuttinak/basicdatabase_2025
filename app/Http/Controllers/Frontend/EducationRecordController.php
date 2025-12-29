@@ -19,56 +19,64 @@ class EducationRecordController extends Controller
         return view('frontend.client.education_record.education_record_create', compact('client','subjects', 'educations'));
     }
 
-    public function EducationRecordStore(Request $request)
-    {
-        $validated = $request->validate([
-            'client_id'    => 'required|exists:clients,id',
-            'education_id' => 'required', // ปรับตามชื่อ table จริง เช่น exists:educations,id
-            'semester'     => 'required|string|max:10',
-            'school_name'  => 'required|string',
-            'record_date'  => 'required|date',
-            'grade_average' => 'nullable|numeric',
-            'subjects'     => 'nullable|array',
-            'subjects.*.subject_id' => 'sometimes',
-            'subjects.*.score'      => 'sometimes',
-            'subjects.*.grade'      => 'sometimes',
-        ]);
+     public function EducationRecordStore(Request $request)
+        {
+            $validated = $request->validate([
+                'client_id'    => 'required|exists:clients,id',
+                'education_id' => 'required',
+                'semester'     => 'required|string|max:10',
+                'school_name'  => 'required|string',
+                'record_date'  => 'required|date',
+                'grade_average' => 'nullable|numeric',
+                'subjects'     => 'nullable|array',
+                'subjects.*.subject_id' => 'sometimes|exists:subjects,id',
+                'subjects.*.score'      => 'sometimes|numeric|min:0|max:100',
+                'subjects.*.grade'      => 'sometimes|string',
+            ]);
 
-        // กันบันทึกซ้ำ
-        $existingRecord = EducationRecord::where('client_id', $validated['client_id'])
-            ->where('education_id', $validated['education_id'])
-            ->where('semester', $validated['semester'])
-            ->first();
+            // กันบันทึกซ้ำทั้ง record
+            $existingRecord = EducationRecord::where('client_id', $validated['client_id'])
+                ->where('education_id', $validated['education_id'])
+                ->where('semester', $validated['semester'])
+                ->first();
 
-        if ($existingRecord) {
-            return back()->with('error', 'มีการบันทึกผลการเรียนในภาคเรียนนี้แล้ว')->withInput();
-        }
+            if ($existingRecord) {
+                return back()->with('error', 'มีการบันทึกผลการเรียนในภาคเรียนนี้แล้ว')->withInput();
+            }
 
-        // Insert record
-        $record = EducationRecord::create([
-            'client_id'    => $validated['client_id'],
-            'education_id' => $validated['education_id'],
-            'semester'     => $validated['semester'],
-            'school_name'  => $validated['school_name'],
-            'record_date'  => $validated['record_date'],
-            'grade_average' => $validated['grade_average'] ?? null,
-        ]);
-
-        // Attach subjects ถ้ามี
-        if (!empty($validated['subjects'])) {
-            foreach ($validated['subjects'] as $data) {
-                if (!empty($data['subject_id'])) {
-                    $record->subjects()->attach($data['subject_id'], [
-                        'score' => $data['score'] ?? null,
-                        'grade' => $data['grade'] ?? null,
-                    ]);
+            // ✅ กันเลือกวิชาซ้ำในฟอร์มเดียวกัน
+            if (!empty($validated['subjects'])) {
+                $subjectIds = array_column($validated['subjects'], 'subject_id');
+                if (count($subjectIds) !== count(array_unique($subjectIds))) {
+                    return back()->with('error', 'ไม่สามารถเลือกวิชาเดิมซ้ำในฟอร์มเดียวกันได้')->withInput();
                 }
             }
-        }
 
-        return redirect()->route('education_record_show', ['client_id' => $validated['client_id']])
-                         ->with('success','บันทึกผลการเรียนเรียบร้อยแล้ว');
-    }
+            // Insert record
+            $record = EducationRecord::create([
+                'client_id'    => $validated['client_id'],
+                'education_id' => $validated['education_id'],
+                'semester'     => $validated['semester'],
+                'school_name'  => $validated['school_name'],
+                'record_date'  => $validated['record_date'],
+                'grade_average' => $validated['grade_average'] ?? null,
+            ]);
+
+            // Attach subjects ถ้ามี
+            if (!empty($validated['subjects'])) {
+                foreach ($validated['subjects'] as $data) {
+                    if (!empty($data['subject_id'])) {
+                        $record->subjects()->attach($data['subject_id'], [
+                            'score' => $data['score'] ?? null,
+                            'grade' => $data['grade'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            return redirect()->route('education_record_show', ['client_id' => $validated['client_id']])
+                            ->with('success','บันทึกผลการเรียนเรียบร้อยแล้ว');
+        }
 
     // ฟังก์ชันช่วยแปลงเกรดเป็นคะแนน
     private function convertGradeToPoint($grade)

@@ -51,51 +51,38 @@
 
                 <li class="menu-title">กระบวนการ</li>
 
-                <li>
-                    <a href="#sidebarAuth" data-bs-toggle="collapse">
-                        <i data-feather="users"></i>
-                        <span> ข้อมูลผู้ใช้ </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarAuth">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('institution.all') }}" class="tp-link">รายการสถานศึกษา</a>
-                            </li>
-                            <li>
-                              <a href="{{ route('factfinding.add', $client->id) }}" class="tp-link">สอบข้อเท็จจริง</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('family.add', $client->id) }}" class="tp-link">บันทึกครอบครัว</a>
-                            </li>
-                            <li>
-                                <a href="auth-lock-screen.html" class="tp-link">Lock Screen</a>
-                            </li>
-                            <li>
-                                <a href="auth-confirm-mail.html" class="tp-link">Confirm Mail</a>
-                            </li>
-                            <li>
-                                <a href="email-verification.html" class="tp-link">Email Verification</a>
-                            </li>
-                            <li>
-                                <a href="auth-logout.html" class="tp-link">Logout</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebareducationRecord" data-bs-toggle="collapse">
+               <li>
+                        <a href="#sidebarAuth" data-bs-toggle="collapse"
+                        class="{{ Request::is('institution*') || Request::is('factfinding*') || Request::is('family*') ? 'active' : '' }}">
+                            <i data-feather="users"></i>
+                            <span> ข้อมูลผู้ใช้ </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse {{ Request::is('institution*') || Request::is('factfinding*') || Request::is('family*') ? 'show' : '' }}" id="sidebarAuth">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('institution.all') }}" class="tp-link">รายการสถานศึกษา</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('factfinding.add', $client->id) }}" class="tp-link">สอบข้อเท็จจริง</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('family.add', $client->id) }}" class="tp-link">บันทึกครอบครัว</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+               <li>
+                    <a href="#sidebareducationRecord" data-bs-toggle="collapse"
+                    class="{{ Request::is('education_record*') || Request::is('school_followup*') || Request::is('absent*') ? 'active' : '' }}">
                         <i data-feather="alert-octagon"></i>
                         <span> ข้อมูลการศึกษา </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebareducationRecord">
+                    <div class="collapse {{ Request::is('education_record*') || Request::is('school_followup*') || Request::is('absent*') ? 'show' : '' }}" id="sidebareducationRecord">
                         <ul class="nav-second-level">
                             <li>
-                               <a href="{{ route('education_record_add', ['client_id' => $client->id]) }}" class="tp-link">
-                                    บันทึกผลการเรียน
-                                </a>
+                                <a href="{{ route('education_record_add', ['client_id' => $client->id]) }}" class="tp-link">บันทึกผลการเรียน</a>
                             </li>
                             <li>
                                 <a href="{{ route('education_record_show', $client->id) }}" class="tp-link">แสดงผลการเรียน</a>
@@ -106,69 +93,42 @@
                             <li>
                                 <a href="{{ route('absent.add', $client->id) }}" class="tp-link">บันทึกการขาดเรียน</a>
                             </li>
-                            <li>
-                                <a href="offline-page.html" class="tp-link">Offline Page</a>
-                            </li>
                         </ul>
                     </div>
                 </li>
 
                 <li>
-                    <a href="#sidebaraccident" data-bs-toggle="collapse">
+                    <a href="#sidebaraccident" data-bs-toggle="collapse"
+                    class="{{ Request::is('accident*') || Request::is('check_body*') || Request::is('medical*') || Request::is('vaccine*') || Request::is('psychiatric*') || Request::is('addictive*') ? 'active' : '' }}">
                         <i data-feather="file-text"></i>
                         <span> ข้อมูลสุขภาพ </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebaraccident">
+                    <div class="collapse {{ Request::is('accident*') || Request::is('check_body*') || Request::is('medical*') || Request::is('vaccine*') || Request::is('psychiatric*') || Request::is('addictive*') ? 'show' : '' }}" id="sidebaraccident">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('accident.add', $client->id) }}" class="tp-link">บันทึกการบาดเจ็บ</a>
-                            </li>
-                            
-                            <li>
-                                <a href="{{ route('check_body.add', $client->id) }}" class="tp-link">ตรวจสุขภาพเบื้องต้น</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('medical.add', $client->id) }}" class="tp-link">การรักษาพยาบาล</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('vaccine.index', $client->id) }}" class="tp-link">ประวัติการรับวัคซีน</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('psychiatric.create', $client->id) }}" class="tp-link">การวินิจฉัยทางจิตเวช</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('addictive.create', $client->id) }}" class="tp-link">การตรวจสารเสพติด</a>
-                            </li>
-                            <li>
-                                <a href="pages-maintenance.html" class="tp-link">Maintenance</a>
-                            </li>
-                            <li>
-                                <a href="pages-coming-soon.html" class="tp-link">Coming Soon</a>
-                            </li>
+                            <li><a href="{{ route('accident.add', $client->id) }}" class="tp-link">บันทึกการบาดเจ็บ</a></li>
+                            <li><a href="{{ route('check_body.add', $client->id) }}" class="tp-link">ตรวจสุขภาพเบื้องต้น</a></li>
+                            <li><a href="{{ route('medical.add', $client->id) }}" class="tp-link">การรักษาพยาบาล</a></li>
+                            <li><a href="{{ route('vaccine.index', $client->id) }}" class="tp-link">ประวัติการรับวัคซีน</a></li>
+                            <li><a href="{{ route('psychiatric.create', $client->id) }}" class="tp-link">การวินิจฉัยทางจิตเวช</a></li>
+                            <li><a href="{{ route('addictive.create', $client->id) }}" class="tp-link">การตรวจสารเสพติด</a></li>
                         </ul>
                     </div>
                 </li>
 
-                <li>
-                    <a href="calendar.html" class="tp-link">
-                        <i data-feather="calendar"></i>
-                        <span> Calendar </span>
-                    </a>
-                </li>
 
                 <li class="menu-title mt-2">General</li>
 
                 <li>
                     <a href="#sidebarBaseui" data-bs-toggle="collapse">
                         <i data-feather="package"></i>
-                        <span> Components </span>
+                        <span> ข้อมูลด้านพฤติกรรม </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarBaseui">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="ui-accordions.html" class="tp-link">Accordions</a>
+                                <a href="{{ route('observe.create', $client->id) }}" class="tp-link">บันทึกพฤติกรรม</a>
                             </li>
                             <li>
                                 <a href="ui-alerts.html" class="tp-link">Alerts</a>
@@ -179,60 +139,7 @@
                             <li>
                                 <a href="ui-breadcrumb.html" class="tp-link">Breadcrumb</a>
                             </li>
-                            <li>
-                                <a href="ui-buttons.html" class="tp-link">Buttons</a>
-                            </li>
-                            <li>
-                                <a href="ui-cards.html" class="tp-link">Cards</a>
-                            </li>
-                            <li>
-                                <a href="ui-collapse.html" class="tp-link">Collapse</a>
-                            </li>
-                            <li>
-                                <a href="ui-dropdowns.html" class="tp-link">Dropdowns</a>
-                            </li>
-                            <li>
-                                <a href="ui-video.html" class="tp-link">Embed Video</a>
-                            </li>
-                            <li>
-                                <a href="ui-grid.html" class="tp-link">Grid</a>
-                            </li>
-                            <li>
-                                <a href="ui-images.html" class="tp-link">Images</a>
-                            </li>
-                            <li>
-                                <a href="ui-list.html" class="tp-link">List Group</a>
-                            </li>
-                            <li>
-                                <a href="ui-modals.html" class="tp-link">Modals</a>
-                            </li>
-                            <li>
-                                <a href="ui-placeholders.html" class="tp-link">Placeholders</a>
-                            </li>
-                            <li>
-                                <a href="ui-pagination.html" class="tp-link">Pagination</a>
-                            </li>
-                            <li>
-                                <a href="ui-popovers.html" class="tp-link">Popovers</a>
-                            </li>
-                            <li>
-                                <a href="ui-progress.html" class="tp-link">Progress</a>
-                            </li>
-                            <li>
-                                <a href="ui-scrollspy.html" class="tp-link">Scrollspy</a>
-                            </li>
-                            <li>
-                                <a href="ui-spinners.html" class="tp-link">Spinners</a>
-                            </li>
-                            <li>
-                                <a href="ui-tabs.html" class="tp-link">Tabs</a>
-                            </li>
-                            <li>
-                                <a href="ui-tooltips.html" class="tp-link">Tooltips</a>
-                            </li>
-                            <li>
-                                <a href="ui-typography.html" class="tp-link">Typography</a>
-                            </li>
+                                                 
                         </ul>
                     </div>
                 </li>

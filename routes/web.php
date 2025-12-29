@@ -13,15 +13,14 @@ use App\Http\Controllers\Frontend\AccidentController;
 use App\Http\Controllers\Frontend\AddictiveController;
 use App\Http\Controllers\Frontend\CheckBodyController;
 use App\Http\Controllers\backend\InstitutionController;
+use App\Http\Controllers\backend\MisbehaviorController;
 use App\Http\Controllers\Frontend\FactfindingController;
 use App\Http\Controllers\Frontend\PsychiatricController;
 use App\Http\Controllers\Frontend\VaccinationController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
-
-
-
+use App\Http\Controllers\Frontend\ObserveController;
 
 
 Route::get('/', function () {
@@ -77,6 +76,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/delete/psycho/{id}', [PsychoController::class, 'DeletePsycho'])->name('psycho.delete');
 
 });
+
+// Misbehavior Modal Route All
+    Route::middleware('auth')->group(function () {
+    Route::get('/misbehavior', [MisbehaviorController::class, 'ShowMisbehavior'])->name('misbehavior.show');
+    Route::post('/store/misbehavior', [MisbehaviorController::class, 'StoreMisbehavior'])->name('misbehavior.store');
+    Route::get('/edit/misbehavior/{id}', [MisbehaviorController::class, 'EditMisbehavior']);
+    Route::post('/update/misbehavior', [MisbehaviorController::class, 'UpdateMisbehavior'])->name('misbehavior.update');
+    Route::get('/delete/misbehavior/{id}', [MisbehaviorController::class, 'DeleteMisbehavior'])->name('misbehavior.delete');
+
+});
+
 
 // Client Route All
     Route::middleware('auth')->group(function () {
@@ -296,7 +306,7 @@ Route::prefix('vaccine')->name('vaccine.')->group(function () {
     Route::delete('/delete/{id}', [VaccinationController::class, 'VaccineDelete'])->name('delete');
 });
 
-// บันทึกการตรวจวินิจฉัยทางจิตเวช
+// บันทึกการตรวจวินิจฉัยทางจิตเวช Psychiatric
 Route::prefix('psychiatric')->group(function(){
     Route::get('/add/{client_id}', [PsychiatricController::class, 'AddPsychiatric'])->name('psychiatric.create');
     Route::post('/store', [PsychiatricController::class, 'StorePsychiatric'])->name('psychiatric.store');
@@ -305,7 +315,7 @@ Route::prefix('psychiatric')->group(function(){
     Route::delete('/delete/{id}', [PsychiatricController::class, 'DeletePsychiatric'])->name('psychiatric.delete');
 });
 
-// บันทึกการตรวจสารเสพติด
+// บันทึกการตรวจสารเสพติด Addictive
 Route::prefix('addictive')->group(function(){
     Route::get('/add/{client_id}', [AddictiveController::class, 'AddAddictive'])->name('addictive.create');
     Route::post('/store', [AddictiveController::class, 'StoreAddictive'])->name('addictive.store');
@@ -313,5 +323,22 @@ Route::prefix('addictive')->group(function(){
     Route::put('/update/{id}', [AddictiveController::class, 'UpdateAddictive'])->name('addictive.update');
     Route::delete('/delete/{id}', [AddictiveController::class, 'DeleteAddictive'])->name('addictive.delete');
    
+});
+
+// Routes สำหรับพฤติกรรม (Observe)
+Route::prefix('observe')->group(function(){
+    Route::get('/add/{client_id}', [ObserveController::class, 'AddObserve'])->name('observe.create');
+    Route::post('/store', [ObserveController::class, 'StoreObserve'])->name('observe.store');
+    Route::get('/edit/{id}', [ObserveController::class, 'EditObserve'])->name('observe.edit');
+    Route::put('/update/{id}', [ObserveController::class, 'UpdateObserve'])->name('observe.update');
+    Route::delete('/delete/{id}', [ObserveController::class, 'DeleteObserve'])->name('observe.delete');
+});
+
+// Routes สำหรับการติดตามผล (Followup)
+Route::prefix('followup')->group(function(){
+    Route::post('/store', [ObserveController::class, 'StoreFollowup'])->name('followup.store');
+    Route::get('/edit/{id}', [ObserveController::class, 'EditFollowup'])->name('followup.edit');
+    Route::put('/update/{id}', [ObserveController::class, 'UpdateFollowup'])->name('followup.update');
+    Route::delete('/delete/{id}', [ObserveController::class, 'DeleteFollowup'])->name('followup.delete');
 });
 
