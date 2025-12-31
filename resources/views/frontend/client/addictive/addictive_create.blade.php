@@ -64,10 +64,17 @@
                             data-bs-target="#editAddictiveModal{{ $addictive->id }}">
                       <i class="bi bi-pencil-square"></i> แก้ไข
                     </button>
-                    <button type="button" class="btn btn-sm btn-danger"
-                            onclick="confirmDeleteAddictive({{ $addictive->id }})">
-                      <i class="bi bi-trash"></i> ลบ
-                    </button>
+                    
+                  <form id="delete-form-addictive-{{ $addictive->id }}" 
+                        action="{{ route('addictive.delete', $addictive->id) }}" 
+                        method="POST" class="d-inline">
+                      @csrf 
+                      @method('DELETE')
+                      <button type="button" class="btn btn-sm btn-danger"
+                              onclick="confirmDelete('delete-form-addictive-{{ $addictive->id }}', 'คุณต้องการลบข้อมูลการเสพติดนี้ใช่หรือไม่')">
+                          <i class="bi bi-trash"></i> ลบ
+                      </button>
+                  </form>
                     <a href="#" class="btn btn-sm btn-info">
                       <i class="bi bi-file-earmark-text"></i> รายงาน
                     </a>
@@ -89,7 +96,6 @@
     @endif
   </div>
 </div>
-
 
 <!-- Modal เพิ่มข้อมูล -->
 <div class="modal fade" id="createAddictiveModal" tabindex="-1" aria-hidden="true">
@@ -268,24 +274,6 @@ document.addEventListener('DOMContentLoaded', function () {
       { targets: 7, width: '18%', className: 'text-center' }   // จัดการ
     ]
   });
-
-  // ✅ SweetAlert delete confirm
-  window.confirmDeleteAddictive = function(id) {
-    Swal.fire({
-      title: 'ท่านแน่ใจ ?',
-      text: 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'ตกลง',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        document.getElementById('delete-form-addictive-' + id).submit();
-      }
-    });
-  };
 
   // ✅ Toggle referField สำหรับ modal create
   const examNoNew = document.getElementById('exam_no_new');

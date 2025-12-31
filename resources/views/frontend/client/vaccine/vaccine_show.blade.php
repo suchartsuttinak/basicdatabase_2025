@@ -60,11 +60,19 @@
                                 @method('DELETE')
                             </form>
 
-                            <!-- ✅ ปุ่มลบเรียก SweetAlert -->
-                            <button type="button" class="btn btn-danger btn-sm ms-1"
-                                    onclick="confirmDelete({{ $item->id }})">
-                                <i class="bi bi-trash"></i> ลบ
-                            </button>
+                           <!-- ✅ ฟอร์มลบแบบ hidden -->
+                                <form id="delete-form-item-{{ $item->id }}" 
+                                    action="{{ route('vaccine.delete', $item->id) }}" 
+                                    method="POST" style="display:none;">
+                                    @csrf 
+                                    @method('DELETE')
+                                </form>
+
+                                <!-- ✅ ปุ่มลบเรียก SweetAlert -->
+                                <button type="button" class="btn btn-danger btn-sm ms-1"
+                                        onclick="confirmDelete('delete-form-item-{{ $item->id }}', 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่')">
+                                    <i class="bi bi-trash"></i> ลบ
+                                </button>
                         </td>
                     </tr>
                 @endforeach
@@ -226,22 +234,7 @@
             $('#edit-vaccine-form').attr('action', '/vaccine/update/' + "{{ session('edit_id') }}");
         @endif
     });
-
-    // ✅ SweetAlert2 สำหรับยืนยันการลบ
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'ท่านแน่ใจ ?',
-            text: 'ลบข้อมูลนี้ใช่หรือไม่ ?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'ตกลง',
-            cancelButtonText: 'ยกเลิก',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-form-' + id).submit();
-            }
-        });
-    }
+ 
 </script>
 
 @endpush

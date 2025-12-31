@@ -101,19 +101,26 @@ class ObserveController extends Controller
     // บันทึกการติดตามผล
     public function StoreFollowup(Request $request)
     {
-        $data = $request->validate([
-            'observe_id' => 'required|integer|exists:observes,id',
-            'followup_date' => 'required|date',
-            'followup_count' => 'required|integer|min:1',
-            'followup_action' => 'nullable|string',
-            'followup_result' => 'nullable|string',
-        ]);
+            $data = $request->validate([
+                'observe_id'      => 'required|integer|exists:observes,id',
+                'followup_date'   => 'required|date',
+                'followup_action' => 'nullable|string',
+                'followup_result' => 'nullable|string',
+            ]);
 
-        ObserveFollowup::create($data);
+            $observe = Observe::findOrFail($data['observe_id']);
+            $data['followup_count'] = $observe->followups()->count() + 1;
 
-        return redirect()->route('observe.edit', $data['observe_id'])
-                         ->with('followup_success','บันทึกการติดตามผลเรียบร้อย');
-    }
+            ObserveFollowup::create($data);
+
+            return redirect()
+                ->route('observe.edit', $data['observe_id'])
+                ->with('followup_success', 'บันทึกการติดตามผลเรียบร้อย');
+}
+
+
+
+
 
     // ลบการติดตามผล
     public function DeleteFollowup($id)

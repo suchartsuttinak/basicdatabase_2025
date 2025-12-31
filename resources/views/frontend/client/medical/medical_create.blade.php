@@ -51,23 +51,25 @@
                                         <i class="bi bi-pencil-square"></i> แก้ไข
                                         </button>
 
-                                   <button type="button" class="btn btn-sm btn-danger"
-                                                onclick="confirmDeleteMedical({{ $medical->id }})">
-                                            <i class="bi bi-trash"></i> ลบ
-                                        </button>
+                                 <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="confirmDelete('delete-form-medical-{{ $medical->id }}', 'คุณต้องการลบข้อมูลทางการแพทย์นี้ใช่หรือไม่')">
+                                    <i class="bi bi-trash"></i> ลบ
+                                </button>
 
                                     <a href="{{ route('medical.report', $medical->id) }}" class="btn btn-sm btn-info">
                                         <i class="bi bi-file-earmark-text"></i> รายงาน
                                     </a>
                                 </div>
-
+  
                                 {{-- ฟอร์มลบแบบซ่อน --}}
-                                <form id="delete-form-medical-{{ $medical->id }}"
-                                        action="{{ route('medical.delete', $medical->id) }}"
-                                        method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
+                                  <form id="delete-form-medical-{{ $medical->id }}" 
+                                        action="{{ route('medical.delete', $medical->id) }}" 
+                                        method="POST" style="display:none;">
+                                      @csrf
+                                      @method('DELETE')
+                                  </form>
+
+
                             </td>
                         </tr>
                     @empty
@@ -282,23 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ]
   });
 
-  // ✅ SweetAlert2 สำหรับยืนยันการลบ
-  window.confirmDeleteMedical = function(id) {
-    Swal.fire({
-      title: 'ท่านแน่ใจ ?',
-      text: 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'ตกลง',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        document.getElementById('delete-form-medical-' + id).submit();
-      }
-    });
-  };
+  
 
   // ✅ Toggle ฟิลด์การวินิจฉัย/วันที่แพทย์นัด สำหรับ Create
   const referYesNew   = document.getElementById('refer_yes_new');

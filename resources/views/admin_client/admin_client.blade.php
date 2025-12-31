@@ -148,6 +148,28 @@
     });
     </script>
 
+    <!-- ✅ ฟังก์ชันกลางสำหรับยืนยันการลบ -->
+<script>
+    window.confirmDelete = function(formId, message = 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่') {
+        Swal.fire({
+            title: 'ท่านแน่ใจ ?',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'ตกลง',
+            cancelButtonText: 'ยกเลิก',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(formId).submit();
+            }
+        });
+    };
+</script>
+
+
+
     <!-- Toastr Alert -->
     <script>
         @if(Session::has('message'))

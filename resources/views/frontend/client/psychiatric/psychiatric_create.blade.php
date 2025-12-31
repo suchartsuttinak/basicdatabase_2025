@@ -66,10 +66,16 @@
                                         <i class="bi bi-pencil-square"></i> แก้ไข
                                         </button>
 
+                                      <form id="delete-form-psychiatric-{{ $psychiatric->id }}" 
+                                          action="{{ route('psychiatric.delete', $psychiatric->id) }}" 
+                                          method="POST" class="d-inline">
+                                        @csrf 
+                                        @method('DELETE')
                                         <button type="button" class="btn btn-sm btn-danger"
-                                                onclick="confirmDeletePsychiatric({{ $psychiatric->id }})">
+                                                onclick="confirmDelete('delete-form-psychiatric-{{ $psychiatric->id }}', 'คุณต้องการลบข้อมูลจิตเวชนี้ใช่หรือไม่')">
                                             <i class="bi bi-trash"></i> ลบ
                                         </button>
+                                    </form>
 
                                         <a href="" class="btn btn-sm btn-info">
                                             <i class="bi bi-file-earmark-text"></i> รายงาน
@@ -285,6 +291,7 @@
   </div>
 </div>
 @endforeach
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -304,23 +311,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ]
   });
 
-  // ✅ SweetAlert2 สำหรับยืนยันการลบ
-  window.confirmDeletePsychiatric = function(id) {
-    Swal.fire({
-      title: 'ท่านแน่ใจ ?',
-      text: 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'ตกลง',
-      cancelButtonText: 'ยกเลิก',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        document.getElementById('delete-form-psychiatric-' + id).submit();
-      }
-    });
-  };
 
   // ✅ Toggle การรักษา (รับยา/ไม่รับยา) สำหรับ Create
   const drugYesNew   = document.getElementById('drug_yes_new');
