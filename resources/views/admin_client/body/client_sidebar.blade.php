@@ -69,6 +69,9 @@
                                 <li>
                                     <a href="{{ route('family.add', $client->id) }}" class="tp-link">บันทึกครอบครัว</a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('visitFamily.create', $client->id) }}" class="tp-link">เยี่ยมครอบครัว</a>
+                                </li>
                             </ul>
                         </div>
                     </li>

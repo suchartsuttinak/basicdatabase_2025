@@ -16,13 +16,16 @@
         </div>
     @endif
 
-
-<div class="container my-4">
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i> บันทึกผลการเรียน</h5>
-        </div>
-        
+            <div class="container my-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-journal-text me-2"></i> บันทึกผลการเรียน
+                </h5>
+                <!-- ปุ่มปิดฟอร์ม -->
+                <a href="{{ route('admin.index', $client->id) }}" class="btn-close btn-close-white" aria-label="Close"></a>
+            </div>
+                    
         <div class="card-body">
             <form action="{{ route('education_record_store') }}" method="POST" novalidate>
                 @csrf
@@ -54,22 +57,23 @@
 
                 <!-- ภาคเรียน + โรงเรียน -->
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                  <div class="col-md-4">
                         <label for="semester" class="form-label fw-bold">ภาคเรียน</label>
                         <input type="text"
-                               name="semester"
-                               id="semester"
-                               class="form-control @error('semester') is-invalid @enderror"
-                               placeholder="เช่น 1/2568"
-                               maxlength="10"
-                               value="{{ old('semester') }}"
-                               required>
+                            name="semester"
+                            id="semester"
+                            class="form-control @error('semester') is-invalid @enderror"
+                            placeholder="เช่น 1/2568"
+                            maxlength="10"
+                            value="{{ old('semester') }}"
+                            required
+                            pattern="^[1-3]\/\d{4}$"
+                            title="กรุณากรอกในรูปแบบ เช่น 1/2568">
                         @error('semester')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
-                    <div class="col-md-8">
+              <div class="col-md-8">
                         <label for="school_name" class="form-label fw-bold">สถานศึกษา</label>
                         <input type="text"
                                name="school_name"

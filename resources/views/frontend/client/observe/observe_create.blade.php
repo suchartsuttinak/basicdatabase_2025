@@ -27,8 +27,9 @@
             </div>
       </div>
 
-        <!-- ตารางแสดงผล -->
-        <div class="card mt-2 shadow-sm border-0">
+            <!-- ตารางแสดงผล -->
+         @if($observes->count() > 0)
+            <div class="card mt-2 shadow-sm border-0">
                 <div class="card-body pt-0">
                     <table class="table table-striped table-hover align-middle">
                                 <thead class="table-primary">
@@ -154,8 +155,14 @@
             </table>
         </div>
     </div>
-</div>
-
+   @else
+    <!-- กรณีไม่มีข้อมูล -->
+    <div class="alert alert-secondary text-center mt-2">
+        <i class="bi bi-info-circle me-1"></i> ยังไม่มีบันทึกพฤติกรรม
+    </div>
+@endif
+ </div>
+ 
 <!-- Modal: ฟอร์มบันทึก/แก้ไขพฤติกรรม -->
 <div class="modal fade" id="observeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">

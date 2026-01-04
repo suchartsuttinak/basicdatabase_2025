@@ -9,6 +9,7 @@ use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\AbsentController;
 use App\Http\Controllers\Frontend\FamilyController;
 use App\Http\Controllers\Frontend\MedicalController;
+use App\Http\Controllers\Frontend\ObserveController;
 use App\Http\Controllers\Frontend\AccidentController;
 use App\Http\Controllers\Frontend\AddictiveController;
 use App\Http\Controllers\Frontend\CheckBodyController;
@@ -17,10 +18,10 @@ use App\Http\Controllers\backend\MisbehaviorController;
 use App\Http\Controllers\Frontend\FactfindingController;
 use App\Http\Controllers\Frontend\PsychiatricController;
 use App\Http\Controllers\Frontend\VaccinationController;
+use App\Http\Controllers\Frontend\VisitFamilyController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
-use App\Http\Controllers\Frontend\ObserveController;
 
 
 Route::get('/', function () {
@@ -342,3 +343,32 @@ Route::prefix('followup')->group(function(){
     Route::delete('/delete/{id}', [ObserveController::class, 'DeleteFollowup'])->name('followup.delete');
 });
 
+// Vitsit_Family Route All
+Route::prefix('vitsitFamily')->group(function () {
+    Route::get('/add/{client_id}', [VisitFamilyController::class, 'AddvisitFamily'])->name('visitFamily.create');
+    Route::post('/store/{client_id}', [VisitFamilyController::class, 'StoreVisitFamily'])->name('vitsitFamily.store');
+    Route::get('/edit/{id}', [VisitFamilyController::class, 'EditVisitFamily'])->name('vitsitFamily.edit');
+    Route::put('/update/{id}', [VisitFamilyController::class, 'UpdateVisitFamily'])->name('vitsitFamily.update');
+
+    // ชี้ไปที่ VisitFamilyController@destroy ให้ตรงกับเมธอดที่มีอยู่
+    Route::delete('/image/{id}', [VisitFamilyController::class, 'destroy'])->name('image.destroy');
+
+    // (ตัวเลือก) ถ้าจะทำ “แทนที่รูป” ให้เพิ่ม route นี้
+    Route::patch('/image/{id}', [VisitFamilyController::class, 'replaceImage'])->name('image.replace');
+
+
+
+
+
+
+
+    // Ajax Route จังหวัด-อำเภอ-ตำบล-รหัสไปรษณีย์
+    Route::get('/get-districts/{province_id}', [VisitFamilyController::class, 'getDistricts'])
+        ->name('vitsitFamily.getDistricts');
+
+    Route::get('/get-subdistricts/{district_id}', [VisitFamilyController::class, 'getSubdistricts'])
+        ->name('vitsitFamily.getSubdistricts');
+
+    Route::get('/get-zipcode/{subdistrict_id}', [VisitFamilyController::class, 'getZipcode'])
+        ->name('vitsitFamily.getZipcode');
+});

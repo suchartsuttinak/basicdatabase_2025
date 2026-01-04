@@ -22,17 +22,36 @@ class EducationRecordController extends Controller
      public function EducationRecordStore(Request $request)
         {
             $validated = $request->validate([
-                'client_id'    => 'required|exists:clients,id',
-                'education_id' => 'required',
-                'semester'     => 'required|string|max:10',
-                'school_name'  => 'required|string',
-                'record_date'  => 'required|date',
-                'grade_average' => 'nullable|numeric',
-                'subjects'     => 'nullable|array',
-                'subjects.*.subject_id' => 'sometimes|exists:subjects,id',
-                'subjects.*.score'      => 'sometimes|numeric|min:0|max:100',
-                'subjects.*.grade'      => 'sometimes|string',
-            ]);
+        'client_id'    => 'required|exists:clients,id',
+        'education_id' => 'required',
+        'semester'     => ['required', 'regex:/^[1-3]\/\d{4}$/'],
+        'school_name'  => 'required|string',
+        'record_date'  => 'required|date',
+        'grade_average'=> 'nullable|numeric',
+        'subjects'     => 'nullable|array',
+        'subjects.*.subject_id' => 'sometimes|exists:subjects,id',
+        'subjects.*.score'      => 'sometimes|numeric|min:0|max:100',
+        'subjects.*.grade'      => 'sometimes|string',
+    ], [
+        // ✅ ข้อความแจ้งเตือนภาษาไทย
+        'client_id.required'    => 'กรุณาเลือกผู้รับบริการ',
+        'client_id.exists'      => 'ไม่พบข้อมูลผู้รับบริการนี้',
+        'education_id.required' => 'กรุณาเลือกระดับการศึกษา',
+        'semester.required'     => 'กรุณากรอกภาคเรียน',
+        'semester.regex'        => 'กรุณากรอกภาคเรียนในรูปแบบที่ถูกต้อง เช่น 1/2568',
+        'school_name.required'  => 'กรุณากรอกชื่อสถานศึกษา',
+        'record_date.required'  => 'กรุณาเลือกวันที่บันทึก',
+        'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่ที่ถูกต้อง',
+        'grade_average.numeric' => 'เกรดเฉลี่ยต้องเป็นตัวเลข',
+        'subjects.array'        => 'ข้อมูลวิชาต้องอยู่ในรูปแบบที่ถูกต้อง',
+        'subjects.*.subject_id.exists' => 'รหัสวิชาที่เลือกไม่ถูกต้อง',
+        'subjects.*.score.numeric'     => 'คะแนนต้องเป็นตัวเลข',
+        'subjects.*.score.min'         => 'คะแนนต้องไม่น้อยกว่า 0',
+        'subjects.*.score.max'         => 'คะแนนต้องไม่เกิน 100',
+        'subjects.*.grade.string'      => 'เกรดต้องเป็นข้อความ',
+    ]);
+
+
 
             // กันบันทึกซ้ำทั้ง record
             $existingRecord = EducationRecord::where('client_id', $validated['client_id'])
@@ -60,7 +79,25 @@ class EducationRecordController extends Controller
                 'school_name'  => $validated['school_name'],
                 'record_date'  => $validated['record_date'],
                 'grade_average' => $validated['grade_average'] ?? null,
-            ]);
+            ],
+            [
+            // ✅ ข้อความแจ้งเตือนภาษาไทย
+            'client_id.required'    => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.exists'      => 'ไม่พบข้อมูลผู้รับบริการนี้',
+            'education_id.required' => 'กรุณาเลือกระดับการศึกษา',
+            'semester.required'     => 'กรุณากรอกภาคเรียน',
+            'semester.regex'        => 'กรุณากรอกภาคเรียนในรูปแบบที่ถูกต้อง เช่น 1/2568',
+            'school_name.required'  => 'กรุณากรอกชื่อสถานศึกษา',
+            'record_date.required'  => 'กรุณาเลือกวันที่บันทึก',
+            'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่ที่ถูกต้อง',
+            'grade_average.numeric' => 'เกรดเฉลี่ยต้องเป็นตัวเลข',
+            'subjects.array'        => 'ข้อมูลวิชาต้องอยู่ในรูปแบบที่ถูกต้อง',
+            'subjects.*.subject_id.exists' => 'รหัสวิชาที่เลือกไม่ถูกต้อง',
+            'subjects.*.score.numeric'     => 'คะแนนต้องเป็นตัวเลข',
+            'subjects.*.score.min'         => 'คะแนนต้องไม่น้อยกว่า 0',
+            'subjects.*.score.max'         => 'คะแนนต้องไม่เกิน 100',
+            'subjects.*.grade.string'      => 'เกรดต้องเป็นข้อความ',
+        ]);
 
             // Attach subjects ถ้ามี
             if (!empty($validated['subjects'])) {
@@ -114,7 +151,7 @@ class EducationRecordController extends Controller
         $validated = $request->validate([
             'client_id'    => 'required|exists:clients,id',
             'education_id' => 'required', // ปรับตามชื่อ table จริง
-            'semester'     => 'required|string',
+            'semester' => ['required', 'regex:/^[1-3]\/\d{4}$/'],
             'school_name'  => 'required|string',
             'record_date'  => 'required|date',
             'grade_average'=> 'nullable|numeric|regex:/^\d{1,3}(\.\d{1,2})?$/',
