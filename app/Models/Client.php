@@ -84,6 +84,14 @@ class Client extends Model
     }
 
 
+ // เพิ่มความสัมพันธ์กับ Member
+    public function members()
+    {
+        return $this->hasMany(Member::class, 'client_id');
+    }
+
+
+
 
     //ตาราง บิดา มารดา สามี/ภรรยา และญาติ
      public function father()       { return $this->hasOne(Father::class);}

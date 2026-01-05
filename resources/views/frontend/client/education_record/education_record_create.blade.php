@@ -125,14 +125,11 @@
                                 <label class="form-label">เกรด</label>
                                 <select name="subjects[0][grade]" class="form-select">
                                     <option value="">-- เลือกเกรด --</option>
-                                    <option value="4">4.00</option>
-                                    <option value="3.5">3.50</option>
-                                    <option value="3">3.00</option>
-                                    <option value="2.5">2.50</option>
-                                    <option value="2">2.00</option>
-                                    <option value="1.5">1.50</option>
-                                    <option value="1">1.00</option>
-                                    <option value="0">0.00</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                    <option value="0">0</option>
                                 </select>
                             </div>
                             <div class="col-md-1 d-flex align-items-end justify-content-end">
@@ -247,7 +244,5 @@ document.getElementById('semester').addEventListener('input', function() {
     }
 });
 </script>
-
-
 
 @endsection

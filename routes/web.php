@@ -7,7 +7,9 @@ use App\Http\Controllers\backend\ClientController;
 use App\Http\Controllers\backend\PsychoController;
 use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\AbsentController;
+use App\Http\Controllers\Frontend\EscapeController;
 use App\Http\Controllers\Frontend\FamilyController;
+use App\Http\Controllers\Frontend\MemberController;
 use App\Http\Controllers\Frontend\MedicalController;
 use App\Http\Controllers\Frontend\ObserveController;
 use App\Http\Controllers\Frontend\AccidentController;
@@ -19,6 +21,7 @@ use App\Http\Controllers\Frontend\FactfindingController;
 use App\Http\Controllers\Frontend\PsychiatricController;
 use App\Http\Controllers\Frontend\VaccinationController;
 use App\Http\Controllers\Frontend\VisitFamilyController;
+use App\Http\Controllers\Frontend\EscapeFollowController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
@@ -349,18 +352,13 @@ Route::prefix('vitsitFamily')->group(function () {
     Route::post('/store/{client_id}', [VisitFamilyController::class, 'StoreVisitFamily'])->name('vitsitFamily.store');
     Route::get('/edit/{id}', [VisitFamilyController::class, 'EditVisitFamily'])->name('vitsitFamily.edit');
     Route::put('/update/{id}', [VisitFamilyController::class, 'UpdateVisitFamily'])->name('vitsitFamily.update');
-
-    // ชี้ไปที่ VisitFamilyController@destroy ให้ตรงกับเมธอดที่มีอยู่
-    Route::delete('/image/{id}', [VisitFamilyController::class, 'destroy'])->name('image.destroy');
-
+  
     // (ตัวเลือก) ถ้าจะทำ “แทนที่รูป” ให้เพิ่ม route นี้
     Route::patch('/image/{id}', [VisitFamilyController::class, 'replaceImage'])->name('image.replace');
 
-
-
-
-
-
+    // ชี้ไปที่ VisitFamilyController@destroy ให้ตรงกับเมธอดที่มีอยู่
+     Route::delete('/vitsitFamily/image/{id}', [VisitFamilyController::class, 'destroy'])
+        ->name('image.destroy');
 
     // Ajax Route จังหวัด-อำเภอ-ตำบล-รหัสไปรษณีย์
     Route::get('/get-districts/{province_id}', [VisitFamilyController::class, 'getDistricts'])
@@ -372,3 +370,54 @@ Route::prefix('vitsitFamily')->group(function () {
     Route::get('/get-zipcode/{subdistrict_id}', [VisitFamilyController::class, 'getZipcode'])
         ->name('vitsitFamily.getZipcode');
 });
+
+// Routes สมาชิกในครอบครัว (Member)
+Route::prefix('member')->group(function(){
+    Route::get('/add/{client_id}', [MemberController::class, 'AddMember'])->name('member.create');
+   Route::get('/show/{client_id}', [MemberController::class, 'ShowMember'])->name('member.show');
+    Route::post('/store', [MemberController::class, 'StoreMember'])->name('member.store');
+    Route::get('/edit/{id}', [MemberController::class, 'EditMember'])->name('member.edit');
+    Route::put('/update/{id}', [MemberController::class, 'UpdateMember'])->name('member.update');
+    Route::delete('/delete/{id}', [MemberController::class, 'DeleteMember'])->name('member.delete');
+   
+});
+
+
+/// Escape หลัก
+Route::prefix('escape')->group(function(){
+    // หน้า index แสดง Escape ทั้งหมด
+    Route::get('/index/{client_id}', [EscapeController::class, 'IndexEscape'])->name('escape.index');
+
+    // หน้า add escape ใหม่
+    Route::get('/add/{client_id}', [EscapeController::class, 'AddEscape'])->name('escape.add');
+
+    // บันทึก escape ใหม่
+    Route::post('/store', [EscapeController::class, 'StoreEscape'])->name('escape.store');
+
+    // หน้า edit escape ตาม id
+    Route::get('/edit/{id}', [EscapeController::class, 'EditEscape'])->name('escape.edit');
+
+    // อัปเดต escape ตาม id
+    Route::put('/update/{id}', [EscapeController::class, 'UpdateEscape'])->name('escape.update');
+
+    // ✅ เพิ่ม route สำหรับลบ escape
+    Route::delete('/delete/{id}', [EscapeController::class, 'DeleteEscape'])->name('escape.delete');
+});
+
+// EscapeFollow
+Route::prefix('escape-follows')->group(function(){
+    // เพิ่มการติดตามใหม่
+    Route::post('/store/{escape_id}', [EscapeFollowController::class, 'StoreFollow'])->name('escape_follows.store');
+
+    // อัปเดตการติดตาม
+    Route::put('/update/{id}', [EscapeFollowController::class, 'UpdateFollow'])->name('escape_follows.update');
+
+    // ลบการติดตาม
+    Route::delete('/delete/{id}', [EscapeFollowController::class, 'DeleteFollow'])->name('escape_follows.delete');
+});
+
+
+
+ 
+   
+

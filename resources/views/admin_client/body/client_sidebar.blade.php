@@ -72,6 +72,9 @@
                                 <li>
                                     <a href="{{ route('visitFamily.create', $client->id) }}" class="tp-link">เยี่ยมครอบครัว</a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('member.create', $client->id) }}" class="tp-link">บันทึกสมาชิกครอบครัว</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -134,7 +137,7 @@
                                 <a href="{{ route('observe.create', $client->id) }}" class="tp-link">บันทึกพฤติกรรม</a>
                             </li>
                             <li>
-                                <a href="ui-alerts.html" class="tp-link">Alerts</a>
+                                <a href="{{ route('escape.add', $client->id) }}" class="tp-link">หนีออกจากบ้าน</a>
                             </li>
                             <li>
                                 <a href="ui-badges.html" class="tp-link">Badges</a>

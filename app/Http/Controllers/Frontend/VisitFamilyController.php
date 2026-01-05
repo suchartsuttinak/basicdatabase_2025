@@ -11,15 +11,12 @@ use App\Models\District;
 use App\Models\SubDistrict;
 use App\Models\Income;
 use App\Models\Image;
+// use Image;
 use Illuminate\Support\Facades\Storage;
 
+// use Intervention\Image\Facades\Image;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
-
-
-
-
-
 
 class VisitFamilyController extends Controller
 {
@@ -41,9 +38,6 @@ class VisitFamilyController extends Controller
             ->route('vitsitFamily.edit', $visitFamily->id)
             ->with('warning', 'มีการบันทึกข้อมูลรายนี้แล้ว กรุณาแก้ไขข้อมูล');
     }
-
-
-
         return view('frontend.client.visitFamily.visitFamily_add', compact(
             'provinces', 'districts', 'sub_districts', 'client_id', 'client', 'incomes', 'visitFamily'
         ));
@@ -76,11 +70,9 @@ class VisitFamilyController extends Controller
     // บันทึกข้อมูลใหม่
     public function StoreVisitFamily(Request $request, $client_id)
     {
-
-  
         $validated = $request->validate([
         'visit_date'      => 'required|date',
-        'count'           => 'nullable|integer',
+        // 'count'           => 'nullable|integer',
         'family_fname'    => 'required|string|max:255',
         'family_age'      => 'nullable|integer',
         'member'          => 'nullable|string|max:255',
@@ -113,6 +105,7 @@ class VisitFamilyController extends Controller
     ]);
 
     $validated['client_id'] = $client_id;
+    $validated['count'] = 1; // ✅ บังคับให้เป็น 1 ทุกครั้ง
 
     $visitFamily = VisitFamily::create($validated);
 
@@ -230,19 +223,23 @@ class VisitFamilyController extends Controller
      // ลบรูป (ตอบกลับ JSON สำหรับ AJAX)
 public function destroy($id)
 {
-    $image = Image::find($id);
+   $image = Image::find($id);
 
     if (!$image) {
         return response()->json(['error' => 'ไม่พบรูปภาพ'], 404);
     }
 
-    // ลบไฟล์จริง
-    Storage::disk('public')->delete($image->file_path);
+    // ลบไฟล์จริง (ตรวจสอบก่อนลบ)
+    if ($image->file_path && Storage::disk('public')->exists($image->file_path)) {
+        Storage::disk('public')->delete($image->file_path);
+    }
 
     // ลบแถวฐานข้อมูล
     $image->delete();
 
     return response()->json(['success' => true]);
+
+
 }
 
 // (ตัวเลือก) แทนที่ไฟล์รูปเดิม

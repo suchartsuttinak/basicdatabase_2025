@@ -44,8 +44,13 @@ class ObserveController extends Controller
 
         Observe::create($data);
 
+        $notification = [
+            'message' => 'บันทึกข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('observe.create', $data['client_id'])
-                         ->with('success','บันทึกข้อมูลเรียบร้อย');
+                         ->with($notification);
     }
 
     // หน้าแก้ไข
@@ -83,8 +88,13 @@ class ObserveController extends Controller
 
         $observe->update($data);
 
+        $notification = [
+            'message' => 'อัปเดตข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('observe.create', $data['client_id'])
-                         ->with('success','แก้ไขข้อมูลเรียบร้อย');
+                         ->with($notification);
     }
 
     // ลบข้อมูล
@@ -94,8 +104,13 @@ class ObserveController extends Controller
         $client_id = $observe->client_id;
         $observe->delete();
 
+        $notification = [
+            'message' => 'ลบข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('observe.create', $client_id)
-                         ->with('success','ลบข้อมูลเรียบร้อย');
+                         ->with($notification);
     }
 
     // บันทึกการติดตามผล
@@ -113,14 +128,15 @@ class ObserveController extends Controller
 
             ObserveFollowup::create($data);
 
+             $notification = [
+            'message' => 'บันทึกข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
             return redirect()
                 ->route('observe.edit', $data['observe_id'])
-                ->with('followup_success', 'บันทึกการติดตามผลเรียบร้อย');
-}
-
-
-
-
+                ->with($notification);
+        }
 
     // ลบการติดตามผล
     public function DeleteFollowup($id)
@@ -129,8 +145,13 @@ class ObserveController extends Controller
         $observe_id = $followup->observe_id;
         $followup->delete();
 
+        $notification = [
+            'message' => 'ลบข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('observe.edit', $observe_id)
-                         ->with('followup_success','ลบการติดตามผลเรียบร้อย');
+                         ->with($notification);
     }
 
     // แก้ไขการติดตามผล
@@ -170,7 +191,12 @@ class ObserveController extends Controller
 
         $followup->update($data);
 
+          $notification = [
+            'message' => 'อัปเดตข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('observe.edit', $followup->observe_id)
-                         ->with('followup_success','แก้ไขการติดตามผลเรียบร้อย');
+                         ->with($notification);
     }
 }

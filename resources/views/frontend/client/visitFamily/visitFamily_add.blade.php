@@ -117,18 +117,17 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group col-md-3 mb-3">
-                                    <label for="count" class="form-label">ครั้งที่:</label>
-                                    <div class="d-flex align-items-center">
-                                        <input type="text" name="count" id="count" class="form-control"
-                                            value="{{ old('count', $visitFamily->count ?? '') }}">
-                                        <span class="ms-2">ครั้ง</span>
-                                    </div>
-                                    @error('count')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                              <div class="form-group col-md-3 mb-3">
+                                <label for="count" class="form-label">ครั้งที่:</label>
+                                <div class="d-flex align-items-center">
+                                    {{-- แสดงค่า 1 แบบ readonly --}}
+                                    <input type="text" id="count" class="form-control" value="1" readonly>
+                                    <span class="ms-2">ครั้ง</span>
                                 </div>
+                                {{-- ส่งค่า 1 ไปกับฟอร์มแบบ hidden --}}
+                                <input type="hidden" name="count" value="1">
                             </div>
+                        </div>
 
                             <div class="row">
                                 <div class="form-group col-md-6 mb-3">
@@ -467,32 +466,34 @@
                             <div id="preview" class="row mt-3"></div>
                         </div>
 
-                   {{-- ลบภาพ --}}
-                    @if(isset($images) && $images->count() > 0)
-                        <div class="mb-3">
-                            <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
-                            <div class="row" id="image-gallery">
-                                @foreach($images as $img)
-                                  <div class="col-md-3 mb-3 position-relative" id="image-{{ $img->id }}">
-                            <div class="ratio ratio-1x1">
-                                <img src="{{ asset('storage/'.$img->file_path) }}" 
-                                    class="w-100 h-100 rounded border shadow-sm" 
-                                    style="object-fit: cover;">
-                            </div>
-
-                            {{-- ปุ่มลบ overlay --}}
-                            <button type="button" 
-                                    class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-3 mt-1 delete-image"
-                                    data-url="{{ route('image.destroy', $img->id) }}"
-                                    data-id="{{ $img->id }}">
-                                ลบภาพ
-                            </button>
+               
+                  {{-- ลบภาพ --}}
+@if(isset($images) && $images->count() > 0)
+    <div class="mb-3">
+        <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
+        <div class="row" id="image-gallery">
+            @foreach($images as $img)
+                <div class="col-md-3 mb-3" id="image-{{ $img->id }}">
+                    <div class="position-relative">
+                        <div class="ratio ratio-1x1">
+                            <img src="{{ asset('storage/'.$img->file_path) }}"
+                                 class="w-100 h-100 rounded border shadow-sm"
+                                 style="object-fit: cover;">
                         </div>
 
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                        {{-- ปุ่มลบ overlay --}}
+                        <button type="button"
+                                class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-2 mt-2 delete-image"
+                                data-url="{{ route('image.destroy', $img->id) }}"
+                                data-id="{{ $img->id }}">
+                           ลบภาพ
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
                     <div class="text-start">
                         <button type="submit" class="btn btn-success">
                             {{ isset($visitFamily) ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูลใหม่' }}
@@ -579,38 +580,6 @@
             });
         });
     </script>
-
-    <!-- ลบภาพ -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.delete-image').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const url = btn.dataset.url;
-                const id = btn.dataset.id;
-
-                if (!confirm('คุณแน่ใจว่าต้องการลบภาพนี้?')) return;
-
-                fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById(`image-${id}`).remove();
-                    } else {
-                        alert(data.error || 'เกิดข้อผิดพลาดในการลบภาพ');
-                    }
-                })
-                .catch(() => alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'));
-            });
-        });
-    });
-    </script>
-
     <!-- แสดงภาพ -->
     <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -636,4 +605,64 @@
         });
     });
     </script>
+
+<!-- ต้องมี SweetAlert2 ใน layout -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ลบภาพ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const csrf = '{{ csrf_token() }}';
+
+    // ดักทุกปุ่มที่มี class delete-image
+    document.querySelectorAll('.delete-image').forEach(button => {
+        button.addEventListener('click', () => {
+            const url = button.dataset.url;
+            const id  = button.dataset.id;
+
+            Swal.fire({
+                title: '⚠️ ยืนยันการลบ',
+                text: 'คุณแน่ใจหรือไม่ว่าต้องการลบภาพนี้?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true,
+                backdrop: true,
+                allowOutsideClick: false,
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`image-${id}`).remove();
+                        Swal.fire({
+                            title: 'ลบแล้ว!',
+                            text: 'ภาพถูกลบเรียบร้อย',
+                            icon: 'success',
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire('ผิดพลาด!', data.error || 'เกิดข้อผิดพลาดในการลบภาพ', 'error');
+                    }
+                })
+                .catch(() => Swal.fire('ผิดพลาด!', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'));
+            });
+        });
+    });
+});
+</script>
+
+
     @endsection
