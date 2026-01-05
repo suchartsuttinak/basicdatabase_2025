@@ -267,6 +267,10 @@ Route::prefix('check_body')->name('check_body.')->group(function () {
 
     // ✅ เพิ่ม route สำหรับรายงาน (ตรงกับปุ่มใน view)
     Route::get('/report/{id}', [CheckBodyController::class, 'CheckBodyReport'])->name('report');
+
+    Route::get('/index/{client_id}', [EscapeController::class, 'IndexEscape'])->name('escape.index');
+
+
 });
 
 
@@ -385,23 +389,20 @@ Route::prefix('member')->group(function(){
 
 /// Escape หลัก
 Route::prefix('escape')->group(function(){
-    // หน้า index แสดง Escape ทั้งหมด
     Route::get('/index/{client_id}', [EscapeController::class, 'IndexEscape'])->name('escape.index');
-
-    // หน้า add escape ใหม่
     Route::get('/add/{client_id}', [EscapeController::class, 'AddEscape'])->name('escape.add');
-
-    // บันทึก escape ใหม่
     Route::post('/store', [EscapeController::class, 'StoreEscape'])->name('escape.store');
-
-    // หน้า edit escape ตาม id
     Route::get('/edit/{id}', [EscapeController::class, 'EditEscape'])->name('escape.edit');
-
-    // อัปเดต escape ตาม id
     Route::put('/update/{id}', [EscapeController::class, 'UpdateEscape'])->name('escape.update');
-
-    // ✅ เพิ่ม route สำหรับลบ escape
     Route::delete('/delete/{id}', [EscapeController::class, 'DeleteEscape'])->name('escape.delete');
+
+    // ✅ เปลี่ยน CopyEscape ให้เป็น GET
+    Route::get('/copy/{id}', [EscapeController::class, 'CopyEscape'])->name('escape.copy');
+
+
+
+
+
 });
 
 // EscapeFollow

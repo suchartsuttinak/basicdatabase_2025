@@ -27,8 +27,9 @@ class EscapeController extends Controller
     {
         $client = Client::findOrFail($client_id);
         $retires = Retire::all();
+        $mode = 'create'; // ✅ บอกว่าเป็นการเพิ่มใหม่
 
-        return view('frontend.client.escape.escape_create', compact('client','retires'));
+        return view('frontend.client.escape.escape_create', compact('client','retires','mode'));
     }
 
     // บันทึก Escape ใหม่
@@ -78,13 +79,26 @@ class EscapeController extends Controller
 
     public function DeleteEscape($id)
 {
-    $escape = Escape::findOrFail($id);
-    $escape->delete();
+        $escape = Escape::findOrFail($id);
+        $client_id = $escape->client_id; // ✅ เก็บ client_id ก่อนลบ
+        $escape->delete();
 
-    return redirect()
-        ->route('escape.index')
-        ->with(['message' => 'ลบข้อมูลการออกเรียบร้อย', 'alert-type' => 'success']);
+        return redirect()
+            ->route('escape.index', $client_id) // ✅ ส่ง client_id กลับไป
+            ->with(['message' => 'ลบข้อมูลการออกเรียบร้อย', 'alert-type' => 'success']);
+
+
 }
 
    
+
+    public function CopyEscape($id)
+    {
+        $escape = Escape::with(['client','retire'])->findOrFail($id);
+        $client = $escape->client;
+        $retires = Retire::all();
+        $mode = 'copy'; // ✅ ใช้ create แต่ prefill ข้อมูลเดิม
+
+        return view('frontend.client.escape.escape_create', compact('client','retires','escape','mode'));
+    }
 }

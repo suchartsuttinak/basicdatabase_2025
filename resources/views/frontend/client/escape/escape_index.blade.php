@@ -50,8 +50,12 @@
               <td>{{ $escape->stories ?? '-' }}</td>
               <td class="text-center text-md-center">
                 <a href="{{ route('escape.edit', $escape->id) }}" class="btn btn-sm btn-warning me-1">
-                  <i class="bi bi-pencil-square me-1"></i> Edit
+                  <i class="bi bi-pencil-square me-1"></i> ติดตาม
                 </a>
+                <a href="{{ route('escape.copy', $escape->id) }}" class="btn btn-sm btn-info me-1">
+                    <i class="bi bi-files me-1"></i> แก้ไข
+                </a>
+
                 <form id="delete-form-{{ $escape->id }}"
                       action="{{ route('escape.delete', $escape->id) }}"
                       method="POST" class="d-inline">
@@ -59,7 +63,7 @@
                   @method('DELETE')
                   <button type="button" class="btn btn-sm btn-danger"
                           onclick="confirmDelete('delete-form-{{ $escape->id }}','คุณต้องการลบข้อมูล Escape นี้ใช่หรือไม่')">
-                    <i class="bi bi-trash me-1"></i> Delete
+                    <i class="bi bi-trash me-1"></i> ลบ
                   </button>
                 </form>
               </td>
