@@ -137,7 +137,7 @@
                                 <a href="{{ route('observe.create', $client->id) }}" class="tp-link">บันทึกพฤติกรรม</a>
                             </li>
                             <li>
-                                <a href="{{ route('escape.add', $client->id) }}" class="tp-link">หนีออกจากบ้าน</a>
+                                <a href="{{ route('escape.index', $client->id) }}" class="tp-link">หนีออกจากบ้าน</a>
                             </li>
                             <li>
                                 <a href="ui-badges.html" class="tp-link">Badges</a>
