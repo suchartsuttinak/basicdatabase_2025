@@ -398,11 +398,6 @@ Route::prefix('escape')->group(function(){
 
     // ✅ เปลี่ยน CopyEscape ให้เป็น GET
     Route::get('/copy/{id}', [EscapeController::class, 'CopyEscape'])->name('escape.copy');
-
-
-
-
-
 });
 
 // EscapeFollow

@@ -10,13 +10,13 @@
         @endif
     </h5>
 
-    <form action="{{ $mode == 'edit' ? route('escape.update', $escape->id) : route('escape.store') }}" method="POST"
-        class="card p-3 shadow-sm">
-        @csrf
-        @if ($mode == 'edit')
-            @method('PUT')
-        @endif
-
+    <form action="{{ in_array($mode, ['edit','copy']) ? 
+            route('escape.update', $escape->id) : route('escape.store') }}" method="POST" class="card p-3 shadow-sm">
+            @csrf
+            @if (in_array($mode, ['edit','copy']))
+                @method('PUT')
+            @endif
+        
         <input type="hidden" name="client_id" value="{{ $client->id }}">
 
         <div class="row g-3">

@@ -101,4 +101,6 @@ class EscapeController extends Controller
 
         return view('frontend.client.escape.escape_create', compact('client','retires','escape','mode'));
     }
+    //  คือ ธงบอกสถานะ ให้ view รู้ว่า ตอนนี้ผู้ใช้กำลัง “คัดลอก” ข้อมูลเดิมมาแก้ไข
+    // ฟอร์มต้อง prefill ค่าเดิม - ปุ่มและ action ต้องทำงานเหมือนโหมดแก้ไข (edit) → คือยิงไป UpdateEscape
 }
