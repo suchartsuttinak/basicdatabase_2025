@@ -207,9 +207,8 @@
   </div>
 </div>
 
-<!-- Add follow modal -->
 <div class="modal fade" id="addFollowModal{{ $escape->id }}" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
     <div class="modal-content border-0 shadow-sm">
       <div class="modal-header bg-info text-white">
         <h5 class="modal-title fw-bold">
@@ -222,56 +221,59 @@
           @csrf
 
           <div class="row mb-3">
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
               <label class="form-label fw-bold">วันที่ติดตาม</label>
               <input type="date" name="trace_date" class="form-control form-control-sm" required>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-sm-6 col-md-2">
               <label class="form-label fw-bold">ครั้งที่</label>
-              <input type="number" name="count" class="form-control form-control-sm" min="1" required>
+              <input type="number" name="count" class="form-control form-control-sm" min="1" required readonly>
             </div>
-            <div class="col-md-3">
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-12 col-sm-6 col-md-3">
               <label class="form-label fw-bold">พบ/ไม่พบ</label>
               <select name="trac_no" class="form-select form-select-sm" required>
                 <option value="พบ">พบ</option>
                 <option value="ไม่พบ">ไม่พบ</option>
               </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-9">
               <label class="form-label fw-bold">รายละเอียด</label>
               <input type="text" name="detail" class="form-control form-control-sm">
             </div>
           </div>
 
           <div class="row mb-3">
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
               <label class="form-label fw-bold">วันที่แจ้งความ</label>
               <input type="date" name="report_date" class="form-control form-control-sm">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
               <label class="form-label fw-bold">วันที่ยุติการติดตาม</label>
               <input type="date" name="stop_date" class="form-control form-control-sm">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-6">
               <label class="form-label fw-bold">การลงโทษ</label>
               <input type="text" name="punish" class="form-control form-control-sm">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label fw-bold">วันที่ลงโทษ</label>
-              <input type="date" name="punish_date" class="form-control form-control-sm">
             </div>
           </div>
 
           <div class="row mb-3">
-            <div class="col-md-12">
+            <div class="col-12 col-sm-6 col-md-3">
+              <label class="form-label fw-bold">วันที่ลงโทษ</label>
+              <input type="date" name="punish_date" class="form-control form-control-sm">
+            </div>
+            <div class="col-12 col-sm-6 col-md-9">
               <label class="form-label fw-bold">หมายเหตุ</label>
               <input type="text" name="remark" class="form-control form-control-sm">
             </div>
           </div>
 
-          <div class="d-flex justify-content-end gap-2 mt-3">
+          <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
             <button type="submit" class="btn btn-success btn-sm">
-              <i class="bi bi-save me-1"></i> บันทึกการติดตาม
+              <i class="bi bi-save me-1"></i> บันทึก
             </button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
               <i class="bi bi-x-circle me-1"></i> ปิด

@@ -100,16 +100,26 @@
         </table>
     </div>
 
-    <!-- ปุ่ม -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <button type="button" class="btn btn-outline-secondary btn-sm" id="add-member">
-            <i class="bi bi-plus-circle me-1"></i> เพิ่มสมาชิก
-        </button>
-        <button type="submit" class="btn btn-primary btn-sm">
-            <i class="bi bi-pencil-square me-1"></i> แก้ไขข้อมูล
-        </button>
-    </div>
-</form>
+            <!-- ปุ่ม -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <!-- ฝั่งซ้าย: ปุ่มเพิ่มสมาชิก -->
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="add-member">
+                            <i class="bi bi-plus-circle me-1"></i> เพิ่มสมาชิก
+                        </button>
+                    </div>
+
+                    <!-- ฝั่งขวา: ปุ่มกลับหน้าหลัก + แก้ไขข้อมูล -->
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('member.show', $client->id) }}" class="btn btn-outline-dark btn-sm">
+                            <i class="bi bi-house-door me-1"></i> กลับหน้าหลัก
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-pencil-square me-1"></i> แก้ไขข้อมูล
+                        </button>
+                    </div>
+                </div>
+            </form>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

@@ -14,9 +14,14 @@ class EscapeFollowController extends Controller
     {
         $escape = Escape::findOrFail($escape_id);
 
+        // หาครั้งล่าสุดแล้ว +1
+        $lastFollow = EscapeFollow::where('escape_id', $escape_id)
+            ->orderByDesc('count')
+            ->first();
+        $nextCount = $lastFollow ? $lastFollow->count + 1 : 1;
+
         $data = $request->validate([
             'trace_date'  => 'required|date',
-            'count'       => 'required|integer',
             'trac_no'     => 'required|string',
             'detail'      => 'nullable|string',
             'report_date' => 'nullable|date',
@@ -27,47 +32,65 @@ class EscapeFollowController extends Controller
         ]);
 
         $data['escape_id'] = $escape->id;
+        $data['count']     = $nextCount; // กำหนดอัตโนมัติ
 
         EscapeFollow::create($data);
 
+        $notification = [
+        'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
+
         return redirect()
             ->route('escape.edit', $escape->id)
-            ->with(['message' => 'เพิ่มข้อมูลการติดตามเรียบร้อย', 'alert-type' => 'success']);
+            ->with($notification);
     }
 
+    // อัปเดตการติดตาม
     public function UpdateFollow(Request $request, $id)
-{
-    $follow = EscapeFollow::findOrFail($id);
+    {
+        $follow = EscapeFollow::findOrFail($id);
 
-    $data = $request->validate([
-        'trace_date'  => 'required|date',
-        'count'       => 'required|integer',
-        'trac_no'     => 'required|string',
-        'detail'      => 'nullable|string',
-        'report_date' => 'nullable|date',
-        'stop_date'   => 'nullable|date',
-        'punish'      => 'nullable|string',
-        'punish_date' => 'nullable|date',
-        'remark'      => 'nullable|string',
-    ]);
+        $data = $request->validate([
+            'trace_date'  => 'required|date',
+            'trac_no'     => 'required|string',
+            'detail'      => 'nullable|string',
+            'report_date' => 'nullable|date',
+            'stop_date'   => 'nullable|date',
+            'punish'      => 'nullable|string',
+            'punish_date' => 'nullable|date',
+            'remark'      => 'nullable|string',
+        ]);
 
-    $follow->update($data);
+        // สำหรับ update เราไม่ต้องเปลี่ยน count ให้มันคงเดิม
+        $data['count'] = $follow->count;
 
-    return redirect()
-        ->route('escape.edit', $follow->escape_id)
-        ->with(['success' => 'อัปเดตข้อมูลการติดตามเรียบร้อย']);
-}
+        $follow->update($data);
 
+        $notification = [
+        'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
 
+        return redirect()
+            ->route('escape.edit', $follow->escape_id)
+            ->with($notification);
+    }
 
-     public function DeleteFollow($id)
-{
-    $follow = EscapeFollow::findOrFail($id);
-    $escape_id = $follow->escape_id;
-    $follow->delete();
+    // ลบการติดตาม
+    public function DeleteFollow($id)
+    {
+        $follow = EscapeFollow::findOrFail($id);
+        $escape_id = $follow->escape_id;
+        $follow->delete();
 
-    return redirect()
-        ->route('escape.edit', $escape_id)
-        ->with(['success' => 'ลบข้อมูลการติดตามเรียบร้อย']);
-}
+            $notification = [
+        'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ];
+
+        return redirect()
+            ->route('escape.edit', $escape_id)
+            ->with($notification);
+    }
 }

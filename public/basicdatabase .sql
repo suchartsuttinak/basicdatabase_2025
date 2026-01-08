@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jan 04, 2026 at 08:58 AM
+-- Generation Time: Jan 08, 2026 at 11:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,7 +46,8 @@ CREATE TABLE `absents` (
 --
 
 INSERT INTO `absents` (`id`, `absent_date`, `cause`, `operation`, `remark`, `record_date`, `teacher`, `client_id`, `education_record_id`, `created_at`, `updated_at`) VALUES
-(11, '2026-01-04', 'ทดสอบจร้า', 'เทาระบบ', 'ทดสอบระบบจร้า', '2026-01-04', 'นางสาวแอน ดีเลิศ', 20, 26, '2026-01-04 00:34:41', '2026-01-04 00:35:13');
+(11, '2026-01-04', 'ทดสอบจร้า', 'เทาระบบ', 'ทดสอบระบบจร้า', '2026-01-04', 'นางสาวแอน ดีเลิศ', 20, 26, '2026-01-04 00:34:41', '2026-01-04 00:35:13'),
+(12, '2026-01-08', 'ทดสอบระบบจ้า', 'ไม่ได้ดำเนินการ', 'เทสระบบ', '2026-01-08', 'นางสาวแอน ดีเลิศ', 20, 26, '2026-01-08 03:53:26', '2026-01-08 03:53:26');
 
 -- --------------------------------------------------------
 
@@ -98,7 +99,7 @@ CREATE TABLE `addictives` (
 --
 
 INSERT INTO `addictives` (`id`, `date`, `count`, `exam`, `refer`, `record`, `recorder`, `client_id`, `created_at`, `updated_at`) VALUES
-(16, '2025-12-02', 1, 0, NULL, 'dd', 'dd', 20, '2025-12-30 20:57:53', '2025-12-30 20:57:53');
+(16, '2025-12-02', 1, 1, 1, 'เทส', 'ทดสอบระบบ', 20, '2025-12-30 20:57:53', '2026-01-06 08:48:52');
 
 -- --------------------------------------------------------
 
@@ -1349,6 +1350,63 @@ INSERT INTO `education_record_subjects` (`id`, `education_record_id`, `subject_i
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `escapes`
+--
+
+CREATE TABLE `escapes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `retire_date` date NOT NULL,
+  `retire_id` bigint(20) UNSIGNED NOT NULL,
+  `stories` text DEFAULT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `escapes`
+--
+
+INSERT INTO `escapes` (`id`, `retire_date`, `retire_id`, `stories`, `client_id`, `created_at`, `updated_at`) VALUES
+(39, '2026-01-06', 1, 'ทดสอบระบบ', 20, '2026-01-06 07:30:09', '2026-01-06 08:05:22'),
+(40, '2026-01-06', 2, 'เทสระบบ', 20, '2026-01-06 08:08:21', '2026-01-06 08:08:21'),
+(44, '2025-12-30', 2, 'ทดสอบระบบจ้า', 20, '2026-01-06 08:42:57', '2026-01-06 08:43:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `escape_follows`
+--
+
+CREATE TABLE `escape_follows` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `escape_id` bigint(20) UNSIGNED NOT NULL,
+  `trace_date` date NOT NULL,
+  `count` int(11) NOT NULL,
+  `trac_no` enum('พบ','ไม่พบ') NOT NULL,
+  `detail` text DEFAULT NULL,
+  `report_date` date DEFAULT NULL,
+  `stop_date` date DEFAULT NULL,
+  `punish` varchar(255) DEFAULT NULL,
+  `punish_date` date DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `escape_follows`
+--
+
+INSERT INTO `escape_follows` (`id`, `escape_id`, `trace_date`, `count`, `trac_no`, `detail`, `report_date`, `stop_date`, `punish`, `punish_date`, `remark`, `created_at`, `updated_at`) VALUES
+(13, 44, '2026-01-07', 1, 'ไม่พบ', 'ทดสอบ', '2026-01-15', '2026-01-14', 'ทดสอบ', '2026-01-06', 'ทดสอบระบบ', '2026-01-06 08:43:29', '2026-01-06 08:50:01'),
+(17, 39, '2026-01-06', 1, 'ไม่พบ', 'ทดสอบ', '2025-12-30', '2026-01-07', 'ทดสอบ', '2026-01-06', 'ทดสอบระบบ', '2026-01-07 07:13:29', '2026-01-07 07:18:38'),
+(23, 39, '2026-01-05', 2, 'พบ', 'ทดสอบ', '2025-12-30', '2026-01-07', 'ทดสอบ', '2026-01-06', 'ทดสอบระบบ', '2026-01-07 07:20:53', '2026-01-07 07:20:53'),
+(25, 39, '2026-01-07', 3, 'พบ', 'ทดสอบ', '2026-01-07', '2025-12-29', 'ทดสอบ', '2026-01-06', 'ทดสอบระบบ', '2026-01-08 03:46:36', '2026-01-08 03:46:36');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `factfindings`
 --
 
@@ -1497,7 +1555,7 @@ CREATE TABLE `images` (
 INSERT INTO `images` (`id`, `file_path`, `file_name`, `mime_type`, `size`, `visit_family_id`, `client_id`, `created_at`, `updated_at`) VALUES
 (71, 'visit_images/05OjdyjnFOfm18gQXMTmUjdHOJuYrxiKxzYddCzu.jpg', '480871760_9631864360190134_7298987325229337518_n - Copy.jpg', 'image/jpeg', 54262, 19, 20, '2026-01-03 21:54:14', '2026-01-03 21:54:14'),
 (72, 'visit_images/DhFE2Q2RHbNDbtI8m3AFEEbHGOe0Lx15hiTp3mjD.jpg', '480565719_9631864390190131_5086549319843129400_n.jpg', 'image/jpeg', 26907, 19, 20, '2026-01-04 00:15:49', '2026-01-04 00:15:49'),
-(75, 'visit_images/CCUO5weK3B76dHIiePOjFrlQIlyC9CgoKk3EotMO.png', '20211226141749oHNLHq02mko1k3UK.png', 'image/png', 290571, 19, 20, '2026-01-04 00:21:59', '2026-01-04 00:21:59');
+(78, 'visit_images/2tK7KUgx1ckvd09n7GXzyIHvtEDvAbo4dofzZcEi.jpg', '580822.jpg', 'image/jpeg', 120271, 19, 20, '2026-01-04 07:49:27', '2026-01-04 07:49:27');
 
 -- --------------------------------------------------------
 
@@ -1636,6 +1694,43 @@ CREATE TABLE `medicals` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `medicals`
+--
+
+INSERT INTO `medicals` (`id`, `medical_date`, `disease_name`, `illness`, `treatment`, `refer`, `diagnosis`, `appt_date`, `teacher`, `remark`, `client_id`, `created_at`, `updated_at`) VALUES
+(11, '2026-01-08', 'ทดสอบ', 'เทสระบบ', 'ทดสอบ', 'พบแพทย์', 'ทดสอบระบบ', '2026-01-15', 'นางสาวแอน ดีเลิศ', 'เทสระบบ', 20, '2026-01-08 03:51:32', '2026-01-08 03:52:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `members`
+--
+
+CREATE TABLE `members` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `count` int(11) DEFAULT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `member_age` int(11) DEFAULT NULL,
+  `education_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `relationship` varchar(255) DEFAULT NULL,
+  `occupation_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `income_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `remark` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `members`
+--
+
+INSERT INTO `members` (`id`, `client_id`, `count`, `fullname`, `member_age`, `education_id`, `relationship`, `occupation_id`, `income_id`, `remark`, `created_at`, `updated_at`) VALUES
+(94, 20, NULL, 'นายสุชาติ สุทธินาค', 8, 5, 'พี่', 5, 4, 'ทดสอบ', '2026-01-07 08:08:51', '2026-01-07 08:08:51'),
+(95, 20, NULL, 'นางสาวมยุรี แซ่ด่าง', 11, 5, 'ป้า', 6, 4, 'เทสระบบ', '2026-01-07 08:08:51', '2026-01-07 08:08:51'),
+(96, 20, NULL, 'นายประกร ทั่งสมุทร', 22, 6, 'ลุง', 6, 6, 'ทดสอบระบบ', '2026-01-07 08:08:51', '2026-01-07 08:08:51');
+
 -- --------------------------------------------------------
 
 --
@@ -1697,7 +1792,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (74, '2025_12_29_024735_create_observes_table', 33),
 (75, '2025_12_29_025139_create_observe_followups_table', 33),
 (79, '2026_01_02_103618_create_visit_families_table', 34),
-(80, '2026_01_02_103631_create_images_table', 34);
+(80, '2026_01_02_103631_create_images_table', 34),
+(81, '2026_01_04_103119_create_members_table', 35),
+(82, '2026_01_05_073934_create_retires_table', 36),
+(83, '2026_01_05_102937_create_escapes_table', 37),
+(84, '2026_01_05_103005_create_escape_follows_table', 37);
 
 -- --------------------------------------------------------
 
@@ -1825,7 +1924,9 @@ CREATE TABLE `observes` (
 --
 
 INSERT INTO `observes` (`id`, `date`, `behavior`, `cause`, `solution`, `action`, `obstacles`, `result`, `record_date`, `recorder`, `misbehavior_id`, `client_id`, `created_at`, `updated_at`) VALUES
-(24, '2025-12-10', 'กก', 'กกก', 'กก', NULL, 'กก', 'กก', '2025-12-22', 'กก', 4, 20, '2025-12-30 21:51:11', '2025-12-30 21:51:11');
+(27, '2026-01-06', 'กก', 'กก', 'กก', 'กก', 'กก', 'กก', '2026-01-21', 'กก', 3, 22, '2026-01-04 20:01:02', '2026-01-04 20:01:02'),
+(28, '2026-01-04', 'ทดสอบ', 'เทสระบบ', 'ทดสอบ', 'เทสระบบ', 'ทดสอบ', 'เทส', '2026-01-27', 'นายประรัก', 8, 20, '2026-01-06 08:47:16', '2026-01-06 08:47:16'),
+(29, '2026-01-08', 'ทดสอบ', 'เทส', 'ทดสอบ', 'เทส', 'ทดสอบ', 'เทส', '2026-01-07', 'นายสิทธิรักษ์', 5, 20, '2026-01-08 03:49:20', '2026-01-08 03:49:20');
 
 -- --------------------------------------------------------
 
@@ -1849,8 +1950,8 @@ CREATE TABLE `observe_followups` (
 --
 
 INSERT INTO `observe_followups` (`id`, `observe_id`, `followup_date`, `followup_count`, `followup_action`, `followup_result`, `created_at`, `updated_at`) VALUES
-(40, 24, '2025-12-17', 1, 'ทดสอบ', 'ทดสอบ', '2026-01-01 18:59:01', '2026-01-01 18:59:01'),
-(41, 24, '2025-12-31', 2, 'ทดสอบ', 'เทส', '2026-01-01 18:59:24', '2026-01-01 18:59:24');
+(44, 27, '2026-01-05', 1, 'พพ', 'อออดดด', '2026-01-04 20:04:22', '2026-01-04 20:06:06'),
+(47, 28, '2026-01-07', 1, 'ติดตามผล', 'เทส', '2026-01-07 07:40:55', '2026-01-07 07:40:55');
 
 -- --------------------------------------------------------
 
@@ -2160,6 +2261,29 @@ INSERT INTO `religions` (`id`, `religion_name`, `created_at`, `updated_at`) VALU
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `retires`
+--
+
+CREATE TABLE `retires` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `retire_name` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `retires`
+--
+
+INSERT INTO `retires` (`id`, `retire_name`, `created_at`, `updated_at`) VALUES
+(1, 'หลบหนี', NULL, NULL),
+(2, 'พลัดหลง', NULL, NULL),
+(3, 'ไม่กลับบ้าน', NULL, NULL),
+(4, 'อื่น ๆ', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `school_followups`
 --
 
@@ -2178,6 +2302,15 @@ CREATE TABLE `school_followups` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `school_followups`
+--
+
+INSERT INTO `school_followups` (`id`, `follow_date`, `teacher_name`, `tel`, `follow_type`, `follo_no`, `result`, `contact_name`, `remark`, `client_id`, `education_record_id`, `created_at`, `updated_at`) VALUES
+(16, '2026-01-04', 'นายปรีดา คงไทยสอน', '088-534-6727', 'self', 1, 'ทดสอบระบบ', 'นายรักไทย จ้ารรัก', 'เทสระบบครับ', 20, 26, '2026-01-04 05:12:32', '2026-01-04 05:14:00'),
+(17, '2026-01-01', 'นางสาวปรีดา ไชรเลิศ', '088-534-6727', 'phone', 2, 'เทสระบบจร้า', 'นายรักไทย จ้ารรัก', 'เทสครับ', 20, 26, '2026-01-04 05:13:20', '2026-01-04 05:13:31'),
+(18, '2026-01-06', 'นางสาวปรีดา ไชรเลิศ', '088-534-6727', 'self', 3, 'เทส', 'นายรักไทย จ้ารรัก', 'ทอดสบอ', 20, 26, '2026-01-06 08:57:48', '2026-01-06 08:57:48');
 
 -- --------------------------------------------------------
 
@@ -2199,7 +2332,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('T51bNi6LEQhvYiU9F8z6lASmGcvD0s0r8BxUbEHe', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiM0Vob1Q5M0hrSEpKMnJjNWpQd0NoZ1RTOVNwaTNZbFJqaEl2N3JWcSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jbGllbnQ/MjI9Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1767513058);
+('ezZdEPUMQsUubw6n45uexe0qB9hELkhNvDX6MZLV', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoicW9FQVJnY0llUFNxUmM5OXlQc0ZhWUhpakptV2E4Q3lzTGdXTnJvNCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC92aXRzaXRGYW1pbHkvZWRpdC8xOSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1767869863);
 
 -- --------------------------------------------------------
 
@@ -9855,7 +9988,7 @@ CREATE TABLE `visit_families` (
 --
 
 INSERT INTO `visit_families` (`id`, `visit_date`, `count`, `family_fname`, `family_age`, `member`, `address`, `moo`, `soi`, `road`, `village`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `outside_address`, `inside_address`, `environment`, `neighbor`, `member_relation`, `income_id`, `problem`, `need`, `diagnose`, `assistance`, `comment`, `modify`, `teacher`, `remark`, `client_id`, `created_at`, `updated_at`) VALUES
-(19, '2026-01-06', 1, 'หหหหห', 58, 'กก', '256', '12', 'อดเรก', 'พิพิธ', 'หนองปรือ', 11, 131, 925, '20000', '0885346727', 'กก', 'กก', 'กก', 'กก', 'กก', 4, 'กก', 'กก', 'กก', 'กก', 'กก', 'กก', 'นางสาวแอน ดีเลิศ', 'กกก', 20, '2026-01-03 21:54:01', '2026-01-04 00:18:29');
+(19, '2026-01-06', 1, 'หหหหห', 58, 'กก', '256', '12', 'อดเรก', 'พิพิธ', 'หนองปรือ', 11, 131, 925, '20000', '0885346727', 'ทดสดบ', 'ทดสอบ', 'กก', 'ทดสอบระบบ', 'ทดสอบระบบ', 4, 'เทสระบบ', 'ทดสอบดระบบ', 'กก', 'กก', 'กก', 'กก', 'นางสาวแอน ดีเลิศ', 'กกก', 20, '2026-01-03 21:54:01', '2026-01-08 03:47:55');
 
 --
 -- Indexes for dumped tables
@@ -9958,6 +10091,21 @@ ALTER TABLE `education_record_subjects`
   ADD KEY `education_record_subjects_subject_id_foreign` (`subject_id`);
 
 --
+-- Indexes for table `escapes`
+--
+ALTER TABLE `escapes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `escapes_client_id_foreign` (`client_id`),
+  ADD KEY `escapes_retire_id_foreign` (`retire_id`);
+
+--
+-- Indexes for table `escape_follows`
+--
+ALTER TABLE `escape_follows`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `escape_follows_escape_id_foreign` (`escape_id`);
+
+--
 -- Indexes for table `factfindings`
 --
 ALTER TABLE `factfindings`
@@ -10037,6 +10185,16 @@ ALTER TABLE `maritals`
 ALTER TABLE `medicals`
   ADD PRIMARY KEY (`id`),
   ADD KEY `medicals_client_id_foreign` (`client_id`);
+
+--
+-- Indexes for table `members`
+--
+ALTER TABLE `members`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `members_client_id_foreign` (`client_id`),
+  ADD KEY `members_education_id_foreign` (`education_id`),
+  ADD KEY `members_occupation_id_foreign` (`occupation_id`),
+  ADD KEY `members_income_id_foreign` (`income_id`);
 
 --
 -- Indexes for table `migrations`
@@ -10134,6 +10292,12 @@ ALTER TABLE `religions`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `retires`
+--
+ALTER TABLE `retires`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `school_followups`
 --
 ALTER TABLE `school_followups`
@@ -10217,7 +10381,7 @@ ALTER TABLE `visit_families`
 -- AUTO_INCREMENT for table `absents`
 --
 ALTER TABLE `absents`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `accidents`
@@ -10280,6 +10444,18 @@ ALTER TABLE `education_record_subjects`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
+-- AUTO_INCREMENT for table `escapes`
+--
+ALTER TABLE `escapes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT for table `escape_follows`
+--
+ALTER TABLE `escape_follows`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
 -- AUTO_INCREMENT for table `factfindings`
 --
 ALTER TABLE `factfindings`
@@ -10313,7 +10489,7 @@ ALTER TABLE `houses`
 -- AUTO_INCREMENT for table `images`
 --
 ALTER TABLE `images`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `incomes`
@@ -10343,13 +10519,19 @@ ALTER TABLE `maritals`
 -- AUTO_INCREMENT for table `medicals`
 --
 ALTER TABLE `medicals`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `members`
+--
+ALTER TABLE `members`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT for table `misbehaviors`
@@ -10373,13 +10555,13 @@ ALTER TABLE `nationals`
 -- AUTO_INCREMENT for table `observes`
 --
 ALTER TABLE `observes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `observe_followups`
 --
 ALTER TABLE `observe_followups`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `occupations`
@@ -10430,10 +10612,16 @@ ALTER TABLE `religions`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `retires`
+--
+ALTER TABLE `retires`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `school_followups`
 --
 ALTER TABLE `school_followups`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `spouses`
@@ -10546,6 +10734,19 @@ ALTER TABLE `education_record_subjects`
   ADD CONSTRAINT `education_record_subjects_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `escapes`
+--
+ALTER TABLE `escapes`
+  ADD CONSTRAINT `escapes_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `escapes_retire_id_foreign` FOREIGN KEY (`retire_id`) REFERENCES `retires` (`id`);
+
+--
+-- Constraints for table `escape_follows`
+--
+ALTER TABLE `escape_follows`
+  ADD CONSTRAINT `escape_follows_escape_id_foreign` FOREIGN KEY (`escape_id`) REFERENCES `escapes` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `factfindings`
 --
 ALTER TABLE `factfindings`
@@ -10576,6 +10777,15 @@ ALTER TABLE `images`
 --
 ALTER TABLE `medicals`
   ADD CONSTRAINT `medicals_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `members`
+--
+ALTER TABLE `members`
+  ADD CONSTRAINT `members_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `members_education_id_foreign` FOREIGN KEY (`education_id`) REFERENCES `education` (`id`),
+  ADD CONSTRAINT `members_income_id_foreign` FOREIGN KEY (`income_id`) REFERENCES `incomes` (`id`),
+  ADD CONSTRAINT `members_occupation_id_foreign` FOREIGN KEY (`occupation_id`) REFERENCES `occupations` (`id`);
 
 --
 -- Constraints for table `mothers`

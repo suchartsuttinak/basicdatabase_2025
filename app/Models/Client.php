@@ -90,6 +90,14 @@ class Client extends Model
         return $this->hasMany(Member::class, 'client_id');
     }
 
+      // เพิ่มความสัมพันธ์กับ Estimate
+    public function estimates()
+    {
+        return $this->hasMany(Estimate::class);
+    }
+
+
+
 
 
 

@@ -25,6 +25,7 @@ use App\Http\Controllers\Frontend\EscapeFollowController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
+use App\Http\Controllers\Frontend\EstimateController;
 
 
 Route::get('/', function () {
@@ -387,6 +388,23 @@ Route::prefix('member')->group(function(){
 });
 
 
+
+   // Routes ประเมินครอบครัว (Estimate)
+Route::prefix('estimate')->group(function(){
+    Route::get('/show/{client_id}', [EstimateController::class, 'ShowEstimate'])->name('estimate.show');
+    Route::post('/store', [EstimateController::class, 'StoreEstimate'])->name('estimate.store');
+
+    // สำคัญ: ห้ามใส่ "estimate/" ซ้ำใน path
+    Route::get('/edit/{id}', [EstimateController::class, 'EditEstimate'])->name('estimate.edit');
+    Route::put('/update/{id}', [EstimateController::class, 'UpdateEstimate'])->name('estimate.update');
+
+    Route::delete('/delete/{id}', [EstimateController::class, 'DeleteEstimate'])->name('estimate.delete');
+});
+
+
+
+
+
 /// Escape หลัก
 Route::prefix('escape')->group(function(){
     Route::get('/index/{client_id}', [EscapeController::class, 'IndexEscape'])->name('escape.index');
@@ -411,7 +429,7 @@ Route::prefix('escape-follows')->group(function(){
     // ลบการติดตาม
     Route::delete('/delete/{id}', [EscapeFollowController::class, 'DeleteFollow'])->name('escape_follows.delete');
 });
-
+/// สิ้นสุด Escape หลัก
 
 
  

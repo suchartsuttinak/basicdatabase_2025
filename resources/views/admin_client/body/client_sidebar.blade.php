@@ -75,6 +75,11 @@
                                 <li>
                                     <a href="{{ route('member.create', $client->id) }}" class="tp-link">บันทึกสมาชิกครอบครัว</a>
                                 </li>
+                                <li>
+                                 <a href="{{ route('estimate.show', $client->id) }}" class="tp-link">ประเมินครอบครัว</a>
+
+
+                                </li>
                             </ul>
                         </div>
                     </li>
