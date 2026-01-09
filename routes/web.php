@@ -33,16 +33,16 @@ use App\Http\Controllers\Frontend\EducationRecordController;
 
 
 
-Route::get('/', function () {
+    Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
+    Route::get('/dashboard', function () {
     return view('admin.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // User Profile
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -50,17 +50,17 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 // Admin Logout
-Route::get('/admin/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
+    Route::get('/admin/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 
 // Admin Profile
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/profile', [AdminController::class, 'AdminProfile'])->name('admin.profile');
     Route::post('/profile/store', [AdminController::class, 'ProfileStore'])->name('profile.store');
     Route::post('/admin/password/update', [AdminController::class, 'PasswordUpdate'])->name('admin.password.update');  
 });
 
 // Institution Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/institution', [InstitutionController::class, 'InstitutionAll'])->name('institution.all');
     Route::post('/store/institution', [InstitutionController::class, 'InstitutionStore'])->name('institution.store');
     Route::get('/edit/institution/{id}', [InstitutionController::class, 'EditInstitution']);
@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Subject Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/subject', [SubjectController::class, 'SubjectShow'])->name('subject.show');
     Route::post('/store/subject', [SubjectController::class, 'SubjectStore'])->name('subject.store');
     Route::get('/edit/subject/{id}', [SubjectController::class, 'EditSubject']);
@@ -78,7 +78,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Psycho Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/psycho', [PsychoController::class, 'ShowPsycho'])->name('psycho.show');
     Route::post('/store/psycho', [PsychoController::class, 'StorePsycho'])->name('psycho.store');
     Route::get('/edit/psycho/{id}', [PsychoController::class, 'EditPsycho']);
@@ -98,7 +98,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Outside Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/outside', [OutsideController::class, 'ShowOutside'])->name('outside.show');
     Route::post('/store/outside', [OutsideController::class, 'StoreOutside'])->name('outside.store');
     Route::get('/edit/outside/{id}', [OutsideController::class, 'EditOutside']);
@@ -107,7 +107,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Document Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/document', [DocumentController::class, 'ShowDocument'])->name('document.show');
     Route::post('/store/document', [DocumentController::class, 'StoreDocument'])->name('document.store');
     Route::get('/edit/document/{id}', [DocumentController::class, 'EditDocument']);
@@ -116,7 +116,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Education Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/education', [EducationController::class, 'ShowEducation'])->name('education.show');
     Route::post('/store/education', [EducationController::class, 'StoreEducation'])->name('education.store');
     Route::get('/edit/education/{id}', [EducationController::class, 'EditEducation']);
@@ -124,7 +124,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/delete/education/{id}', [EducationController::class, 'DeleteEducation'])->name('education.delete');
 });
 // Income Modal Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/income', [IncomeController::class, 'ShowIncome'])->name('income.show');
     Route::post('/store/income', [IncomeController::class, 'StoreIncome'])->name('income.store');
     Route::get('/edit/income/{id}', [IncomeController::class, 'EditIncome']);
@@ -150,13 +150,13 @@ Route::middleware('auth')->group(function () {
 });
 
 // AdminClient Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/admin/client/{id}', [AdminClientController::class, 'Index'])->name('admin.index');
     Route::get('/client/report/{id}', [AdminClientController::class, 'ClientReport'])->name('client.report');
 });
 
 // Facfiding Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     // เพิ่ม factfinding ใหม่ โดยส่ง client_id
     Route::get('/factfinding/add/{client_id}', [FactfindingController::class, 'FactfindingAdd'])
         ->name('factfinding.add');
@@ -192,7 +192,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Education Record Route All
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     // เปิดฟอร์ม (GET)
     Route::get('/education_record/add/{client_id}', 
         [EducationRecordController::class, 'EducationRecordAdd']
@@ -246,7 +246,7 @@ Route::middleware('auth')->group(function () {
     });
   
 // 🏫 บันทึกการติดตามเด็กในโรงเรียน
-Route::prefix('school_followup')->group(function () {
+    Route::prefix('school_followup')->group(function () {
     Route::get('/add/{client_id}', [SchoolFollowupController::class, 'SchoolFollowupAdd'])->name('school_followup_add');
     Route::post('/store', [SchoolFollowupController::class, 'SchoolFollowupStore'])->name('school_followup_store');
     Route::get('/edit/{id}', [SchoolFollowupController::class, 'SchoolFollowupEdit'])->name('school_followup.edit');
@@ -260,7 +260,7 @@ Route::prefix('school_followup')->group(function () {
 });
 
 /// 🏫 บันทึกการขาดเรียนของเด็ก
-Route::prefix('absent')->name('absent.')->group(function () {
+    Route::prefix('absent')->name('absent.')->group(function () {
     Route::get('/add/{client_id}', [AbsentController::class, 'AbsentAdd'])->name('add');
     Route::post('/store', [AbsentController::class, 'AbsentStore'])->name('store');
     Route::get('/edit/{id}', [AbsentController::class, 'AbsentEdit'])->name('edit');
@@ -270,7 +270,7 @@ Route::prefix('absent')->name('absent.')->group(function () {
 });
 
 // 🏫 บันทึกการบาดเจ็บของเด็ก
-Route::prefix('accident')->name('accident.')->group(function () {
+    Route::prefix('accident')->name('accident.')->group(function () {
     // แสดงฟอร์มเพิ่มข้อมูล (client_id จำเป็น)
     Route::get('/add/{client_id}', [AccidentController::class, 'AccidentAdd'])->name('add');
 
@@ -292,7 +292,7 @@ Route::prefix('accident')->name('accident.')->group(function () {
 
 
 // 🏫 ตรวจสุขภาพเบื้องต้น
-Route::prefix('check_body')->name('check_body.')->group(function () {
+    Route::prefix('check_body')->name('check_body.')->group(function () {
     // แสดงฟอร์มเพิ่มข้อมูล (client_id จำเป็น)
     Route::get('/add/{client_id}', [CheckBodyController::class, 'CheckBodyAdd'])->name('add');
      // บันทึกข้อมูลใหม่
@@ -317,7 +317,7 @@ Route::prefix('check_body')->name('check_body.')->group(function () {
 
 
 // 🏫 บันทึกการการรักษาพยาบาลในหน่วยงาน
-Route::prefix('medical')->name('medical.')->group(function () {
+    Route::prefix('medical')->name('medical.')->group(function () {
     // แสดงฟอร์มเพิ่มข้อมูล (client_id จำเป็น)
     Route::get('/add/{client_id}', [MedicalController::class, 'MedicalAdd'])->name('add');
 
@@ -339,7 +339,7 @@ Route::prefix('medical')->name('medical.')->group(function () {
 
 
 // Vaccination Modal Route All
-Route::prefix('vaccine')->name('vaccine.')->group(function () {
+    Route::prefix('vaccine')->name('vaccine.')->group(function () {
     // แสดงรายการวัคซีนของ client
     Route::get('/add/{client_id}', [VaccinationController::class, 'VaccineShow'])->name('index');
 
@@ -357,7 +357,7 @@ Route::prefix('vaccine')->name('vaccine.')->group(function () {
 });
 
 // บันทึกการตรวจวินิจฉัยทางจิตเวช Psychiatric
-Route::prefix('psychiatric')->group(function(){
+    Route::prefix('psychiatric')->group(function(){
     Route::get('/add/{client_id}', [PsychiatricController::class, 'AddPsychiatric'])->name('psychiatric.create');
     Route::post('/store', [PsychiatricController::class, 'StorePsychiatric'])->name('psychiatric.store');
     Route::get('/edit/{id}', [PsychiatricController::class, 'EditPsychiatric'])->name('psychiatric.edit');
@@ -366,7 +366,7 @@ Route::prefix('psychiatric')->group(function(){
 });
 
 // บันทึกการตรวจสารเสพติด Addictive
-Route::prefix('addictive')->group(function(){
+    Route::prefix('addictive')->group(function(){
     Route::get('/add/{client_id}', [AddictiveController::class, 'AddAddictive'])->name('addictive.create');
     Route::post('/store', [AddictiveController::class, 'StoreAddictive'])->name('addictive.store');
     Route::get('/edit/{id}', [AddictiveController::class, 'EditAddictive'])->name('addictive.edit');
@@ -376,7 +376,7 @@ Route::prefix('addictive')->group(function(){
 });
 
 // Routes สำหรับพฤติกรรม (Observe)
-Route::prefix('observe')->group(function(){
+    Route::prefix('observe')->group(function(){
     Route::get('/add/{client_id}', [ObserveController::class, 'AddObserve'])->name('observe.create');
     Route::post('/store', [ObserveController::class, 'StoreObserve'])->name('observe.store');
     Route::get('/edit/{id}', [ObserveController::class, 'EditObserve'])->name('observe.edit');
@@ -385,7 +385,7 @@ Route::prefix('observe')->group(function(){
 });
 
 // Routes สำหรับการติดตามผล (Followup)
-Route::prefix('followup')->group(function(){
+    Route::prefix('followup')->group(function(){
     Route::post('/store', [ObserveController::class, 'StoreFollowup'])->name('followup.store');
     Route::get('/edit/{id}', [ObserveController::class, 'EditFollowup'])->name('followup.edit');
     Route::put('/update/{id}', [ObserveController::class, 'UpdateFollowup'])->name('followup.update');
@@ -393,7 +393,7 @@ Route::prefix('followup')->group(function(){
 });
 
 // Vitsit_Family Route All
-Route::prefix('vitsitFamily')->group(function () {
+    Route::prefix('vitsitFamily')->group(function () {
     Route::get('/add/{client_id}', [VisitFamilyController::class, 'AddvisitFamily'])->name('visitFamily.create');
     Route::post('/store/{client_id}', [VisitFamilyController::class, 'StoreVisitFamily'])->name('vitsitFamily.store');
     Route::get('/edit/{id}', [VisitFamilyController::class, 'EditVisitFamily'])->name('vitsitFamily.edit');
@@ -418,7 +418,7 @@ Route::prefix('vitsitFamily')->group(function () {
 });
 
 // Routes สมาชิกในครอบครัว (Member)
-Route::prefix('member')->group(function(){
+    Route::prefix('member')->group(function(){
     Route::get('/add/{client_id}', [MemberController::class, 'AddMember'])->name('member.create');
    Route::get('/show/{client_id}', [MemberController::class, 'ShowMember'])->name('member.show');
     Route::post('/store', [MemberController::class, 'StoreMember'])->name('member.store');
@@ -429,7 +429,7 @@ Route::prefix('member')->group(function(){
 });
 
    // Routes ประเมินครอบครัว (Estimate)
-Route::prefix('estimate')->group(function(){
+    Route::prefix('estimate')->group(function(){
     Route::get('/show/{client_id}', [EstimateController::class, 'ShowEstimate'])->name('estimate.show');
     Route::post('/store', [EstimateController::class, 'StoreEstimate'])->name('estimate.store');
 
@@ -442,7 +442,7 @@ Route::prefix('estimate')->group(function(){
 
 
 /// Escape หลัก
-Route::prefix('escape')->group(function(){
+    Route::prefix('escape')->group(function(){
     Route::get('/index/{client_id}', [EscapeController::class, 'IndexEscape'])->name('escape.index');
     Route::get('/add/{client_id}', [EscapeController::class, 'AddEscape'])->name('escape.add');
     Route::post('/store', [EscapeController::class, 'StoreEscape'])->name('escape.store');
@@ -455,7 +455,7 @@ Route::prefix('escape')->group(function(){
 });
 
 // EscapeFollow
-Route::prefix('escape-follows')->group(function(){
+    Route::prefix('escape-follows')->group(function(){
     // เพิ่มการติดตามใหม่
     Route::post('/store/{escape_id}', [EscapeFollowController::class, 'StoreFollow'])->name('escape_follows.store');
 

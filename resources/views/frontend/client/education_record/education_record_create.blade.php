@@ -154,15 +154,23 @@
                     </div>
                 </div>
 
-                <!-- ปุ่ม -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <button type="button" class="btn btn-outline-secondary" id="add-subject">
-                        <i class="bi bi-plus-circle me-1"></i> เพิ่มวิชา
-                    </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-save me-1"></i> บันทึกผล
-                    </button>
-                </div>
+              <!-- ปุ่ม -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary" id="add-subject">
+                                <i class="bi bi-plus-circle me-1"></i> เพิ่มวิชา
+                            </button>
+                            <a href="{{ route('education_record_show', ['client_id' => $client->id]) }}" 
+                                class="btn btn-outline-primary">
+                                    <i class="bi bi-house-door me-1"></i> กลับหน้าหลัก
+                                </a>
+
+
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save me-1"></i> บันทึกผล
+                        </button>
+                    </div>
             </form>
         </div>
     </div>

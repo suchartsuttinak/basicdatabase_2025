@@ -159,19 +159,25 @@
                     </div>
 
                     <!-- ปุ่ม -->
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button type="button" class="btn btn-outline-secondary" id="add-subject">
-                            <i class="bi bi-plus-circle me-1"></i> เพิ่มวิชา
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-save me-1"></i> บันทึกผล
-                        </button>
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary" id="add-subject">
+                                    <i class="bi bi-plus-circle me-1"></i> เพิ่มวิชา
+                                </button>
+                                <a href="{{ route('education_record_show', ['client_id' => $record->client_id]) }}" 
+                                class="btn btn-outline-primary">
+                                    <i class="bi bi-arrow-left-circle me-1"></i> กลับหน้าหลัก
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save me-1"></i> แก้ไขข้อมูล
+                            </button>
+                        </div>
             </form>
         </div>
     </div>
 </div>
-{{-- ✅ Script สำหรับเพิ่มช่องวิชา --}}
+
 {{-- ✅ Script สำหรับเพิ่ม/ลบช่องวิชา --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
