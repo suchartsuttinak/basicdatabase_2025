@@ -40,13 +40,15 @@ class EstimateController extends Controller
                 'date',
                 Rule::unique('estimates')->where(function ($query) use ($request) {
                     return $query->where('client_id', $request->client_id);
-                }), // ห้ามซ้ำ client_id + date
+                }),
             ],
             'follo_no' => 'required',
             'results' => 'nullable|string',
             'teacher' => 'nullable|string',
             'remark' => 'nullable|string',
             'client_id' => 'required|exists:clients,id',
+        ], [
+            'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น', // ✅ custom message
         ]);
 
         // สร้าง record ใหม่
@@ -71,9 +73,15 @@ class EstimateController extends Controller
             }
         }
 
+        $notification = [
+            'message' => 'บันทึกข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
+
         return redirect()
             ->route('estimate.show', $request->client_id)
-            ->with('success', 'บันทึกข้อมูลเรียบร้อย');
+            ->with($notification);
     }
 
     // ฟอร์มแก้ไข
@@ -129,8 +137,14 @@ class EstimateController extends Controller
             $counter++;
         }
 
+        $notification = [
+            'message' => 'แก้ไขข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
+
         return redirect()->route('estimate.show', $estimate->client_id)
-            ->with('success', 'แก้ไขข้อมูลเรียบร้อย');
+            ->with($notification);
     }
 
     // ลบข้อมูล
@@ -151,7 +165,12 @@ class EstimateController extends Controller
             $counter++;
         }
 
+          $notification = [
+            'message' => 'ลบข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('estimate.show', $client_id)
-            ->with('success', 'ลบข้อมูลเรียบร้อย');
+            ->with($notification);
     }
 }

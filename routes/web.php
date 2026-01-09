@@ -4,15 +4,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\backend\ClientController;
+use App\Http\Controllers\backend\IncomeController;
 use App\Http\Controllers\backend\PsychoController;
+use App\Http\Controllers\backend\OutsideController;
 use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\AbsentController;
 use App\Http\Controllers\Frontend\EscapeController;
 use App\Http\Controllers\Frontend\FamilyController;
 use App\Http\Controllers\Frontend\MemberController;
+use App\Http\Controllers\backend\DocumentController;
 use App\Http\Controllers\Frontend\MedicalController;
 use App\Http\Controllers\Frontend\ObserveController;
+use App\Http\Controllers\backend\EducationController;
 use App\Http\Controllers\Frontend\AccidentController;
+use App\Http\Controllers\Frontend\EstimateController;
 use App\Http\Controllers\Frontend\AddictiveController;
 use App\Http\Controllers\Frontend\CheckBodyController;
 use App\Http\Controllers\backend\InstitutionController;
@@ -25,7 +30,7 @@ use App\Http\Controllers\Frontend\EscapeFollowController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Frontend\SchoolFollowupController;
 use App\Http\Controllers\Frontend\EducationRecordController;
-use App\Http\Controllers\Frontend\EstimateController;
+
 
 
 Route::get('/', function () {
@@ -91,6 +96,42 @@ Route::middleware('auth')->group(function () {
     Route::get('/delete/misbehavior/{id}', [MisbehaviorController::class, 'DeleteMisbehavior'])->name('misbehavior.delete');
 
 });
+
+// Outside Modal Route All
+Route::middleware('auth')->group(function () {
+    Route::get('/outside', [OutsideController::class, 'ShowOutside'])->name('outside.show');
+    Route::post('/store/outside', [OutsideController::class, 'StoreOutside'])->name('outside.store');
+    Route::get('/edit/outside/{id}', [OutsideController::class, 'EditOutside']);
+    Route::post('/update/outside', [OutsideController::class, 'UpdateOutside'])->name('outside.update');
+    Route::get('/delete/outside/{id}', [OutsideController::class, 'DeleteOutside'])->name('outside.delete');
+});
+
+// Document Modal Route All
+Route::middleware('auth')->group(function () {
+    Route::get('/document', [DocumentController::class, 'ShowDocument'])->name('document.show');
+    Route::post('/store/document', [DocumentController::class, 'StoreDocument'])->name('document.store');
+    Route::get('/edit/document/{id}', [DocumentController::class, 'EditDocument']);
+    Route::post('/update/document', [DocumentController::class, 'UpdateDocument'])->name('document.update');
+    Route::get('/delete/document/{id}', [DocumentController::class, 'DeleteDocument'])->name('document.delete');
+});
+
+// Education Modal Route All
+Route::middleware('auth')->group(function () {
+    Route::get('/education', [EducationController::class, 'ShowEducation'])->name('education.show');
+    Route::post('/store/education', [EducationController::class, 'StoreEducation'])->name('education.store');
+    Route::get('/edit/education/{id}', [EducationController::class, 'EditEducation']);
+    Route::post('/update/education', [EducationController::class, 'UpdateEducation'])->name('education.update');
+    Route::get('/delete/education/{id}', [EducationController::class, 'DeleteEducation'])->name('education.delete');
+});
+// Income Modal Route All
+Route::middleware('auth')->group(function () {
+    Route::get('/income', [IncomeController::class, 'ShowIncome'])->name('income.show');
+    Route::post('/store/income', [IncomeController::class, 'StoreIncome'])->name('income.store');
+    Route::get('/edit/income/{id}', [IncomeController::class, 'EditIncome']);
+    Route::post('/update/income', [IncomeController::class, 'UpdateIncome'])->name('income.update');
+    Route::get('/delete/income/{id}', [IncomeController::class, 'DeleteIncome'])->name('income.delete');
+});
+
 
 
 // Client Route All
@@ -387,8 +428,6 @@ Route::prefix('member')->group(function(){
    
 });
 
-
-
    // Routes ประเมินครอบครัว (Estimate)
 Route::prefix('estimate')->group(function(){
     Route::get('/show/{client_id}', [EstimateController::class, 'ShowEstimate'])->name('estimate.show');
@@ -400,9 +439,6 @@ Route::prefix('estimate')->group(function(){
 
     Route::delete('/delete/{id}', [EstimateController::class, 'DeleteEstimate'])->name('estimate.delete');
 });
-
-
-
 
 
 /// Escape หลัก

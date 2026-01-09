@@ -56,24 +56,30 @@
                     <div class="collapse" id="sidebarAuth">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('institution.all') }}" class="tp-link">ชื่อสถานศึกษา</a>
+                                <a href="{{ route('institution.all') }}" class="tp-link">รายการสถานศึกษา</a>
                             </li>
                             <li>
-                                <a href="{{ route('subject.show') }}" class="tp-link">วิชาเรียน</a>
+                                <a href="{{ route('subject.show') }}" class="tp-link">รายการวิชาเรียน</a>
                             </li>
                             <li>
-                                <a href="{{ route('psycho.show') }}" class="tp-link">โรคทางจิตเวช</a>
+                                <a href="{{ route('psycho.show') }}" class="tp-link">รายการโรคทางจิตเวช</a>
                             </li>
                             <li>
-                                <a href="{{ route('misbehavior.show') }}" class="tp-link">บันทึกพฤติกรรม</a>
+                                <a href="{{ route('misbehavior.show') }}" class="tp-link">รายการพฤติกรรม</a>
                             </li>
                             <li>
-                                <a href="auth-confirm-mail.html" class="tp-link">Confirm Mail</a>
+                                <a href="{{ route('outside.show') }}" class="tp-link">สาเหตุที่เด็กอยู่ภายนอก</a>
                             </li>
                             <li>
-                                <a href="email-verification.html" class="tp-link">Email Verification</a>
+                                <a href="{{ route('document.show') }}" class="tp-link">รายการเอกสาร</a>
                             </li>
                             <li>
+                                <a href="{{ route('education.show') }}" class="tp-link">ระดับการศึกษา</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('income.show') }}" class="tp-link">รายการรายได้</a>
+                            </li>
+                            
                                 <a href="auth-logout.html" class="tp-link">Logout</a>
                             </li>
                         </ul>

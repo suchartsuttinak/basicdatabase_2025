@@ -1,6 +1,39 @@
 @extends('admin_client.admin_client')
 @section('content')
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- ✅ แสดงข้อผิดพลาดจากการ validate -->
+@if ($errors->any())
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            html: '{!! implode("<br>", $errors->all()) !!}',
+            timer: 3000,              // ✅ ปิดเองใน 3 วินาที
+            timerProgressBar: true    // ✅ แสดง progress bar ด้านบน
+        });
+        // ✅ เปิด modal กลับมาอัตโนมัติ
+        var addModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
+        addModal.show();
+    </script>
+@endif
+
+@if (session('message'))
+    <script>
+        Swal.fire({
+            icon: '{{ session('alert-type') }}',
+            title: '{{ session('message') }}',
+            timer: 3000,              // ✅ ปิดเองใน 3 วินาที
+            timerProgressBar: true
+        });
+    </script>
+@endif
+<!-- สิ้นสุด✅ แสดงข้อผิดพลาดจากการ validate -->
+
+
+
 <div class="card shadow-sm border-0 mt-3">
     <div class="card-header bg-light fw-bold text-dark py-2 px-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
@@ -51,7 +84,7 @@
                 </tr>
             </thead>
             <tbody>
-    @foreach ($client->estimates->sortByDesc('date') as $item)
+        @foreach ($client->estimates->sortByDesc('date') as $item)
         <tr>
             <td>{{ $item->count }}</td>
             <td>{{ \Carbon\Carbon::parse($item->date)->format('d/m/Y') }}</td>
@@ -111,12 +144,15 @@
         </div>
 
         <div class="modal-body">
-            <div class="mb-3 col-4">
-                <label class="form-label">วันที่ติดตาม</label>
-                <input type="date" name="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date') }}">
-                @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
+           <div class="mb-3 col-4">
+                    <label class="form-label">วันที่ติดตาม</label>
+                    <input type="date" name="date"
+                        class="form-control @error('date') is-invalid @enderror"
+                        value="{{ old('date') }}">
+                    @error('date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             <div class="mb-3">
                 <label class="form-label">การดำเนินงาน</label><br>
                 <div class="form-check">
