@@ -96,6 +96,11 @@ class Client extends Model
         return $this->hasMany(Estimate::class);
     }
 
+    public function refers()
+{
+    return $this->hasMany(Refer::class);
+}
+
 
 
 

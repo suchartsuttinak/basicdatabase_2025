@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Subject;
 use App\Models\Education;
+use App\Models\Institution;
+use Illuminate\Http\Request;
 use App\Models\EducationRecord;
+use App\Http\Controllers\Controller;
 
 class EducationRecordController extends Controller
 {
@@ -61,6 +62,11 @@ class EducationRecordController extends Controller
         return back()->with('error', 'มีการบันทึกผลการเรียนในภาคเรียนนี้แล้ว')->withInput();
     }
 
+    // ✅ เก็บชื่อสถานศึกษาในตาราง institutions ถ้ายังไม่มี
+    $institution = Institution::firstOrCreate(
+        ['institution_name' => $validated['school_name']]
+    );
+
     // ✅ กันเลือกวิชาซ้ำในฟอร์มเดียวกัน
     if (!empty($validated['subjects'])) {
         $subjectIds = array_column($validated['subjects'], 'subject_id');
@@ -69,12 +75,13 @@ class EducationRecordController extends Controller
         }
     }
 
-    // Insert record
+    // Insert record พร้อม institution_id
     $record = EducationRecord::create([
         'client_id'     => $validated['client_id'],
         'education_id'  => $validated['education_id'],
         'semester'      => $validated['semester'],
-        'school_name'   => $validated['school_name'],
+        'school_name'   => $validated['school_name'],   // จะเก็บไว้ก็ได้
+        'institution_id'=> $institution->id,            // ✅ ใช้ FK เชื่อมกับ institutions
         'record_date'   => $validated['record_date'],
         'grade_average' => $validated['grade_average'] ?? null,
     ]);
@@ -94,7 +101,6 @@ class EducationRecordController extends Controller
     return redirect()->route('education_record_show', ['client_id' => $validated['client_id']])
         ->with('success','บันทึกผลการเรียนเรียบร้อยแล้ว');
 }
-
     // ฟังก์ชันช่วยแปลงเกรดเป็นคะแนน
     private function convertGradeToPoint($grade)
     {

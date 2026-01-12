@@ -31,6 +31,13 @@ class EducationRecord extends Model
         return $this->belongsTo(Education::class, 'education_id');
     }
 
+    public function institution()
+{
+    return $this->belongsTo(Institution::class);
+}
+
+
+
 
 }
 

@@ -29,7 +29,8 @@
 
                 <li>
                     <a href="#sidebarDashboards" data-bs-toggle="collapse">
-                        <i data-feather="home"></i>
+                         <i data-feather="users"></i>
+                        {{-- <i data-feather="home"></i> --}}
                         <span> บันทึกข้อมูลแรกเข้า </span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -49,7 +50,7 @@
 
                 <li>
                     <a href="#sidebarAuth" data-bs-toggle="collapse">
-                        <i data-feather="users"></i>
+                        <i data-feather="home"></i>
                         <span> ข้อมูลผู้ใช้ </span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -61,6 +62,9 @@
                             <li>
                                 <a href="{{ route('subject.show') }}" class="tp-link">รายการวิชาเรียน</a>
                             </li>
+                             <li>
+                                <a href="{{ route('education.show') }}" class="tp-link">รายการระดับการศึกษา</a>
+                            </li>
                             <li>
                                 <a href="{{ route('psycho.show') }}" class="tp-link">รายการโรคทางจิตเวช</a>
                             </li>
@@ -68,16 +72,17 @@
                                 <a href="{{ route('misbehavior.show') }}" class="tp-link">รายการพฤติกรรม</a>
                             </li>
                             <li>
-                                <a href="{{ route('outside.show') }}" class="tp-link">สาเหตุที่เด็กอยู่ภายนอก</a>
+                                <a href="{{ route('outside.show') }}" class="tp-link">รายการเด็กที่อยู่ภายนอก</a>
                             </li>
                             <li>
                                 <a href="{{ route('document.show') }}" class="tp-link">รายการเอกสาร</a>
                             </li>
-                            <li>
-                                <a href="{{ route('education.show') }}" class="tp-link">ระดับการศึกษา</a>
-                            </li>
+                           
                             <li>
                                 <a href="{{ route('income.show') }}" class="tp-link">รายการรายได้</a>
+                            </li>
+                            <li>
+                                <a href="{{ route('refers.index') }}" class="tp-link">รายการการจำหน่าย</a>
                             </li>
                             
                                 <a href="auth-logout.html" class="tp-link">Logout</a>

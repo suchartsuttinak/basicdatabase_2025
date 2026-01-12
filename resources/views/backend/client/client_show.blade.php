@@ -75,6 +75,8 @@
                                             </td>
 
                                             <!-- แสดงสถานะ release_status -->
+
+                                              
                                             <td>
                                                 @if($client->release_status === 'show')
                                                     <span class="badge bg-success">Active</span>
@@ -84,6 +86,10 @@
                                             </td>
 
                                             <td>
+                                                <a title="Main" href="{{ route('admin.index', $client->id) }}" 
+                                                    class="btn btn-primary btn-sm">
+                                                    <span class="mdi mdi-eye-circle mdi-18px"></span>
+                                                </a>
                                                 <a title="Edit" href="{{ route('client.edit', $client->id) }}" 
                                                     class="btn btn-success btn-sm">
                                                     <span class="mdi mdi-book-edit-outline mdi-18px"></span>
@@ -94,10 +100,10 @@
                                                     <span class="mdi mdi-trash-can-outline mdi-18px"></span>
                                                 </a>
 
-                                                <a title="Main" href="{{ route('admin.index', $client->id) }}" 
-                                                    class="btn btn-primary btn-sm">
-                                                    <span class="mdi mdi-eye-circle mdi-18px"></span>
+                                               <a title="จำหน่าย" href="{{ route('refers.index') }}" class="btn btn-warning btn-sm">
+                                                    <span class="mdi mdi-arrow-right-bold mdi-18px"></span>
                                                 </a>
+
                                             </td>
                                         </tr>
                                     @endforeach

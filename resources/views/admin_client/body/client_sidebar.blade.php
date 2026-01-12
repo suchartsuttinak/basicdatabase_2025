@@ -155,6 +155,24 @@
                     </div>
                 </li>
 
+                 <li>
+                    <a href="#sidebarMaps" data-bs-toggle="collapse">
+                        <i data-feather="map"></i>
+                        <span> สังคมสงเคราะห์ </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="sidebarMaps">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a href="{{ route('case_outside.show', $client->id) }}" class="tp-link">ติดตามเด็กที่อยู่ภายนอก</a>
+                            </li>
+                            <li>
+                                <a href="maps-vector.html" class="tp-link">Vector Maps</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
                 <li>
                     <a href="widgets.html" class="tp-link">
                         <i data-feather="aperture"></i>
@@ -162,156 +180,12 @@
                     </a>
                 </li>
 
-                <li>
-                    <a href="#sidebarAdvancedUI" data-bs-toggle="collapse">
-                        <i data-feather="cpu"></i>
-                        <span> Extended UI </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarAdvancedUI">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="extended-carousel.html" class="tp-link">Carousel</a>
-                            </li>
-                            <li>
-                                <a href="extended-notifications.html" class="tp-link">Notifications</a>
-                            </li>
-                            <li>
-                                <a href="extended-offcanvas.html" class="tp-link">Offcanvas</a>
-                            </li>
-                            <li>
-                                <a href="extended-range-slider.html" class="tp-link">Range Slider</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+               
+            
 
-                <li>
-                    <a href="#sidebarIcons" data-bs-toggle="collapse">
-                        <i data-feather="award"></i>
-                        <span> Icons </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarIcons">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="icons-feather.html" class="tp-link">Feather Icons</a>
-                            </li>
-                            <li>
-                                <a href="icons-mdi.html" class="tp-link">Material Design Icons</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+            
 
-                <li>
-                    <a href="#sidebarForms" data-bs-toggle="collapse">
-                        <i data-feather="briefcase"></i>
-                        <span> Forms </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarForms">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="forms-elements.html" class="tp-link">General Elements</a>
-                            </li>
-                            <li>
-                                <a href="forms-validation.html" class="tp-link">Validation</a>
-                            </li>
-                            <li>
-                                <a href="forms-quilljs.html" class="tp-link">Quilljs Editor</a>
-                            </li>
-                            <li>
-                                <a href="forms-pickers.html" class="tp-link">Picker</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarTables" data-bs-toggle="collapse">
-                        <i data-feather="table"></i>
-                        <span> Tables </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarTables">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="tables-basic.html" class="tp-link">Basic Tables</a>
-                            </li>
-                            <li>
-                                <a href="tables-datatables.html" class="tp-link">Data Tables</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarCharts" data-bs-toggle="collapse">
-                        <i data-feather="pie-chart"></i>
-                        <span> Apex Charts </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarCharts">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href='charts-line.html'>Line</a>
-                            </li>
-                            <li>
-                                <a href='charts-area.html'>Area</a>
-                            </li>
-                            <li>
-                                <a href='charts-column.html'>Column</a>
-                            </li>
-                            <li>
-                                <a href='charts-bar.html'>Bar</a>
-                            </li>
-                            <li>
-                                <a href='charts-mixed.html'>Mixed</a>
-                            </li>
-                            <li>
-                                <a href='charts-timeline.html'>Timeline</a>
-                            </li>
-                            <li>
-                                <a href='charts-rangearea.html'>Range Area</a>
-                            </li>
-                            <li>
-                                <a href='charts-funnel.html'>Funnel</a>
-                            </li>
-                            <li>
-                                <a href='charts-candlestick.html'>Candlestick</a>
-                            </li>
-                            <li>
-                                <a href='charts-boxplot.html'>Boxplot</a>
-                            </li>
-                            <li>
-                                <a href='charts-bubble.html'>Bubble</a>
-                            </li>
-                            <li>
-                                <a href='charts-scatter.html'>Scatter</a>
-                            </li>
-                            <li>
-                                <a href='charts-heatmap.html'>Heatmap</a>
-                            </li>
-                            <li>
-                                <a href='charts-treemap.html'>Treemap</a>
-                            </li>
-                            <li>
-                                <a href='charts-pie.html'>Pie</a>
-                            </li>
-                            <li>
-                                <a href='charts-radialbar.html'>Radialbar</a>
-                            </li>
-                            <li>
-                                <a href='charts-radar.html'>Radar</a>
-                            </li>
-                            <li>
-                                <a href='charts-polararea.html'>Polar</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
+             
                 <li>
                     <a href="#sidebarMaps" data-bs-toggle="collapse">
                         <i data-feather="map"></i>

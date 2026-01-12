@@ -22,24 +22,20 @@
     <table class="table table-striped table-hover align-middle">
       <thead class="table-primary text-center">
         <tr>
-          <th>ID</th>
-          <th>วันที่ออก</th>
-          <th>ประเภทการออก</th>
-          <th>เรื่องราว/สาเหตุ</th>
-          <th>Client ID</th>
-          <th>วันที่สร้าง</th>
-          <th>วันที่แก้ไขล่าสุด</th>
+       
+          <th class="text-start">วันที่ออก</th>
+          <th class="text-start">ประเภทการออก</th>
+          <th class="text-start">พฤติการณ์/สาเหตุ</th>
+    
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>{{ $escape->id }}</td>
+       
           <td>{{ $escape->retire_date ? $escape->retire_date->format('d/m/Y') : '-' }}</td>
           <td>{{ $escape->retire->retire_name ?? '-' }}</td>
           <td>{{ $escape->stories ?? '-' }}</td>
-          <td>{{ $escape->client_id }}</td>
-          <td>{{ $escape->created_at ? $escape->created_at->format('d/m/Y H:i:s') : '-' }}</td>
-          <td>{{ $escape->updated_at ? $escape->updated_at->format('d/m/Y H:i:s') : '-' }}</td>
+
         </tr>
       </tbody>
     </table>
@@ -146,7 +142,7 @@
                           <option value="ไม่พบ" {{ $f->trac_no == 'ไม่พบ' ? 'selected' : '' }}>ไม่พบ</option>
                         </select>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-12 mt-2">
                         <label class="form-label fw-bold">รายละเอียด</label>
                         <input type="text" name="detail" class="form-control form-control-sm"
                                value="{{ old('detail', $f->detail) }}">
@@ -164,12 +160,12 @@
                         <input type="date" name="stop_date" class="form-control form-control-sm"
                                value="{{ old('stop_date', $f->stop_date?->format('Y-m-d')) }}">
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-12 mt-2">
                         <label class="form-label fw-bold">การลงโทษ</label>
                         <input type="text" name="punish" class="form-control form-control-sm"
                                value="{{ old('punish', $f->punish) }}">
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-3 mt-2">
                         <label class="form-label fw-bold">วันที่ลงโทษ</label>
                         <input type="date" name="punish_date" class="form-control form-control-sm"
                                value="{{ old('punish_date', $f->punish_date?->format('Y-m-d')) }}">
@@ -254,7 +250,7 @@
               <label class="form-label fw-bold">วันที่ยุติการติดตาม</label>
               <input type="date" name="stop_date" class="form-control form-control-sm">
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-12 mt-2">
               <label class="form-label fw-bold">การลงโทษ</label>
               <input type="text" name="punish" class="form-control form-control-sm">
             </div>

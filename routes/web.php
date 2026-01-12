@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\backend\ClientController;
 use App\Http\Controllers\backend\IncomeController;
 use App\Http\Controllers\backend\PsychoController;
+use App\Http\Controllers\Frontend\ReferController;
 use App\Http\Controllers\backend\OutsideController;
 use App\Http\Controllers\backend\SubjectController;
 use App\Http\Controllers\Frontend\AbsentController;
@@ -16,12 +17,14 @@ use App\Http\Controllers\backend\DocumentController;
 use App\Http\Controllers\Frontend\MedicalController;
 use App\Http\Controllers\Frontend\ObserveController;
 use App\Http\Controllers\backend\EducationController;
+use App\Http\Controllers\backend\TranslateController;
 use App\Http\Controllers\Frontend\AccidentController;
 use App\Http\Controllers\Frontend\EstimateController;
 use App\Http\Controllers\Frontend\AddictiveController;
 use App\Http\Controllers\Frontend\CheckBodyController;
 use App\Http\Controllers\backend\InstitutionController;
 use App\Http\Controllers\backend\MisbehaviorController;
+use App\Http\Controllers\Frontend\CaseOutsideController;
 use App\Http\Controllers\Frontend\FactfindingController;
 use App\Http\Controllers\Frontend\PsychiatricController;
 use App\Http\Controllers\Frontend\VaccinationController;
@@ -131,6 +134,16 @@ require __DIR__.'/auth.php';
     Route::post('/update/income', [IncomeController::class, 'UpdateIncome'])->name('income.update');
     Route::get('/delete/income/{id}', [IncomeController::class, 'DeleteIncome'])->name('income.delete');
 });
+
+// translates Modal Route All
+    Route::middleware('auth')->group(function () {
+    Route::get('/translate', [TranslateController::class, 'ShowTranslate'])->name('translate.show');
+    Route::post('/store/translate', [TranslateController::class, 'StoreTranslate'])->name('translate.store');
+    Route::get('/edit/translate/{id}', [TranslateController::class, 'EditTranslate']);
+    Route::post('/update/translate', [TranslateController::class, 'UpdateTranslate'])->name('translate.update');
+    Route::get('/delete/translate/{id}', [TranslateController::class, 'DeleteTranslate'])->name('translate.delete');
+});
+
 
 
 
@@ -467,7 +480,31 @@ require __DIR__.'/auth.php';
 });
 /// สิ้นสุด Escape หลัก
 
+// Routes ติดตามเด็กที่อยู่นอกสถานสงเคราะห์ (CaseOutside)
+    Route::prefix('case-outside')->group(function(){
+    Route::get('/show/{client_id}', [CaseOutsideController::class, 'ShowCaseOutside'])->name('case_outside.show');
+    Route::post('/store', [CaseOutsideController::class, 'StoreCaseOutside'])->name('case_outside.store');
+    Route::put('/update/{id}', [CaseOutsideController::class, 'UpdateCaseOutside'])->name('case_outside.update');
+    Route::delete('/delete/{id}', [CaseOutsideController::class, 'DeleteCaseOutside'])->name('case_outside.delete');
+});
 
- 
-   
+// Routes ติดตามเด็กที่อยู่นอกสถานสงเคราะห์ (CaseOutside)
+   Route::prefix('refer')->group(function(){
+    Route::get('/refers', [ReferController::class, 'index'])->name('refers.index');
+    Route::post('/refers/store', [ReferController::class, 'store'])->name('refers.store');
+    Route::put('/refers/{id}/restore', [ReferController::class, 'restore'])->name('refers.restore');
+});
+
+
+
+
+
+
+
+
+    
+  
+
+
+
 

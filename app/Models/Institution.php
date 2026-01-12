@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Institution extends Model
 {
-    protected $guarded = [];
+    protected $fillable = ['institution_name'];
+
+
 }

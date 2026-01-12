@@ -5,8 +5,8 @@
                 &copy;
                 <script>
                     document.write(new Date().getFullYear())
-                </script> - Made with <span class="mdi mdi-heart text-danger"></span> by <a href="#!"
-                    class="text-reset fw-semibold">Zoyothemes</a>
+                </script> - พัฒนา <span class="mdi mdi-heart text-danger"></span> โดย <a href="#!"
+                    class="text-reset fw-semibold">นายสุชาติ สุทธินาค</a>
             </div>
         </div>
     </div>
