@@ -28,13 +28,9 @@
     <!-- ✅ Datepicker CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
-     <!-- ✅ Google Fonts (Kanit) -->
+    <!-- ✅ Google Fonts (Kanit) -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- ✅ Custom Font Style -->
-   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- ✅ Custom Font Style -->
 <style>
     body {
         font-family: 'Kanit', sans-serif;
@@ -53,38 +49,43 @@
         font-weight: 400;
         letter-spacing: 0.5px;
     }
-
-    /* ✅ ทำให้ข้อความในช่อง input/textarea เป็นสีอ่อน */
     .form-control {
-        color: #6c757d; /* เทาอ่อน */
+        color: #6c757d;
     }
     .form-control::placeholder {
-        color: #adb5bd; /* สี placeholder อ่อนกว่า */
-        opacity: 1;     /* ให้แสดงชัดเจน */
+        color: #adb5bd;
+        opacity: 1;
     }
+
+    /* ปรับตัวอักษรในตาราง DataTable ให้เล็กลง */
+    table.dataTable td, 
+    table.dataTable th {
+        font-size: 12px;   /* ปรับขนาดตามที่ต้องการ เช่น 12px */
+    }
+
+    /* ปรับตัวอักษรในส่วน control เช่น search, pagination */
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_paginate {
+        font-size: 12px;
+    }
+
 </style>
+
 </head>
 
 <body data-menu-color="light" data-sidebar="default">
 
-    <!-- Begin page -->
     <div id="app-layout">
-
-        <!-- Topbar -->
         @include('admin.body.header')
-
-        <!-- Sidebar -->
         @include('admin.body.sidebar')
 
-        <!-- Content -->
         <div class="content-page">
             @yield('admin')
-
-            <!-- Footer -->
             @include('admin.body.footer')
         </div>
     </div>
-    <!-- END wrapper -->
 
     <!-- Vendor JS -->
     <script src="{{ asset('backend/assets/libs/jquery/jquery.min.js') }}"></script>
@@ -111,6 +112,29 @@
     <script src="{{ asset('backend/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('backend/assets/js/pages/datatable.init.js') }}"></script>
 
+    <!-- ✅ DataTables ภาษาไทย -->
+    <script>
+    $(document).ready(function() {
+        $('#datatable').DataTable({
+            destroy: true, // บังคับให้ทับค่า init เดิม
+            language: {
+                search: "ค้นหา:",
+                lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+                info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                infoEmpty: "ไม่มีข้อมูลให้แสดง",
+                infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+                zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                paginate: {
+                    first: "หน้าแรก",
+                    last: "หน้าสุดท้าย",
+                    next: "ถัดไป",
+                    previous: "ก่อนหน้า"
+                },
+            }
+        });
+    });
+    </script>
+
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="{{ asset('backend/assets/js/code.js') }}"></script>
@@ -122,57 +146,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
 
-   <!-- ✅ Init Datepicker Thai + แปลงปี พ.ศ. ในช่อง input -->
-<script>
-$(function() {
-    $('.datepicker-th').datepicker({
-        format: 'dd/mm/yyyy',
-        language: 'th',
-        thaiyear: true,
-        autoclose: true,
-        todayHighlight: true
-    }).on('show', function() {
-        setTimeout(function() {
-            // บังคับให้ label ปีเป็น พ.ศ.
-            $('.datepicker-switch').each(function() {
-                const text = $(this).text();
-                const match = text.match(/(\d{4})$/);
-                if (match) {
-                    const year = parseInt(match[1]);
-                    if (year < 2500) {
-                        $(this).text(text.replace(year, year + 543));
+    <!-- ✅ Init Datepicker Thai -->
+    <script>
+    $(function() {
+        $('.datepicker-th').datepicker({
+            format: 'dd/mm/yyyy',
+            language: 'th',
+            thaiyear: true,
+            autoclose: true,
+            todayHighlight: true
+        }).on('show', function() {
+            setTimeout(function() {
+                $('.datepicker-switch').each(function() {
+                    const text = $(this).text();
+                    const match = text.match(/(\d{4})$/);
+                    if (match) {
+                        const year = parseInt(match[1]);
+                        if (year < 2500) {
+                            $(this).text(text.replace(year, year + 543));
+                        }
                     }
-                }
-            });
-            $('.datepicker-years .year').each(function() {
-                const year = parseInt($(this).text());
-                if (year < 2500) {
-                    $(this).text(year + 543);
-                }
-            });
-        }, 10);
-    }).on('changeDate', function(e) {
-        let date = e.date;
-        if (date) {
-            let day = ('0' + date.getDate()).slice(-2);
-            let month = ('0' + (date.getMonth() + 1)).slice(-2);
-            let yearBE = date.getFullYear() + 543;
-
-            // ✅ แสดงปี พ.ศ. ในช่อง input ที่ผู้ใช้เห็น
-            let displayDate = `${day}/${month}/${yearBE}`;
-            $(this).val(displayDate);
-
-            // ✅ แปลงกลับเป็นปี ค.ศ. สำหรับ hidden input
-            let yearAD = date.getFullYear(); // ใช้ค่าเดิมจาก JS Date (ค.ศ.)
-            let isoDate = `${yearAD}-${month}-${day}`;
-
-            // hidden input ต้องตั้ง id ให้ตรง เช่น birth_date_display → birth_date
-            let hiddenInputId = $(this).attr('id').replace('_display', '');
-            $('#' + hiddenInputId).val(isoDate);
-        }
+                });
+                $('.datepicker-years .year').each(function() {
+                    const year = parseInt($(this).text());
+                    if (year < 2500) {
+                        $(this).text(year + 543);
+                    }
+                });
+            }, 10);
+        });
     });
-});
-</script>
+    </script>
 
     <!-- Toastr Alert -->
     <script>
@@ -186,5 +190,6 @@ $(function() {
             }
         @endif
     </script>
-</body>
+
+   </body>
 </html>

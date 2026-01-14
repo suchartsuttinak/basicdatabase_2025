@@ -39,7 +39,12 @@
                             <li>
                                 <a href="{{ route('client.show') }}" class="tp-link">ทะเบียนผู้รับ</a>
                             </li>
-                            <li>
+                             <li>
+                                <a href="{{ route('client.show_refer') }}" class="tp-link">ทะเบียนผู้ทั้งหมด</a>
+                            </li>
+                          
+                          
+                     <li>
                                 <a href="ecommerce.html" class="tp-link">E-commerce</a>
                             </li>
                         </ul>
@@ -81,10 +86,7 @@
                             <li>
                                 <a href="{{ route('income.show') }}" class="tp-link">รายการรายได้</a>
                             </li>
-                            <li>
-                                <a href="{{ route('refers.index') }}" class="tp-link">รายการการจำหน่าย</a>
-                            </li>
-                            
+                             
                                 <a href="auth-logout.html" class="tp-link">Logout</a>
                             </li>
                         </ul>

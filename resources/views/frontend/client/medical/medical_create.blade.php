@@ -268,23 +268,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // ✅ Init DataTable
-  $('#datatable-medical').DataTable({
-    responsive: true,
-    autoWidth: false,
-    pageLength: 10,
-    ordering: true,
-    language: {
-      url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
-    },
-    columnDefs: [
-      { targets: 0, className: 'text-center', width: '6%' },   // ลำดับ
-      { targets: -1, className: 'text-center text-nowrap', width: '16%' }  // จัดการ
-    ]
-  });
 
-  
 
   // ✅ Toggle ฟิลด์การวินิจฉัย/วันที่แพทย์นัด สำหรับ Create
   const referYesNew   = document.getElementById('refer_yes_new');
@@ -327,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (referNo)  referNo.addEventListener('change', toggleMedicalSection);
     });
   });
-});
+
 </script>
 @endpush
 

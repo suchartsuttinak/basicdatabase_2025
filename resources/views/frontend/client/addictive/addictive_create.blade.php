@@ -257,23 +257,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // ✅ DataTable init
-  $('#datatable-addictive').DataTable({
-    responsive: true,
-    autoWidth: false,
-    pageLength: 10,
-    ordering: true,
-    language: {
-      url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
-    },
-    columnDefs: [
-      { targets: 0, width: '6%', className: 'text-center' },   // ลำดับ
-      { targets: 2, width: '8%', className: 'text-center' },   // ครั้งที่
-      { targets: 6, width: '12%', className: 'text-center' },  // ผู้ตรวจ
-      { targets: 7, width: '18%', className: 'text-center' }   // จัดการ
-    ]
-  });
+
 
   // ✅ Toggle referField สำหรับ modal create
   const examNoNew = document.getElementById('exam_no_new');
@@ -308,8 +292,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if (examYes) examYes.addEventListener('change', toggleRefer);
     });
   });
-});
+
 </script>
+
 @endpush
 
 @endsection

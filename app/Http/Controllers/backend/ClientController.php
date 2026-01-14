@@ -41,9 +41,6 @@ class ClientController extends Controller
 
     // ✅ ส่งข้อมูลไปยัง view
     return view('backend.client.client_show', compact('clients'));
-
-
-
     }
    
     public function ClientAdd()
@@ -349,7 +346,30 @@ public function ClientUpdate(Request $request)
     return redirect()->route('client.show')->with($notification);
 }
     
+ public function ClientShowRefer()
+    {
+    // ✅ ดึงเฉพาะ clients ที่ยัง active (release_status = 'show' หรือ 'refer')
+            $clients = Client::with('problems')
+            ->whereIn('release_status', ['show', 'refer'])
+                ->get();
 
+    // ✅ ส่งข้อมูลไปยัง view
+    return view('backend.client.client_show_refer', compact('clients'));
+    }
+    
+   public function changeStatus($id)
+{
+    $client = Client::findOrFail($id);
+
+    if ($client->release_status === 'refer') {
+        $client->release_status = 'show'; // ✅ ปรับสถานะเป็น Active
+        $client->save();
+    }
+
+    return redirect()->back()
+        ->with('success', 'ปรับสถานะเรียบร้อยแล้ว')
+        ->with('alert', 'สถานะถูกเปลี่ยนจาก Refer เป็น Show');
+}
 
 }
 

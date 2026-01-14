@@ -1,5 +1,6 @@
-@extends('admin.admin_master')
-@section('admin')
+@extends('admin_client.admin_client')
+@section('content')
+
 
 <div class="container-fluid mt-2">
     <div class="card shadow-sm border-0 w-100 mb-0">
@@ -82,20 +83,13 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form action="{{ route('refers.store') }}" method="POST">
-          @csrf
+      <form action="{{ route('refers.store') }}" method="POST">
+    @csrf
+    <input type="hidden" name="client_id" value="{{ $client->id }}">
+    <input type="hidden" name="status" value="refer">
 
-          {{-- ต้องเลือก client --}}
-          <div class="mb-3">
-            <label class="form-label fw-bold">เลือกผู้รับ</label>
-            <select name="client_id" class="form-select form-select-sm" required>
-              <option value="">-- เลือกผู้รับ --</option>
-              @foreach(App\Models\Client::where('release_status', '!=', 'refer')->get() as $c)
-                <option value="{{ $c->id }}">{{ $c->fullname }}</option>
-              @endforeach
-            </select>
-          </div>
 
+    <input type="hidden" name="status" value="refer">
           <div class="row mb-3">
             <div class="col-md-4">
               <label class="form-label fw-bold">วันที่นำส่ง</label>

@@ -39,6 +39,7 @@
                             <li>
                                 <a href="{{ route('client.show') }}" class="tp-link">ทะเบียนผู้รับ</a>
                             </li>
+    
                             <li>
                                  <a href="{{ route('client.report', $client->id) }}" class="tp-link">
                                     รายงานการช่วยเหลือ 
@@ -166,6 +167,9 @@
                             <li>
                                 <a href="{{ route('case_outside.show', $client->id) }}" class="tp-link">ติดตามเด็กที่อยู่ภายนอก</a>
                             </li>
+                             <li>
+                                <a href="{{ route('refers.index', $client->id) }}" class="tp-link">รายการการจำหน่าย</a>
+                            </li>
                             <li>
                                 <a href="maps-vector.html" class="tp-link">Vector Maps</a>
                             </li>
@@ -180,12 +184,6 @@
                     </a>
                 </li>
 
-               
-            
-
-            
-
-             
                 <li>
                     <a href="#sidebarMaps" data-bs-toggle="collapse">
                         <i data-feather="map"></i>

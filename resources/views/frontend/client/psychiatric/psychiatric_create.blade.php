@@ -294,22 +294,6 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // ✅ Init DataTable
-  $('#datatable-psychiatric').DataTable({
-    responsive: true,
-    autoWidth: false,
-    pageLength: 10,
-    ordering: true,
-    language: {
-      url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
-    },
-    columnDefs: [
-      { targets: 0, className: 'text-center', width: '6%' },   // ลำดับ
-      { targets: 4, className: 'text-center', width: '12%' },  // นัดครั้งต่อไป
-      { targets: -1, className: 'text-center text-nowrap', width: '16%' }  // จัดการ
-    ]
-  });
 
 
   // ✅ Toggle การรักษา (รับยา/ไม่รับยา) สำหรับ Create
@@ -369,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
       text.textContent = 'เพิ่มข้อมูล';
     });
   }
-});
+
 </script>
 @endpush
 @endsection

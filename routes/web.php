@@ -144,17 +144,21 @@ require __DIR__.'/auth.php';
     Route::get('/delete/translate/{id}', [TranslateController::class, 'DeleteTranslate'])->name('translate.delete');
 });
 
-
-
-
 // Client Route All
     Route::middleware('auth')->group(function () {
     Route::get('/client', [ClientController::class, 'clientShow'])->name('client.show');
+    Route::get('/client/refer', [ClientController::class, 'clientShowRefer'])->name('client.show_refer');
     Route::get('/client/add', [ClientController::class, 'clientAdd'])->name('client.add');
     Route::post('/client/store', [ClientController::class, 'ClientStore'])->name('client.store');
     Route::get('/client/edit/{id}', [ClientController::class, 'ClientEdit'])->name('client.edit');
     Route::post('/client/update', [ClientController::class, 'ClientUpdate'])->name('client.update');
     Route::get('/client/delete/{id}', [ClientController::class, 'ClientDelete'])->name('client.delete');
+
+    // ✅ เพิ่ม route สำหรับเปลี่ยนสถานะ client จาก refer → show
+    Route::post('/client/change-status/{id}', [ClientController::class, 'changeStatus'])
+     ->name('client.changeStatus');
+
+
     
 // Ajax Route All จังหวัด-อําเภอ-ตําบล
     Route::get('/get-districts/{province_id}', [ClientController::class, 'getDistricts']);
@@ -489,8 +493,8 @@ require __DIR__.'/auth.php';
 });
 
 // Routes ติดตามเด็กที่อยู่นอกสถานสงเคราะห์ (CaseOutside)
-   Route::prefix('refer')->group(function(){
-    Route::get('/refers', [ReferController::class, 'index'])->name('refers.index');
+  Route::prefix('refer')->group(function(){
+    Route::get('/refers/{client_id}', [ReferController::class, 'index'])->name('refers.index');
     Route::post('/refers/store', [ReferController::class, 'store'])->name('refers.store');
     Route::put('/refers/{id}/restore', [ReferController::class, 'restore'])->name('refers.restore');
 });

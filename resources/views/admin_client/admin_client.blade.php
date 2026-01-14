@@ -31,10 +31,6 @@
     <!-- ✅ Google Fonts (Kanit) -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- ✅ Custom Font Style -->
-   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- ✅ Custom Font Style -->
 <style>
     body {
         font-family: 'Kanit', sans-serif;
@@ -53,20 +49,32 @@
         font-weight: 400;
         letter-spacing: 0.5px;
     }
-
-    /* ✅ ทำให้ข้อความในช่อง input/textarea เป็นสีอ่อน */
     .form-control {
-        color: #6c757d; /* เทาอ่อน */
+        color: #6c757d;
     }
     .form-control::placeholder {
-        color: #adb5bd; /* สี placeholder อ่อนกว่า */
-        opacity: 1;     /* ให้แสดงชัดเจน */
+        color: #adb5bd;
+        opacity: 1;
     }
+
+    /* ปรับตัวอักษรในตาราง DataTable ให้เล็กลง */
+    table.dataTable td, 
+    table.dataTable th {
+        font-size: 12px;   /* ปรับขนาดตามที่ต้องการ เช่น 12px */
+    }
+
+    /* ปรับตัวอักษรในส่วน control เช่น search, pagination */
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_paginate {
+        font-size: 12px;
+    }
+
 </style>
 </head>
 
 <body data-menu-color="light" data-sidebar="default">
-    <!-- Begin page -->
     <div id="app-layout">
         @include('admin_client.body.client_header')
         @include('admin_client.body.client_sidebar')
@@ -102,6 +110,44 @@
     <script src="{{ asset('backend/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('backend/assets/js/pages/datatable.init.js') }}"></script>
 
+   
+   <!-- ✅ DataTables ภาษาไทย (Global) -->
+<script>
+$(function() {
+    // กำหนดค่าเริ่มต้นของ DataTables ให้ทุกตารางใช้ภาษาไทย
+    $.extend(true, $.fn.dataTable.defaults, {
+        responsive: true,
+        destroy: true, // บังคับให้ทับค่า init เดิม
+        language: {
+            search: "ค้นหา:",
+            lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+            info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+            infoEmpty: "ไม่มีข้อมูลให้แสดง",
+            infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+            zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+            paginate: {
+                first: "หน้าแรก",
+                last: "หน้าสุดท้าย",
+                next: "ถัดไป",
+                previous: "ก่อนหน้า"
+            }
+        }
+    });
+
+    // ✅ init ทุกตารางที่มี id ขึ้นต้นด้วย datatable-
+    $('table[id^="datatable"]').each(function() {
+        const $table = $(this);
+        if (!$.fn.dataTable.isDataTable($table)) {
+            $table.DataTable();
+        } else {
+            $table.DataTable().destroy();
+            $table.DataTable();
+        }
+    });
+});
+</script>
+
+
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="{{ asset('backend/assets/js/code.js') }}"></script>
@@ -124,7 +170,6 @@
             todayHighlight: true
         }).on('show', function() {
             setTimeout(function() {
-                // เปลี่ยนหัวปฏิทินให้เป็น พ.ศ.
                 $('.datepicker-switch').each(function() {
                     const text = $(this).text();
                     const match = text.match(/(\d{4})$/);
@@ -135,8 +180,6 @@
                         }
                     }
                 });
-
-                // เปลี่ยนรายการปีให้เป็น พ.ศ.
                 $('.datepicker-years .year').each(function() {
                     const year = parseInt($(this).text());
                     if (year < 2500) {
@@ -149,26 +192,24 @@
     </script>
 
     <!-- ✅ ฟังก์ชันกลางสำหรับยืนยันการลบ -->
-<script>
-    window.confirmDelete = function(formId, message = 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่') {
-        Swal.fire({
-            title: 'ท่านแน่ใจ ?',
-            text: message,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'ตกลง',
-            cancelButtonText: 'ยกเลิก',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById(formId).submit();
-            }
-        });
-    };
-</script>
-
-
+    <script>
+        window.confirmDelete = function(formId, message = 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่') {
+            Swal.fire({
+                title: 'ท่านแน่ใจ ?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        };
+    </script>
 
     <!-- Toastr Alert -->
     <script>

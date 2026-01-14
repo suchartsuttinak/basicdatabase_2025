@@ -207,50 +207,38 @@
 
 @push('scripts')
     <!-- ✅ Init DataTable -->
+   
+    <!-- SweetAlert2 สำหรับยืนยันการลบ -->
     <script>
-        $(document).ready(function() {
-            $('#datatable-absent').DataTable({
-                responsive: true,
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'ท่านแน่ใจ ?',
+                text: 'ลบข้อมูลนี้ใช่หรือไม่ ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
                 }
+            });
+        }
+    </script>
+
+    <!-- Script สำหรับเปิด-ซ่อนฟอร์ม -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const collapseEl = document.getElementById('absentForm');
+            const toggleBtn = document.getElementById('toggleAbsentBtn');
+
+            collapseEl.addEventListener('shown.bs.collapse', function () {
+                toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i><span class="ms-1">ซ่อน/ฟอร์ม</span>';
+            });
+
+            collapseEl.addEventListener('hidden.bs.collapse', function () {
+                toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i><span class="ms-1">เพิ่มข้อมูล</span>';
             });
         });
     </script>
-
-    <!-- SweetAlert2 สำหรับยืนยันการลบ -->
-            <script>
-            function confirmDelete(id) {
-                Swal.fire({
-                    title: 'ท่านแน่ใจ ?',
-                    text: 'ลบข้อมูลนี้ใช่หรือไม่ ?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'ตกลง',
-                    cancelButtonText: 'ยกเลิก',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById('delete-form-' + id).submit();
-                    }
-                });
-            }
-            </script>
-
-        <!-- Script สำหรับเปิด-ซ่อนฟอร์ม -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const collapseEl = document.getElementById('absentForm');
-                const toggleBtn = document.getElementById('toggleAbsentBtn');
-
-                collapseEl.addEventListener('shown.bs.collapse', function () {
-                    toggleBtn.innerHTML = '<i class="bi bi-chevron-up"></i><span class="ms-1">ซ่อน/ฟอร์ม</span>';
-                });
-
-                collapseEl.addEventListener('hidden.bs.collapse', function () {
-                    toggleBtn.innerHTML = '<i class="bi bi-chevron-down"></i><span class="ms-1">เพิมข้อมูล</span>';
-                });
-            });
-        </script>
-
-
-        @endpush
+@endpush

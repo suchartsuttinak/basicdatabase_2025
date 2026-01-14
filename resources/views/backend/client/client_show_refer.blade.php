@@ -1,6 +1,8 @@
 @extends('admin.admin_master')
 @section('admin')
 
+
+
 <div class="content">
     <div class="container-fluid">
 
@@ -90,18 +92,21 @@
                                                     class="btn btn-primary btn-sm">
                                                     <span class="mdi mdi-eye-circle mdi-18px"></span>
                                                 </a>
-                                                <a title="Edit" href="{{ route('client.edit', $client->id) }}" 
-                                                    class="btn btn-success btn-sm">
-                                                    <span class="mdi mdi-book-edit-outline mdi-18px"></span>
-                                                </a>
-
-                                                <a title="Delete" href="{{ route('client.delete', $client->id) }}" 
-                                                    class="btn btn-danger btn-sm" id="delete">
-                                                    <span class="mdi mdi-trash-can-outline mdi-18px"></span>
-                                                </a>
+                                               
                                               <a title="จำหน่าย" href="{{ route('refers.index', $client->id) }}" class="btn btn-warning btn-sm">
                                                     <span class="mdi mdi-arrow-right-bold mdi-18px"></span>
                                                 </a>
+
+                                    {{-- ✅ ปุ่มปรับสถานะจาก refer → show --}}
+                                        @if($client->release_status === 'refer')
+                                            <form method="POST" action="{{ route('client.changeStatus', $client->id) }}" 
+                                                class="d-inline-block change-status-form">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm" title="ปรับเป็น Active">
+                                                    <span class="mdi mdi-check-circle mdi-18px"></span>
+                                                </button>
+                                            </form>
+                                        @endif
 
                                             </td>
                                         </tr>
@@ -121,5 +126,28 @@
 
     </div> <!-- end container-fluid -->
 </div> <!-- end content -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelectorAll('.change-status-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // ป้องกันการ submit ทันที
+
+            Swal.fire({
+                title: 'ท่านแน่ใจ ?',
+                text: 'ต้องการปรับสถานะเป็น Active ใช่หรือไม่ ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // ถ้ากดยืนยัน ค่อย submit
+                }
+            });
+        });
+    });
+</script>
  
 @endsection
