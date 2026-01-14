@@ -104,7 +104,7 @@
                        value="{{ \Carbon\Carbon::parse($case->date)->format('Y-m-d') }}"
                        class="form-control form-control-sm" required>
               </div>
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-md-6">
                 <label class="form-label fw-bold">สาเหตุที่พักอาศัยอยู่ภายนอก</label>
                 <select name="outside_id" class="form-select form-select-sm" required>
                   @foreach($outside as $o)
@@ -196,7 +196,7 @@
               <label class="form-label fw-bold">วันที่ติดตาม</label>
               <input type="date" name="date" class="form-control form-control-sm" required>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-6">
               <label class="form-label fw-bold">สาเหตุที่พักอาศัยอยู่ภายนอก</label>
               <select name="outside_id" class="form-select form-select-sm" required>
                 <option value="">-- เลือกสาเหตุ --</option>
@@ -227,19 +227,19 @@
             </div>
           </div>
 
-          <div class="mb-2">
+          <div class="mb-2 mt-2">
             <label class="form-label fw-bold">ผลการติดตาม</label>
             <textarea name="results" class="form-control form-control-sm" rows="2"></textarea>
           </div>
 
-          <div class="row mb-2">
+          <div class="row mb-2 mt-2">
             <div class="col-12 col-md-6">
               <label class="form-label fw-bold">ผู้ติดตาม</label>
               <input type="text" name="teacher" class="form-control form-control-sm">
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-12 mt-2">
               <label class="form-label fw-bold">หมายเหตุ</label>
-              <textarea name="remerk" class="form-control form-control-sm" rows="1"></textarea>
+              <textarea name="remerk" class="form-control form-control-sm" rows="2"></textarea>
             </div>
           </div>
 
