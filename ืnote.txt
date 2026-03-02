@@ -1,0 +1,7 @@
+
+คุณสามารถใช้ Command Palette () แล้วพิมพ์ว่
+	- กด Ctrl + Shift + P
+        Windsurf: Chat with AI      
+
+• 	
+
