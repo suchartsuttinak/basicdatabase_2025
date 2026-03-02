@@ -451,16 +451,16 @@
 
              <div class="col-md-12 mb-3">
                     <label for="case_resident" class="form-label">สถานะอยู่อาศัย <span class="text-danger">*</span></label>
-                    <select name="case_resident" id="case_resident"
-                class="form-select @error('case_resident') is-invalid @enderror" required>
-                    <option value="">-- เลือกสถานะ --</option>
-                    <option value="Active" {{ old('case_resident', $client->case_resident ?? '') === 'Active' ? 'selected' : '' }}>
-                        อยู่อาศัย
-                    </option>
-                    <option value="Inactive" {{ old('case_resident', $client->case_resident ?? '') === 'Inactive' ? 'selected' : '' }}>
-                        ไม่อยู่อาศัย
-                    </option>
-                </select>
+                   <select name="case_resident" id="case_resident"
+                            class="form-select @error('case_resident') is-invalid @enderror" required>
+                        <option value="">-- เลือกสถานะ --</option>
+                        <option value="Active" {{ old('case_resident', $client->case_resident ?? '') === 'Active' ? 'selected' : '' }}>
+                            อยู่อาศัย
+                        </option>
+                        <option value="Inactive" {{ old('case_resident', $client->case_resident ?? '') === 'Inactive' ? 'selected' : '' }}>
+                            ไม่อยู่อาศัย
+                        </option>
+                    </select>
                     @error('case_resident')
                         <small class="text-danger error-message" id="error-case_resident">{{ $message }}</small>
                     @enderror

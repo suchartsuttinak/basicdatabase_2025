@@ -76,6 +76,7 @@ class VisitFamilyController extends Controller
         'family_fname'    => 'required|string|max:255',
         'family_age'      => 'nullable|integer',
         'member'          => 'nullable|string|max:255',
+        'residence_status'=> 'nullable|string|max:100', // ✅ เพิ่มฟิลด์ใหม่
         'address'         => 'nullable|string|max:255',
         'moo'             => 'nullable|string|max:50',
         'soi'             => 'nullable|string|max:50',
@@ -166,10 +167,11 @@ class VisitFamilyController extends Controller
     {
         $validated = $request->validate([
             'visit_date'      => 'required|date',
-            'count'           => 'nullable|integer',
+            // 'count'           => 'nullable|integer',
             'family_fname'    => 'required|string|max:255',
             'family_age'      => 'nullable|integer',
             'member'          => 'nullable|string|max:255',
+            'residence_status'=> 'nullable|string|max:100', // ✅ เพิ่มฟิลด์ใหม่
             'address'         => 'nullable|string|max:255',
             'moo'             => 'nullable|string|max:50',
             'soi'             => 'nullable|string|max:50',

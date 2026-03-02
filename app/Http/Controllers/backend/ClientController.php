@@ -159,7 +159,8 @@ public function ClientStore(Request $request)
         'sub_district_id' => 'nullable|integer',
         'zipcode'         => 'nullable|integer',
         'phone'           => 'nullable|string|max:50',
-          // ✅ ฟิลด์ใหม่สำหรับภูมิลำเนาเดิม
+
+        // ✅ ฟิลด์ใหม่สำหรับภูมิลำเนาเดิม
         'origin_address'        => 'nullable|string|max:255',
         'origin_moo'            => 'nullable|string|max:255',
         'origin_soi'            => 'nullable|string|max:255',
@@ -177,7 +178,10 @@ public function ClientStore(Request $request)
         'project_id'      => 'required|integer',
         'house_id'        => 'required|integer',
         'status_id'       => 'required|integer',
-        'case_resident'   => 'required|in:Active,Not Active',
+
+        // ✅ ปรับให้ตรงกับ Blade: Active / Inactive
+        'case_resident'   => 'required|in:Active,Inactive',
+
         'problems'        => 'nullable|array',
         'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ], [
@@ -201,7 +205,11 @@ public function ClientStore(Request $request)
         'project_id.required'      => 'กรุณาเลือกโครงการ',
         'house_id.required'        => 'กรุณาเลือกบ้าน',
         'status_id.required'       => 'กรุณาเลือกสถานะ',
+
+        // ✅ ปรับข้อความภาษาไทยสำหรับ case_resident
         'case_resident.required'   => 'กรุณาเลือกสถานะการอยู่อาศัย',
+        'case_resident.in'         => 'สถานะการอยู่อาศัยต้องเป็น อยู่อาศัย หรือ ไม่อยู่อาศัย เท่านั้น',
+
         'image.image'              => 'ไฟล์ต้องเป็นรูปภาพ',
         'image.mimes'              => 'รูปภาพต้องเป็นไฟล์ประเภท jpeg, png, jpg, gif หรือ svg',
         'image.max'                => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
@@ -237,7 +245,6 @@ public function ClientStore(Request $request)
 
     return redirect()->route('client.show')->with($notification);
 }
-//สิ้นสุด method store
 
 public function ClientEdit($id )
 {
@@ -337,7 +344,7 @@ public function ClientUpdate(Request $request)
         'project_id'      => 'required|integer',
         'house_id'        => 'required|integer',
         'status_id'       => 'required|integer',
-        'case_resident'   => 'required|in:Active,Not Active',
+        'case_resident' => 'required|in:Active,Inactive',
         'problems'        => 'nullable|array',
         'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ], [
@@ -348,6 +355,10 @@ public function ClientUpdate(Request $request)
         'id_card.string'         => 'เลขบัตรประชาชนต้องเป็นตัวอักษร',
         'id_card.max'            => 'เลขบัตรประชาชนต้องไม่เกิน 13 หลัก',
         // ข้อความอื่น ๆ ตามที่คุณเขียนไว้
+        
+        // ✅ ปรับข้อความภาษาไทยสำหรับ case_resident
+        'case_resident.required'   => 'กรุณาเลือกสถานะการอยู่อาศัย',
+        'case_resident.in'         => 'สถานะการอยู่อาศัยต้องเป็น อยู่อาศัย หรือ ไม่อยู่อาศัย เท่านั้น',
     ]);
 
     // จัดการไฟล์ภาพ

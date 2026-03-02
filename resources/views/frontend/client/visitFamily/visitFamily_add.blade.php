@@ -117,16 +117,16 @@
                                     @enderror
                                 </div>
 
-                              <div class="form-group col-md-3 mb-3">
+                              {{-- <div class="form-group col-md-3 mb-3">
                                 <label for="count" class="form-label">ครั้งที่:</label>
                                 <div class="d-flex align-items-center">
-                                    {{-- แสดงค่า 1 แบบ readonly --}}
+                              
                                     <input type="text" id="count" class="form-control" value="1" readonly>
                                     <span class="ms-2">ครั้ง</span>
                                 </div>
-                                {{-- ส่งค่า 1 ไปกับฟอร์มแบบ hidden --}}
+                          
                                 <input type="hidden" name="count" value="1">
-                            </div>
+                            </div> --}}
                         </div>
 
                             <div class="row">
@@ -158,7 +158,16 @@
 
                             <div class="row">
                                 <div class="form-group col-md-6 mb-3">
-                                    <label class="form-label" for="income_id">รายได้ : <span
+                                    <label for="member" class="form-label">ความสัมพันธ์กับผู้รับ</label>
+                                    <input type="text" name="member" class="form-control"
+                                        value="{{ old('member', $visitFamily->member ?? '') }}">
+                                    @error('member')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                    <label class="form-label" for="income_id">รายได้เฉลี่ยครอบครัว : <span
                                             class="text-danger">*</span></label>
                                     <select name="income_id" id="income_id"
                                         class="form-control form-select @error('income_id') is-invalid @enderror">
@@ -175,17 +184,15 @@
                                     @enderror
                                 </div>
 
-
-
-                                <div class="form-group col-md-6 mb-3">
-                                    <label for="member" class="form-label">ความสัมพันธ์กับผู้รับ</label>
-                                    <input type="text" name="member" class="form-control"
-                                        value="{{ old('member', $visitFamily->member ?? '') }}">
-                                    @error('member')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <div class="form-group col-md-12 mb-3">
+                                    <label for="residence_status" class="form-label">สถานะการอยู่อาศัย:</label>
+                                    <input type="text" 
+                                        id="residence_status" 
+                                        name="residence_status" 
+                                        class="form-control" 
+                                        value="{{ old('residence_status', $visitFamily->residence_status) }}" 
+                                        placeholder="เช่น บ้านของตนเอง, บ้านเช่า, อยู่กับครอบครัว, บ้านพักคนงาน">
                                 </div>
-
 
                                 <div class="form-group col-md-12 mb-3">
                                     <label for="outside_address" class="form-label">สภาพที่อยู่ภายนอก : <span
@@ -464,42 +471,42 @@
 
                             {{-- พื้นที่แสดง preview --}}
                             <div id="preview" class="row mt-3"></div>
-                        </div>
+                        </div>   
+                                          
+                      {{-- ลบภาพ --}}
+                        @if(isset($images) && $images->count() > 0)
+                            <div class="mb-3">
+                                <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
+                                <div class="row" id="image-gallery">
+                                    @foreach($images as $img)
+                                        <div class="col-md-3 mb-3" id="image-{{ $img->id }}">
+                                            <div class="position-relative">
+                                                <div class="ratio ratio-1x1">
+                                                    <img src="{{ asset('storage/'.$img->file_path) }}"
+                                                        class="w-100 h-100 rounded border shadow-sm"
+                                                        style="object-fit: cover;">
+                                                </div>
 
-               
-                  {{-- ลบภาพ --}}
-@if(isset($images) && $images->count() > 0)
-    <div class="mb-3">
-        <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
-        <div class="row" id="image-gallery">
-            @foreach($images as $img)
-                <div class="col-md-3 mb-3" id="image-{{ $img->id }}">
-                    <div class="position-relative">
-                        <div class="ratio ratio-1x1">
-                            <img src="{{ asset('storage/'.$img->file_path) }}"
-                                 class="w-100 h-100 rounded border shadow-sm"
-                                 style="object-fit: cover;">
-                        </div>
-
-                        {{-- ปุ่มลบ overlay --}}
-                        <button type="button"
-                                class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-2 mt-2 delete-image"
-                                data-url="{{ route('image.destroy', $img->id) }}"
-                                data-id="{{ $img->id }}">
-                           ลบภาพ
-                        </button>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-@endif
+                                                {{-- ปุ่มลบ overlay --}}
+                                                <button type="button"
+                                                        class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-2 mt-2 delete-image"
+                                                        data-url="{{ route('image.destroy', $img->id) }}"
+                                                        data-id="{{ $img->id }}">
+                                                ลบภาพ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     <div class="text-start">
                         <button type="submit" class="btn btn-success">
                             {{ isset($visitFamily) ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูลใหม่' }}
                         </button>
                     </div>
                 </form>
+        </div>
         </div>
 
 

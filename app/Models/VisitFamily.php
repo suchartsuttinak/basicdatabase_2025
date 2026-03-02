@@ -17,6 +17,7 @@ class VisitFamily extends Model
         'family_fname',
         'family_age',
         'member',
+        'residence_status',
         'address',
         'moo',
         'soi',
