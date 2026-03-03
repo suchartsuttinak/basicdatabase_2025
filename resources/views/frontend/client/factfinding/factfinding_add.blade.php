@@ -81,7 +81,7 @@
 
                 <div class="row pt-4">
                     <div class="form-group col-md-3 mb-3">
-                        <label for="date" class="form-label">วันที่บันทึก: <span class="text-danger">*</span></label>
+                        <label for="date" class="form-label">วันที่นำส่ง: <span class="text-danger">*</span></label>
                         <input type="date" name="date" id="date"
                             class="form-control @error('date') is-invalid @enderror"
                             value="{{ old('date') }}">
@@ -166,7 +166,7 @@
                       <!-- รายละเอียดการเจ็บป่วย -->
                     <div class="form-group col-md-12 mb-3" id="sickDetailGroup"
                         style="{{ old('sick') == 1 ? '' : 'display:none;' }}">
-                        <label for="sick_detail" class="form-label text-start">รายละเอียดการเจ็บป่วย</label>
+                        <label for="sick_detail" class="form-label text-start">รายละเอียดการเจ็บป่วย : <span class="text-danger">*</span></label>
                         <textarea name="sick_detail" id="sick_detail"
                                 class="form-control bg-white border rounded shadow-sm"
                                 style="text-align: left; padding-left: 1em; margin: 0;"
@@ -206,6 +206,7 @@
                                     <option value="B" {{ old('blood_group') == 'B' ? 'selected' : '' }}>B</option>
                                     <option value="AB" {{ old('blood_group') == 'AB' ? 'selected' : '' }}>AB</option>
                                     <option value="O" {{ old('blood_group') == 'O' ? 'selected' : '' }}>O</option>
+                                    <option value="ไม่ระบุ" {{ old('blood_group') == 'ไม่ระบุ' ? 'selected' : '' }}>ไม่ระบุ</option>
                                 </select>
                                 @error('blood_group')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -288,7 +289,7 @@
                 
             <div class="row">
                 <div class="form-group col-md-12 mb-3">
-                        <label for="relation_parent" class="form-label">ความสัมพันธ์ระหว่างบิดา/มารดา : <span class="text-danger">*</span></label>
+                        <label for="relation_parent" class="form-label">ความสัมพันธ์ระหว่างบิดา/มารดา</label>
                         <textarea name="relation_parent" id="relation_parent"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_parent') is-invalid @enderror"
                                 rows="3">{{ old('relation_parent') }}</textarea>
@@ -298,7 +299,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="relation_family" class="form-label">ความสัมพันธ์ระหว่างบุคลลในครอบครัว : <span class="text-danger">*</span></label>
+                        <label for="relation_family" class="form-label">ความสัมพันธ์ระหว่างบุคลลในครอบครัว</label>
                         <textarea name="relation_family" id="relation_family"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_family') is-invalid @enderror"
                                 rows="3">{{ old('relation_family') }}</textarea>
@@ -309,7 +310,7 @@
                 </div>
                 
                      <div class="form-group col-md-12 mb-3">
-                        <label for="relation_child" class="form-label">ความสัมพันธ์ระหว่างเด็กกับบุคคลในครอบครัว : <span class="text-danger">*</span></label>
+                        <label for="relation_child" class="form-label">ความสัมพันธ์ระหว่างเด็กกับบุคคลในครอบครัว</label>
                         <textarea name="relation_child" id="relation_child"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_child') is-invalid @enderror"
                                 rows="3">{{ old('relation_child') }}</textarea>
@@ -369,7 +370,7 @@
                       
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="ex_conditions" class="form-label">สภาพที่อยู่อาศัยภายนอก : <span class="text-danger">*</span></label>
+                        <label for="ex_conditions" class="form-label">สภาพที่อยู่อาศัยภายนอก</label>
                         <textarea name="ex_conditions" id="ex_conditions"
                                 class="form-control bg-white border rounded shadow-sm @error('ex_conditions') is-invalid @enderror"
                                 rows="3">{{ old('ex_conditions') }}</textarea>
@@ -379,7 +380,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="in_conditions" class="form-label">สภาพที่อยู่อาศัยภายใน : <span class="text-danger">*</span></label>
+                        <label for="in_conditions" class="form-label">สภาพที่อยู่อาศัยภายใน</label>
                         <textarea name="in_conditions" id="in_conditions"
                                 class="form-control bg-white border rounded shadow-sm @error('in_conditions') is-invalid @enderror"
                                 rows="3">{{ old('in_conditions') }}</textarea>
@@ -389,7 +390,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="environment" class="form-label">สภาพแวดล้อม : <span class="text-danger">*</span></label>
+                        <label for="environment" class="form-label">สภาพแวดล้อม</label>
                         <textarea name="environment" id="environment"
                                 class="form-control bg-white border rounded shadow-sm @error('environment') is-invalid @enderror"
                                 rows="4">{{ old('environment') }}</textarea>
@@ -399,7 +400,7 @@
                 </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="cause_problem" class="form-label">สาเหตุที่เข้ารับการสงเคราะห์ : <span class="text-danger">*</span></label>
+                        <label for="cause_problem" class="form-label">สาเหตุที่เข้ารับการสงเคราะห์</label>
                         <textarea name="cause_problem" id="cause_problem"
                                 class="form-control bg-white border rounded shadow-sm @error('cause_problem') is-invalid @enderror"
                                 rows="3">{{ old('cause_problem') }}</textarea>
@@ -409,7 +410,7 @@
                 </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="need" class="form-label">ความต้องการความช่วยเหลือ : <span class="text-danger">*</span></label>
+                        <label for="need" class="form-label">ความต้องการความช่วยเหลือ</label>
                         <textarea name="need" id="need"
                                 class="form-control bg-white border rounded shadow-sm @error('need') is-invalid @enderror"
                                 rows="3">{{ old('need') }}</textarea>
@@ -419,7 +420,7 @@
                 </div>
 
                    <div class="form-group col-md-12 mb-3">
-                        <label for="case_history" class="form-label">ประวัติความเป็นมา : <span class="text-danger">*</span></label>
+                        <label for="case_history" class="form-label">ประวัติความเป็นมา</label>
                         <textarea name="case_history" id="case_history"
                                 class="form-control bg-white border rounded shadow-sm @error('case_history') is-invalid @enderror"
                                 rows="4">{{ old('case_history') }}</textarea>
@@ -429,7 +430,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="information" class="form-label">ข้อเท็จจริงอื่นๆ : <span class="text-danger">*</span></label>
+                        <label for="information" class="form-label">ข้อเท็จจริงอื่นๆ</label>
                         <textarea name="information" id="information"
                                 class="form-control bg-white border rounded shadow-sm @error('information') is-invalid @enderror"
                                 rows="4">{{ old('information') }}</textarea>
@@ -439,7 +440,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="diagnosis" class="form-label">การวินิจฉัยปัญหา : <span class="text-danger">*</span></label>
+                        <label for="diagnosis" class="form-label">การวินิจฉัยปัญหา</label>
                         <textarea name="diagnosis" id="diagnosis"
                                 class="form-control bg-white border rounded shadow-sm @error('diagnosis') is-invalid @enderror"
                                 rows="4">{{ old('diagnosis') }}</textarea>
@@ -450,7 +451,7 @@
 
                     <div class="row mb-3">
                         <div class="form-group col-md-4 mb-3">
-                                <label for="receive_date" class="form-label">วันที่รับเข้า: <span class="text-danger">*</span></label>
+                                <label for="receive_date" class="form-label">วันที่บันทึก <span class="text-danger">*</span></label>
                                 <input type="date" name="receive_date" id="receive_date"
                                     class="form-control @error('receive_date') is-invalid @enderror"
                                     value="{{ old('receive_date') }}">
@@ -480,9 +481,9 @@
                 </form>
             </div>
             
-  <!-- ประวัติการรักษาพยาบาล -->
-       <script>
-    document.addEventListener('DOMContentLoaded', function () {
+ <!-- ประวัติการรักษาพยาบาล -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
     const yes = document.getElementById('sickYes');
     const no = document.getElementById('sickNo');
     const detail = document.getElementById('sickDetailGroup');
@@ -495,6 +496,7 @@
         } else {
             detail.style.display = 'none';
             detailField.removeAttribute('required');
+            detailField.value = ''; // เคลียร์ค่าเมื่อเลือก "ไม่มี"
         }
     }
 
@@ -504,58 +506,64 @@
 });
 </script>
 
-{{-- JavaScript สําหรับการตรวจสอบข้อมูล --}}
-        <script>
-        document.querySelectorAll('input[name="sick"]').forEach(function(radio) {
-            radio.addEventListener('change', function() {
-                const errorMsg = document.getElementById('sick-error');
-                if (errorMsg) {
-                    errorMsg.remove(); // ลบข้อความ error ทันที
-                }
-                // เอา class is-invalid ออกด้วย
-                document.querySelectorAll('input[name="sick"]').forEach(function(r) {
-                    r.classList.remove('is-invalid');
-                });
+{{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
+<script>
+    // ลบ error เมื่อเปลี่ยนค่า radio sick
+    document.querySelectorAll('input[name="sick"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const errorMsg = document.getElementById('sick-error');
+            if (errorMsg) errorMsg.remove();
+            document.querySelectorAll('input[name="sick"]').forEach(function(r) {
+                r.classList.remove('is-invalid');
             });
         });
-        document.getElementById('date').addEventListener('input', function() {
-            const errorMsg = document.getElementById('date-error');
-            if (errorMsg) errorMsg.remove();
-            this.classList.remove('is-invalid');
-        });
-        document.getElementById('receive_date').addEventListener('input', function() {
-            const errorMsg = document.getElementById('receive_date-error');
-            if (errorMsg) errorMsg.remove();
-            this.classList.remove('is-invalid');
-        });
+    });
 
-        document.getElementById('recorder').addEventListener('input', function() {
-            const errorMsg = document.getElementById('recorder-error');
-            if (errorMsg) errorMsg.remove();
-            this.classList.remove('is-invalid');
-        });
+    // ลบ error เมื่อกรอกข้อมูลใหม่
+    document.getElementById('date').addEventListener('input', function() {
+        const errorMsg = document.getElementById('date-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
 
-        document.getElementById('fact_name').addEventListener('input', function() {
-            const errorMsg = document.getElementById('fact_name-error');
-            if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันที
-            this.classList.remove('is-invalid'); // ลบกรอบแดง
-        });
+    document.getElementById('receive_date').addEventListener('input', function() {
+        const errorMsg = document.getElementById('receive_date-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
 
-        document.getElementById('case_history').addEventListener('input', function() {
-            const errorMsg = document.getElementById('case_history-error');
-            if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันทีเมื่อพิมพ์
-            this.classList.remove('is-invalid'); // ลบกรอบแดง
-});
-        document.getElementById('marital_id').addEventListener('input', function() {
-            const errorMsg = document.getElementById('marital_id-error');
-            if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันทีเมื่อพิมพ์
-            this.classList.remove('is-invalid'); // ลบกรอบแดง
-        });
+    document.getElementById('recorder').addEventListener('input', function() {
+        const errorMsg = document.getElementById('recorder-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
 
-        </script>
- {{-- JavaScript สําหรับการตรวจสอบข้อมูล --}}
-      
+    document.getElementById('fact_name').addEventListener('input', function() {
+        const errorMsg = document.getElementById('fact_name-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
 
+    document.getElementById('case_history').addEventListener('input', function() {
+        const errorMsg = document.getElementById('case_history-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('marital_id').addEventListener('input', function() {
+        const errorMsg = document.getElementById('marital_id-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    // ✅ เพิ่ม real-time validation สำหรับ sick_detail
+    document.getElementById('sick_detail').addEventListener('input', function() {
+        const errorMsg = this.parentElement.querySelector('.text-danger');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+</script>
+{{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
 
 @endsection
 

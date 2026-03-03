@@ -79,17 +79,20 @@
                             <div class="card-body">
 
                         <!-- ชื่อบิดา -->
-                    <div class="col-md-12 mb-3">
-                            <label for="father_fname" class="form-label">ชื่อบิดา</label>
+                 <div class="col-md-12 mb-3">
+                        <label for="father_fname" class="form-label">ชื่อบิดา</label>
+                        <div class="input-group">
                             <input type="text" 
                                 name="father[fname]" 
                                 id="father_fname"
                                 class="form-control @error('father.fname') is-invalid @enderror"
-                                value="{{ old('father.fname', $father->fname ?? '') }}">
-                            @error('father.fname')
-                                <small class="text-danger error-message">{{ $message }}</small>
-                            @enderror
-                        </div>
+                                value="{{ old('father.fname', $father->fname ?? '') }}"
+                                placeholder="กรอกคำนำหน้าชื่อ เช่น นายสุชาติ">
+                                </div>
+                                @error('father.fname')
+                                    <small class="text-danger error-message">{{ $message }}</small>
+                                @enderror
+                            </div>
                         <!-- นามสกุล -->
                         <div class="col-md-12 mb-3">
                                 <label for="lname" class="form-label">นามสกุล</label>
@@ -287,12 +290,17 @@
                             <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวมารดา</h5></div>
                             <div class="card-body">
                                <!-- ชื่อบิดา -->
-                        <div class="col-md-12 mb-3">
-                            <label for="fname" class="form-label">ชื่อ</label>
-                            <input type="text" name="mother[fname]" id="fname"
-                                class="form-control @error('fname') is-invalid @enderror"
-                                value="{{ old('mother.fname', $mother->fname ?? '') }}">
-                            @error('fname')
+                     <div class="col-md-12 mb-3">
+                            <label for="fname" class="form-label">ชื่อมารดา</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                    name="mother[fname]" 
+                                    id="fname"
+                                    class="form-control @error('mother.fname') is-invalid @enderror"
+                                    value="{{ old('mother.fname', $mother->fname ?? '') }}"
+                                    placeholder="กรอกคำนำหน้าชื่อ เช่น นางสาวสมหญิง">
+                            </div>
+                            @error('mother.fname')
                                 <small class="text-danger error-message" id="error-fname">{{ $message }}</small>
                             @enderror
                         </div>
@@ -356,7 +364,7 @@
     <!-- Card ขวา -->
     <div class="col-lg-6 mb-4">
         <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อบิดา</h5></div>
+            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อมารดา</h5></div>
 
             <div class="card-body">
                 <div class="row">
@@ -487,14 +495,15 @@
                     <!-- Card ซ้าย -->
                     <div class="col-lg-6 mb-4">
                         <div class="card border shadow-sm">
-                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวมารดา</h5></div>
+                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวสามี/ภรรยา</h5></div>
                             <div class="card-body">
                                <!-- ชื่อบิดา -->
                         <div class="col-md-12 mb-3">
-                            <label for="fname" class="form-label">ชื่อ</label>
+                            <label for="fname" class="form-label">ชื่อสามี/ภรรยา</label>
                             <input type="text" name="spouse[fname]" id="fname"
                                 class="form-control @error('fname') is-invalid @enderror"
-                                value="{{ old('spouse.fname', $spouse->fname ?? '') }}">
+                                value="{{ old('spouse.fname', $spouse->fname ?? '') }}"
+                                 placeholder="กรอกคำนำหน้าชื่อ เช่น นายสมชาย">
                             @error('fname')
                                 <small class="text-danger error-message" id="error-fname">{{ $message }}</small>
                             @enderror
@@ -559,7 +568,7 @@
     <!-- Card ขวา -->
     <div class="col-lg-6 mb-4">
         <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อบิดา</h5></div>
+            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อสามี/ภรรยา</h5></div>
 
             <div class="card-body">
                 <div class="row">
@@ -689,14 +698,15 @@
                     <!-- Card ซ้าย -->
                     <div class="col-lg-6 mb-4">
                         <div class="card border shadow-sm">
-                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวมารดา</h5></div>
+                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวญาติ</h5></div>
                             <div class="card-body">
                                <!-- ชื่อบิดา -->
                         <div class="col-md-12 mb-3">
-                            <label for="fname" class="form-label">ชื่อ</label>
+                            <label for="fname" class="form-label">ชื่อญาติ</label>
                             <input type="text" name="relative[fname]" id="fname"
                                 class="form-control @error('fname') is-invalid @enderror"
-                                value="{{ old('relative.fname', $relative->fname ?? '') }}">
+                                value="{{ old('relative.fname', $relative->fname ?? '') }}"
+                                placeholder="กรอกคำนำหน้าชื่อ เช่น นางสาวสมหญิง">
                             @error('fname')
                                 <small class="text-danger error-message" id="error-fname">{{ $message }}</small>
                             @enderror
@@ -761,7 +771,7 @@
     <!-- Card ขวา -->
     <div class="col-lg-6 mb-4">
         <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อบิดา</h5></div>
+            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อญาติ</h5></div>
 
             <div class="card-body">
                 <div class="row">

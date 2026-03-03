@@ -35,80 +35,81 @@ class FactfindingController extends Controller
 
    public function FactfindingStore(Request $request)
 {
-        $validated = $request->validate([
-            'client_id'   => 'required|integer',
-            'date'        => 'required|date',
-            'receive_date'=> 'required|date',
-            'fact_name'   => 'required|string|max:255',
+       $validated = $request->validate([
+    'client_id'   => 'required|integer',
+    'date'        => 'required|date',
+    'receive_date'=> 'required|date',
+    'fact_name'   => 'required|string|max:255',
 
-            'appearance'  => 'nullable|string',
-            'skin'        => 'nullable|string',
-            'scar'        => 'nullable|string',
-            'disability'  => 'nullable|string',
-            'evidence'    => 'nullable|string',
-            'sick'        => 'required|in:0,1',
-            'sick_detail' => 'nullable|string',
-            'treatment'   => 'nullable|string',
-            'hospital'    => 'nullable|string',
-            'weight' => 'nullable|numeric|max:500',
-            'height' => 'nullable|numeric|max:300',
-            'blood_group' => 'nullable|string',
-            'hygiene'     => 'nullable|string',
-            'oral_health' => 'nullable|string',
-            'injury'      => 'nullable|string',
-            'marital_id'  => 'required|integer',
-            'relation_parent' => 'nullable|string',
-            'relation_family' => 'nullable|string',
-            'relation_child'  => 'nullable|string',
-            'ex_conditions'   => 'nullable|string',
-            'in_conditions'   => 'nullable|string',
-            'environment'     => 'nullable|string',
-            'cause_problem'   => 'nullable|string',
-            'need'            => 'nullable|string',
-            'information'     => 'nullable|string',
-            'diagnosis'       => 'nullable|string',
+    'appearance'  => 'nullable|string',
+    'skin'        => 'nullable|string',
+    'scar'        => 'nullable|string',
+    'disability'  => 'nullable|string',
+    'evidence'    => 'nullable|string',
+    'sick'        => 'required|in:0,1',
+   'sick_detail' => 'required_if:sick,1|nullable|string',
+    'treatment'   => 'nullable|string',
+    'hospital'    => 'nullable|string',
+    'weight'      => 'nullable|numeric|max:500',
+    'height'      => 'nullable|numeric|max:300',
+    'blood_group' => 'nullable|string',
+    'hygiene'     => 'nullable|string',
+    'oral_health' => 'nullable|string',
+    'injury'      => 'nullable|string',
+    'marital_id'  => 'required|integer',
+    'relation_parent' => 'nullable|string',
+    'relation_family' => 'nullable|string',
+    'relation_child'  => 'nullable|string',
+    'ex_conditions'   => 'nullable|string',
+    'in_conditions'   => 'nullable|string',
+    'environment'     => 'nullable|string',
+    'cause_problem'   => 'nullable|string',
+    'need'            => 'nullable|string',
+    'information'     => 'nullable|string',
+    'diagnosis'       => 'nullable|string',
 
-            'case_history'    => 'nullable|string',
-            'recorder'        => 'required|string',
-            'active'          => 'nullable|boolean',
+    'case_history'    => 'nullable|string',
+    'recorder'        => 'required|string',
+    'active'          => 'nullable|boolean',
 
-            'documents'   => 'nullable|array',
-            'documents.*' => 'integer',
-        ], [
-            'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
-            'client_id.integer'  => 'รหัสผู้รับบริการต้องเป็นตัวเลข',
+    'documents'   => 'nullable|array',
+    'documents.*' => 'integer',
+], [
+    'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
+    'client_id.integer'  => 'รหัสผู้รับบริการต้องเป็นตัวเลข',
 
-            'date.required'      => 'กรุณากรอกวันที่นำส่ง',
-            'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+    'date.required'      => 'กรุณากรอกวันที่นำส่ง',
+    'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
 
-            'receive_date.required' => 'กรุณากรอกวันที่บันทึกข้อมูล',
-            'receive_date.date'     => 'รูปแบบวันที่รับบริการไม่ถูกต้อง',
+    'receive_date.required' => 'กรุณากรอกวันที่บันทึกข้อมูล',
+    'receive_date.date'     => 'รูปแบบวันที่รับบริการไม่ถูกต้อง',
 
-            'fact_name.required' => 'กรุณากรอกชื่อผู้นำส่ง',
-            'fact_name.string'   => 'ชื่อข้อเท็จจริงต้องเป็นข้อความ',
-            'fact_name.max'      => 'ชื่อข้อเท็จจริงต้องไม่เกิน 255 ตัวอักษร',
+    'fact_name.required' => 'กรุณากรอกชื่อผู้นำส่ง',
+    'fact_name.string'   => 'ชื่อข้อเท็จจริงต้องเป็นข้อความ',
+    'fact_name.max'      => 'ชื่อข้อเท็จจริงต้องไม่เกิน 255 ตัวอักษร',
 
-            'sick.required'      => 'กรุณาระบุสถานะการเจ็บป่วย',
-            'sick.in'            => 'ค่าที่ระบุไม่ถูกต้อง (ต้องเป็น 0 หรือ 1)',
+     'sick.required'      => 'กรุณาระบุสถานะการเจ็บป่วย',
+    'sick.in'            => 'ค่าที่ระบุไม่ถูกต้อง (ต้องเป็น 0 หรือ 1)',
+    'sick_detail.required_if' => 'กรุณากรอกรายละเอียดการเจ็บป่วย',
+    'sick_detail.string'      => 'รายละเอียดการเจ็บป่วยต้องเป็นข้อความ', // 👈 เพิ่มตรงนี้
 
-            'marital_id.required' => 'กรุณาเลือกสถานภาพสมรส',
-            'marital_id.integer'  => 'สถานภาพสมรสต้องเป็นตัวเลข',
+    'marital_id.required' => 'กรุณาเลือกสถานภาพสมรส',
+    'marital_id.integer'  => 'สถานภาพสมรสต้องเป็นตัวเลข',
 
-            'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลขเท่านั้น',
-            'weight.min'     => 'น้ำหนักต้องไม่น้อยกว่า 1 กิโลกรัม',
-            'weight.max'     => 'น้ำหนักต้องไม่เกิน 500 กิโลกรัม',
+    'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลขเท่านั้น',
+    'weight.min'     => 'น้ำหนักต้องไม่น้อยกว่า 1 กิโลกรัม',
+    'weight.max'     => 'น้ำหนักต้องไม่เกิน 500 กิโลกรัม',
 
-            'height.numeric' => 'ส่วนสูงต้องเป็นตัวเลขเท่านั้น',
-            'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
-            'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
+    'height.numeric' => 'ส่วนสูงต้องเป็นตัวเลขเท่านั้น',
+    'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
+    'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
 
-            'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
-            'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+    'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
+    'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
 
-            'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
-            'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
-        ]);
-
+    'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
+    'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
+]);
     // ✅ แยก documents ออกมาก่อน
     $documents = $validated['documents'] ?? [];
     unset($validated['documents']);
@@ -156,86 +157,88 @@ class FactfindingController extends Controller
 
   public function FactfindingUpdate(Request $request, $factfinding_id)
 {
-    $validated = $request->validate([
-            'client_id'     => 'required|integer',
-            'date'          => 'required|date',
-            'receive_date'  => 'required|date',
-            'fact_name'     => 'required|string|max:255',
-            'appearance'    => 'nullable|string',
-            'skin'          => 'nullable|string',
-            'scar'          => 'nullable|string',
-            'disability'    => 'nullable|string',
-            'evidence'      => 'nullable|string',
-            'sick'          => 'required|in:0,1',
-            'sick_detail'   => 'nullable|string',
-            'treatment'     => 'nullable|string',
-            'hospital'      => 'nullable|string',
-            'weight'        => 'nullable|numeric|max:500',
-            'height'        => 'nullable|numeric|max:300',
-            'blood_group'   => 'nullable|string',
-            'hygiene'       => 'nullable|string',
-            'oral_health'   => 'nullable|string',
-            'injury'        => 'nullable|string',
-            'marital_id'    => 'required|integer',
-            'relation_parent' => 'nullable|string',
-            'relation_family' => 'nullable|string',
-            'relation_child'  => 'nullable|string',
-            'ex_conditions'   => 'nullable|string',
-            'in_conditions'   => 'nullable|string',
-            'environment'     => 'nullable|string',
-            'cause_problem'   => 'nullable|string',
-            'need'            => 'nullable|string',
-            'information'     => 'nullable|string',
-            'diagnosis'       => 'nullable|string',
+        $validated = $request->validate([
+        'client_id'   => 'required|integer',
+        'date'        => 'required|date',
+        'receive_date'=> 'required|date',
+        'fact_name'   => 'required|string|max:255',
 
-            'case_history'    => 'nullable|string',
-            'recorder'        => 'required|string',
-            'active'          => 'nullable|boolean',
+        'appearance'  => 'nullable|string',
+        'skin'        => 'nullable|string',
+        'scar'        => 'nullable|string',
+        'disability'  => 'nullable|string',
+        'evidence'    => 'nullable|string',
+        'sick'        => 'required|in:0,1',
+        'sick_detail' => 'required_if:sick,1|nullable|string',
+        'treatment'   => 'nullable|string',
+        'hospital'    => 'nullable|string',
+        'weight'      => 'nullable|numeric|max:500',
+        'height'      => 'nullable|numeric|max:300',
+        'blood_group' => 'nullable|string',
+        'hygiene'     => 'nullable|string',
+        'oral_health' => 'nullable|string',
+        'injury'      => 'nullable|string',
+        'marital_id'  => 'required|integer',
+        'relation_parent' => 'nullable|string',
+        'relation_family' => 'nullable|string',
+        'relation_child'  => 'nullable|string',
+        'ex_conditions'   => 'nullable|string',
+        'in_conditions'   => 'nullable|string',
+        'environment'     => 'nullable|string',
+        'cause_problem'   => 'nullable|string',
+        'need'            => 'nullable|string',
+        'information'     => 'nullable|string',
+        'diagnosis'       => 'nullable|string',
 
-            'documents'   => 'nullable|array',
-            'documents.*' => 'integer',
-        ], [
-            'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
-            'client_id.integer'  => 'รหัสผู้รับบริการต้องเป็นตัวเลข',
+        'case_history'    => 'nullable|string',
+        'recorder'        => 'required|string',
+        'active'          => 'nullable|boolean',
 
-            'date.required'      => 'กรุณากรอกวันที่นำส่ง',
-            'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+        'documents'   => 'nullable|array',
+        'documents.*' => 'integer',
+    ], [
+        'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
+        'client_id.integer'  => 'รหัสผู้รับบริการต้องเป็นตัวเลข',
 
-            'receive_date.required' => 'กรุณากรอกวันที่บันทึกข้อมูล',
-            'receive_date.date'     => 'รูปแบบวันที่รับบริการไม่ถูกต้อง',
+        'date.required'      => 'กรุณากรอกวันที่นำส่ง',
+        'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
 
-            'fact_name.required' => 'กรุณากรอกชื่อผู้นำส่ง',
-            'fact_name.string'   => 'ชื่อข้อเท็จจริงต้องเป็นข้อความ',
-            'fact_name.max'      => 'ชื่อข้อเท็จจริงต้องไม่เกิน 255 ตัวอักษร',
+        'receive_date.required' => 'กรุณากรอกวันที่บันทึกข้อมูล',
+        'receive_date.date'     => 'รูปแบบวันที่รับบริการไม่ถูกต้อง',
 
-            'sick.required'      => 'กรุณาระบุสถานะการเจ็บป่วย',
-            'sick.in'            => 'ค่าที่ระบุไม่ถูกต้อง (ต้องเป็น 0 หรือ 1)',
+        'fact_name.required' => 'กรุณากรอกชื่อผู้นำส่ง',
+        'fact_name.string'   => 'ชื่อข้อเท็จจริงต้องเป็นข้อความ',
+        'fact_name.max'      => 'ชื่อข้อเท็จจริงต้องไม่เกิน 255 ตัวอักษร',
 
-            'marital_id.required' => 'กรุณาเลือกสถานภาพสมรส',
-            'marital_id.integer'  => 'สถานภาพสมรสต้องเป็นตัวเลข',
+        'sick.required'      => 'กรุณาระบุสถานะการเจ็บป่วย',
+        'sick.in'            => 'ค่าที่ระบุไม่ถูกต้อง (ต้องเป็น 0 หรือ 1)',
+        'sick_detail.required_if' => 'กรุณากรอกรายละเอียดการเจ็บป่วย',
+        'sick_detail.string'      => 'รายละเอียดการเจ็บป่วยต้องเป็นข้อความ', // 👈 เพิ่มตรงนี้
 
-            'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลขเท่านั้น',
-            'weight.min'     => 'น้ำหนักต้องไม่น้อยกว่า 1 กิโลกรัม',
-            'weight.max'     => 'น้ำหนักต้องไม่เกิน 500 กิโลกรัม',
+        'marital_id.required' => 'กรุณาเลือกสถานภาพสมรส',
+        'marital_id.integer'  => 'สถานภาพสมรสต้องเป็นตัวเลข',
 
-            'height.numeric' => 'ส่วนสูงต้องเป็นตัวเลขเท่านั้น',
-            'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
-            'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
+        'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลขเท่านั้น',
+        'weight.min'     => 'น้ำหนักต้องไม่น้อยกว่า 1 กิโลกรัม',
+        'weight.max'     => 'น้ำหนักต้องไม่เกิน 500 กิโลกรัม',
 
-            'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
-            'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+        'height.numeric' => 'ส่วนสูงต้องเป็นตัวเลขเท่านั้น',
+        'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
+        'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
 
-            'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
-            'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
-        ]);
+        'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
+        'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
 
-    // ✅ ดึง factfinding ตาม factfinding_id
-    $factFinding = Factfinding::findOrFail($factfinding_id);
+        'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
+        'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
+    ]);
+        // ✅ ดึง factfinding ตาม factfinding_id
+        $factFinding = Factfinding::findOrFail($factfinding_id);
 
-      // ✅ ถ้า sick = 0 ให้ลบค่า sick_detail
-    if ($validated['sick'] == 0) {
-        $validated['sick_detail'] = null;
-    }
+        // ✅ ถ้า sick = 0 ให้ลบค่า sick_detail
+        if ($validated['sick'] == 0) {
+            $validated['sick_detail'] = null;
+        }
 
     // ✅ เตรียม payload
     $payload = [

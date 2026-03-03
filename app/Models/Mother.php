@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Mother extends Model
 {
    protected $fillable = [
-        'fname','lname','age','occupation','income','idcard',
+         'fname','lname','age','occupation','income','idcard',
         'address_no','moo','soi','road','village',
         'client_id','province_id','district_id','sub_district_id',
-        'phone'
+        'zipcode','phone'
+
+
     ];
 
     public function client()

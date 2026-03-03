@@ -10,6 +10,7 @@ class Spouse extends Model
         'fname','lname','age','occupation','income','idcard',
         'address_no','moo','soi','road','village',
         'client_id','province_id','district_id','sub_district_id',
+        'zipcode',
         'phone'
     ];
 

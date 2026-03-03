@@ -153,46 +153,43 @@
                         </div>
                 </div>
 
-               <!-- Sick radio button -->
-                    <div class="form-group col-md-2 mb-3">
+            <!-- สถานะการเจ็บป่วย -->
+                            <div class="form-group col-md-2 mb-3">
                                 <label class="form-label d-block">ประวัติการเจ็บป่วย : <span class="text-danger">*</span></label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input @error('sick') is-invalid @enderror" 
-                                type="radio" 
-                                name="sick" 
-                                id="sickYes"
-                                value="1"
-                                {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? 'checked' : '' }} required>
-                            <label class="form-check-label" for="sickYes">มี</label>
-                        </div>
 
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input @error('sick') is-invalid @enderror" 
-                                type="radio" 
-                                name="sick" 
-                                id="sickNo"
-                                value="0"
-                                {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 0 ? 'checked' : '' }} required>
-                            <label class="form-check-label" for="sickNo">ไม่มี</label>
-                        </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input @error('sick') is-invalid @enderror"
+                                        type="radio" name="sick" id="sickYes"
+                                        value="1"
+                                        {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? 'checked' : '' }} required>
+                                    <label class="form-check-label" for="sickYes">มี</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input @error('sick') is-invalid @enderror"
+                                        type="radio" name="sick" id="sickNo"
+                                        value="0"
+                                        {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 0 ? 'checked' : '' }} required>
+                                    <label class="form-check-label" for="sickNo">ไม่มี</label>
+                                </div>
+
                                 @error('sick')
-                                    <div class="text-danger small">{{ $message }}</div>
+                                    <div class="text-danger small" id="sick-error">{{ $message }}</div>
                                 @enderror
-                        </div>
+                            </div>
 
-                      <!-- รายละเอียดการเจ็บป่วย -->
-                    <div class="form-group col-md-12 mb-3" id="sickDetailGroup"
-                        style="{{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? '' : 'display:none;' }}">
-                        <label for="sick_detail" class="form-label text-start">รายละเอียดการเจ็บป่วย</label>
-                        <textarea name="sick_detail" id="sick_detail"
-                                class="form-control bg-white border rounded shadow-sm"
-                                style="text-align: left; padding-left: 1em; margin: 0;"
-                                rows="3"
-                                {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? 'required' : '' }}>{{ old('sick_detail', isset($factFinding) ? $factFinding->sick_detail : '') }}</textarea>
-                        @error('sick_detail')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
+                            <!-- รายละเอียดการเจ็บป่วย -->
+                            <div class="form-group col-md-12 mb-3" id="sickDetailGroup"
+                                style="{{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? '' : 'display:none;' }}">
+                                <label for="sick_detail" class="form-label text-start">รายละเอียดการเจ็บป่วย</label>
+                                <textarea name="sick_detail" id="sick_detail"
+                                    class="form-control bg-white border rounded shadow-sm @error('sick_detail') is-invalid @enderror"
+                                    rows="4"
+                                    {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? 'required' : '' }}>{{ old('sick_detail', isset($factFinding) ? $factFinding->sick_detail : '') }}</textarea>
+                                @error('sick_detail')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
 
                     <div class="row">
                         <div class="form-group col-md-6 mb-3">
@@ -223,6 +220,7 @@
                                 <option value="B" {{ old('blood_group', $factFinding->blood_group ?? '') == 'B' ? 'selected' : '' }}>B</option>
                                 <option value="AB" {{ old('blood_group', $factFinding->blood_group ?? '') == 'AB' ? 'selected' : '' }}>AB</option>
                                 <option value="O" {{ old('blood_group', $factFinding->blood_group ?? '') == 'O' ? 'selected' : '' }}>O</option>
+                                <option value="ไม่ระบุ" {{ old('blood_group', $factFinding->blood_group ?? '') == 'ไม่ระบุ' ? 'selected' : '' }}>ไม่ระบุ</option>               
                             </select>
                             @error('blood_group')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -499,83 +497,87 @@
                 </form>
             </div>
             
-  <!-- ประวัติการรักษาพยาบาล -->
-       <script>
+    <!-- ประวัติการรักษาพยาบาล -->
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const yes = document.getElementById('sickYes');
-    const no = document.getElementById('sickNo');
-    const detail = document.getElementById('sickDetailGroup');
-    const detailField = document.getElementById('sick_detail');
+        const yes = document.getElementById('sickYes');
+        const no = document.getElementById('sickNo');
+        const detail = document.getElementById('sickDetailGroup');
+        const detailField = document.getElementById('sick_detail');
 
-    function toggleDetail() {
-        if (yes.checked) {
-            detail.style.display = '';
-            detailField.setAttribute('required', 'required');
-        } else {
-            detail.style.display = 'none';
-            detailField.removeAttribute('required');
+        function toggleDetail() {
+            if (yes.checked) {
+                detail.style.display = '';
+                detailField.setAttribute('required', 'required');
+            } else {
+                detail.style.display = 'none';
+                detailField.removeAttribute('required');
+                detailField.value = ''; // เคลียร์ค่าเมื่อเลือก "ไม่มี"
+            }
         }
-    }
 
     yes.addEventListener('change', toggleDetail);
     no.addEventListener('change', toggleDetail);
     toggleDetail(); // init on load
+
+    // ลบ error เมื่อพิมพ์ใน sick_detail
+    detailField.addEventListener('input', function() {
+        const errorMsg = this.parentElement.querySelector('.text-danger');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
 });
 </script>
 
-{{-- JavaScript สําหรับการตรวจสอบข้อมูล --}}
+        {{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
         <script>
-        document.querySelectorAll('input[name="sick"]').forEach(function(radio) {
-            radio.addEventListener('change', function() {
-                const errorMsg = document.getElementById('sick-error');
-                if (errorMsg) {
-                    errorMsg.remove(); // ลบข้อความ error ทันที
-                }
-                // เอา class is-invalid ออกด้วย
-                document.querySelectorAll('input[name="sick"]').forEach(function(r) {
-                    r.classList.remove('is-invalid');
+            document.querySelectorAll('input[name="sick"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const errorMsg = document.getElementById('sick-error');
+                    if (errorMsg) errorMsg.remove();
+                    document.querySelectorAll('input[name="sick"]').forEach(function(r) {
+                        r.classList.remove('is-invalid');
+                    });
                 });
             });
-        });
-        document.getElementById('date').addEventListener('input', function() {
-            const errorMsg = document.getElementById('date-error');
-            if (errorMsg) errorMsg.remove();
-            this.classList.remove('is-invalid');
-        });
-        document.getElementById('receive_date').addEventListener('input', function() {
-            const errorMsg = document.getElementById('receive_date-error');
-            if (errorMsg) errorMsg.remove();
-            this.classList.remove('is-invalid');
-        });
 
-        document.getElementById('recorder').addEventListener('input', function() {
-            const errorMsg = document.getElementById('recorder-error');
-            if (errorMsg) errorMsg.remove();
-            this.classList.remove('is-invalid');
-        });
+            document.getElementById('date').addEventListener('input', function() {
+                const errorMsg = document.getElementById('date-error');
+                if (errorMsg) errorMsg.remove();
+                this.classList.remove('is-invalid');
+            });
 
-        document.getElementById('fact_name').addEventListener('input', function() {
-            const errorMsg = document.getElementById('fact_name-error');
-            if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันที
-            this.classList.remove('is-invalid'); // ลบกรอบแดง
-        });
+            document.getElementById('receive_date').addEventListener('input', function() {
+                const errorMsg = document.getElementById('receive_date-error');
+                if (errorMsg) errorMsg.remove();
+                this.classList.remove('is-invalid');
+            });
 
-        document.getElementById('case_history').addEventListener('input', function() {
-            const errorMsg = document.getElementById('case_history-error');
-            if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันทีเมื่อพิมพ์
-            this.classList.remove('is-invalid'); // ลบกรอบแดง
-});
-        document.getElementById('marital_id').addEventListener('input', function() {
-            const errorMsg = document.getElementById('marital_id-error');
-            if (errorMsg) errorMsg.remove(); // ลบข้อความ error ทันทีเมื่อพิมพ์
-            this.classList.remove('is-invalid'); // ลบกรอบแดง
-        });
+            document.getElementById('recorder').addEventListener('input', function() {
+                const errorMsg = document.getElementById('recorder-error');
+                if (errorMsg) errorMsg.remove();
+                this.classList.remove('is-invalid');
+            });
 
+            document.getElementById('fact_name').addEventListener('input', function() {
+                const errorMsg = document.getElementById('fact_name-error');
+                if (errorMsg) errorMsg.remove();
+                this.classList.remove('is-invalid');
+            });
+
+            document.getElementById('case_history').addEventListener('input', function() {
+                const errorMsg = document.getElementById('case_history-error');
+                if (errorMsg) errorMsg.remove();
+                this.classList.remove('is-invalid');
+            });
+
+            document.getElementById('marital_id').addEventListener('input', function() {
+                const errorMsg = document.getElementById('marital_id-error');
+                if (errorMsg) errorMsg.remove();
+                this.classList.remove('is-invalid');
+            });
         </script>
- {{-- JavaScript สําหรับการตรวจสอบข้อมูล --}}
-      
-
-
+        {{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
 @endsection
 
         
