@@ -199,6 +199,20 @@
                  </div>
 
                    <div class="row">
+                          <div class="form-group col-md-4 mb-3">
+                                <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
+                                <select name="blood_group" id="blood_group" class="form-control">
+                                    <option value="">-- กรุณาเลือกกรุ๊ปเลือด --</option>
+                                    <option value="A" {{ old('blood_group') == 'A' ? 'selected' : '' }}>A</option>
+                                    <option value="B" {{ old('blood_group') == 'B' ? 'selected' : '' }}>B</option>
+                                    <option value="AB" {{ old('blood_group') == 'AB' ? 'selected' : '' }}>AB</option>
+                                    <option value="O" {{ old('blood_group') == 'O' ? 'selected' : '' }}>O</option>
+                                </select>
+                                @error('blood_group')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                        <div class="form-group col-md-4 mb-3">
                             <label for="weight" class="form-label">น้ำหนัก</label>
                             <div class="d-flex align-items-center">
@@ -222,15 +236,6 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                      </div>
-
-                      <div class="form-group col-md-4 mb-3">
-                            <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
-                            <input type="text" name="blood_group" class="form-control" 
-                            value="{{ old('blood_group') }}">
-                            @error('blood_group')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>  
                  </div>   
                  
                 <div class="row">

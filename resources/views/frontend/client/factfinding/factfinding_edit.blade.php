@@ -93,7 +93,7 @@
 
                 <div class="row pt-4">
                     <div class="form-group col-md-3 mb-3">
-                        <label for="date" class="form-label">วันที่บันทึก: <span class="text-danger">*</span></label>
+                        <label for="date" class="form-label">วันที่นำส่ง: <span class="text-danger">*</span></label>
                         <input type="date" name="date" id="date"
                             class="form-control @error('date') is-invalid @enderror"
                            value="{{ old('date', isset($factFinding) ? $factFinding->date : '') }}">
@@ -213,8 +213,21 @@
                             @enderror
                         </div>      
                  </div>
-
+                    
                    <div class="row">
+                       <div class="form-group col-md-4 mb-3">
+                            <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
+                            <select name="blood_group" id="blood_group" class="form-control">
+                                <option value="">-- กรุณาเลือกกรุ๊ปเลือด --</option>
+                                <option value="A" {{ old('blood_group', $factFinding->blood_group ?? '') == 'A' ? 'selected' : '' }}>A</option>
+                                <option value="B" {{ old('blood_group', $factFinding->blood_group ?? '') == 'B' ? 'selected' : '' }}>B</option>
+                                <option value="AB" {{ old('blood_group', $factFinding->blood_group ?? '') == 'AB' ? 'selected' : '' }}>AB</option>
+                                <option value="O" {{ old('blood_group', $factFinding->blood_group ?? '') == 'O' ? 'selected' : '' }}>O</option>
+                            </select>
+                            @error('blood_group')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                        <div class="form-group col-md-4 mb-3">
                             <label for="weight" class="form-label">น้ำหนัก</label>
                             <div class="d-flex align-items-center">
@@ -238,15 +251,6 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                      </div>
-
-                      <div class="form-group col-md-4 mb-3">
-                            <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
-                            <input type="text" name="blood_group" class="form-control" 
-                            value="{{ old('blood_group', isset($factFinding) ? $factFinding->blood_group : '') }}">
-                            @error('blood_group')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>  
                  </div>    
 
                 <div class="row">
@@ -300,7 +304,7 @@
                 
             <div class="row">
                 <div class="form-group col-md-12 mb-3">
-                        <label for="relation_parent" class="form-label">ความสัมพันธ์ระหว่างบิดา/มารดา : <span class="text-danger">*</span></label>
+                        <label for="relation_parent" class="form-label">ความสัมพันธ์ระหว่างบิดา/มารดา</label>
                         <textarea name="relation_parent" id="relation_parent"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_parent') is-invalid @enderror"
                                 rows="3">{{ old('relation_parent', isset($factFinding) ? $factFinding->relation_parent : '') }}</textarea>
@@ -310,7 +314,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="relation_family" class="form-label">ความสัมพันธ์ระหว่างบุคลลในครอบครัว : <span class="text-danger">*</span></label>
+                        <label for="relation_family" class="form-label">ความสัมพันธ์ระหว่างบุคลลในครอบครัว</label>
                         <textarea name="relation_family" id="relation_family"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_family') is-invalid @enderror"
                                 rows="3">{{ old('relation_family', isset($factFinding) ? $factFinding->relation_family : '') }}</textarea>
@@ -321,7 +325,7 @@
                 </div>
                 
                      <div class="form-group col-md-12 mb-3">
-                        <label for="relation_child" class="form-label">ความสัมพันธ์ระหว่างเด็กกับบุคคลในครอบครัว : <span class="text-danger">*</span></label>
+                        <label for="relation_child" class="form-label">ความสัมพันธ์ระหว่างเด็กกับบุคคลในครอบครัว</label>
                         <textarea name="relation_child" id="relation_child"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_child') is-invalid @enderror"
                                 rows="3">{{ old('relation_child', isset($factFinding) ? $factFinding->relation_child : '') }}</textarea>
@@ -382,7 +386,7 @@
                       
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="ex_conditions" class="form-label">สภาพที่อยู่อาศัยภายนอก : <span class="text-danger">*</span></label>
+                        <label for="ex_conditions" class="form-label">สภาพที่อยู่อาศัยภายนอก</label>
                         <textarea name="ex_conditions" id="ex_conditions"
                                 class="form-control bg-white border rounded shadow-sm @error('ex_conditions') is-invalid @enderror"
                                 rows="3">{{ old('ex_conditions', isset($factFinding) ? $factFinding->ex_conditions : '') }}</textarea>
@@ -392,7 +396,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="in_conditions" class="form-label">สภาพที่อยู่อาศัยภายใน : <span class="text-danger">*</span></label>
+                        <label for="in_conditions" class="form-label">สภาพที่อยู่อาศัยภายใน</label>
                         <textarea name="in_conditions" id="in_conditions"
                                 class="form-control bg-white border rounded shadow-sm @error('in_conditions') is-invalid @enderror"
                                 rows="3">{{ old('in_conditions', isset($factFinding) ? $factFinding->in_conditions : '') }}</textarea>
@@ -402,7 +406,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="environment" class="form-label">สภาพแวดล้อม : <span class="text-danger">*</span></label>
+                        <label for="environment" class="form-label">สภาพแวดล้อม</label>
                         <textarea name="environment" id="environment"
                                 class="form-control bg-white border rounded shadow-sm @error('environment') is-invalid @enderror"
                                 rows="4">{{ old('environment', isset($factFinding) ? $factFinding->environment : '') }}</textarea>
@@ -412,7 +416,7 @@
                 </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="cause_problem" class="form-label">สาเหตุที่เข้ารับการสงเคราะห์ : <span class="text-danger">*</span></label>
+                        <label for="cause_problem" class="form-label">สาเหตุที่เข้ารับการสงเคราะห์</label>
                         <textarea name="cause_problem" id="cause_problem"
                                 class="form-control bg-white border rounded shadow-sm @error('cause_problem') is-invalid @enderror"
                                 rows="3">{{ old('cause_problem', isset($factFinding) ? $factFinding->cause_problem : '') }}</textarea>
@@ -422,7 +426,7 @@
                 </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="need" class="form-label">ความต้องการความช่วยเหลือ : <span class="text-danger">*</span></label>
+                        <label for="need" class="form-label">ความต้องการความช่วยเหลือ</label>
                         <textarea name="need" id="need"
                                 class="form-control bg-white border rounded shadow-sm @error('need') is-invalid @enderror"
                                 rows="3">{{ old('need', isset($factFinding) ? $factFinding->need : '') }}</textarea>
@@ -432,7 +436,7 @@
                 </div>
 
                    <div class="form-group col-md-12 mb-3">
-                        <label for="case_history" class="form-label">ประวัติความเป็นมา : <span class="text-danger">*</span></label>
+                        <label for="case_history" class="form-label">ประวัติความเป็นมา</label>
                         <textarea name="case_history" id="case_history"
                                 class="form-control bg-white border rounded shadow-sm @error('case_history') is-invalid @enderror"
                                 rows="4">{{ old('case_history', isset($factFinding) ? $factFinding->case_history : '') }}</textarea>
@@ -442,7 +446,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="information" class="form-label">ข้อเท็จจริงอื่นๆ : <span class="text-danger">*</span></label>
+                        <label for="information" class="form-label">ข้อเท็จจริงอื่น ๆ</label>
                         <textarea name="information" id="information"
                                 class="form-control bg-white border rounded shadow-sm @error('information') is-invalid @enderror"
                                 rows="4">{{ old('information', isset($factFinding) ? $factFinding->information : '') }}</textarea>
@@ -452,7 +456,7 @@
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="diagnosis" class="form-label">การวินิจฉัยปัญหา : <span class="text-danger">*</span></label>
+                        <label for="diagnosis" class="form-label">การวินิจฉัยปัญหา</label>
                         <textarea name="diagnosis" id="diagnosis"
                                 class="form-control bg-white border rounded shadow-sm @error('diagnosis') is-invalid @enderror"
                                 rows="4">{{ old('diagnosis', isset($factFinding) ? $factFinding->diagnosis : '') }}</textarea>
@@ -463,7 +467,7 @@
 
                     <div class="row mb-3">
                         <div class="form-group col-md-4 mb-3">
-                                <label for="receive_date" class="form-label">วันที่รับเข้า: <span class="text-danger">*</span></label>
+                                <label for="receive_date" class="form-label">วันที่บันทึก: <span class="text-danger">*</span></label>
                                 <input type="date" name="receive_date" id="receive_date"
                                     class="form-control @error('receive_date') is-invalid @enderror"
                                     value="{{ old('receive_date', isset($factFinding) ? $factFinding->receive_date : '') }}">

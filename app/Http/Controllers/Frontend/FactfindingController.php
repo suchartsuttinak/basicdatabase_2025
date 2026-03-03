@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Frontend;
-use Illuminate\Support\Facades\Validator; // ✅ ต้องมีบรรทัดนี้
 use App\Models\Client;
 use App\Models\Document;
 use App\Models\Factfinding;
@@ -9,8 +8,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\FactFindingDocument;
 use App\Models\Marital;
-
-
 
 class FactfindingController extends Controller
 {
@@ -38,47 +35,79 @@ class FactfindingController extends Controller
 
    public function FactfindingStore(Request $request)
 {
-    $validated = $request->validate([
-        'client_id'   => 'required|integer',
-        'date'        => 'required|date',
-        'receive_date'=> 'required|date',
-        'fact_name'   => 'required|string|max:255',
+        $validated = $request->validate([
+            'client_id'   => 'required|integer',
+            'date'        => 'required|date',
+            'receive_date'=> 'required|date',
+            'fact_name'   => 'required|string|max:255',
 
-        // ✅ เพิ่มฟิลด์อื่น ๆ ที่คุณใช้จริง
-        'appearance'  => 'nullable|string',
-        'skin'        => 'nullable|string',
-        'scar'        => 'nullable|string',
-        'disability'  => 'nullable|string',
-        'evidence'    => 'nullable|string',
-        'sick'        => 'required|in:0,1',
-        'sick_detail' => 'nullable|string',
-        'treatment'   => 'nullable|string',
-        'hospital'    => 'nullable|string',
-        'weight'      => 'nullable|numeric',
-        'height'      => 'nullable|numeric',
-        'blood_group' => 'nullable|string',
-        'hygiene'     => 'nullable|string',
-        'oral_health' => 'nullable|string',
-        'injury'      => 'nullable|string',
-        'marital_id'  => 'required|integer',
-        'relation_parent' => 'nullable|string',
-        'relation_family' => 'nullable|string',
-        'relation_child'  => 'nullable|string',
-        'ex_conditions'   => 'nullable|string',
-        'in_conditions'   => 'nullable|string',
-        'environment'     => 'nullable|string',
-        'cause_problem'   => 'nullable|string',
-        'need'            => 'nullable|string',
-        'information'     => 'nullable|string',
-        'diagnosis'       => 'nullable|string',
+            'appearance'  => 'nullable|string',
+            'skin'        => 'nullable|string',
+            'scar'        => 'nullable|string',
+            'disability'  => 'nullable|string',
+            'evidence'    => 'nullable|string',
+            'sick'        => 'required|in:0,1',
+            'sick_detail' => 'nullable|string',
+            'treatment'   => 'nullable|string',
+            'hospital'    => 'nullable|string',
+            'weight' => 'nullable|numeric|max:500',
+            'height' => 'nullable|numeric|max:300',
+            'blood_group' => 'nullable|string',
+            'hygiene'     => 'nullable|string',
+            'oral_health' => 'nullable|string',
+            'injury'      => 'nullable|string',
+            'marital_id'  => 'required|integer',
+            'relation_parent' => 'nullable|string',
+            'relation_family' => 'nullable|string',
+            'relation_child'  => 'nullable|string',
+            'ex_conditions'   => 'nullable|string',
+            'in_conditions'   => 'nullable|string',
+            'environment'     => 'nullable|string',
+            'cause_problem'   => 'nullable|string',
+            'need'            => 'nullable|string',
+            'information'     => 'nullable|string',
+            'diagnosis'       => 'nullable|string',
 
-        'case_history'    => 'nullable|string', // ✅ ปรับจาก required → nullable
-        'recorder'        => 'required|string',
-        'active'          => 'nullable|boolean',
+            'case_history'    => 'nullable|string',
+            'recorder'        => 'required|string',
+            'active'          => 'nullable|boolean',
 
-        'documents'   => 'nullable|array',
-        'documents.*' => 'integer',
-    ]);
+            'documents'   => 'nullable|array',
+            'documents.*' => 'integer',
+        ], [
+            'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.integer'  => 'รหัสผู้รับบริการต้องเป็นตัวเลข',
+
+            'date.required'      => 'กรุณากรอกวันที่นำส่ง',
+            'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+
+            'receive_date.required' => 'กรุณากรอกวันที่บันทึกข้อมูล',
+            'receive_date.date'     => 'รูปแบบวันที่รับบริการไม่ถูกต้อง',
+
+            'fact_name.required' => 'กรุณากรอกชื่อผู้นำส่ง',
+            'fact_name.string'   => 'ชื่อข้อเท็จจริงต้องเป็นข้อความ',
+            'fact_name.max'      => 'ชื่อข้อเท็จจริงต้องไม่เกิน 255 ตัวอักษร',
+
+            'sick.required'      => 'กรุณาระบุสถานะการเจ็บป่วย',
+            'sick.in'            => 'ค่าที่ระบุไม่ถูกต้อง (ต้องเป็น 0 หรือ 1)',
+
+            'marital_id.required' => 'กรุณาเลือกสถานภาพสมรส',
+            'marital_id.integer'  => 'สถานภาพสมรสต้องเป็นตัวเลข',
+
+            'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลขเท่านั้น',
+            'weight.min'     => 'น้ำหนักต้องไม่น้อยกว่า 1 กิโลกรัม',
+            'weight.max'     => 'น้ำหนักต้องไม่เกิน 500 กิโลกรัม',
+
+            'height.numeric' => 'ส่วนสูงต้องเป็นตัวเลขเท่านั้น',
+            'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
+            'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
+
+            'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
+            'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+
+            'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
+            'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
+        ]);
 
     // ✅ แยก documents ออกมาก่อน
     $documents = $validated['documents'] ?? [];
@@ -112,7 +141,6 @@ class FactfindingController extends Controller
                      ->with('success','บันทึกข้อมูลเรียบร้อยแล้ว');
 }
 
-
  public function FactfindingEdit($factfinding_id)
     {
         $factFinding = Factfinding::findOrFail($factfinding_id);
@@ -126,47 +154,80 @@ class FactfindingController extends Controller
         ));
     }
 
-
-
   public function FactfindingUpdate(Request $request, $factfinding_id)
 {
     $validated = $request->validate([
-        'client_id'   => 'required|integer',
-        'date'        => 'required|date',
-        'receive_date'=> 'required|date',
-        'fact_name'   => 'required|string|max:255',
-        'appearance'  => 'nullable|string',
-        'skin'        => 'nullable|string',
-        'scar'        => 'nullable|string',
-        'disability'  => 'nullable|string',
-        'evidence'    => 'nullable|string',
-        'sick'        => 'required|in:0,1',
-        'sick_detail' => 'nullable|string',
-        'treatment'   => 'nullable|string',
-        'hospital'    => 'nullable|string',
-        'weight'      => 'nullable|numeric',
-        'height'      => 'nullable|numeric',
-        'blood_group' => 'nullable|string',
-        'hygiene'     => 'nullable|string',
-        'oral_health' => 'nullable|string',
-        'injury'      => 'nullable|string',
-        'marital_id'  => 'required|integer',
-        'relation_parent' => 'nullable|string',
-        'relation_family' => 'nullable|string',
-        'relation_child'  => 'nullable|string',
-        'ex_conditions'   => 'nullable|string',
-        'in_conditions'   => 'nullable|string',
-        'environment'     => 'nullable|string',
-        'cause_problem'   => 'nullable|string',
-        'need'            => 'nullable|string',
-        'information'     => 'nullable|string',
-        'diagnosis'       => 'nullable|string',
-        'case_history'    => ['required','regex:/^(?=.*[ก-๙a-zA-Z])[ก-๙a-zA-Z0-9\s]+$/u'],
-        'recorder'        => 'required|string',
-        'active'          => 'nullable|boolean',
-        'documents'       => 'nullable|array',
-        'documents.*'     => 'integer',
-    ]);
+            'client_id'     => 'required|integer',
+            'date'          => 'required|date',
+            'receive_date'  => 'required|date',
+            'fact_name'     => 'required|string|max:255',
+            'appearance'    => 'nullable|string',
+            'skin'          => 'nullable|string',
+            'scar'          => 'nullable|string',
+            'disability'    => 'nullable|string',
+            'evidence'      => 'nullable|string',
+            'sick'          => 'required|in:0,1',
+            'sick_detail'   => 'nullable|string',
+            'treatment'     => 'nullable|string',
+            'hospital'      => 'nullable|string',
+            'weight'        => 'nullable|numeric|max:500',
+            'height'        => 'nullable|numeric|max:300',
+            'blood_group'   => 'nullable|string',
+            'hygiene'       => 'nullable|string',
+            'oral_health'   => 'nullable|string',
+            'injury'        => 'nullable|string',
+            'marital_id'    => 'required|integer',
+            'relation_parent' => 'nullable|string',
+            'relation_family' => 'nullable|string',
+            'relation_child'  => 'nullable|string',
+            'ex_conditions'   => 'nullable|string',
+            'in_conditions'   => 'nullable|string',
+            'environment'     => 'nullable|string',
+            'cause_problem'   => 'nullable|string',
+            'need'            => 'nullable|string',
+            'information'     => 'nullable|string',
+            'diagnosis'       => 'nullable|string',
+
+            'case_history'    => 'nullable|string',
+            'recorder'        => 'required|string',
+            'active'          => 'nullable|boolean',
+
+            'documents'   => 'nullable|array',
+            'documents.*' => 'integer',
+        ], [
+            'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.integer'  => 'รหัสผู้รับบริการต้องเป็นตัวเลข',
+
+            'date.required'      => 'กรุณากรอกวันที่นำส่ง',
+            'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+
+            'receive_date.required' => 'กรุณากรอกวันที่บันทึกข้อมูล',
+            'receive_date.date'     => 'รูปแบบวันที่รับบริการไม่ถูกต้อง',
+
+            'fact_name.required' => 'กรุณากรอกชื่อผู้นำส่ง',
+            'fact_name.string'   => 'ชื่อข้อเท็จจริงต้องเป็นข้อความ',
+            'fact_name.max'      => 'ชื่อข้อเท็จจริงต้องไม่เกิน 255 ตัวอักษร',
+
+            'sick.required'      => 'กรุณาระบุสถานะการเจ็บป่วย',
+            'sick.in'            => 'ค่าที่ระบุไม่ถูกต้อง (ต้องเป็น 0 หรือ 1)',
+
+            'marital_id.required' => 'กรุณาเลือกสถานภาพสมรส',
+            'marital_id.integer'  => 'สถานภาพสมรสต้องเป็นตัวเลข',
+
+            'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลขเท่านั้น',
+            'weight.min'     => 'น้ำหนักต้องไม่น้อยกว่า 1 กิโลกรัม',
+            'weight.max'     => 'น้ำหนักต้องไม่เกิน 500 กิโลกรัม',
+
+            'height.numeric' => 'ส่วนสูงต้องเป็นตัวเลขเท่านั้น',
+            'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
+            'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
+
+            'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
+            'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+
+            'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
+            'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
+        ]);
 
     // ✅ ดึง factfinding ตาม factfinding_id
     $factFinding = Factfinding::findOrFail($factfinding_id);
@@ -175,8 +236,6 @@ class FactfindingController extends Controller
     if ($validated['sick'] == 0) {
         $validated['sick_detail'] = null;
     }
-
-
 
     // ✅ เตรียม payload
     $payload = [
