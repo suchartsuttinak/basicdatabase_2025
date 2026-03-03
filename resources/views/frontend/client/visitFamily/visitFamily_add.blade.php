@@ -106,16 +106,17 @@
                             <!-- ฟิลด์สำหรับข้อมูลส่วนตัว -->
 
                             <div class="row pt-4">
-                                <div class="form-group col-md-3 mb-3">
-                                    <label for="visit_date" class="form-label">วันที่เยี่ยมบ้าน: <span
-                                            class="text-danger">*</span></label>
-                                    <input type="date" name="visit_date" id="visit_date"
-                                        class="form-control @error('visit_date') is-invalid @enderror"
-                                        value="{{ old('visit_date', $visitFamily->visit_date ?? '') }}">
-                                    @error('visit_date')
-                                        <small class="text-danger" id="visit_date-error">{{ $message }}</small>
-                                    @enderror
-                                </div>
+                               <div class="form-group col-md-3 mb-3">
+                        <label for="visit_date" class="form-label">
+                            วันที่เยี่ยมบ้าน: <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" name="visit_date" id="visit_date"
+                            class="form-control @error('visit_date') is-invalid @enderror"
+                            value="{{ old('visit_date', $visitFamily->visit_date ?? '') }}">
+                        @error('visit_date')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
 
                               {{-- <div class="form-group col-md-3 mb-3">
                                 <label for="count" class="form-label">ครั้งที่:</label>
@@ -131,7 +132,7 @@
 
                             <div class="row">
                                 <div class="form-group col-md-6 mb-3">
-                                    <label for="family_fname" class="form-label">ชื่อ-สกุล เจ้าของบ้าน: <span
+                                    <label for="family_fname" class="form-label">ชื่อ-สกุล ผู้ให้ข้อมูล: <span
                                             class="text-danger">*</span></label>
                                     <input type="text" name="family_fname" id="family_fname"
                                         class="form-control @error('family_fname') is-invalid @enderror"
@@ -167,8 +168,7 @@
                                 </div>
 
                                 <div class="form-group col-md-6 mb-3">
-                                    <label class="form-label" for="income_id">รายได้เฉลี่ยครอบครัว : <span
-                                            class="text-danger">*</span></label>
+                                    <label class="form-label" for="income_id">รายได้เฉลี่ยครอบครัว</label>
                                     <select name="income_id" id="income_id"
                                         class="form-control form-select @error('income_id') is-invalid @enderror">
                                         <option value="">--รายได้เฉลี่ย--</option>
@@ -184,19 +184,18 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group col-md-12 mb-3">
-                                    <label for="residence_status" class="form-label">สถานะการอยู่อาศัย:</label>
-                                    <input type="text" 
-                                        id="residence_status" 
-                                        name="residence_status" 
-                                        class="form-control" 
-                                        value="{{ old('residence_status', $visitFamily->residence_status) }}" 
-                                        placeholder="เช่น บ้านของตนเอง, บ้านเช่า, อยู่กับครอบครัว, บ้านพักคนงาน">
-                                </div>
+                              <div class="form-group col-md-12 mb-3">
+                                        <label for="residence_status" class="form-label">สถานะการอยู่อาศัย:</label>
+                                        <input type="text"  
+                                            id="residence_status"  
+                                            name="residence_status"  
+                                            class="form-control"  
+                                            value="{{ old('residence_status', $visitFamily->residence_status ?? '') }}"  
+                                            placeholder="เช่น บ้านของตนเอง, บ้านเช่า, อยู่กับครอบครัว, บ้านพักคนงาน">
+                                    </div>
 
                                 <div class="form-group col-md-12 mb-3">
-                                    <label for="outside_address" class="form-label">สภาพที่อยู่ภายนอก : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="outside_address" class="form-label">สภาพที่อยู่ภายนอก</label>
                                     <textarea name="outside_address" id="outside_address"
                                         class="form-control bg-white border rounded shadow-sm @error('outside_address') is-invalid @enderror"
                                         rows="3">{{ old('outside_address', $visitFamily->outside_address ?? '') }}</textarea>
@@ -207,8 +206,7 @@
                                 </div>
 
                                 <div class="form-group col-md-12 mb-3">
-                                    <label for="inside_address" class="form-label">สภาพที่อยู่ภายใน : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="inside_address" class="form-label">สภาพที่อยู่ภายใน</label>
                                     <textarea name="inside_address" id="inside_address"
                                         class="form-control bg-white border rounded shadow-sm @error('inside_address') is-invalid @enderror" rows="3">{{ old('inside_address', $visitFamily->inside_address ?? '') }}</textarea>
                                     @error('inside_address')
@@ -218,8 +216,7 @@
                                 </div>
 
                                 <div class="form-group col-md-12 mb-3">
-                                    <label for="environment" class="form-label">สภาพแวดล้อม : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="environment" class="form-label">สภาพแวดล้อม</label>
                                     <textarea name="environment" id="environment"
                                         class="form-control bg-white border rounded shadow-sm @error('environment') is-invalid @enderror" rows="3">{{ old('environment', $visitFamily->environment ?? '') }}</textarea>
                                     @error('environment')
@@ -229,8 +226,7 @@
                                 </div>
 
                                 <div class="form-group col-md-12 mb-3">
-                                    <label for="neighbor" class="form-label">ความสัมพันธ์กับเพื่อนบ้าน : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="neighbor" class="form-label">ความสัมพันธ์กับเพื่อนบ้าน</label>
                                     <textarea name="neighbor" id="neighbor"
                                         class="form-control bg-white border rounded shadow-sm @error('neighbor') is-invalid @enderror" rows="3">{{ old('neighbor', $visitFamily->neighbor ?? '') }}</textarea>
                                     @error('neighbor')
@@ -239,8 +235,7 @@
                                 </div>
 
                                 <div class="form-group col-md-12 mb-3">
-                                    <label for="member_relation" class="form-label">ความสัมพันธ์ของสมาชิกในบ้าน : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="member_relation" class="form-label">ความสัมพันธ์ของสมาชิกในบ้าน</label>
                                     <textarea name="member_relation" id="member_relation"
                                         class="form-control bg-white border rounded shadow-sm @error('member_relation') is-invalid @enderror"
                                         rows="3">{{ old('member_relation', $visitFamily->member_relation ?? '') }}</textarea>
@@ -251,8 +246,7 @@
                                 </div>
 
                                 <div class="form-group col-md-12 mb-3 mt-3">
-                                    <label for="problem" class="form-label">ปัญหาที่พบ : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="problem" class="form-label">ปัญหาที่พบ</label>
                                     <textarea name="problem" id="problem"
                                         class="form-control bg-white border rounded shadow-sm @error('problem') is-invalid @enderror" rows="3">{{ old('problem', $visitFamily->problem ?? '') }}</textarea>
                                     @error('problem')
@@ -261,8 +255,7 @@
                                 </div>
 
                                 <div class="form-group col-md-12 mb-3">
-                                    <label for="need" class="form-label">ความต้องการ : <span
-                                            class="text-danger">*</span></label>
+                                    <label for="need" class="form-label">ความต้องการ</label>
                                     <textarea name="need" id="need"
                                         class="form-control bg-white border rounded shadow-sm @error('need') is-invalid @enderror" rows="3">{{ old('need', $visitFamily->need ?? '') }}</textarea>
                                     @error('need')
@@ -287,7 +280,7 @@
                         </div>
                         <div class="card-body">
                             <!-- ฟิลด์สำหรับข้อมูลการติดต่อ -->
-                            <!-- ที่อยู่ จังหวัด อำเภอ ตําบล รหัสไปรษณีย์ -->
+                      
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="address" class="form-label">ที่อยู่เลขที่</label>
@@ -337,177 +330,182 @@
                                 @enderror
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="province" class="form-label">จังหวัด</label>
-                                    <select name="province_id" id="province" class="form-select"
-                                        data-selected="{{ old('province_id', $visitFamily->province_id ?? '') }}">
-                                        <option value="">--เลือกจังหวัด--</option>
-                                        @foreach ($provinces as $province)
-                                            <option value="{{ $province->id }}"
-                                                {{ old('province_id', $visitFamily->province_id ?? '') == $province->id ? 'selected' : '' }}>
-                                                {{ $province->prov_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="district" class="form-label">เขต/อำเภอ</label>
-                                    <select name="district_id" id="district" class="form-select"
-                                        data-selected="{{ old('district_id', $visitFamily->district_id ?? '') }}">
-                                        <option value="">--เลือกอำเภอ--</option>
-                                        @foreach ($districts as $district)
-                                            <option value="{{ $district->id }}"
-                                                {{ old('district_id', $visitFamily->district_id ?? '') == $district->id ? 'selected' : '' }}>
-                                                {{ $district->dist_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="subdistrict" class="form-label">แขวง/ตำบล</label>
-                                <select name="sub_district_id" id="subdistrict" class="form-select"
-                                    data-selected="{{ old('sub_district_id', $visitFamily->sub_district_id ?? '') }}">
-                                    <option value="">-- เลือกตำบล --</option>
-                                    @foreach ($sub_districts as $subdistrict)
-                                        <option value="{{ $subdistrict->id }}"
-                                            {{ old('sub_district_id', $visitFamily->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                                            {{ $subdistrict->subd_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('sub_district_id')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-                                    <input type="text" name="zipcode" id="zipcode" class="form-control"
-                                        value="{{ old('zipcode', $visitFamily->zipcode ?? '') }}">
-                                    @error('zipcode')
-                                        <small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-3 col-md-8">
-                                    <label for="phone" class="form-label">โทรศัพท์</label>
-                                    <input type="text" name="phone" id="phone" class="form-control"
-                                        value="{{ old('phone', $visitFamily->phone ?? '') }}">
-                                    @error('phone')
-                                        <small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                            </div>
-                            <!-- สิ้นสุด ที่อยู่ จังหวัด อำเภอ ตําบล รหัสไปรษณีย์ -->
-
-                            <div class="form-group col-md-12 mb-3">
-                                <label for="diagnose" class="form-label">การวินิจฉัยปัญหา : <span
-                                        class="text-danger">*</span></label>
-                                <textarea name="diagnose" id="diagnose"
-                                    class="form-control bg-white border rounded shadow-sm @error('diagnose') is-invalid @enderror" rows="3">{{ old('diagnose', $visitFamily->diagnose ?? '') }}</textarea>
-                                @error('diagnose')
-                                    <div class="invalid-feedback d-block" id="diagnose-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group col-md-12 mb-3">
-                                <label for="assistance" class="form-label">การให้ความช่วยเหลือ : <span
-                                        class="text-danger">*</span></label>
-                                <textarea name="assistance" id="assistance"
-                                    class="form-control bg-white border rounded shadow-sm @error('assistance') is-invalid @enderror" rows="3">{{ old('assistance', $visitFamily->assistance ?? '') }}</textarea>
-                                @error('assistance')
-                                    <div class="invalid-feedback d-block" id="assistance-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group col-md-12 mb-3">
-                                <label for="comment" class="form-label">ข้อคิดเห็น : <span
-                                        class="text-danger">*</span></label>
-                                <textarea name="comment" id="comment"
-                                    class="form-control bg-white border rounded shadow-sm @error('comment') is-invalid @enderror" rows="3">{{ old('comment', $visitFamily->comment ?? '') }}</textarea>
-                                @error('comment')
-                                    <div class="invalid-feedback d-block" id="comment-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group col-md-12 mb-3">
-                                <label for="modify" class="form-label">สิ่งที่ควรแก้ไข : <span
-                                        class="text-danger">*</span></label>
-                                <textarea name="modify" id="modify"
-                                    class="form-control bg-white border rounded shadow-sm @error('modify') is-invalid @enderror" rows="3">{{ old('modify', $visitFamily->modify ?? '') }}</textarea>
-                                @error('modify')
-                                    <div class="invalid-feedback d-block" id="modify-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group col-md-12 mb-3">
-                                <label for="remark" class="form-label">หมายเหตุ : <span
-                                        class="text-danger">*</span></label>
-                                <textarea name="remark" id="remark"
-                                    class="form-control bg-white border rounded shadow-sm @error('remark') is-invalid @enderror" rows="3">{{ old('remark', $visitFamily->remark ?? '') }}</textarea>
-                                @error('remark')
-                                    <div class="invalid-feedback d-block" id="remark-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group col-md-6 mb-3">
-                                <label for="teacher" class="form-label">ชื่อเจ้าหน้าที่</label>
-                                <input type="text" name="teacher" id="teacher" class="form-control"
-                                    value="{{ old('teacher', $visitFamily->teacher ?? '') }}">
-                                @error('teacher')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            {{-- เลือกรูป --}}
-                        <div class="mb-3">
-                            <label for="images" class="form-label">เลือกรูปภาพ</label>
-                            <input type="file" name="images[]" id="images" class="form-control" multiple accept="image/*">
-
-                            {{-- พื้นที่แสดง preview --}}
-                            <div id="preview" class="row mt-3"></div>
-                        </div>   
-                                          
-                      {{-- ลบภาพ --}}
-                        @if(isset($images) && $images->count() > 0)
-                            <div class="mb-3">
-                                <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
-                                <div class="row" id="image-gallery">
-                                    @foreach($images as $img)
-                                        <div class="col-md-3 mb-3" id="image-{{ $img->id }}">
-                                            <div class="position-relative">
-                                                <div class="ratio ratio-1x1">
-                                                    <img src="{{ asset('storage/'.$img->file_path) }}"
-                                                        class="w-100 h-100 rounded border shadow-sm"
-                                                        style="object-fit: cover;">
-                                                </div>
-
-                                                {{-- ปุ่มลบ overlay --}}
-                                                <button type="button"
-                                                        class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-2 mt-2 delete-image"
-                                                        data-url="{{ route('image.destroy', $img->id) }}"
-                                                        data-id="{{ $img->id }}">
-                                                ลบภาพ
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                    <div class="text-start">
-                        <button type="submit" class="btn btn-success">
-                            {{ isset($visitFamily) ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูลใหม่' }}
-                        </button>
+                         <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="province" class="form-label">จังหวัด : <span class="text-danger">*</span></label>
+                        <select name="province_id" id="province" 
+                                class="form-select @error('province_id') is-invalid @enderror"
+                                data-selected="{{ old('province_id', $visitFamily->province_id ?? '') }}">
+                            <option value="">--เลือกจังหวัด--</option>
+                            @foreach ($provinces as $province)
+                                <option value="{{ $province->id }}"
+                                    {{ old('province_id', $visitFamily->province_id ?? '') == $province->id ? 'selected' : '' }}>
+                                    {{ $province->prov_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('province_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                </form>
-        </div>
-        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="district" class="form-label">เขต/อำเภอ : <span class="text-danger">*</span></label>
+                            <select name="district_id" id="district" 
+                                    class="form-select @error('district_id') is-invalid @enderror"
+                                    data-selected="{{ old('district_id', $visitFamily->district_id ?? '') }}">
+                                <option value="">--เลือกอำเภอ--</option>
+                                @foreach ($districts as $district)
+                                    <option value="{{ $district->id }}"
+                                        {{ old('district_id', $visitFamily->district_id ?? '') == $district->id ? 'selected' : '' }}>
+                                        {{ $district->dist_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('district_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subdistrict" class="form-label">แขวง/ตำบล : <span class="text-danger">*</span></label>
+                        <select name="sub_district_id" id="subdistrict" class="form-select"
+                            data-selected="{{ old('sub_district_id', $visitFamily->sub_district_id ?? '') }}">
+                            <option value="">-- เลือกตำบล --</option>
+                            @foreach ($sub_districts as $subdistrict)
+                                <option value="{{ $subdistrict->id }}"
+                                    {{ old('sub_district_id', $visitFamily->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
+                                    {{ $subdistrict->subd_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('sub_district_id')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-3 mb-3">
+                        <label for="zipcode" class="form-label">
+                            รหัสไปรษณีย์
+                        </label>
+                        <input type="text" name="zipcode" id="zipcode"
+                            class="form-control"
+                            value="{{ old('zipcode', $visitFamily->zipcode ?? '') }}" readonly>
+                    </div>
+                        <div class="mb-3 col-md-8">
+                            <label for="phone" class="form-label">โทรศัพท์</label>
+                            <input type="text" name="phone" id="phone" class="form-control"
+                                value="{{ old('phone', $visitFamily->phone ?? '') }}">
+                            @error('phone')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    <!-- สิ้นสุด ที่อยู่ จังหวัด อำเภอ ตําบล รหัสไปรษณีย์ -->
+
+                    <div class="form-group col-md-12 mb-3">
+                        <label for="diagnose" class="form-label">การวินิจฉัยปัญหา</label>
+                        <textarea name="diagnose" id="diagnose"
+                            class="form-control bg-white border rounded shadow-sm @error('diagnose') is-invalid @enderror" rows="3">{{ old('diagnose', $visitFamily->diagnose ?? '') }}</textarea>
+                        @error('diagnose')
+                            <div class="invalid-feedback d-block" id="diagnose-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-12 mb-3">
+                        <label for="assistance" class="form-label">การให้ความช่วยเหลือ</label>
+                        <textarea name="assistance" id="assistance"
+                            class="form-control bg-white border rounded shadow-sm @error('assistance') is-invalid @enderror" rows="3">{{ old('assistance', $visitFamily->assistance ?? '') }}</textarea>
+                        @error('assistance')
+                            <div class="invalid-feedback d-block" id="assistance-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-12 mb-3">
+                        <label for="comment" class="form-label">ข้อคิดเห็น</label>
+                        <textarea name="comment" id="comment"
+                            class="form-control bg-white border rounded shadow-sm @error('comment') is-invalid @enderror" rows="3">{{ old('comment', $visitFamily->comment ?? '') }}</textarea>
+                        @error('comment')
+                            <div class="invalid-feedback d-block" id="comment-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-12 mb-3">
+                        <label for="modify" class="form-label">สิ่งที่ควรแก้ไข</label>
+                        <textarea name="modify" id="modify"
+                            class="form-control bg-white border rounded shadow-sm @error('modify') is-invalid @enderror" rows="3">{{ old('modify', $visitFamily->modify ?? '') }}</textarea>
+                        @error('modify')
+                            <div class="invalid-feedback d-block" id="modify-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-12 mb-3">
+                        <label for="remark" class="form-label">หมายเหตุ</label>
+                        <textarea name="remark" id="remark"
+                            class="form-control bg-white border rounded shadow-sm @error('remark') is-invalid @enderror" rows="3">{{ old('remark', $visitFamily->remark ?? '') }}</textarea>
+                        @error('remark')
+                            <div class="invalid-feedback d-block" id="remark-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group col-md-6 mb-3">
+                        <label for="teacher" class="form-label">ชื่อ-สกุล ผู้ที่ติดตามเยี่ยมบ้าน : <span class="text-danger">*</span></label>
+                        <input type="text" 
+                            name="teacher" 
+                            id="teacher" 
+                            class="form-control @error('teacher') is-invalid @enderror"
+                            value="{{ old('teacher', $visitFamily->teacher ?? '') }}">
+                        @error('teacher')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- เลือกรูป --}}
+                <div class="mb-3">
+                    <label for="images" class="form-label">เลือกรูปภาพ</label>
+                    <input type="file" name="images[]" id="images" class="form-control" multiple accept="image/*">
+
+                    {{-- พื้นที่แสดง preview --}}
+                    <div id="preview" class="row mt-3"></div>
+                </div>   
+                                    
+                {{-- ลบภาพ --}}
+                @if(isset($images) && $images->count() > 0)
+                    <div class="mb-3">
+                        <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
+                        <div class="row" id="image-gallery">
+                            @foreach($images as $img)
+                                <div class="col-md-3 mb-3" id="image-{{ $img->id }}">
+                                    <div class="position-relative">
+                                        <div class="ratio ratio-1x1">
+                                            <img src="{{ asset('storage/'.$img->file_path) }}"
+                                                class="w-100 h-100 rounded border shadow-sm"
+                                                style="object-fit: cover;">
+                                        </div>
+
+                                        {{-- ปุ่มลบ overlay --}}
+                                        <button type="button"
+                                                class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-2 mt-2 delete-image"
+                                                data-url="{{ route('image.destroy', $img->id) }}"
+                                                data-id="{{ $img->id }}">
+                                        ลบภาพ
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            <div class="text-start">
+                <button type="submit" class="btn btn-success">
+                    {{ isset($visitFamily) ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูลใหม่' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 
     <!-- จังหวัด อำเภอ ตำบล รหัสไปรษณีย์ -->
@@ -586,32 +584,78 @@
                 }
             });
         });
-    </script>
-    <!-- แสดงภาพ -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const input = document.getElementById('images');
-        const preview = document.getElementById('preview');
+                </script>
+                <!-- แสดงภาพ -->
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const input = document.getElementById('images');
+                    const preview = document.getElementById('preview');
 
-        input.addEventListener('change', function () {
-            preview.innerHTML = ''; // เคลียร์ preview เดิมก่อน
-            Array.from(this.files).forEach(file => {
-                if (!file.type.startsWith('image/')) return;
+                    input.addEventListener('change', function () {
+                        preview.innerHTML = ''; // เคลียร์ preview เดิมก่อน
+                        Array.from(this.files).forEach(file => {
+                            if (!file.type.startsWith('image/')) return;
 
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const col = document.createElement('div');
-                    col.classList.add('col-md-3', 'mb-3');
-                    col.innerHTML = `
-                        <img src="${e.target.result}" class="img-fluid rounded border shadow-sm">
-                    `;
-                    preview.appendChild(col);
-                };
-                reader.readAsDataURL(file);
+                            const reader = new FileReader();
+                            reader.onload = e => {
+                                const col = document.createElement('div');
+                                col.classList.add('col-md-3', 'mb-3');
+                                col.innerHTML = `
+                                    <img src="${e.target.result}" class="img-fluid rounded border shadow-sm">
+                                `;
+                                preview.appendChild(col);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    });
+                });
+                </script>
+
+     
+        {{-- Script validation --}}
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // เลือกทุก input, select, textarea ที่มี class form-control หรือ form-select
+            const fields = document.querySelectorAll("input.form-control, select.form-select, textarea.form-control");
+
+            fields.forEach(field => {
+                // สำหรับ input text/textarea ใช้ event input
+                field.addEventListener("input", function() {
+                    if (this.value.trim() !== "") {
+                        clearError(this);
+                    }
+                });
+
+                // สำหรับ select และ input type=date ใช้ event change
+                field.addEventListener("change", function() {
+                    if (this.value.trim() !== "") {
+                        clearError(this);
+                    }
+                });
+
+                // กรณีหน้า edit: ถ้ามีค่าอยู่แล้ว ให้ซ่อน error และดอกจันทันที
+                if (field.value.trim() !== "") {
+                    clearError(field);
+                }
             });
+
+            function clearError(el) {
+                el.classList.remove("is-invalid");
+
+                // ซ่อนข้อความ error ทั้ง invalid-feedback และ text-danger
+                const feedbacks = el.parentElement.querySelectorAll(".invalid-feedback, .text-danger");
+                feedbacks.forEach(fb => fb.style.display = "none");
+
+                // ซ่อน span * ที่อยู่ใน label ของฟิลด์นั้น
+                const labelStar = el.parentElement.querySelector("label .text-danger");
+                if (labelStar) {
+                    labelStar.style.display = "none";
+                }
+            }
         });
-    });
-    </script>
+        </script>
+        {{-- end Script validation --}}
+
 
 <!-- ต้องมี SweetAlert2 ใน layout -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

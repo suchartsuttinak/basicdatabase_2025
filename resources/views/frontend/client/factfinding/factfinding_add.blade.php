@@ -1,7 +1,6 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-
 <style>
     /* กล่องรวมฟอร์ม */
     .official-form {
