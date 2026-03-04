@@ -5,11 +5,13 @@
             รายการให้ความช่วยเหลือผู้รับ
         </h4>
     {{-- แสดงยอดรวมทั้งหมด --}}
-  <div class="d-flex justify-content-between align-items-center mb-3">
-   <span class="fw-bold text-primary fs-6">
-    <i class="bi bi-person-fill me-2 text-primary"></i>
-    ชื่อ-สกุล : {{ $client->fullname ?? '-' }}
-   </span>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-primary fs-6">
+                <i class="bi bi-person-fill me-2 text-primary"></i>
+                ชื่อ-สกุล :  <span class="ms-2">{{ $client->fullname ?? '-' }} </span>
+                <i class="bi bi-calendar-heart me-2 text-success"></i>
+                <span class="fw-bold">อายุ :</span> {{ $client->age ?? '-' }} ปี
+            </span>
 
          {{-- ยอดรวมทั้งหมด ชิดขวา (แสดงเฉพาะเมื่อมีข้อมูล) --}}
              @if($sessions->isNotEmpty() && $grandTotal > 0)

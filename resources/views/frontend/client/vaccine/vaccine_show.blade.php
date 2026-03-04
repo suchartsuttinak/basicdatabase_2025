@@ -15,16 +15,34 @@
             <span>เพิ่มข้อมูล</span>
         </button>
     </div>
-</div>
-
-<!-- ตารางวัคซีน -->
-<div class="card-body">
-    @if($vaccinations->isEmpty())
-        <!-- ✅ กรณีไม่มีข้อมูล -->
-        <div class="alert alert-info text-center">
-            ยังไม่มีข้อมูลวัคซีน
+     {{-- ข้อมูล client --}}
+            <div class="card mb-0 shadow-sm">
+                <div class="card-body">
+                <div class="row mb-0">
+                    <div class="col-12 col-md-8">
+                    <p class="mb-1 d-flex align-items-center flex-wrap">
+                        <i class="bi bi-person-fill me-2 text-primary"></i>
+                        <span class="fw-bold">ชื่อ-สกุล :</span>
+                        <span class="ms-2">{{ $client->fullname ?? '-' }}</span>
+                        <span class="ms-4">
+                        <i class="bi bi-calendar-heart me-2 text-success"></i>
+                        <span class="fw-bold">อายุ :</span> {{ $client->age ?? '-' }} ปี
+                        </span>
+                    </p>
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
-    @else
+
+        <!-- ตารางวัคซีน -->
+        <div class="card-body">
+            @if($vaccinations->isEmpty())
+                <!-- ✅ กรณีไม่มีข้อมูล -->
+                <div class="alert alert-info text-center">
+                    ยังไม่มีข้อมูลวัคซีน
+                </div>
+            @else
         <table id="datatable-vaccine" class="table table-bordered table-striped align-middle">
             <thead class="table-primary">
                 <tr>

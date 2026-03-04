@@ -6,6 +6,25 @@
     <i class="bi bi-plus-circle"></i> เพิ่มการติดตามใหม่
 </button>
 
+  {{-- ข้อมูล client --}}
+            <div class="card mb-0 shadow-sm">
+                <div class="card-body">
+                <div class="row mb-0">
+                    <div class="col-12 col-md-8">
+                    <p class="mb-1 d-flex align-items-center flex-wrap">
+                        <i class="bi bi-person-fill me-2 text-primary"></i>
+                        <span class="fw-bold">ชื่อ-สกุล :</span>
+                        <span class="ms-2">{{ $client->fullname ?? '-' }}</span>
+                        <span class="ms-4">
+                        <i class="bi bi-calendar-heart me-2 text-success"></i>
+                        <span class="fw-bold">อายุ :</span> {{ $client->age ?? '-' }} ปี
+                        </span>
+                    </p>
+                    </div>
+                </div>
+                </div>
+            </div>
+
 <!-- Modal ฟอร์มติดตาม -->
 <div class="modal fade" id="followupModal" tabindex="-1" aria-labelledby="followupModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-sm-down">
@@ -276,6 +295,10 @@
         </div>
     </div>
 </div>
+@else
+    <div class="alert alert-info text-center small mt-2 ms-2 me-2">
+        <i class="bi bi-info-circle"></i> ยังไม่มีข้อมูลการติดตามผลการเรียน
+    </div>
 @endif
 
 @endsection
