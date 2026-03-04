@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Feb 22, 2026 at 10:58 AM
+-- Generation Time: Mar 03, 2026 at 03:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,14 +40,6 @@ CREATE TABLE `absents` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `absents`
---
-
-INSERT INTO `absents` (`id`, `absent_date`, `cause`, `operation`, `remark`, `record_date`, `teacher`, `client_id`, `education_record_id`, `created_at`, `updated_at`) VALUES
-(18, '2026-02-02', 'กก', 'กก', 'กกก', '2026-02-04', 'กก', 23, 44, '2026-02-22 02:55:22', '2026-02-22 02:55:22'),
-(19, '2026-02-11', 'ห', 'หหห', 'หหห', '2026-02-03', 'หหห', 23, 44, '2026-02-22 02:57:17', '2026-02-22 02:57:17');
 
 -- --------------------------------------------------------
 
@@ -232,8 +224,13 @@ CREATE TABLE `clients` (
 --
 
 INSERT INTO `clients` (`id`, `register_number`, `title_id`, `nick_name`, `first_name`, `last_name`, `gender`, `birth_date`, `id_card`, `national_id`, `religion_id`, `marital_id`, `occupation_id`, `income_id`, `education_id`, `scholl`, `address`, `moo`, `soi`, `road`, `village`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `origin_address`, `origin_moo`, `origin_soi`, `origin_road`, `origin_village`, `origin_province_id`, `origin_district_id`, `origin_sub_district_id`, `origin_zipcode`, `origin_phone`, `arrival_date`, `target_id`, `contact_id`, `project_id`, `house_id`, `status_id`, `case_resident`, `image`, `created_at`, `updated_at`, `release_status`) VALUES
-(23, '124', 5, 'แอน', 'สุธิสา', 'สุทธินาค', 'male', '2000-02-03', '2581236521465', 3, 3, 3, 3, 4, 3, 'ประชานุเคราะห์', '251/8', '12', 'อดเรก', 'พิพิธ', 'หนองปรือ', 11, 132, 941, 20170, '0885346727', '251/8', '12', 'อดเรก', 'พิพิธ', 'หนองปรือ', 16, 179, 1301, 25110, '0885346727', '2026-02-11', 1, 2, 2, 2, 1, 'Active', '1771669731.png', '2026-02-21 03:23:52', '2026-02-22 02:16:13', 'show'),
-(24, '589/9', 2, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'male', '2021-02-05', '2555566655555', 1, 1, 1, 11, 8, 4, 'ประชานุเคราะห์', '23', '1', 'บ่้านวนตาล', 'วีกรการ', 'ดีจับ', 18, 189, 1383, 27000, '0885346727', '658', '2', 'บ้านเหนือ', 'ประภา', 'จังกิง', 11, 134, 960, 20150, '0885346727', '2026-02-11', 3, 2, 2, 2, 2, 'Active', NULL, '2026-02-21 03:59:35', '2026-02-21 03:59:35', 'show');
+(26, '124', 1, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'male', '2016-03-02', '2555566655555', 2, 3, 2, 9, 9, 5, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 17, 185, 1352, 26000, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 17, 185, 1352, 26000, '0885346727', '2026-03-11', 3, 2, 1, 1, 2, 'Active', '1772440101.jpg', '2026-03-02 01:11:39', '2026-03-02 02:19:34', 'show'),
+(27, '589/9', 2, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'male', '2000-03-11', '2555566655556', 3, 3, 3, 10, 8, 16, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 13, 150, 1079, 22000, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 3, 57, 206, 11000, '0885346727', '2026-03-04', 2, 2, 2, 2, 1, 'Active', '1772458137.jpg', '2026-03-02 02:38:40', '2026-03-02 06:30:25', 'show'),
+(28, '589/92', 2, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'male', '2024-10-17', '2555566655111', 1, 2, 2, 10, 10, 15, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 5, 71, 340, 13130, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 5, 71, 340, 13130, '0885346727', '2026-03-18', 4, 3, 1, 2, 1, 'Active', '1772444819.jpg', '2026-03-02 02:46:59', '2026-03-02 02:56:04', 'show'),
+(29, '1246', 3, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'female', '2024-10-17', '2555566655196', 2, 1, 2, 9, 10, 17, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 11, 135, 966, 20160, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 11, 135, 966, 20160, '0885346727', '2026-03-18', 4, 3, 2, 2, 2, 'Active', '1772445559.jpg', '2026-03-02 02:59:19', '2026-03-02 03:04:08', 'show'),
+(30, '12466', 2, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'male', '2016-03-02', '2555566655558', 2, 1, 1, 10, 9, 3, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 16, 180, 1305, 25220, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 16, 180, 1305, 25220, '0885346727', '2026-03-11', 2, 3, 2, 3, 2, 'Active', '1772446065.jpg', '2026-03-02 03:07:45', '2026-03-02 03:10:02', 'show'),
+(31, '589/922', 2, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'female', '2018-03-17', '2555566655547', 2, 3, 1, 11, 9, 15, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 19, 214, 1624, 30270, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 19, 214, 1624, 30270, '0885346727', '2026-03-13', 3, 2, 3, 3, 2, 'Inactive', '1772446880.jpg', '2026-03-02 03:21:20', '2026-03-03 07:02:44', 'show'),
+(32, '589/91', 1, 'พรทิพย์', 'พรทิพย์', 'วิีระการ', 'female', '2022-03-10', '2555566655115', 2, 3, 2, 9, 9, 14, 'ประชานุเคราะห์', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 17, 185, 1351, 26000, '0885346727', '23', '2', 'อดเรก', 'พิพิธ', 'หนองปรือ', 17, 185, 1351, 26000, '0885346727', '2026-03-16', 3, 1, 3, 2, 1, 'Inactive', '1772455249.jpg', '2026-03-02 05:40:49', '2026-03-02 06:28:19', 'show');
 
 -- --------------------------------------------------------
 
@@ -253,9 +250,19 @@ CREATE TABLE `client_problem` (
 --
 
 INSERT INTO `client_problem` (`client_id`, `problem_id`, `created_at`, `updated_at`) VALUES
-(23, 1, '2026-02-21 03:23:52', '2026-02-21 03:23:52'),
-(24, 1, '2026-02-21 04:00:20', '2026-02-21 04:00:20'),
-(24, 2, '2026-02-21 03:59:35', '2026-02-21 03:59:35');
+(26, 1, '2026-03-02 01:11:39', '2026-03-02 01:11:39'),
+(26, 2, '2026-03-02 01:32:36', '2026-03-02 01:32:36'),
+(27, 5, '2026-03-02 02:38:55', '2026-03-02 02:38:55'),
+(27, 8, '2026-03-02 02:38:55', '2026-03-02 02:38:55'),
+(28, 1, '2026-03-02 02:46:59', '2026-03-02 02:46:59'),
+(28, 4, '2026-03-02 02:46:59', '2026-03-02 02:46:59'),
+(29, 5, '2026-03-02 02:59:19', '2026-03-02 02:59:19'),
+(29, 8, '2026-03-02 02:59:19', '2026-03-02 02:59:19'),
+(30, 2, '2026-03-02 03:07:45', '2026-03-02 03:07:45'),
+(30, 5, '2026-03-02 03:07:45', '2026-03-02 03:07:45'),
+(31, 1, '2026-03-02 03:21:20', '2026-03-02 03:21:20'),
+(32, 1, '2026-03-02 05:40:49', '2026-03-02 05:40:49'),
+(32, 2, '2026-03-02 05:40:49', '2026-03-02 05:40:49');
 
 -- --------------------------------------------------------
 
@@ -1341,7 +1348,8 @@ CREATE TABLE `education_records` (
 --
 
 INSERT INTO `education_records` (`id`, `client_id`, `education_id`, `institution_id`, `semester_id`, `school_name`, `record_date`, `grade_average`, `created_at`, `updated_at`) VALUES
-(44, 23, 15, 14, 23, 'โพธิสัมพันธ์วิทยาคาร (เมืองพัทยา 4)', '2026-02-24', NULL, '2026-02-22 02:18:00', '2026-02-22 02:18:00');
+(56, 26, 8, 16, 22, 'โพธิสัมพันธ์วิทยาคาร (เมืองพัทยา 4)', '2026-03-09', NULL, '2026-03-02 01:29:30', '2026-03-02 01:29:30'),
+(57, 26, 12, 16, 17, 'โพธิสัมพันธ์วิทยาคาร (เมืองพัทยา 4)', '2026-03-02', 3.5, '2026-03-02 01:29:50', '2026-03-02 06:33:20');
 
 -- --------------------------------------------------------
 
@@ -1364,9 +1372,10 @@ CREATE TABLE `education_record_subjects` (
 --
 
 INSERT INTO `education_record_subjects` (`id`, `education_record_id`, `subject_id`, `score`, `grade`, `created_at`, `updated_at`) VALUES
-(41, 44, 6, 25, '0', '2026-02-22 02:18:00', '2026-02-22 02:18:14'),
-(42, 44, 7, 69, '2.5', '2026-02-22 02:18:00', '2026-02-22 02:18:14'),
-(43, 44, 11, 80, '4', '2026-02-22 02:18:00', '2026-02-22 02:18:14');
+(57, 56, 9, 50, '1', '2026-03-02 01:29:30', '2026-03-02 01:29:30'),
+(58, 57, 6, 52, '1', '2026-03-02 06:33:20', '2026-03-02 06:33:20'),
+(59, 57, 7, 85, '4', '2026-03-02 06:33:20', '2026-03-02 06:33:20'),
+(60, 57, 13, 74, '3', '2026-03-02 06:33:20', '2026-03-02 06:33:20');
 
 -- --------------------------------------------------------
 
@@ -1461,6 +1470,7 @@ CREATE TABLE `factfindings` (
   `hospital` varchar(255) DEFAULT NULL COMMENT 'โรงพยาบาล',
   `weight` decimal(5,2) DEFAULT NULL COMMENT 'น้ำหนัก (kg)',
   `height` decimal(5,2) DEFAULT NULL COMMENT 'ส่วนสูง (cm)',
+  `blood_group` varchar(10) DEFAULT NULL COMMENT 'กรุ๊ปเลือด',
   `hygiene` varchar(255) DEFAULT NULL COMMENT 'ความสะอาด',
   `oral_health` varchar(255) DEFAULT NULL COMMENT 'สุขภาพช่องปาก',
   `injury` varchar(255) DEFAULT NULL COMMENT 'การบาดเจ็บ/บาดแผล',
@@ -1483,6 +1493,14 @@ CREATE TABLE `factfindings` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `factfindings`
+--
+
+INSERT INTO `factfindings` (`id`, `date`, `receive_date`, `fact_name`, `evidence`, `appearance`, `skin`, `scar`, `disability`, `sick`, `sick_detail`, `treatment`, `hospital`, `weight`, `height`, `blood_group`, `hygiene`, `oral_health`, `injury`, `marital_id`, `relation_parent`, `relation_family`, `relation_child`, `ex_conditions`, `in_conditions`, `environment`, `cause_problem`, `need`, `information`, `diagnosis`, `case_history`, `recorder`, `client_id`, `active`, `created_at`, `updated_at`) VALUES
+(61, '2026-03-11', '2026-03-10', 'นายประทีบ ฉันภัครดี', '', 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 0, 'ไม่ระบุ', '', '', 0.00, 0.00, 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 2, '', '', '', '', '', '', '', '', '', '', '', 'กก', 30, 1, '2026-03-03 05:25:49', '2026-03-03 06:46:03'),
+(62, '2026-03-02', '2026-03-10', 'นายประทีบ ฉันภัครดี', '', 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 1, 'ทดสอบครับ', '', '', 0.00, 0.00, 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 'ไม่ระบุ', 2, '', '', '', '', '', '', '', '', '', '', '', 'นายประรัก', 31, 1, '2026-03-03 06:54:02', '2026-03-03 06:55:00');
+
 -- --------------------------------------------------------
 
 --
@@ -1496,6 +1514,15 @@ CREATE TABLE `factfinding_documents` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `factfinding_documents`
+--
+
+INSERT INTO `factfinding_documents` (`id`, `factfinding_id`, `document_id`, `created_at`, `updated_at`) VALUES
+(369, 61, 2, '2026-03-03 06:46:03', '2026-03-03 06:46:03'),
+(370, 62, 2, '2026-03-03 06:55:00', '2026-03-03 06:55:00'),
+(371, 62, 3, '2026-03-03 06:55:00', '2026-03-03 06:55:00');
 
 -- --------------------------------------------------------
 
@@ -1547,7 +1574,63 @@ CREATE TABLE `fathers` (
 --
 
 INSERT INTO `fathers` (`id`, `fname`, `lname`, `age`, `occupation`, `income`, `idcard`, `address_no`, `moo`, `soi`, `road`, `village`, `client_id`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `created_at`, `updated_at`) VALUES
-(7, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 23, NULL, NULL, NULL, NULL, NULL, '2026-02-21 07:17:29', '2026-02-21 07:17:29');
+(8, 'นายสุชาติ', 'สุทธินาค', 58, 'รับจ้าง', 3000.00, '2581236521433', '25', '2', 'อดเรก', 'พิพิธ', 'เจตจำนงค์ 3', 30, 15, 169, 1213, 24150, '088534565', '2026-03-03 06:02:33', '2026-03-03 06:41:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `help_items`
+--
+
+CREATE TABLE `help_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `help_session_id` bigint(20) UNSIGNED NOT NULL,
+  `item_name` varchar(255) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `unit_price` decimal(10,2) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `help_sessions`
+--
+
+CREATE TABLE `help_sessions` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `help_date` date NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `help_types`
+--
+
+CREATE TABLE `help_types` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `help_name` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `help_types`
+--
+
+INSERT INTO `help_types` (`id`, `help_name`, `created_at`, `updated_at`) VALUES
+(4, 'ด้านการศึกษา', '2026-02-27 07:15:41', '2026-02-27 07:19:01'),
+(5, 'เครื่องอุปโภค/บริโภค', '2026-02-27 07:16:04', '2026-02-27 07:16:04'),
+(6, 'ค่าอาหาร', '2026-02-27 07:16:42', '2026-02-27 07:16:42'),
+(7, 'ค่าเดินทาง', '2026-02-27 07:16:59', '2026-02-27 07:16:59'),
+(8, 'ค่าที่พัก', '2026-02-27 07:17:38', '2026-02-27 07:17:38');
 
 -- --------------------------------------------------------
 
@@ -1643,23 +1726,28 @@ INSERT INTO `institutions` (`id`, `institution_name`, `created_at`, `updated_at`
 (9, 'โรงเรียนชลราษฎรอำรุง', '2026-01-09 08:07:56', '2026-01-09 08:07:56'),
 (10, 'โรงเรียนบางละมุง', '2026-01-09 20:14:40', '2026-01-09 20:14:40'),
 (11, 'โรงเรียนชลราษฎรอำรุง2', '2026-01-12 05:39:30', '2026-01-12 05:39:30'),
-(13, 'วัดบุญสัมพันธ์', '2026-02-22 01:46:45', '2026-02-22 01:46:45'),
-(14, 'โพธิสัมพันธ์วิทยาคาร (เมืองพัทยา 4)', '2026-02-22 01:53:35', '2026-02-22 01:53:35');
+(15, 'โรงเรียนชลกันยานุกูล', '2026-02-22 08:02:55', '2026-02-22 08:02:55'),
+(16, 'โพธิสัมพันธ์วิทยาคาร (เมืองพัทยา 4)', '2026-02-24 06:44:34', '2026-02-24 06:44:34');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `jobs`
+-- Table structure for table `job_agencies`
 --
 
-CREATE TABLE `jobs` (
+CREATE TABLE `job_agencies` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `queue` varchar(255) NOT NULL,
-  `payload` longtext NOT NULL,
-  `attempts` tinyint(3) UNSIGNED NOT NULL,
-  `reserved_at` int(10) UNSIGNED DEFAULT NULL,
-  `available_at` int(10) UNSIGNED NOT NULL,
-  `created_at` int(10) UNSIGNED NOT NULL
+  `job_date` date NOT NULL,
+  `position` varchar(255) NOT NULL,
+  `income` decimal(10,2) NOT NULL,
+  `company` varchar(255) NOT NULL,
+  `coordinator` varchar(255) NOT NULL,
+  `remark` text DEFAULT NULL,
+  `client_id` bigint(20) UNSIGNED NOT NULL,
+  `occupation_id` bigint(20) UNSIGNED NOT NULL,
+  `count` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1751,6 +1839,15 @@ CREATE TABLE `members` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `members`
+--
+
+INSERT INTO `members` (`id`, `client_id`, `count`, `fullname`, `member_age`, `education_id`, `relationship`, `occupation_id`, `income_id`, `remark`, `created_at`, `updated_at`) VALUES
+(107, 31, NULL, 'นายสุชาติ สุทธินาค', 1, 35, 'พี่', 5, 4, NULL, '2026-03-03 07:04:05', '2026-03-03 07:04:05'),
+(108, 31, NULL, 'นางสาวมยุรี แซ่ด่าง', 1, 35, 'ป้า', 11, 12, NULL, '2026-03-03 07:04:05', '2026-03-03 07:04:05'),
+(109, 31, NULL, 'นายประกร ทั่งสมุทร', 11, 9, 'ลุง', 5, 4, NULL, '2026-03-03 07:04:05', '2026-03-03 07:04:05');
+
 -- --------------------------------------------------------
 
 --
@@ -1823,7 +1920,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (90, '2026_01_10_074536_create_case_outsides_table', 40),
 (91, '2026_01_11_011834_create_translates_table', 41),
 (93, '2026_01_11_024716_create_refers_table', 42),
-(94, '2026_02_22_073107_create_semesters_table', 43);
+(94, '2026_02_22_073107_create_semesters_table', 43),
+(96, '2026_02_26_101355_create_job_agencies_table', 44),
+(97, '2026_02_27_133650_create_help_types_table', 45),
+(98, '2026_02_28_034650_create_help_sessions_table', 46),
+(99, '2026_02_28_034804_create_help_items_table', 46);
 
 -- --------------------------------------------------------
 
@@ -1899,7 +2000,7 @@ CREATE TABLE `mothers` (
 --
 
 INSERT INTO `mothers` (`id`, `fname`, `lname`, `age`, `occupation`, `income`, `idcard`, `address_no`, `moo`, `soi`, `road`, `village`, `client_id`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `created_at`, `updated_at`) VALUES
-(7, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 23, NULL, NULL, NULL, NULL, NULL, '2026-02-21 07:17:29', '2026-02-21 07:17:29');
+(8, 'สุชาติ', 'สุทธินาค', 3, 'รับจ้าง', 25630.00, '2222233333333', '25', '8', 'ท่าเรือพลี', 'บ้านหลวง', 'เคนกวิน', 30, 15, 168, 1204, 24110, '0885346727', '2026-03-03 06:02:33', '2026-03-03 06:18:19');
 
 -- --------------------------------------------------------
 
@@ -1953,6 +2054,14 @@ CREATE TABLE `observes` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `observes`
+--
+
+INSERT INTO `observes` (`id`, `date`, `behavior`, `cause`, `solution`, `action`, `obstacles`, `result`, `record_date`, `recorder`, `misbehavior_id`, `client_id`, `created_at`, `updated_at`) VALUES
+(33, '2026-03-02', 'ก', 'ก', 'ก', 'ก', 'ก', 'ก', '2026-03-02', 'หหห', 1, 26, '2026-03-02 07:41:41', '2026-03-02 07:41:41'),
+(34, '2026-03-03', 'ผ', 'ฟฟ', 'ฟฟ', 'ฟฟ', 'ฟฟ', 'ฟฟฟ', '2026-03-31', 'กกก', 6, 26, '2026-03-02 07:43:20', '2026-03-02 07:43:20');
 
 -- --------------------------------------------------------
 
@@ -2312,7 +2421,7 @@ CREATE TABLE `relatives` (
 --
 
 INSERT INTO `relatives` (`id`, `fname`, `lname`, `age`, `occupation`, `income`, `idcard`, `address_no`, `moo`, `soi`, `road`, `village`, `client_id`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `created_at`, `updated_at`) VALUES
-(7, 'กิตติยา', 'ดีเลิศ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 23, 15, 168, 1203, NULL, '0885346727', '2026-02-21 07:17:29', '2026-02-21 07:17:29');
+(8, 'นายกิตติยา', 'ดีเลิศ', 25, 'รับจ้าง', 25630.00, '325555232253', '256', '8', 'ท่าเรือพลี', 'บ้านหลวง', 'เคนกวิน', 30, 15, 168, 1204, 24110, '0885346727', '2026-03-03 06:02:33', '2026-03-03 06:42:51');
 
 -- --------------------------------------------------------
 
@@ -2383,13 +2492,6 @@ CREATE TABLE `school_followups` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `school_followups`
---
-
-INSERT INTO `school_followups` (`id`, `follow_date`, `teacher_name`, `tel`, `follow_type`, `follo_no`, `result`, `contact_name`, `remark`, `client_id`, `education_record_id`, `created_at`, `updated_at`) VALUES
-(25, '2026-02-22', 'นางสาวปรีดา ไชรเลิศ', '088-534-6727', 'self', 1, 'กกก', 'นางสาวปราณี ไก่กลาง', 'กกกก', 23, 44, '2026-02-22 02:48:06', '2026-02-22 02:48:06');
-
 -- --------------------------------------------------------
 
 --
@@ -2449,7 +2551,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('oJmAMWxc799dE2pdeuWqFdWDSUEGdgWHyz0hwxIK', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNG1YQlM2MFVEWXQyUkVhTXZ1MkRuTTBNNUVwZDE3TTVJTElXeW5KNSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hYnNlbnQvYWRkLzIzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1771754275);
+('lXklysmhz4PsGnmd0X8QElFqqx5LdeJ2rvp9PGye', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoid0wzcFpoWXBaNjdaRmtVTTVsV2o1Ujd4d1FiMHI5RDhNdkR3Z2pPcyI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjM1OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvZmFtaWx5L2FkZC8zMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1772547377);
 
 -- --------------------------------------------------------
 
@@ -2485,7 +2587,7 @@ CREATE TABLE `spouses` (
 --
 
 INSERT INTO `spouses` (`id`, `fname`, `lname`, `age`, `occupation`, `income`, `idcard`, `address_no`, `moo`, `soi`, `road`, `village`, `client_id`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `created_at`, `updated_at`) VALUES
-(7, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 23, NULL, NULL, NULL, NULL, NULL, '2026-02-21 07:17:29', '2026-02-21 07:17:29');
+(8, 'กิตติยา', 'ดีเลิศ', 14, 'รับจ้าง', 25630.00, '2222233333333', '256', '8', 'ธรมมสามัคคี 3', 'บ้านหลวง', 'เคนกวิน', 30, 11, 131, 938, 20130, '0885346727', '2026-03-03 06:02:33', '2026-03-03 06:45:19');
 
 -- --------------------------------------------------------
 
@@ -10071,7 +10173,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `photo`, `phone`, `address`, `role`, `status`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'นายสุชาติ สุทธินาค', 'suchart@gmail.com', NULL, '$2y$12$r7ldRtL5v8nPL3lA6yUtK.gmeCe1tLoapbu1GyKAzY7ZszQuibCwS', '1767494221.png', '088534565', '521/3 ณ ซ.อดิเรก', 'user', '1', NULL, '2025-11-12 07:09:52', '2026-01-18 08:24:52'),
 (2, 'Test User', 'test@example.com', '2025-11-12 07:24:22', '$2y$12$gstgMzlTfRlhvJEnptLLu.0nBR2NB.PN3AKTZJxg95y/QoFT.6aq2', NULL, NULL, NULL, 'user', '1', 'rnozqxhOoQ', '2025-11-12 07:24:23', '2025-11-12 07:24:23'),
-(3, 'suttinak', 'suchartsuttinak@gmail.com', NULL, '$2y$12$LG/NWmEWt7/h8VSWL4sk/OcsueFxkVFqkAIaBJ43U3zCsoIp.D5pS', '1764339800.jpg', '088534565', '521/3 ณ ซ.อดิเรก', 'user', '1', NULL, '2025-11-28 07:22:47', '2025-11-28 07:23:20');
+(3, 'suttinak', 'suchartsuttinak@gmail.com', NULL, '$2y$12$LG/NWmEWt7/h8VSWL4sk/OcsueFxkVFqkAIaBJ43U3zCsoIp.D5pS', '1764339800.jpg', '088534565', '521/3 ณ ซ.อดิเรก', 'user', '1', NULL, '2025-11-28 07:22:47', '2025-11-28 07:23:20'),
+(4, 'Admin', 'admin@gmail.com', NULL, '$2y$12$egxJwUvl0r/teBNclHGE1u7smwn4uz7SCTP.pyKt/9J9oJedsR6VO', NULL, NULL, NULL, 'user', '1', NULL, '2026-02-24 06:50:26', '2026-02-24 06:50:26');
 
 -- --------------------------------------------------------
 
@@ -10104,6 +10207,7 @@ CREATE TABLE `visit_families` (
   `family_fname` varchar(100) NOT NULL,
   `family_age` int(11) DEFAULT NULL,
   `member` varchar(100) DEFAULT NULL,
+  `residence_status` varchar(100) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   `moo` varchar(255) DEFAULT NULL,
   `soi` varchar(255) DEFAULT NULL,
@@ -10132,6 +10236,13 @@ CREATE TABLE `visit_families` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `visit_families`
+--
+
+INSERT INTO `visit_families` (`id`, `visit_date`, `count`, `family_fname`, `family_age`, `member`, `residence_status`, `address`, `moo`, `soi`, `road`, `village`, `province_id`, `district_id`, `sub_district_id`, `zipcode`, `phone`, `outside_address`, `inside_address`, `environment`, `neighbor`, `member_relation`, `income_id`, `problem`, `need`, `diagnose`, `assistance`, `comment`, `modify`, `teacher`, `remark`, `client_id`, `created_at`, `updated_at`) VALUES
+(32, '2026-03-03', 1, 'นายสุชาติ สุทธินาค', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 17, 186, 1355, '26130', NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, 'นางสาวแอน ดีเลิศ', NULL, 30, '2026-03-03 06:47:26', '2026-03-03 06:47:46');
 
 --
 -- Indexes for dumped tables
@@ -10301,6 +10412,26 @@ ALTER TABLE `fathers`
   ADD UNIQUE KEY `fathers_client_id_unique` (`client_id`);
 
 --
+-- Indexes for table `help_items`
+--
+ALTER TABLE `help_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `help_items_help_session_id_foreign` (`help_session_id`);
+
+--
+-- Indexes for table `help_sessions`
+--
+ALTER TABLE `help_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `help_sessions_client_id_foreign` (`client_id`);
+
+--
+-- Indexes for table `help_types`
+--
+ALTER TABLE `help_types`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `houses`
 --
 ALTER TABLE `houses`
@@ -10327,11 +10458,12 @@ ALTER TABLE `institutions`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `jobs`
+-- Indexes for table `job_agencies`
 --
-ALTER TABLE `jobs`
+ALTER TABLE `job_agencies`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `jobs_queue_index` (`queue`);
+  ADD KEY `job_agencies_client_id_foreign` (`client_id`),
+  ADD KEY `job_agencies_occupation_id_foreign` (`occupation_id`);
 
 --
 -- Indexes for table `job_batches`
@@ -10574,37 +10706,37 @@ ALTER TABLE `visit_families`
 -- AUTO_INCREMENT for table `absents`
 --
 ALTER TABLE `absents`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `accidents`
 --
 ALTER TABLE `accidents`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `addictives`
 --
 ALTER TABLE `addictives`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `case_outsides`
 --
 ALTER TABLE `case_outsides`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `check_bodies`
 --
 ALTER TABLE `check_bodies`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `clients`
 --
 ALTER TABLE `clients`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -10634,49 +10766,49 @@ ALTER TABLE `education`
 -- AUTO_INCREMENT for table `education_records`
 --
 ALTER TABLE `education_records`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `education_record_subjects`
 --
 ALTER TABLE `education_record_subjects`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `escapes`
 --
 ALTER TABLE `escapes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `escape_follows`
 --
 ALTER TABLE `escape_follows`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `estimates`
 --
 ALTER TABLE `estimates`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `estimate_pictures`
 --
 ALTER TABLE `estimate_pictures`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `factfindings`
 --
 ALTER TABLE `factfindings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `factfinding_documents`
 --
 ALTER TABLE `factfinding_documents`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=226;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=372;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -10688,7 +10820,25 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `fathers`
 --
 ALTER TABLE `fathers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `help_items`
+--
+ALTER TABLE `help_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+
+--
+-- AUTO_INCREMENT for table `help_sessions`
+--
+ALTER TABLE `help_sessions`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT for table `help_types`
+--
+ALTER TABLE `help_types`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `houses`
@@ -10700,7 +10850,7 @@ ALTER TABLE `houses`
 -- AUTO_INCREMENT for table `images`
 --
 ALTER TABLE `images`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `incomes`
@@ -10712,13 +10862,13 @@ ALTER TABLE `incomes`
 -- AUTO_INCREMENT for table `institutions`
 --
 ALTER TABLE `institutions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT for table `jobs`
+-- AUTO_INCREMENT for table `job_agencies`
 --
-ALTER TABLE `jobs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `job_agencies`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `maritals`
@@ -10736,13 +10886,13 @@ ALTER TABLE `medicals`
 -- AUTO_INCREMENT for table `members`
 --
 ALTER TABLE `members`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT for table `misbehaviors`
@@ -10754,7 +10904,7 @@ ALTER TABLE `misbehaviors`
 -- AUTO_INCREMENT for table `mothers`
 --
 ALTER TABLE `mothers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `nationals`
@@ -10766,13 +10916,13 @@ ALTER TABLE `nationals`
 -- AUTO_INCREMENT for table `observes`
 --
 ALTER TABLE `observes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `observe_followups`
 --
 ALTER TABLE `observe_followups`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `occupations`
@@ -10820,13 +10970,13 @@ ALTER TABLE `psychos`
 -- AUTO_INCREMENT for table `refers`
 --
 ALTER TABLE `refers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `relatives`
 --
 ALTER TABLE `relatives`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `religions`
@@ -10844,7 +10994,7 @@ ALTER TABLE `retires`
 -- AUTO_INCREMENT for table `school_followups`
 --
 ALTER TABLE `school_followups`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `semesters`
@@ -10856,7 +11006,7 @@ ALTER TABLE `semesters`
 -- AUTO_INCREMENT for table `spouses`
 --
 ALTER TABLE `spouses`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `statuses`
@@ -10898,19 +11048,19 @@ ALTER TABLE `translates`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `vaccinations`
 --
 ALTER TABLE `vaccinations`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `visit_families`
 --
 ALTER TABLE `visit_families`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- Constraints for dumped tables
@@ -11021,11 +11171,30 @@ ALTER TABLE `fathers`
   ADD CONSTRAINT `fathers_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `help_items`
+--
+ALTER TABLE `help_items`
+  ADD CONSTRAINT `help_items_help_session_id_foreign` FOREIGN KEY (`help_session_id`) REFERENCES `help_sessions` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `help_sessions`
+--
+ALTER TABLE `help_sessions`
+  ADD CONSTRAINT `help_sessions_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `images`
 --
 ALTER TABLE `images`
   ADD CONSTRAINT `images_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `images_visit_family_id_foreign` FOREIGN KEY (`visit_family_id`) REFERENCES `visit_families` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `job_agencies`
+--
+ALTER TABLE `job_agencies`
+  ADD CONSTRAINT `job_agencies_client_id_foreign` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `job_agencies_occupation_id_foreign` FOREIGN KEY (`occupation_id`) REFERENCES `occupations` (`id`);
 
 --
 -- Constraints for table `medicals`

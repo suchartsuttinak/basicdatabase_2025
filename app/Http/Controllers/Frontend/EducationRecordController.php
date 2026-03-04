@@ -32,21 +32,29 @@ class EducationRecordController extends Controller
 
     public function EducationRecordStore(Request $request)
     {
-        $validated = $request->validate([
-            'client_id'    => 'required|exists:clients,id',
-            'education_id' => 'required',
-            'semester_id'  => 'required|exists:semesters,id', // ✅ ใช้ FK
-            'school_name'  => 'required|string',
-            'record_date'  => 'required|date',
-            'grade_average'=> 'nullable|numeric',
-            'subjects'     => 'nullable|array',
-            'subjects.*.subject_id' => 'nullable|exists:subjects,id',
-            'subjects.*.score'      => 'nullable|numeric|min:0|max:100',
-            'subjects.*.grade'      => 'nullable|string',
-        ], [
-            'semester_id.required' => 'กรุณาเลือกภาคเรียน',
-            'semester_id.exists'   => 'ภาคเรียนที่เลือกไม่ถูกต้อง',
-        ]);
+       $validated = $request->validate([
+        'client_id'    => 'required|exists:clients,id',
+        'education_id' => 'required',
+        'semester_id'  => 'required|exists:semesters,id', // ✅ ใช้ FK
+        'school_name'  => 'required|string',
+        'record_date'  => 'required|date',
+        'grade_average'=> 'nullable|numeric',
+        'subjects'     => 'nullable|array',
+        'subjects.*.subject_id' => 'nullable|exists:subjects,id',
+        'subjects.*.score'      => 'nullable|numeric|min:0|max:100',
+        'subjects.*.grade'      => 'nullable|string',
+    ], [     
+        'education_id.required' => 'กรุณาเลือกระดับการศึกษา',
+
+        'semester_id.required'  => 'กรุณาเลือกภาคเรียน',
+        'semester_id.exists'    => 'ภาคเรียนที่เลือกไม่ถูกต้อง',
+
+        'school_name.required'  => 'กรุณากรอกชื่อสถานศึกษา',
+        'school_name.string'    => 'ชื่อสถานศึกษาต้องเป็นข้อความ',
+
+        'record_date.required'  => 'กรุณาเลือกวันที่บันทึก',
+        'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่',
+    ]);
 
         // ✅ กันบันทึกซ้ำ
         $existingRecord = EducationRecord::where('client_id', $validated['client_id'])
@@ -125,6 +133,18 @@ class EducationRecordController extends Controller
             'subjects.*.subject_id' => 'nullable|exists:subjects,id',
             'subjects.*.score'      => 'nullable|numeric|min:0|max:100',
             'subjects.*.grade'      => 'nullable|string',
+        ],
+            [     
+            'education_id.required' => 'กรุณาเลือกระดับการศึกษา',
+
+            'semester_id.required'  => 'กรุณาเลือกภาคเรียน',
+            'semester_id.exists'    => 'ภาคเรียนที่เลือกไม่ถูกต้อง',
+
+            'school_name.required'  => 'กรุณากรอกชื่อสถานศึกษา',
+            'school_name.string'    => 'ชื่อสถานศึกษาต้องเป็นข้อความ',
+
+            'record_date.required'  => 'กรุณาเลือกวันที่บันทึก',
+            'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่',
         ]);
 
         $record = EducationRecord::findOrFail($id);
@@ -197,6 +217,4 @@ class EducationRecordController extends Controller
         return redirect()->route('education_record_show', ['client_id' => $client_id])
                          ->with('success', 'ลบข้อมูลผลการเรียนเรียบร้อยแล้ว');
     }
-
-
 }
