@@ -11,7 +11,7 @@
             icon: 'error',
             title: 'เกิดข้อผิดพลาด',
             html: '{!! implode("<br>", $errors->all()) !!}',
-            timer: 3000,              // ✅ ปิดเองใน 3 วินาที
+            timer: 2000,              // ✅ ปิดเองใน 3 วินาที
             timerProgressBar: true    // ✅ แสดง progress bar ด้านบน
         });
         // ✅ เปิด modal กลับมาอัตโนมัติ
@@ -52,12 +52,10 @@
 
     <!-- ✅ แสดงชื่อและอายุ -->
     <div class="card-body border-bottom pb-2 mb-2">
-        <p class="mb-1">
-            <strong>ชื่อ:</strong> {{ $client->full_name }}
-        </p>
         <p class="mb-0">
-            <strong>อายุ:</strong> 
-            {{ \Carbon\Carbon::parse($client->birth_date)->age }} ปี
+            <strong>ชื่อ:</strong> {{ $client->full_name }}
+            <span class="mx-3">|</span>
+            <strong>อายุ:</strong> {{ \Carbon\Carbon::parse($client->birth_date)->age }} ปี
         </p>
     </div>
 </div>
@@ -144,30 +142,35 @@
         </div>
 
         <div class="modal-body">
-           <div class="mb-3 col-4">
-                    <label class="form-label">วันที่ติดตาม</label>
-                    <input type="date" name="date"
-                        class="form-control @error('date') is-invalid @enderror"
-                        value="{{ old('date') }}">
-                    @error('date')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            <div class="mb-3">
-                <label class="form-label">การดำเนินงาน</label><br>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง" required>
-                    <label class="form-check-label">หน่วยงานไปเอง</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์">
-                    <label class="form-check-label">โทรศัพท์</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย">
-                    <label class="form-check-label">จดหมาย</label>
-                </div>
-            </div>
+          <div class="mb-3 col-4">
+            <label class="form-label">วันที่ติดตาม</label>
+            <input type="date" name="date"
+                class="form-control @error('date') is-invalid @enderror"
+                value="{{ old('date', \Carbon\Carbon::now()->format('Y-m-d')) }}">
+            @error('date')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="mb-3">
+    <label class="form-label">การดำเนินงาน</label><br>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง" {{ old('follo_no') == 'หน่วยงานไปเอง' ? 'checked' : '' }}>
+        <label class="form-check-label">หน่วยงานไปเอง</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์" {{ old('follo_no') == 'โทรศัพท์' ? 'checked' : '' }}>
+        <label class="form-check-label">โทรศัพท์</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย" {{ old('follo_no') == 'จดหมาย' ? 'checked' : '' }}>
+        <label class="form-check-label">จดหมาย</label>
+    </div>
+
+    <!-- แสดงข้อความ error -->
+    @error('follo_no')
+        <span class="text-danger">{{ $message }}</span>
+    @enderror
+</div>
 
             <div class="mb-3">
                 <label class="form-label">ผลการติดตาม</label>
@@ -175,7 +178,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">ผู้ประเมิน</label>
+                <label class="form-label">ผู้ติดตาม</label>
                 <input type="text" name="teacher" class="form-control">
             </div>
 
@@ -192,15 +195,31 @@
                 <div id="preview-area-add" class="d-flex flex-wrap gap-2 mt-2"></div>
                     </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+         <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">บันทึก</button>
+            <!-- ✅ ปุ่มยกเลิกปิด modal ได้ทันที -->
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- ✅ Modal Edit Estimate -->
+{{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
+@if ($errors->any())
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var myModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
+    myModal.show();
+  });
+</script>
+@endif
+
+
+
+
+
+        <!-- ✅ Modal Edit Estimate -->
 <div class="modal fade" id="edit-estimate-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -214,43 +233,57 @@
         </div>
 
         <div class="modal-body">
-    <div class="mb-3 col-4">
-        <label class="form-label">วันที่ติดตาม</label>
-        <input type="date" name="date" id="edit_date" class="form-control">
-    </div>
+          <div class="mb-3 col-4">
+            <label class="form-label">วันที่ติดตาม</label>
+            <input type="date" name="date" id="edit_date" class="form-control">
+          </div>
 
-    <div class="mb-3">
-        <label class="form-label">การดำเนินงาน</label>
-        <input type="text" name="follo_no" id="edit_follo_no" class="form-control">
-    </div>
+          <div class="mb-3">
+            <label class="form-label">การดำเนินงาน</label><br>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง">
+              <label class="form-check-label">หน่วยงานไปเอง</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์">
+              <label class="form-check-label">โทรศัพท์</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย">
+              <label class="form-check-label">จดหมาย</label>
+            </div>
+            @error('follo_no')
+              <span class="text-danger">{{ $message }}</span>
+            @enderror
+          </div>
 
-    <div class="mb-3">
-        <label class="form-label">ผลการติดตาม</label>
-        <textarea name="results" id="edit_results" class="form-control"></textarea>
-    </div>
+          <div class="mb-3">
+            <label class="form-label">ผลการติดตาม</label>
+            <textarea name="results" id="edit_results" class="form-control"></textarea>
+          </div>
 
-    <div class="mb-3">
-        <label class="form-label">ผู้ประเมิน</label>
-        <input type="text" name="teacher" id="edit_teacher" class="form-control">
-    </div>
+          <div class="mb-3">
+            <label class="form-label">ผู้ติดตาม</label>
+            <input type="text" name="teacher" id="edit_teacher" class="form-control">
+          </div>
 
-    <div class="mb-3">
-        <label class="form-label">หมายเหตุ</label>
-        <textarea name="remark" id="edit_remark" class="form-control"></textarea>
-    </div>
+          <div class="mb-3">
+            <label class="form-label">หมายเหตุ</label>
+            <textarea name="remark" id="edit_remark" class="form-control"></textarea>
+          </div>
 
-    <div class="mb-3">
-        <label class="form-label">เลือกรูปภาพใหม่</label>
-        <input type="file" name="pictures[]" multiple class="form-control" id="pictures-input-edit">
-    </div>
+          <div class="mb-3">
+            <label class="form-label">เลือกรูปภาพใหม่</label>
+            <input type="file" name="pictures[]" multiple class="form-control" id="pictures-input-edit">
+          </div>
 
-    <div id="preview-area-edit" class="d-flex flex-wrap gap-2 mt-2"></div>
-</div>
-
-
+          <div id="preview-area-edit" class="d-flex flex-wrap gap-2 mt-2"></div>
+        </div>
 
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">อัปเดต</button>
+          <!-- ✅ ปุ่มยกเลิก -->
+          <button type="button" class="btn btn-secondary btn-cancel" data-bs-dismiss="modal">ยกเลิก</button>
         </div>
       </form>
     </div>
@@ -261,57 +294,66 @@
 
 @push('scripts')
 <script>
-// Preview ไฟล์ใหม่ใน Edit Modal
-document.getElementById('pictures-input-edit').addEventListener('change', function(event) {
-    const previewArea = document.getElementById('preview-area-edit');
-    previewArea.innerHTML = "";
+/**
+ * ฟังก์ชัน preview ไฟล์ใหม่ (ใช้ได้ทั้ง Add และ Edit)
+ */
+function previewFiles(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const previewArea = document.getElementById(previewId);
+    if(!input) return;
 
-    const files = event.target.files;
-    const dt = new DataTransfer();
+    input.addEventListener('change', function(event) {
+        previewArea.innerHTML = "";
+        const files = event.target.files;
+        const dt = new DataTransfer();
 
-    Array.from(files).forEach((file, index) => {
-        if(file.type.startsWith("image/")){
-            const reader = new FileReader();
-            reader.onload = function(e){
-                const wrapper = document.createElement("div");
-                wrapper.className = "position-relative border rounded shadow-sm";
-                wrapper.style.width = "120px";
+        Array.from(files).forEach((file, index) => {
+            if(file.type.startsWith("image/")){
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "position-relative border rounded shadow-sm";
+                    wrapper.style.width = "120px";
 
-                const img = document.createElement("img");
-                img.src = e.target.result;
-                img.className = "img-fluid rounded";
-                img.style.height = "auto";
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "img-fluid rounded";
 
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.textContent = "ลบ";
-                btn.className = "btn btn-sm btn-danger position-absolute";
-                btn.style.top = "4px";
-                btn.style.right = "4px";
-                btn.style.padding = "2px 6px";
-                btn.style.fontSize = "0.75rem";
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.textContent = "ลบ";
+                    btn.className = "btn btn-sm btn-danger position-absolute";
+                    btn.style.top = "4px";
+                    btn.style.right = "4px";
 
-                btn.addEventListener("click", function(){
-                    wrapper.remove();
-                    const newFiles = Array.from(files).filter((_, i) => i !== index);
-                    const newDt = new DataTransfer();
-                    newFiles.forEach(f => newDt.items.add(f));
-                    document.getElementById('pictures-input-edit').files = newDt.files;
-                });
+                    btn.addEventListener("click", function(){
+                        wrapper.remove();
+                        const newFiles = Array.from(files).filter((_, i) => i !== index);
+                        const newDt = new DataTransfer();
+                        newFiles.forEach(f => newDt.items.add(f));
+                        input.files = newDt.files;
+                    });
 
-                wrapper.appendChild(img);
-                wrapper.appendChild(btn);
-                previewArea.appendChild(wrapper);
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(btn);
+                    previewArea.appendChild(wrapper);
+                }
+                reader.readAsDataURL(file);
+                dt.items.add(file);
             }
-            reader.readAsDataURL(file);
-            dt.items.add(file);
-        }
+        });
+
+        input.files = dt.files;
     });
+}
 
-    document.getElementById('pictures-input-edit').files = dt.files;
-});
+// ✅ ใช้งาน preview สำหรับ Add และ Edit
+previewFiles('pictures-input-add', 'preview-area-add');
+previewFiles('pictures-input-edit', 'preview-area-edit');
 
-// โหลดข้อมูลสำหรับ Edit และเติมรูปเดิม
+/**
+ * โหลดข้อมูลสำหรับ Edit และเติมค่าในฟอร์ม
+ */
 function estimateEdit(id){
     $.ajax({
         url: "/estimate/edit/" + id,
@@ -320,13 +362,15 @@ function estimateEdit(id){
         success: function(data){
             // เติมค่าฟอร์ม
             $('#edit_date').val(data.date);
-            $('#edit_follo_no').val(data.follo_no ?? '');
             $('#edit_results').val(data.results ?? '');
             $('#edit_teacher').val(data.teacher ?? '');
             $('#edit_remark').val(data.remark ?? '');
-
-            // เซ็ต action ให้ชี้ไป update/{id}
             $('#edit-estimate-form').attr('action', '/estimate/update/' + data.id);
+
+            // เซ็ตค่า radio follo_no
+            $('input[name="follo_no"]').each(function(){
+                $(this).prop('checked', $(this).val() === data.follo_no);
+            });
 
             // แสดงรูปเดิมพร้อมปุ่มลบ
             const preview = $('#preview-area-edit');
@@ -335,83 +379,45 @@ function estimateEdit(id){
                 data.pictures.forEach(function(pic){
                     preview.append(`
                         <div class="position-relative d-inline-block me-1 mb-1" style="width:80px;">
-                            <img src="/storage/${pic.path}" class="img-thumbnail" style="width:80px; height:auto;">
+                            <img src="${pic.url}" class="img-thumbnail" style="width:80px; height:auto;">
                             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                    onclick="removeOldPicture(${pic.id}, this)">
-                                ลบ
-                            </button>
+                                    onclick="removeOldPicture(${pic.id}, this)">ลบ</button>
                         </div>
                     `);
                 });
             }
+
+            // ✅ ใช้ instance เดียว ไม่สร้างใหม่ทุกครั้ง
+            const modalEl = document.getElementById('edit-estimate-modal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
         }
     });
 }
 
-// ฟังก์ชันลบรูปเดิม
-</script>
-
-<script>
-document.getElementById('pictures-input-add').addEventListener('change', function(event) {
-    const previewArea = document.getElementById('preview-area-add');
-    previewArea.innerHTML = "";
-
-    const files = event.target.files;
-    const dt = new DataTransfer();
-
-    Array.from(files).forEach((file, index) => {
-        if(file.type.startsWith("image/")){
-            const reader = new FileReader();
-            reader.onload = function(e){
-                const wrapper = document.createElement("div");
-                wrapper.className = "position-relative border rounded shadow-sm";
-                wrapper.style.width = "120px";
-
-                const img = document.createElement("img");
-                img.src = e.target.result;
-                img.className = "img-fluid rounded";
-                img.style.height = "auto";
-
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.textContent = "ลบ";
-                btn.className = "btn btn-sm btn-danger position-absolute";
-                btn.style.top = "4px";
-                btn.style.right = "4px";
-                btn.style.padding = "2px 6px";
-                btn.style.fontSize = "0.75rem";
-
-                btn.addEventListener("click", function(){
-                    wrapper.remove();
-                    const newFiles = Array.from(files).filter((_, i) => i !== index);
-                    const newDt = new DataTransfer();
-                    newFiles.forEach(f => newDt.items.add(f));
-                    document.getElementById('pictures-input-add').files = newDt.files;
-                });
-
-                wrapper.appendChild(img);
-                wrapper.appendChild(btn);
-                previewArea.appendChild(wrapper);
-            }
-            reader.readAsDataURL(file);
-            dt.items.add(file);
-        }
-    });
-
-    document.getElementById('pictures-input-add').files = dt.files;
-});
-
+/**
+ * ฟังก์ชันลบรูปเดิม
+ */
 function removeOldPicture(picId, btn){
-    // เอา preview ออก
     $(btn).closest('div').remove();
-
-    // เพิ่ม hidden input เพื่อบอก server ให้ลบรูปนี้
     $('#edit-estimate-form').append(
         `<input type="hidden" name="remove_pictures[]" value="${picId}">`
     );
 }
+
+/**
+ * ✅ เคลียร์ฟอร์มเมื่อกดปุ่มยกเลิก (ทั้ง Add และ Edit)
+ */
+document.querySelector('#add-estimate-modal .btn-secondary[data-bs-dismiss="modal"]')
+    ?.addEventListener('click', function(){
+        document.getElementById('add-estimate-form').reset();
+        document.getElementById('preview-area-add').innerHTML = "";
+    });
+
+document.querySelector('#edit-estimate-modal .btn-secondary[data-bs-dismiss="modal"]')
+    ?.addEventListener('click', function(){
+        document.getElementById('edit-estimate-form').reset();
+        document.getElementById('preview-area-edit').innerHTML = "";
+    });
 </script>
-
-
-
 @endpush

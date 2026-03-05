@@ -49,6 +49,11 @@ class EstimateController extends Controller
             'client_id' => 'required|exists:clients,id',
         ], [
             'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น', // ✅ custom message
+            'date.required' => 'กรุณาเลือกวันที่',
+            'date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'follo_no.required' => 'กรุณาเลือกการดำเนินงาน',
+
+
         ]);
 
         // สร้าง record ใหม่
@@ -89,8 +94,23 @@ class EstimateController extends Controller
     {
         $estimate = Estimate::with('pictures')->findOrFail($id);
         $estimate->date = \Carbon\Carbon::parse($estimate->date)->format('Y-m-d');
-        return response()->json($estimate);
-    }
+        return response()->json([
+            'id'       => $estimate->id,
+            'date'     => $estimate->date,
+            'follo_no' => $estimate->follo_no,
+            'results'  => $estimate->results,
+            'teacher'  => $estimate->teacher,
+            'remark'   => $estimate->remark,
+            'pictures' => $estimate->pictures->map(fn($pic) => [
+                'id'   => $pic->id,
+                'url' => asset('storage/'.$pic->path),   // ✅ ใช้ storage
+
+
+        ]),
+    ]);
+}
+
+
 
     // อัพเดตข้อมูล
     public function UpdateEstimate(Request $request, $id)

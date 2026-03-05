@@ -59,7 +59,7 @@
                 <div class="card-header bg-light fw-bold text-dark py-1 px-2">
                   <i class="bi bi-person-lines-fill me-2"></i> ข้อมูลเด็ก
                 </div>
-                <div class="card-body px-2 py-1">
+                <div class="card-body px-2 py-1 pt-2">
                   <div class="mb-1"><strong>ชื่อ-นามสกุล:</strong> {{ $client->full_name }}</div>
                   <div class="mb-1"><strong>อายุ:</strong> {{ $client->age }} ปี</div>
                   <div class="mb-1"><strong>สถานศึกษา:</strong> {{ optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล' }}</div>

@@ -1,7 +1,16 @@
 <div class="topbar-custom border-bottom bg-light">
     <div class="container-xxl">
         <nav class="navbar navbar-expand-lg navbar-light w-100">
-            <div class="d-flex justify-content-between align-items-center w-100">
+            
+            <!-- ปุ่ม toggle สำหรับมือถือ -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- เมนูหลัก -->
+            <div class="collapse navbar-collapse d-flex justify-content-between align-items-center w-100" id="navbarSupportedContent">
 
                 <!-- เมนูด้านซ้าย -->
                 <ul class="navbar-nav d-flex align-items-center">
@@ -11,73 +20,73 @@
                         </button>
                     </li>
 
-                    <!-- เมนูปกติ -->
-                  <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="fas fa-home"></i> หน้าหลัก
                         </a>
                     </li>
-                    <!-- เมนู ทะเบียนประวัติ -->
+
+                    <!-- ทะเบียนประวัติ -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="complaintDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                             <i class="fas fa-book"></i> ทะเบียนประวัติ
+                        <a class="nav-link dropdown-toggle" href="#" id="historyDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-book"></i> ทะเบียนประวัติ
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="complaintDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="historyDropdown">
                             <li><a class="dropdown-item" href="#">ร้องเรียนทั่วไป</a></li>
                             <li><a class="dropdown-item" href="#">ร้องเรียนการศึกษา</a></li>
                             <li><a class="dropdown-item" href="#">ร้องเรียนอื่น ๆ</a></li>
                         </ul>
                     </li>
-                
-                        <!-- เมนู การศึกษา -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {{ Request::is('education*') ? 'active' : '' }}" 
-                            href="#" id="educationDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-graduation-cap"></i> การศึกษา
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="educationDropdown">
-                                <li>
-                                    <a class="dropdown-item {{ setActive('education_record_add') }}" 
-                                    href="{{ route('education_record_add', ['client_id' => $client->id]) }}">
-                                    บันทึกผลการเรียน
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item {{ setActive('education_record_show') }}" href="{{ route('education_record_show', $client->id) }}">
-                                        แสดงผลการเรียน
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item {{ setActive('education_other') }}" href="#">
-                                        ร้องเรียนอื่น ๆ
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
 
-                     <!-- เมนู สุขภาพ -->
+                    <!-- การศึกษา -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="complaintDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle {{ Request::is('education*') ? 'active' : '' }}" 
+                           href="#" id="educationDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-graduation-cap"></i> การศึกษา
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="educationDropdown">
+                            <li>
+                                <a class="dropdown-item {{ setActive('education_record_add') }}"  
+                                   href="{{ route('education_record_add', ['client_id' => $client->id]) }}">
+                                   บันทึกผลการเรียน
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ setActive('education_record_show') }}" 
+                                   href="{{ route('education_record_show', $client->id) }}">
+                                   แสดงผลการเรียน
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ setActive('education_other') }}" href="#">
+                                    ร้องเรียนอื่น ๆ
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- สุขภาพ -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="healthDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-heartbeat"></i> สุขภาพ
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="complaintDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="healthDropdown">
                             <li><a class="dropdown-item" href="#">ร้องเรียนทั่วไป</a></li>
                             <li><a class="dropdown-item" href="#">ร้องเรียนการศึกษา</a></li>
                             <li><a class="dropdown-item" href="#">ร้องเรียนอื่น ๆ</a></li>
                         </ul>
                     </li>
-  
-                    <!-- เมนู dropdown -->
+
+                    <!-- สังคมสงเคราะห์ -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                        <a class="nav-link dropdown-toggle" href="#" id="socialDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                             <i class="fas fa-users"></i>
-                            สังคมสงเคราะห์
+                            <i class="fas fa-users"></i> สังคมสงเคราะห์
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="searchDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="socialDropdown">
                             <li><a class="dropdown-item" href="#">ค้นหาสถานศึกษา</a></li>
                             <li><a class="dropdown-item" href="#">ค้นหาครอบครัว</a></li>
                             <li><a class="dropdown-item" href="#">ค้นหาบุคคล</a></li>
