@@ -41,13 +41,14 @@
             ประวัติการติดตามและประเมินครอบครัวเด็ก
         </h5>
         <!-- ✅ ปุ่มเปิด Modal -->
-        <button type="button"
-                class="btn btn-sm btn-primary d-flex align-items-center shadow-sm px-3"
-                data-bs-toggle="modal"
-                data-bs-target="#add-estimate-modal">
-            <i class="bi bi-plus-circle me-1"></i>
-            <span>เพิ่มข้อมูล</span>
-        </button>
+<button type="button"
+        class="btn btn-sm btn-primary d-flex align-items-center shadow-sm px-3"
+        data-bs-toggle="modal"
+        data-bs-target="#add-estimate-modal"
+        id="btn-add-estimate">
+    <i class="bi bi-plus-circle me-1"></i>
+    <span>เพิ่มข้อมูล</span>
+</button>
     </div>
 
     <!-- ✅ แสดงชื่อและอายุ -->
@@ -204,20 +205,15 @@
     </div>
   </div>
 </div>
-
-{{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
-@if ($errors->any())
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var myModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
-    myModal.show();
-  });
-</script>
-@endif
-
-
-
-
+    {{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
+    @if ($errors->any())
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var myModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
+        myModal.show();
+    });
+    </script>
+    @endif
 
         <!-- ✅ Modal Edit Estimate -->
 <div class="modal fade" id="edit-estimate-modal" tabindex="-1" aria-hidden="true">
@@ -312,7 +308,7 @@ function previewFiles(inputId, previewId) {
                 const reader = new FileReader();
                 reader.onload = function(e){
                     const wrapper = document.createElement("div");
-                    wrapper.className = "position-relative border rounded shadow-sm";
+                    wrapper.className = "position-relative border rounded shadow-sm d-inline-block me-2 mb-2";
                     wrapper.style.width = "120px";
 
                     const img = document.createElement("img");
@@ -419,5 +415,15 @@ document.querySelector('#edit-estimate-modal .btn-secondary[data-bs-dismiss="mod
         document.getElementById('edit-estimate-form').reset();
         document.getElementById('preview-area-edit').innerHTML = "";
     });
+
+/**
+ * ✅ reset ฟอร์มทุกครั้งที่กดปุ่ม "เพิ่มข้อมูล"
+ */
+document.getElementById('btn-add-estimate')?.addEventListener('click', function(){
+    document.getElementById('add-estimate-form').reset();
+    document.getElementById('preview-area-add').innerHTML = "";
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelector('#add-estimate-form input[name="date"]').value = today;
+});
 </script>
 @endpush
