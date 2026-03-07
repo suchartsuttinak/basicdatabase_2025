@@ -78,12 +78,12 @@
                 <td>{{ $addictive->recorder ?? '-' }}</td>
                 <td class="text-center">
                   <div class="d-flex flex-wrap justify-content-center gap-1">
-                    <button type="button" class="btn btn-sm btn-warning"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editAddictiveModal{{ $addictive->id }}">
+               
+                  <!-- ปุ่มแก้ไข -->
+                  <button type="button" class="btn btn-sm btn-warning"
+                          onclick="openEditAddictive({{ $addictive->id }})">
                       <i class="bi bi-pencil-square"></i> แก้ไข
-                    </button>
-                    
+                  </button>         
                   <form id="delete-form-addictive-{{ $addictive->id }}" 
                         action="{{ route('addictive.delete', $addictive->id) }}" 
                         method="POST" class="d-inline">
@@ -117,166 +117,229 @@
 </div>
 
 <!-- Modal เพิ่มข้อมูล -->
-<div class="modal fade" id="createAddictiveModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="createAddictiveModal" tabindex="-1" aria-labelledby="createAddictiveLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">เพิ่มข้อมูลการตรวจสารเสพติด</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+      <!-- Header -->
+      <div class="modal-header bg-primary text-white py-2">
+        <h5 class="modal-title fw-bold" id="createAddictiveLabel">
+          <i class="bi bi-eyedropper me-2"></i> เพิ่มข้อมูลการตรวจสารเสพติด
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <form action="{{ route('addictive.store') }}" method="POST">
-          @csrf
+
+      <!-- Form -->
+      <form id="addictive-form" action="{{ route('addictive.store') }}" method="POST" novalidate>
+        @csrf
+        <div class="modal-body">
           <input type="hidden" name="client_id" value="{{ $client->id }}">
 
-          <div class="row mb-2">
-            <div class="col-12 col-md-3">
-              <label class="form-label fw-bold">วันที่ตรวจ</label>
-              <input type="date" name="date" class="form-control form-control-sm" required>
+          <div class="row gx-3 gy-2">
+            <div class="col-md-4">
+              <label class="form-label">วันที่ตรวจ</label>
+              <input type="date" name="date"
+                     class="form-control form-control-sm @error('date') is-invalid @enderror"
+                     value="{{ old('date', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
+              @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-3">
-              <label class="form-label fw-bold">ครั้งที่</label>
+
+            <div class="col-md-4">
+              <label class="form-label">ครั้งที่</label>
               <input type="number" name="count" class="form-control form-control-sm"
                      value="{{ $addictives->count() + 1 }}" readonly>
             </div>
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-bold">ผลการตรวจ</label><br>
+
+            <div class="col-md-4">
+              <label class="form-label">ผลการตรวจ</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="exam" value="0" checked id="exam_no_new">
+                <input class="form-check-input @error('exam') is-invalid @enderror" type="radio" name="exam" value="0"
+                       {{ old('exam','0') == '0' ? 'checked' : '' }} id="exam_no_new">
                 <label class="form-check-label" for="exam_no_new">ไม่พบสารเสพติด</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="exam" value="1" id="exam_yes_new">
+                <input class="form-check-input @error('exam') is-invalid @enderror" type="radio" name="exam" value="1"
+                       {{ old('exam') == '1' ? 'checked' : '' }} id="exam_yes_new">
                 <label class="form-check-label" for="exam_yes_new">พบสารเสพติด</label>
               </div>
+              @error('exam') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
             </div>
           </div>
 
-          <div class="row mb-2" id="referField_new" style="display:none;">
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-bold">การส่งต่อ</label><br>
+          <div class="row mb-3" id="referField_new" style="display: {{ old('exam') == '1' ? 'flex' : 'none' }};">
+            <div class="col-md-6">
+              <label class="form-label">การส่งต่อ</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="refer" value="1" id="refer_treatment_new">
+                <input class="form-check-input" type="radio" name="refer" value="1"
+                       {{ old('refer') == '1' ? 'checked' : '' }} id="refer_treatment_new">
                 <label class="form-check-label" for="refer_treatment_new">ส่งต่อบำบัด</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="refer" value="2" id="refer_followup_new">
+                <input class="form-check-input" type="radio" name="refer" value="2"
+                       {{ old('refer') == '2' ? 'checked' : '' }} id="refer_followup_new">
                 <label class="form-check-label" for="refer_followup_new">ติดตามดูแลต่อเนื่อง</label>
               </div>
+              @error('refer') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
             </div>
           </div>
 
-          <div class="mb-2">
-            <label class="form-label fw-bold">บันทึกผล</label>
-            <textarea name="record" class="form-control form-control-sm" rows="2"></textarea>
+          <div class="mb-3">
+            <label class="form-label">บันทึกผล</label>
+            <textarea name="record"
+                      class="form-control form-control-sm @error('record') is-invalid @enderror"
+                      rows="2">{{ old('record') }}</textarea>
+            @error('record') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
 
           <div class="mb-2">
             <label class="form-label fw-bold">ผู้ตรวจ</label>
-            <input type="text" name="recorder" class="form-control form-control-sm" required>
+            <input type="text" name="recorder"
+                   class="form-control form-control-sm @error('recorder') is-invalid @enderror"
+                   value="{{ old('recorder') }}" required>
+            @error('recorder') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
+        </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-success btn-sm">
-              <i class="bi bi-save me-1"></i> บันทึกผล
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-1"></i> ปิด
-            </button>
-          </div>
-        </form>
-      </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save me-1"></i> บันทึกผล
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btn-cancel-addictive">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- Modal แก้ไข -->
-@foreach ($addictives as $addictive)
-  <div class="modal fade" id="editAddictiveModal{{ $addictive->id }}" tabindex="-1" aria-hidden="true" data-addictive-id="{{ $addictive->id }}">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">แก้ไขข้อมูลการตรวจสารเสพติด</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form action="{{ route('addictive.update', $addictive->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="client_id" value="{{ $client->id }}">
+    {{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
+    @if ($errors->any())
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var myModal = new bootstrap.Modal(document.getElementById('createAddictiveModal'));
+        myModal.show();
+    });
+    </script>
+    @endif
 
-            <div class="row mb-2">
-              <div class="col-12 col-md-3">
-                <label class="form-label fw-bold">วันที่ตรวจ</label>
-                <input type="date" name="date" class="form-control form-control-sm"
-                       value="{{ old('date', $addictive->date) }}" required>
-              </div>
-              <div class="col-12 col-md-3">
-                <label class="form-label fw-bold">ครั้งที่</label>
-                <input type="number" name="count" class="form-control form-control-sm"
-                       value="{{ old('count', $addictive->count) }}" readonly>
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label fw-bold">ผลการตรวจ</label><br>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="exam" value="0"
-                      {{ old('exam', $addictive->exam) == 0 ? 'checked' : '' }} id="exam_no_{{ $addictive->id }}">
-                  <label class="form-check-label" for="exam_no_{{ $addictive->id }}">ไม่พบสารเสพติด</label>
+      @foreach ($addictives as $addictive)
+      <div class="modal fade" id="editAddictiveModal{{ $addictive->id }}" tabindex="-1" aria-hidden="true" data-addictive-id="{{ $addictive->id }}">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header bg-warning text-dark py-2">
+              <h5 class="modal-title fw-bold">
+                <i class="bi bi-pencil-square me-2"></i> แก้ไขข้อมูลการตรวจสารเสพติด
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Form -->
+            <form action="{{ route('addictive.update', $addictive->id) }}" method="POST" novalidate>
+              @csrf
+              @method('PUT')
+              <input type="hidden" name="client_id" value="{{ $client->id }}">
+
+              <div class="modal-body">
+                <div class="row mb-2">
+                  <div class="col-md-3">
+                    <label class="form-label fw-bold">วันที่ตรวจ</label>
+                    <input type="date" name="date"
+                          class="form-control form-control-sm @error('date') is-invalid @enderror"
+                          value="{{ old('date', $addictive->date) }}" required>
+                    @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                  </div>
+
+                  <div class="col-md-3">
+                    <label class="form-label fw-bold">ครั้งที่</label>
+                    <input type="number" name="count" class="form-control form-control-sm"
+                          value="{{ old('count', $addictive->count) }}" readonly>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold">ผลการตรวจ</label><br>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input @error('exam') is-invalid @enderror" type="radio" name="exam" value="0"
+                            {{ old('exam', $addictive->exam) == 0 ? 'checked' : '' }} id="exam_no_{{ $addictive->id }}">
+                      <label class="form-check-label" for="exam_no_{{ $addictive->id }}">ไม่พบสารเสพติด</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input @error('exam') is-invalid @enderror" type="radio" name="exam" value="1"
+                            {{ old('exam', $addictive->exam) == 1 ? 'checked' : '' }} id="exam_yes_{{ $addictive->id }}">
+                      <label class="form-check-label" for="exam_yes_{{ $addictive->id }}">พบสารเสพติด</label>
+                    </div>
+                    @error('exam') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                  </div>
                 </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="exam" value="1"
-                      {{ old('exam', $addictive->exam) == 1 ? 'checked' : '' }} id="exam_yes_{{ $addictive->id }}">
-                  <label class="form-check-label" for="exam_yes_{{ $addictive->id }}">พบสารเสพติด</label>
+
+                <div class="row mb-2" id="referField_{{ $addictive->id }}"
+                    style="display: {{ old('exam', $addictive->exam) == 1 ? 'flex' : 'none' }};">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold">การส่งต่อ</label><br>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="refer" value="1"
+                            {{ old('refer', $addictive->refer) == 1 ? 'checked' : '' }} id="refer_treatment_{{ $addictive->id }}">
+                      <label class="form-check-label" for="refer_treatment_{{ $addictive->id }}">ส่งต่อบำบัด</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="refer" value="2"
+                            {{ old('refer', $addictive->refer) == 2 ? 'checked' : '' }} id="refer_followup_{{ $addictive->id }}">
+                      <label class="form-check-label" for="refer_followup_{{ $addictive->id }}">ติดตามดูแลต่อเนื่อง</label>
+                    </div>
+                    @error('refer') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                  </div>
                 </div>
+
+                <div class="mb-2">
+                  <label class="form-label fw-bold">บันทึกผล</label>
+                  <textarea name="record"
+                            class="form-control form-control-sm @error('record') is-invalid @enderror"
+                            rows="2">{{ old('record', $addictive->record) }}</textarea>
+                  @error('record') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label fw-bold">ผู้ตรวจ</label>
+                    <input type="text" name="recorder"
+                          class="form-control form-control-sm"
+                          value="{{ old('recorder', $addictive->recorder ?? 'ไม่ระบุ') }}">
+                  </div>
               </div>
-            </div>
 
-            <div class="row mb-2" id="referField_{{ $addictive->id }}"
-                 style="display: {{ old('exam', $addictive->exam) == 1 ? 'flex' : 'none' }};">
-              <div class="col-12 col-md-6">
-                <label class="form-label fw-bold">การส่งต่อ</label><br>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="refer" value="1"
-                      {{ old('refer', $addictive->refer) == 1 ? 'checked' : '' }} id="refer_treatment_{{ $addictive->id }}">
-                  <label class="form-check-label" for="refer_treatment_{{ $addictive->id }}">ส่งต่อบำบัด</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="refer" value="2"
-                      {{ old('refer', $addictive->refer) == 2 ? 'checked' : '' }} id="refer_followup_{{ $addictive->id }}">
-                  <label class="form-check-label" for="refer_followup_{{ $addictive->id }}">ติดตามดูแลต่อเนื่อง</label>
-                </div>
+              <!-- Footer -->
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success btn-sm">
+                  <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                  <i class="bi bi-x-circle me-1"></i> ปิด
+                </button>
               </div>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label fw-bold">บันทึกผล</label>
-              <textarea name="record" class="form-control form-control-sm" rows="2">{{ old('record', $addictive->record) }}</textarea>
-            </div>
-
-            <div class="mb-2">
-              <label class="form-label fw-bold">ผู้ตรวจ</label>
-              <input type="text" name="recorder" class="form-control form-control-sm"
-                     value="{{ old('recorder', $addictive->recorder) }}" required>
-            </div>
-
-            <div class="d-flex justify-content-end gap-2">
-              <button type="submit" class="btn btn-success btn-sm">
-                <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
-              </button>
-              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-                <i class="bi bi-x-circle me-1"></i> ปิด
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-@endforeach
+      @endforeach
+      @endsection
 
+ 
 @push('scripts')
 <script>
-
+  // ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
+  function resetForm(modalEl) {
+    const form = modalEl.querySelector('form');
+    if (form) {
+      form.reset();
+      form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+    }
+    // ซ่อน referField ถ้ามี
+    const referField = modalEl.querySelector('[id^="referField_"]');
+    if (referField) referField.style.display = 'none';
+  }
 
   // ✅ Toggle referField สำหรับ modal create
   const examNoNew = document.getElementById('exam_no_new');
@@ -291,6 +354,13 @@
     toggleReferNew();
     examNoNew.addEventListener('change', toggleReferNew);
     examYesNew.addEventListener('change', toggleReferNew);
+  }
+
+  // ✅ Reset ฟอร์มเมื่อเปิด/ปิด modal create
+  const createModal = document.getElementById('addictiveModal');
+  if (createModal) {
+    createModal.addEventListener('shown.bs.modal', () => resetForm(createModal));
+    createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
   }
 
   // ✅ Toggle referField สำหรับ modal edit
@@ -310,10 +380,71 @@
       if (examNo) examNo.addEventListener('change', toggleRefer);
       if (examYes) examYes.addEventListener('change', toggleRefer);
     });
+
+    // ✅ Reset ฟอร์มเมื่อปิด modal edit
+    modalEl.addEventListener('hidden.bs.modal', () => resetForm(modalEl));
   });
 
+  // ✅ โหลดข้อมูลลงฟอร์ม edit
+  function openEditAddictive(id) {
+    fetch(`/addictive/json/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        const modalSel = `#editAddictiveModal${id}`;
+        document.querySelector(`${modalSel} input[name="date"]`).value = data.date;
+        document.querySelector(`${modalSel} input[name="count"]`).value = data.count;
+        document.querySelector(`${modalSel} textarea[name="record"]`).value = data.record ?? '';
+        document.querySelector(`${modalSel} input[name="recorder"]`).value = data.recorder ?? '';
+
+        if (data.exam == 1) {
+          document.querySelector(`#exam_yes_${id}`).checked = true;
+          document.querySelector(`#referField_${id}`).style.display = 'flex';
+        } else {
+          document.querySelector(`#exam_no_${id}`).checked = true;
+          document.querySelector(`#referField_${id}`).style.display = 'none';
+        }
+
+        if (data.refer == 1) {
+          document.querySelector(`#refer_treatment_${id}`).checked = true;
+        } else if (data.refer == 2) {
+          document.querySelector(`#refer_followup_${id}`).checked = true;
+        }
+
+        new bootstrap.Modal(document.getElementById(`editAddictiveModal${id}`)).show();
+      });
+  }
+  </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const createBtn = document.querySelector('button[data-bs-target="#createAddictiveModal"]');
+    const createModal = document.getElementById('createAddictiveModal');
+    const createForm = createModal?.querySelector('form');
+
+    function resetCreateForm(){
+        if(createForm){
+            createForm.reset();
+            // ตั้งค่า default วันที่เป็นวันนี้ ถ้ามี field date
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = createForm.querySelector('input[name="date"]');
+            if(dateInput) dateInput.value = today;
+
+            // เคลียร์ error feedback
+            createForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            createForm.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+        }
+        // ซ่อน referField ถ้ามี
+        const referFieldNew = document.getElementById('referField_new');
+        if(referFieldNew) referFieldNew.style.display = 'none';
+    }
+
+    // ✅ กดปุ่ม "เพิ่มข้อมูล" → reset ฟอร์ม
+    createBtn?.addEventListener('click', resetCreateForm);
+
+    // ✅ เมื่อ modal ถูกปิด → reset ฟอร์ม
+    createModal?.addEventListener('hidden.bs.modal', resetCreateForm);
+});
 </script>
 
-@endpush
 
-@endsection
+@endpush

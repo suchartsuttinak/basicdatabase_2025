@@ -52,30 +52,55 @@ class AbsentController extends Controller
 
     /** บันทึกข้อมูลการขาดเรียน */
     public function AbsentStore(Request $request)
-    {
-        $validated = $request->validate([
-            'client_id'           => 'required|integer|exists:clients,id',
-            'education_record_id' => 'nullable|integer',
-            'absent_date'         => 'required|date',
-            'cause'               => 'nullable|string|max:255',
-            'operation'           => 'nullable|string|max:255',
-            'remark'              => 'nullable|string|max:500',
-            'record_date'         => 'required|date',
-            'teacher'             => 'nullable|string|max:255'
-        ]);
+{
+    $validated = $request->validate([
+        'client_id'           => 'required|integer|exists:clients,id',
+        'education_record_id' => 'nullable|integer',
+        'absent_date'         => 'required|date',
+        'record_date'         => 'required|date',
+        'cause'               => 'required|string|max:255',
+        'operation'           => 'nullable|string|max:255',
+        'remark'              => 'nullable|string|max:500',
+        'teacher'             => 'required|string|max:255',
+    ], [
+        'client_id.required'       => 'กรุณาระบุรหัสเด็ก',
+        'client_id.integer'        => 'รหัสเด็กต้องเป็นตัวเลข',
+        'client_id.exists'         => 'ไม่พบข้อมูลเด็กในระบบ',
 
-        $validated['education_record_id'] = $validated['education_record_id'] ?: null;
+        'absent_date.required'     => 'กรุณาเลือกวันที่ขาดเรียน',
+        'absent_date.date'         => 'รูปแบบวันที่ขาดเรียนไม่ถูกต้อง',
 
-        Absent::create($validated);
+        'record_date.required'     => 'กรุณาเลือกวันที่บันทึกข้อมูล',
+        'record_date.date'         => 'รูปแบบวันที่บันทึกไม่ถูกต้อง',
 
-        return redirect()
-            ->route('absent.add', $request->client_id)
-            ->with([
-                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success'
-            ]);
-    }
+        'cause.required'           => 'กรุณาระบุสาเหตุที่ขาดเรียน',
+        'cause.string'             => 'สาเหตุที่ขาดเรียนต้องเป็นข้อความ',
+        'cause.max'                => 'สาเหตุที่ขาดเรียนต้องไม่เกิน 255 ตัวอักษร',
 
+        'operation.string'         => 'การดำเนินงานต้องเป็นข้อความ',
+        'operation.max'            => 'การดำเนินงานต้องไม่เกิน 255 ตัวอักษร',
+
+        'remark.string'            => 'หมายเหตุต้องเป็นข้อความ',
+        'remark.max'               => 'หมายเหตุต้องไม่เกิน 500 ตัวอักษร',
+
+        'teacher.required'         => 'กรุณากรอกชื่อผู้ดูแลเด็ก',
+        'teacher.string'           => 'ชื่อผู้ดูแลเด็กต้องเป็นข้อความ',
+        'teacher.max'              => 'ชื่อผู้ดูแลเด็กต้องไม่เกิน 255 ตัวอักษร',
+    ]);
+
+    // ✅ ตั้งค่า default วันที่ปัจจุบันอัตโนมัติ หากไม่ได้ส่งมา
+    $validated['absent_date'] = $validated['absent_date'] ?? now()->format('Y-m-d');
+    $validated['record_date'] = $validated['record_date'] ?? now()->format('Y-m-d');
+    $validated['education_record_id'] = $validated['education_record_id'] ?: null;
+
+    Absent::create($validated);
+
+    // ✅ ส่งกลับพร้อม flash message แต่ไม่ส่ง input กลับ
+    return back()->with([
+        'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+        'alert-type' => 'success'
+    ]);
+}
     /** แสดงรายงานการขาดเรียน */
     public function AbsentReport($absent_id)
     {
@@ -110,34 +135,51 @@ class AbsentController extends Controller
     }
 
     /** เปิดฟอร์มแก้ไขการขาดเรียน */
-    public function AbsentEdit($id)
-    {
-        $absent = Absent::findOrFail($id);
-        $client = Client::findOrFail($absent->client_id);
+   // ✅ คืนค่า JSON สำหรับ AJAX
+public function AbsentEdit($id)
+{
+    $absent = Absent::findOrFail($id);
 
-        $educationRecord = EducationRecord::with(['education','semester'])
-            ->where('client_id', $client->id)
-            ->join('semesters', 'education_records.semester_id', '=', 'semesters.id')
-            ->orderByRaw("
-                CAST(SUBSTRING_INDEX(semesters.semester_name, '/', -1) AS UNSIGNED) DESC,
-                CAST(SUBSTRING_INDEX(semesters.semester_name, '/', 1) AS UNSIGNED) DESC
-            ")
-            ->select('education_records.*')
-            ->first();
+    return response()->json([
+        'id'          => $absent->id,
+        'absent_date' => \Carbon\Carbon::parse($absent->absent_date)->format('Y-m-d'),
+        'record_date' => \Carbon\Carbon::parse($absent->record_date)->format('Y-m-d'),
+        'cause'       => $absent->cause,
+        'operation'   => $absent->operation,
+        'remark'      => $absent->remark,
+        'teacher'     => $absent->teacher,
+    ]);
+}
 
-        return view('frontend.client.absent.absent_create', [
-            'absent'          => $absent,
-            'client'          => $client,
-            'educationRecord' => $educationRecord,
-            'client_id'       => $client->id,
-            'school_name'     => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
-            'education_name'  => optional($educationRecord->education)->education_name ?? 'ไม่พบข้อมูล',
-            'term'            => optional($educationRecord->semester)->semester_name ?? 'ไม่พบข้อมูล',
-            'absents'         => Absent::where('client_id', $client->id)
-                                    ->orderByDesc('absent_date')
-                                    ->get(),
-        ]);
-    }
+// ✅ คืนค่า view สำหรับหน้าเต็ม (ถ้าคุณยังต้องใช้)
+public function AbsentEditView($id)
+{
+    $absent = Absent::findOrFail($id);
+    $client = Client::findOrFail($absent->client_id);
+
+    $educationRecord = EducationRecord::with(['education','semester'])
+        ->where('client_id', $client->id)
+        ->join('semesters', 'education_records.semester_id', '=', 'semesters.id')
+        ->orderByRaw("
+            CAST(SUBSTRING_INDEX(semesters.semester_name, '/', -1) AS UNSIGNED) DESC,
+            CAST(SUBSTRING_INDEX(semesters.semester_name, '/', 1) AS UNSIGNED) DESC
+        ")
+        ->select('education_records.*')
+        ->first();
+
+    return view('frontend.client.absent.absent_create', [
+        'absent'          => $absent,
+        'client'          => $client,
+        'educationRecord' => $educationRecord,
+        'client_id'       => $client->id,
+        'school_name'     => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
+        'education_name'  => optional($educationRecord->education)->education_name ?? 'ไม่พบข้อมูล',
+        'term'            => optional($educationRecord->semester)->semester_name ?? 'ไม่พบข้อมูล',
+        'absents'         => Absent::where('client_id', $client->id)
+                                ->orderByDesc('absent_date')
+                                ->get(),
+    ]);
+}
 
     /** อัปเดตข้อมูลการขาดเรียน */
     public function AbsentUpdate(Request $request, $id)

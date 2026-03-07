@@ -291,7 +291,7 @@ require __DIR__.'/auth.php';
     Route::prefix('school_followup')->group(function () {
     Route::get('/add/{client_id}', [SchoolFollowupController::class, 'SchoolFollowupAdd'])->name('school_followup_add');
     Route::post('/store', [SchoolFollowupController::class, 'SchoolFollowupStore'])->name('school_followup_store');
-    Route::get('/edit/{id}', [SchoolFollowupController::class, 'SchoolFollowupEdit'])->name('school_followup.edit');
+   Route::get('/edit/{id}', [SchoolFollowupController::class, 'SchoolFollowupEdit'])->name('school_followup.edit');
     Route::put('/update/{id}', [SchoolFollowupController::class, 'SchoolFollowupUpdate'])->name('school_followup.update');
     Route::delete('/delete/{id}', [SchoolFollowupController::class, 'SchoolFollowupDelete'])->name('school_followup.delete');
 
@@ -300,17 +300,15 @@ require __DIR__.'/auth.php';
         ->whereNumber('followup_id')
         ->name('school_followup.report');
 });
-
-/// 🏫 บันทึกการขาดเรียนของเด็ก
     Route::prefix('absent')->name('absent.')->group(function () {
     Route::get('/add/{client_id}', [AbsentController::class, 'AbsentAdd'])->name('add');
     Route::post('/store', [AbsentController::class, 'AbsentStore'])->name('store');
-   Route::get('/edit/{id}', [AbsentController::class, 'AbsentEdit'])->name('edit');
+    Route::get('/edit/{id}', [AbsentController::class, 'AbsentEdit'])->name('edit'); // ✅ JSON สำหรับ AJAX
+    Route::get('/edit-view/{id}', [AbsentController::class, 'AbsentEditView'])->name('edit.view'); // ✅ View
     Route::put('/update/{id}', [AbsentController::class, 'AbsentUpdate'])->name('update');
     Route::delete('/delete/{id}', [AbsentController::class, 'AbsentDelete'])->name('delete');
     Route::get('/report/{id}', [AbsentController::class, 'AbsentReport'])->name('report');
 });
-
 // 🏫 บันทึกการบาดเจ็บของเด็ก
     Route::prefix('accident')->name('accident.')->group(function () {
     // แสดงฟอร์มเพิ่มข้อมูล (client_id จำเป็น)
@@ -407,14 +405,15 @@ require __DIR__.'/auth.php';
     Route::delete('/delete/{id}', [PsychiatricController::class, 'DeletePsychiatric'])->name('psychiatric.delete');
 });
 
-// บันทึกการตรวจสารเสพติด Addictive
-    Route::prefix('addictive')->group(function(){
+Route::prefix('addictive')->group(function(){
     Route::get('/add/{client_id}', [AddictiveController::class, 'AddAddictive'])->name('addictive.create');
     Route::post('/store', [AddictiveController::class, 'StoreAddictive'])->name('addictive.store');
     Route::get('/edit/{id}', [AddictiveController::class, 'EditAddictive'])->name('addictive.edit');
     Route::put('/update/{id}', [AddictiveController::class, 'UpdateAddictive'])->name('addictive.update');
     Route::delete('/delete/{id}', [AddictiveController::class, 'DeleteAddictive'])->name('addictive.delete');
-   
+
+    // ✅ JSON สำหรับโหลดข้อมูลไปใส่ใน modal edit
+    Route::get('/json/{id}', [AddictiveController::class, 'EditAddictiveJson'])->name('addictive.json');
 });
 
 // Routes สำหรับพฤติกรรม (Observe)

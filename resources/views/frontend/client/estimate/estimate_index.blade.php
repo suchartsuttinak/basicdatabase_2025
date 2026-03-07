@@ -214,8 +214,8 @@
     });
     </script>
     @endif
-
-        <!-- ✅ Modal Edit Estimate -->
+    
+<!-- ✅ Modal Edit Estimate -->
 <div class="modal fade" id="edit-estimate-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -223,29 +223,37 @@
         @csrf
         @method('PUT')
 
-        <div class="modal-header">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title">แก้ไขข้อมูลการติดตาม</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
           <div class="mb-3 col-4">
             <label class="form-label">วันที่ติดตาม</label>
-            <input type="date" name="date" id="edit_date" class="form-control">
+            <input type="date" name="date" id="edit_date"
+                   class="form-control @error('date') is-invalid @enderror"
+                   value="{{ old('date') }}">
+            @error('date')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="mb-3">
             <label class="form-label">การดำเนินงาน</label><br>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง">
+              <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง"
+                     {{ old('follo_no') == 'หน่วยงานไปเอง' ? 'checked' : '' }}>
               <label class="form-check-label">หน่วยงานไปเอง</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์">
+              <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์"
+                     {{ old('follo_no') == 'โทรศัพท์' ? 'checked' : '' }}>
               <label class="form-check-label">โทรศัพท์</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย">
+              <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย"
+                     {{ old('follo_no') == 'จดหมาย' ? 'checked' : '' }}>
               <label class="form-check-label">จดหมาย</label>
             </div>
             @error('follo_no')
@@ -255,22 +263,40 @@
 
           <div class="mb-3">
             <label class="form-label">ผลการติดตาม</label>
-            <textarea name="results" id="edit_results" class="form-control"></textarea>
+            <textarea name="results" id="edit_results"
+                      class="form-control @error('results') is-invalid @enderror">{{ old('results') }}</textarea>
+            @error('results')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="mb-3">
             <label class="form-label">ผู้ติดตาม</label>
-            <input type="text" name="teacher" id="edit_teacher" class="form-control">
+            <input type="text" name="teacher" id="edit_teacher"
+                   class="form-control @error('teacher') is-invalid @enderror"
+                   value="{{ old('teacher') }}">
+            @error('teacher')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="mb-3">
             <label class="form-label">หมายเหตุ</label>
-            <textarea name="remark" id="edit_remark" class="form-control"></textarea>
+            <textarea name="remark" id="edit_remark"
+                      class="form-control @error('remark') is-invalid @enderror">{{ old('remark') }}</textarea>
+            @error('remark')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div class="mb-3">
             <label class="form-label">เลือกรูปภาพใหม่</label>
-            <input type="file" name="pictures[]" multiple class="form-control" id="pictures-input-edit">
+            <input type="file" name="pictures[]" multiple
+                   class="form-control @error('pictures') is-invalid @enderror"
+                   id="pictures-input-edit">
+            @error('pictures')
+              <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
           </div>
 
           <div id="preview-area-edit" class="d-flex flex-wrap gap-2 mt-2"></div>
@@ -278,7 +304,6 @@
 
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">อัปเดต</button>
-          <!-- ✅ ปุ่มยกเลิก -->
           <button type="button" class="btn btn-secondary btn-cancel" data-bs-dismiss="modal">ยกเลิก</button>
         </div>
       </form>

@@ -45,17 +45,30 @@ class SchoolFollowupController extends Controller
 
 public function SchoolFollowupStore(Request $request)
 {
-    $validated = $request->validate([
-        'client_id'           => 'required|integer|exists:clients,id',
-        'education_record_id' => 'nullable|integer',
-        'follow_date'         => 'required|date',
-        'teacher_name'        => 'nullable|string|max:255',
-        'tel'                 => 'nullable|string|max:20',
-        'follow_type'         => 'required|string|in:self,phone,other',
-        'result'              => 'nullable|string',
-        'remark'              => 'nullable|string',
-        'contact_name'        => 'nullable|string|max:255',
-    ]);
+   $validated = $request->validate([
+    'client_id'           => 'required|integer|exists:clients,id',
+    'education_record_id' => 'nullable|integer',
+    'follow_date'         => 'required|date',
+    'teacher_name'        => 'nullable|string|max:255',
+    'tel'                 => 'nullable|string|max:20',
+    'follow_type'         => 'required|string|in:self,phone,other',
+    'result'              => 'nullable|string',
+    'remark'              => 'nullable|string',
+    'contact_name'        => 'required|string|max:255',
+], [
+    'client_id.required'    => 'กรุณาเลือกเด็กนักเรียน',
+    'client_id.integer'     => 'รหัสนักเรียนต้องเป็นตัวเลข',
+    'client_id.exists'      => 'ไม่พบข้อมูลนักเรียนที่เลือก',
+    'follow_date.required'  => 'กรุณาระบุวันที่ติดตาม',
+    'follow_date.date'      => 'วันที่ติดตามไม่ถูกต้อง',
+    'follow_type.required'  => 'กรุณาเลือกวิธีการติดตาม',
+    'follow_type.in'        => 'วิธีการติดตามไม่ถูกต้อง',
+    'teacher_name.max'      => 'ชื่อครูต้องไม่เกิน 255 ตัวอักษร',
+    'tel.max'               => 'เบอร์โทรศัพท์ต้องไม่เกิน 20 ตัวอักษร',
+    'contact_name.max'      => 'ชื่อผู้ติดตามต้องไม่เกิน 255 ตัวอักษร',
+    'contact_name.required' => 'กรุณาระบุชื่อผู้ติดตาม',
+]);
+
 
     SchoolFollowup::create($validated);
 
@@ -63,40 +76,24 @@ public function SchoolFollowupStore(Request $request)
         ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 }
 
-
-
     /**
      * เปิดฟอร์มแก้ไขการติดตาม
      */
-    public function SchoolFollowupEdit($id)
-    {
-        $followup = SchoolFollowup::findOrFail($id);
-        $client   = Client::findOrFail($followup->client_id);
+ public function SchoolFollowupEdit($id)
+{
+    $followup = SchoolFollowup::findOrFail($id);
 
-        $educationRecord = EducationRecord::with(['education','semester'])
-            ->where('client_id', $client->id)
-            ->join('semesters', 'education_records.semester_id', '=', 'semesters.id')
-            ->orderByRaw("
-                CAST(SUBSTRING_INDEX(semesters.semester_name, '/', -1) AS UNSIGNED) DESC,
-                CAST(SUBSTRING_INDEX(semesters.semester_name, '/', 1) AS UNSIGNED) DESC
-            ")
-            ->select('education_records.*')
-            ->first();
-
-        return view('frontend.client.school_followup.school_followup_create', [
-            'followup'        => $followup,
-            'client'          => $client,
-            'educationRecord' => $educationRecord,
-            'client_id'       => $client->id,
-            'school_name'     => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
-            'education_name'  => optional($educationRecord->education)->education_name ?? 'ไม่พบข้อมูล',
-            'term'            => optional($educationRecord->semester)->semester_name ?? 'ไม่พบข้อมูล',
-            'followups'       => SchoolFollowup::where('client_id', $client->id)
-                                    ->orderByDesc('follow_date')
-                                    ->get(),
-        ]);
-    }
-
+    return response()->json([
+        'id'           => $followup->id,
+        'follow_date'  => \Carbon\Carbon::parse($followup->follow_date)->format('Y-m-d'),
+        'teacher_name' => $followup->teacher_name,
+        'tel'          => $followup->tel,
+        'follow_type'  => $followup->follow_type,
+        'result'       => $followup->result,
+        'remark'       => $followup->remark,
+        'contact_name' => $followup->contact_name,
+    ]);
+}
     /**
      * อัปเดตข้อมูลการติดตาม
      */
@@ -140,7 +137,6 @@ public function SchoolFollowupStore(Request $request)
                 'alert-type' => 'success'
             ]);
     }
-
     /**
      * รายงานการติดตาม
      */
