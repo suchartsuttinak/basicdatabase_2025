@@ -48,66 +48,62 @@
               <th style="width:18%">จัดการ</th>
             </tr>
           </thead>
-          <tbody>
-            @foreach ($addictives as $index => $addictive)
-              <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ \Carbon\Carbon::parse($addictive->date)->format('d/m/Y') }}</td>
-                <td class="text-center">{{ $addictive->count }}</td>
-                <td>
-                  @if($addictive->exam == 0)
-                    <span class="badge bg-success">ไม่พบสารเสพติด</span>
-                  @else
-                    <span class="badge bg-danger">พบสารเสพติด</span>
-                  @endif
-                </td>
-                <td>
-                  @if($addictive->exam == 1)
-                    @if($addictive->refer == 1)
-                      <span class="badge bg-warning text-dark">ส่งต่อบำบัด</span>
-                    @elseif($addictive->refer == 2)
-                      <span class="badge bg-info">ติดตามดูแลต่อเนื่อง</span>
-                    @else
-                      <span class="badge bg-secondary">-</span>
-                    @endif
-                  @else
-                    <span class="badge bg-secondary">-</span>
-                  @endif
-                </td>
-                <td>{{ $addictive->record ?? '-' }}</td>
-                <td>{{ $addictive->recorder ?? '-' }}</td>
-                <td class="text-center">
-                  <div class="d-flex flex-wrap justify-content-center gap-1">
-               
-                  <!-- ปุ่มแก้ไข -->
-                  <button type="button" class="btn btn-sm btn-warning"
-                          onclick="openEditAddictive({{ $addictive->id }})">
-                      <i class="bi bi-pencil-square"></i> แก้ไข
-                  </button>         
-                  <form id="delete-form-addictive-{{ $addictive->id }}" 
-                        action="{{ route('addictive.delete', $addictive->id) }}" 
-                        method="POST" class="d-inline">
-                      @csrf 
-                      @method('DELETE')
-                      <button type="button" class="btn btn-sm btn-danger"
-                              onclick="confirmDelete('delete-form-addictive-{{ $addictive->id }}', 'คุณต้องการลบข้อมูลการเสพติดนี้ใช่หรือไม่')">
-                          <i class="bi bi-trash"></i> ลบ
-                      </button>
-                  </form>
-                    <a href="#" class="btn btn-sm btn-info">
-                      <i class="bi bi-file-earmark-text"></i> รายงาน
-                    </a>
-                  </div>
-                  <form id="delete-form-addictive-{{ $addictive->id }}"
-                        action="{{ route('addictive.delete', $addictive->id) }}"
-                        method="POST" style="display:none;">
-                    @csrf
-                    @method('DELETE')
-                  </form>
-                </td>
-              </tr>
-            @endforeach
-          </tbody>
+         <tbody>
+  @foreach ($addictives as $index => $addictive)
+    <tr id="row-addictive-{{ $addictive->id }}">
+      <td class="text-center">{{ $index + 1 }}</td>
+      <td class="col-date">{{ \Carbon\Carbon::parse($addictive->date)->format('d/m/Y') }}</td>
+      <td class="text-center col-count">{{ $addictive->count }}</td>
+      <td class="col-exam">
+        @if($addictive->exam == 0)
+          <span class="badge bg-success">ไม่พบสารเสพติด</span>
+        @else
+          <span class="badge bg-danger">พบสารเสพติด</span>
+        @endif
+      </td>
+      <td class="col-refer">
+        @if($addictive->exam == 1)
+          @if($addictive->refer == 1)
+            <span class="badge bg-warning text-dark">ส่งต่อบำบัด</span>
+          @elseif($addictive->refer == 2)
+            <span class="badge bg-info">ติดตามดูแลต่อเนื่อง</span>
+          @else
+            <span class="badge bg-secondary">-</span>
+          @endif
+        @else
+          <span class="badge bg-secondary">-</span>
+        @endif
+      </td>
+      <td class="col-record">{{ $addictive->record ?? '-' }}</td>
+      <td class="col-recorder">{{ $addictive->recorder ?? '-' }}</td>
+      <td class="text-center">
+        <div class="d-flex flex-wrap justify-content-center gap-1">
+          <!-- ปุ่มแก้ไข -->
+          <button type="button" class="btn btn-sm btn-warning"
+                  onclick="openEditAddictive({{ $addictive->id }})">
+              <i class="bi bi-pencil-square"></i> แก้ไข
+          </button>
+
+          <!-- ปุ่มลบ -->
+          <form id="delete-form-addictive-{{ $addictive->id }}"
+                action="{{ route('addictive.delete', $addictive->id) }}"
+                method="POST" class="d-inline">
+            @csrf
+            @method('DELETE')
+            <button type="button" class="btn btn-sm btn-danger"
+                    onclick="confirmDelete('delete-form-addictive-{{ $addictive->id }}', 'คุณต้องการลบข้อมูลการเสพติดนี้ใช่หรือไม่')">
+                <i class="bi bi-trash"></i> ลบ
+            </button>
+          </form>
+
+          <a href="#" class="btn btn-sm btn-info">
+            <i class="bi bi-file-earmark-text"></i> รายงาน
+          </a>
+        </div>
+      </td>
+    </tr>
+  @endforeach
+</tbody>
         </table>
       </div>
     @else
@@ -328,123 +324,168 @@
  
 @push('scripts')
 <script>
-  // ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
-  function resetForm(modalEl) {
-    const form = modalEl.querySelector('form');
-    if (form) {
-      form.reset();
-      form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-      form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-    }
-    // ซ่อน referField ถ้ามี
-    const referField = modalEl.querySelector('[id^="referField_"]');
-    if (referField) referField.style.display = 'none';
+// ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
+function resetForm(modalEl) {
+  const form = modalEl.querySelector('form');
+  if (form) {
+    form.reset();
+    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
   }
+  const referField = modalEl.querySelector('[id^="referField_"]');
+  if (referField) referField.style.display = 'none';
+}
 
-  // ✅ Toggle referField สำหรับ modal create
-  const examNoNew = document.getElementById('exam_no_new');
-  const examYesNew = document.getElementById('exam_yes_new');
-  const referFieldNew = document.getElementById('referField_new');
+// ✅ Toggle referField ตามค่า exam
+function toggleRefer(examYesEl, referFieldEl) {
+  if (!referFieldEl) return;
+  referFieldEl.style.display = (examYesEl && examYesEl.checked) ? 'flex' : 'none';
+}
 
-  function toggleReferNew() {
-    if (!referFieldNew) return;
-    referFieldNew.style.display = (examYesNew && examYesNew.checked) ? 'flex' : 'none';
-  }
-  if (examNoNew && examYesNew) {
-    toggleReferNew();
-    examNoNew.addEventListener('change', toggleReferNew);
-    examYesNew.addEventListener('change', toggleReferNew);
-  }
+// ✅ สำหรับ modal create
+const examNoNew = document.getElementById('exam_no_new');
+const examYesNew = document.getElementById('exam_yes_new');
+const referFieldNew = document.getElementById('referField_new');
+if (examNoNew && examYesNew) {
+  toggleRefer(examYesNew, referFieldNew);
+  examNoNew.addEventListener('change', () => toggleRefer(examYesNew, referFieldNew));
+  examYesNew.addEventListener('change', () => toggleRefer(examYesNew, referFieldNew));
+}
 
-  // ✅ Reset ฟอร์มเมื่อเปิด/ปิด modal create
-  const createModal = document.getElementById('addictiveModal');
-  if (createModal) {
-    createModal.addEventListener('shown.bs.modal', () => resetForm(createModal));
-    createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
-  }
+const createModal = document.getElementById('createAddictiveModal');
+if (createModal) {
+  createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
+}
 
-  // ✅ Toggle referField สำหรับ modal edit
-  document.querySelectorAll('.modal[id^="editAddictiveModal"]').forEach(function(modalEl) {
-    modalEl.addEventListener('shown.bs.modal', function () {
-      const id = modalEl.getAttribute('data-addictive-id');
-      const referField = document.getElementById('referField_' + id);
-      const examNo = document.getElementById('exam_no_' + id);
-      const examYes = document.getElementById('exam_yes_' + id);
+// ✅ สำหรับ modal edit
+document.querySelectorAll('.modal[id^="editAddictiveModal"]').forEach(function(modalEl) {
+  modalEl.addEventListener('shown.bs.modal', function () {
+    const id = modalEl.getAttribute('data-addictive-id');
+    const referField = document.getElementById('referField_' + id);
+    const examNo = document.getElementById('exam_no_' + id);
+    const examYes = document.getElementById('exam_yes_' + id);
 
-      function toggleRefer() {
-        if (!referField) return;
-        referField.style.display = (examYes && examYes.checked) ? 'flex' : 'none';
-      }
+    // ตรวจสอบค่าเริ่มต้น
+    toggleRefer(examYes, referField);
 
-      toggleRefer();
-      if (examNo) examNo.addEventListener('change', toggleRefer);
-      if (examYes) examYes.addEventListener('change', toggleRefer);
-    });
-
-    // ✅ Reset ฟอร์มเมื่อปิด modal edit
-    modalEl.addEventListener('hidden.bs.modal', () => resetForm(modalEl));
+    // ผูก event ให้ radio
+    if (examNo) examNo.addEventListener('change', () => toggleRefer(examYes, referField));
+    if (examYes) examYes.addEventListener('change', () => toggleRefer(examYes, referField));
   });
 
-  // ✅ โหลดข้อมูลลงฟอร์ม edit
-  function openEditAddictive(id) {
-    fetch(`/addictive/json/${id}`)
-      .then(response => response.json())
+  modalEl.addEventListener('hidden.bs.modal', () => resetForm(modalEl));
+
+  // ✅ Intercept submit → ใช้ fetch + SweetAlert
+  const form = modalEl.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: form.method,
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(res => res.json())
       .then(data => {
-        const modalSel = `#editAddictiveModal${id}`;
-        document.querySelector(`${modalSel} input[name="date"]`).value = data.date;
-        document.querySelector(`${modalSel} input[name="count"]`).value = data.count;
-        document.querySelector(`${modalSel} textarea[name="record"]`).value = data.record ?? '';
-        document.querySelector(`${modalSel} input[name="recorder"]`).value = data.recorder ?? '';
+        if (data.success) {
+          bootstrap.Modal.getInstance(modalEl).hide();
+          resetForm(modalEl);
 
-        if (data.exam == 1) {
-          document.querySelector(`#exam_yes_${id}`).checked = true;
-          document.querySelector(`#referField_${id}`).style.display = 'flex';
+          // ✅ อัปเดตตารางทันที
+          const row = document.querySelector(`#row-addictive-${data.data.id}`);
+          if (row) {
+            row.querySelector('.col-date').innerText = data.data.date;
+            row.querySelector('.col-count').innerText = data.data.count;
+            row.querySelector('.col-recorder').innerText = data.data.recorder;
+            row.querySelector('.col-record').innerText = data.data.record ?? '';
+            row.querySelector('.col-exam').innerHTML =
+              data.data.exam == 0
+                ? '<span class="badge bg-success">ไม่พบสารเสพติด</span>'
+                : '<span class="badge bg-danger">พบสารเสพติด</span>';
+            row.querySelector('.col-refer').innerHTML =
+              data.data.exam == 1
+                ? (data.data.refer == 1
+                    ? '<span class="badge bg-warning text-dark">ส่งต่อบำบัด</span>'
+                    : data.data.refer == 2
+                      ? '<span class="badge bg-info">ติดตามดูแลต่อเนื่อง</span>'
+                      : '<span class="badge bg-secondary">-</span>')
+                : '<span class="badge bg-secondary">-</span>';
+          }
+
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: data.message,
+            showConfirmButton: false,
+            timer: 2000
+          });
         } else {
-          document.querySelector(`#exam_no_${id}`).checked = true;
-          document.querySelector(`#referField_${id}`).style.display = 'none';
-        }
+          Object.keys(data.errors).forEach(field => {
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input) {
+              input.classList.add('is-invalid');
+              let feedback = input.nextElementSibling;
+              if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.innerText = data.errors[field][0];
+                feedback.style.display = 'block';
+              }
+            }
+          });
 
-        if (data.refer == 1) {
-          document.querySelector(`#refer_treatment_${id}`).checked = true;
-        } else if (data.refer == 2) {
-          document.querySelector(`#refer_followup_${id}`).checked = true;
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'กรุณาตรวจสอบข้อมูลที่กรอก',
+          });
         }
-
-        new bootstrap.Modal(document.getElementById(`editAddictiveModal${id}`)).show();
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'ผิดพลาด',
+          text: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้',
+        });
       });
+    });
   }
-  </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const createBtn = document.querySelector('button[data-bs-target="#createAddictiveModal"]');
-    const createModal = document.getElementById('createAddictiveModal');
-    const createForm = createModal?.querySelector('form');
-
-    function resetCreateForm(){
-        if(createForm){
-            createForm.reset();
-            // ตั้งค่า default วันที่เป็นวันนี้ ถ้ามี field date
-            const today = new Date().toISOString().split('T')[0];
-            const dateInput = createForm.querySelector('input[name="date"]');
-            if(dateInput) dateInput.value = today;
-
-            // เคลียร์ error feedback
-            createForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            createForm.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
-        }
-        // ซ่อน referField ถ้ามี
-        const referFieldNew = document.getElementById('referField_new');
-        if(referFieldNew) referFieldNew.style.display = 'none';
-    }
-
-    // ✅ กดปุ่ม "เพิ่มข้อมูล" → reset ฟอร์ม
-    createBtn?.addEventListener('click', resetCreateForm);
-
-    // ✅ เมื่อ modal ถูกปิด → reset ฟอร์ม
-    createModal?.addEventListener('hidden.bs.modal', resetCreateForm);
 });
+
+// ✅ โหลดข้อมูลลงฟอร์ม edit
+function openEditAddictive(id) {
+  fetch(`/addictive/json/${id}`)
+    .then(response => response.json())
+    .then(data => {
+      const modalSel = `#editAddictiveModal${id}`;
+      document.querySelector(`${modalSel} input[name="date"]`).value = data.date;
+      document.querySelector(`${modalSel} input[name="count"]`).value = data.count;
+      document.querySelector(`${modalSel} textarea[name="record"]`).value = data.record ?? '';
+      document.querySelector(`${modalSel} input[name="recorder"]`).value = data.recorder ?? '';
+
+      const examYes = document.querySelector(`#exam_yes_${id}`);
+      const examNo = document.querySelector(`#exam_no_${id}`);
+      const referField = document.querySelector(`#referField_${id}`);
+
+      if (data.exam == 1) {
+        examYes.checked = true;
+        referField.style.display = 'flex';
+      } else {
+        examNo.checked = true;
+        referField.style.display = 'none';
+      }
+
+      if (data.refer == 1) {
+        document.querySelector(`#refer_treatment_${id}`).checked = true;
+      } else if (data.refer == 2) {
+        document.querySelector(`#refer_followup_${id}`).checked = true;
+      }
+
+      new bootstrap.Modal(document.getElementById(`editAddictiveModal${id}`)).show();
+    })
+    .catch(err => console.error('โหลดข้อมูลไม่สำเร็จ', err));
+}
 </script>
-
-
 @endpush

@@ -9,11 +9,14 @@
     <h6 class="mb-0 fw-bold">
       <i class="bi bi-clipboard-check me-1"></i> ข้อมูลการตรวจวินิจฉัยทางจิตวิทยา
     </h6>
-    <button type="button" class="btn btn-sm btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#createPsychiatricModal">
-      <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูล
-    </button>
+   <button type="button" 
+        class="btn btn-sm btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#createPsychiatricModal"
+        id="btn-create-psychiatric">
+    <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูล
+</button>
+
   </div>
    {{-- ข้อมูล client --}}
             <div class="card mb-0 shadow-sm">
@@ -33,8 +36,6 @@
                 </div>
                 </div>
             </div>
-
-       
 
 <!-- ตารางจิตเวช -->
 @if($psychiatrics->isNotEmpty())
@@ -78,11 +79,12 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1">
-                                        <button type="button" class="btn btn-sm btn-warning"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editPsychiatricModal{{ $psychiatric->id }}">
-                                            <i class="bi bi-pencil-square"></i> แก้ไข
-                                        </button>
+                                     <button type="button" 
+                                            class="btn btn-sm btn-warning"
+                                            onclick="openEditPsychiatric({{ $psychiatric->id }})">
+                                        <i class="bi bi-pencil-square"></i> แก้ไข
+                                    </button>
+
                                         <button type="button" class="btn btn-sm btn-danger"
                                                 onclick="confirmDelete('delete-form-psychiatric-{{ $psychiatric->id }}', 'คุณต้องการลบข้อมูลจิตเวชนี้ใช่หรือไม่')">
                                             <i class="bi bi-trash"></i> ลบ
@@ -113,32 +115,183 @@
 @endif
  </div>
 
-
 <!-- Modal เพิ่มข้อมูลการตรวจวินิจฉัยทางจิตเวช -->
-<div class="modal fade" id="createPsychiatricModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="createPsychiatricModal" tabindex="-1" aria-labelledby="createPsychiatricLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">เพิ่มข้อมูลการตรวจวินิจฉัยทางจิตเวช</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+      <!-- Header -->
+      <div class="modal-header bg-primary text-white py-2">
+        <h5 class="modal-title fw-bold" id="createPsychiatricLabel">
+          <i class="bi bi-clipboard-heart me-2"></i> เพิ่มข้อมูลการตรวจวินิจฉัยทางจิตเวช
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <form action="{{ route('psychiatric.store') }}" method="POST">
-          @csrf
+
+      <!-- Form -->
+      <form id="psychiatric-form" action="{{ route('psychiatric.store') }}" method="POST" novalidate>
+        @csrf
+        <div class="modal-body">
           <input type="hidden" name="client_id" value="{{ $client->id }}">
 
-          <div class="row mb-2">
-            <div class="col-12 col-md-3">
+          <!-- วันที่ส่งตรวจ / สถานพยาบาล / ผลการตรวจ -->
+          <div class="row mb-3">
+            <div class="col-md-3">
               <label class="form-label fw-bold">วันที่ส่งตรวจ</label>
-              <input type="date" name="sent_date" class="form-control form-control-sm" required>
+              <input type="date" name="sent_date"
+                     class="form-control form-control-sm @error('sent_date') is-invalid @enderror"
+                     value="{{ old('sent_date') }}" required>
+              @error('sent_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-4">
+
+            <div class="col-md-4">
               <label class="form-label fw-bold">สถานพยาบาล</label>
-              <input type="text" name="hotpital" class="form-control form-control-sm">
+              <input type="text" name="hotpital"
+                     class="form-control form-control-sm @error('hotpital') is-invalid @enderror"
+                     value="{{ old('hotpital') }}">
+              @error('hotpital') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-5">
+
+            <div class="col-md-5">
               <label class="form-label fw-bold">ผลการตรวจวินิจฉัย</label>
-              <select name="psycho_id" class="form-select form-select-sm" required>
+              <select name="psycho_id"
+                      class="form-select form-select-sm @error('psycho_id') is-invalid @enderror" required>
+                <option value="">-- เลือกผลการตรวจ --</option>
+                @foreach($psycho as $p)
+                  <option value="{{ $p->id }}" {{ old('psycho_id') == $p->id ? 'selected' : '' }}>
+                    {{ $p->psycho_name }}
+                  </option>
+                @endforeach
+              </select>
+              @error('psycho_id') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            </div>
+          </div>
+
+          <!-- สรุปผล -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">สรุปผลการตรวจ/การวินิจฉัย</label>
+            <textarea name="diagnose"
+                      class="form-control form-control-sm @error('diagnose') is-invalid @enderror"
+                      rows="3">{{ old('diagnose') }}</textarea>
+            @error('diagnose') <div class="invalid-feedback">{{ $message }}</div> @enderror
+          </div>
+
+          <!-- นัดครั้งต่อไป / การรักษา / ชื่อยา -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label class="form-label fw-bold">นัดครั้งต่อไป</label>
+              <input type="date" name="appoin_date"
+                     class="form-control form-control-sm @error('appoin_date') is-invalid @enderror"
+                     value="{{ old('appoin_date') }}">
+              @error('appoin_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold">การรักษา</label>
+              <div class="d-flex align-items-center gap-3 mt-1">
+                <div class="form-check">
+                  <input class="form-check-input @error('drug_no') is-invalid @enderror" type="radio" name="drug_no" value="yes"
+                         {{ old('drug_no') == 'yes' ? 'checked' : '' }} id="drug_yes_new">
+                  <label class="form-check-label" for="drug_yes_new">รับยา</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input @error('drug_no') is-invalid @enderror" type="radio" name="drug_no" value="no"
+                         {{ old('drug_no','no') == 'no' ? 'checked' : '' }} id="drug_no_new">
+                  <label class="form-check-label" for="drug_no_new">ไม่รับยา</label>
+                </div>
+              </div>
+              @error('drug_no') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-5" id="drug_name_field_new" style="display: {{ old('drug_no') == 'yes' ? 'block' : 'none' }};">
+              <label class="form-label fw-bold">ชื่อยา</label>
+              <input type="text" name="drug_name"
+                     class="form-control form-control-sm @error('drug_name') is-invalid @enderror"
+                     value="{{ old('drug_name') }}">
+              @error('drug_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+          </div>
+
+          <!-- การขึ้นทะเบียนคนพิการ -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">การขึ้นทะเบียนคนพิการ</label>
+              <div class="d-flex align-items-center gap-3 mt-1">
+                <div class="form-check">
+                  <input class="form-check-input @error('disa_no') is-invalid @enderror" type="radio" name="disa_no" value="yes"
+                         {{ old('disa_no') == 'yes' ? 'checked' : '' }}>
+                  <label class="form-check-label">ขึ้นทะเบียน</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input @error('disa_no') is-invalid @enderror" type="radio" name="disa_no" value="no"
+                         {{ old('disa_no','no') == 'no' ? 'checked' : '' }}>
+                  <label class="form-check-label">ไม่ขึ้นทะเบียน</label>
+                </div>
+              </div>
+              @error('disa_no') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save me-1"></i> บันทึกผล
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btn-cancel-psychiatric">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
+@if ($errors->any())
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var myModal = new bootstrap.Modal(document.getElementById('createPsychiatricModal'));
+    myModal.show();
+});
+</script>
+@endif
+
+@foreach ($psychiatrics as $psychiatric)
+<!-- Modal แก้ไขข้อมูลการตรวจวินิจฉัยทางจิตเวช -->
+<div class="modal fade" id="editPsychiatricModal" tabindex="-1" aria-labelledby="editPsychiatricLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header bg-warning text-dark py-2">
+        <h5 class="modal-title fw-bold" id="editPsychiatricLabel">
+          <i class="bi bi-pencil-square me-2"></i> แก้ไขข้อมูลการตรวจวินิจฉัยทางจิตเวช
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Form -->
+      <form id="psychiatric-edit-form" method="POST">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+          <input type="hidden" name="client_id" value="{{ $client->id }}">
+          <input type="hidden" id="edit_id">
+
+          <!-- วันที่ส่งตรวจ / สถานพยาบาล / ผลการตรวจ -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label class="form-label fw-bold">วันที่ส่งตรวจ</label>
+              <input type="date" name="sent_date" id="edit_sent_date" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">สถานพยาบาล</label>
+              <input type="text" name="hotpital" id="edit_hotpital" class="form-control form-control-sm">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label fw-bold">ผลการตรวจวินิจฉัย</label>
+              <select name="psycho_id" id="edit_psycho_id" class="form-select form-select-sm" required>
                 <option value="">-- เลือกผลการตรวจ --</option>
                 @foreach($psycho as $p)
                   <option value="{{ $p->id }}">{{ $p->psycho_name }}</option>
@@ -147,159 +300,65 @@
             </div>
           </div>
 
-          <div class="mb-2">
+          <!-- สรุปผล -->
+          <div class="mb-3">
             <label class="form-label fw-bold">สรุปผลการตรวจ/การวินิจฉัย</label>
-            <textarea name="diagnose" class="form-control form-control-sm" rows="2"></textarea>
+            <textarea name="diagnose" id="edit_diagnose" class="form-control form-control-sm" rows="3"></textarea>
           </div>
 
-          <div class="row mb-2">
-            <div class="col-12 col-md-3">
+          <!-- นัดครั้งต่อไป / การรักษา / ชื่อยา -->
+          <div class="row mb-3">
+            <div class="col-md-3">
               <label class="form-label fw-bold">นัดครั้งต่อไป</label>
-              <input type="date" name="appoin_date" class="form-control form-control-sm">
+              <input type="date" name="appoin_date" id="edit_appoin_date" class="form-control form-control-sm">
             </div>
-            <div class="col-12 col-md-3 ms-md-3">
-              <label class="form-label fw-bold">การรักษา</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="drug_no" value="yes" id="drug_yes_new">
-                <label class="form-check-label" for="drug_yes_new">รับยา</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="drug_no" value="no" id="drug_no_new" checked>
-                <label class="form-check-label" for="drug_no_new">ไม่รับยา</label>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">การรักษา</label>
+              <div class="d-flex align-items-center gap-3 mt-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="drug_no" value="yes" id="edit_drug_yes">
+                  <label class="form-check-label" for="edit_drug_yes">รับยา</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="drug_no" value="no" id="edit_drug_no">
+                  <label class="form-check-label" for="edit_drug_no">ไม่รับยา</label>
+                </div>
               </div>
             </div>
-            <div class="col-12 col-md-5" id="drug_name_field_new" style="display:none;">
+            <div class="col-md-5" id="edit_drug_name_field" style="display:none;">
               <label class="form-label fw-bold">ชื่อยา</label>
-              <input type="text" name="drug_name" class="form-control form-control-sm">
+              <input type="text" name="drug_name" id="edit_drug_name" class="form-control form-control-sm">
             </div>
           </div>
 
-          <div class="row mb-2">
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-bold">การขึ้นทะเบียนคนพิการ</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="disa_no" value="yes">
-                <label class="form-check-label">ขึ้นทะเบียน</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="disa_no" value="no" checked>
-                <label class="form-check-label">ไม่ขึ้นทะเบียน</label>
-              </div>
-            </div>
-          </div>
-
-          <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-success btn-sm">
-              <i class="bi bi-save me-1"></i> บันทึกผล
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-1"></i> ปิด
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-@foreach ($psychiatrics as $psychiatric)
-<div class="modal fade" id="editPsychiatricModal{{ $psychiatric->id }}" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">แก้ไขข้อมูลการตรวจวินิจฉัยทางจิตเวช</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form action="{{ route('psychiatric.update', $psychiatric->id) }}" method="POST">
-          @csrf
-          @method('PUT')
-          <input type="hidden" name="client_id" value="{{ $client->id }}">
-
-          <div class="row mb-2">
-            <div class="col-12 col-md-3">
-              <label class="form-label fw-bold">วันที่ส่งตรวจ</label>
-              <input type="date" name="sent_date" class="form-control form-control-sm"
-                     value="{{ old('sent_date', $psychiatric->sent_date) }}" required>
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label fw-bold">สถานพยาบาล</label>
-              <input type="text" name="hotpital" class="form-control form-control-sm"
-                     value="{{ old('hotpital', $psychiatric->hotpital) }}">
-            </div>
-            <div class="col-12 col-md-5">
-              <label class="form-label fw-bold">ผลการตรวจวินิจฉัย</label>
-              <select name="psycho_id" class="form-select form-select-sm" required>
-                <option value="">-- เลือกผลการตรวจ --</option>
-                @foreach($psycho as $p)
-                  <option value="{{ $p->id }}" {{ old('psycho_id', $psychiatric->psycho_id) == $p->id ? 'selected' : '' }}>
-                    {{ $p->psycho_name }}
-                  </option>
-                @endforeach
-              </select>
-            </div>
-          </div>
-
-          <div class="mb-2">
-            <label class="form-label fw-bold">สรุปผลการตรวจ/การวินิจฉัย</label>
-            <textarea name="diagnose" class="form-control form-control-sm" rows="2">{{ old('diagnose', $psychiatric->diagnose) }}</textarea>
-          </div>
-
-          <div class="row mb-2">
-            <div class="col-12 col-md-3">
-              <label class="form-label fw-bold">นัดครั้งต่อไป</label>
-              <input type="date" name="appoin_date" class="form-control form-control-sm"
-                     value="{{ old('appoin_date', $psychiatric->appoin_date) }}">
-            </div>
-            <div class="col-12 col-md-3 ms-md-3">
-              <label class="form-label fw-bold">การรักษา</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="drug_no" value="yes"
-                       {{ old('drug_no', $psychiatric->drug_no) == 'yes' ? 'checked' : '' }}
-                       id="drug_yes_{{ $psychiatric->id }}">
-                <label class="form-check-label" for="drug_yes_{{ $psychiatric->id }}">รับยา</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="drug_no" value="no"
-                       {{ old('drug_no', $psychiatric->drug_no) == 'no' ? 'checked' : '' }}
-                       id="drug_no_{{ $psychiatric->id }}">
-                <label class="form-check-label" for="drug_no_{{ $psychiatric->id }}">ไม่รับยา</label>
-              </div>
-            </div>
-            <div class="col-12 col-md-5" id="drug_name_field_{{ $psychiatric->id }}"
-                 style="display: {{ old('drug_no', $psychiatric->drug_no) == 'yes' ? 'block' : 'none' }};">
-              <label class="form-label fw-bold">ชื่อยา</label>
-              <input type="text" name="drug_name" class="form-control form-control-sm"
-                     value="{{ old('drug_name', $psychiatric->drug_name) }}">
-            </div>
-          </div>
-
-          <div class="row mb-2">
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-bold">การขึ้นทะเบียนคนพิการ</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="disa_no" value="yes"
-                       {{ old('disa_no', $psychiatric->disa_no) == 'yes' ? 'checked' : '' }}>
-                <label class="form-check-label">ขึ้นทะเบียน</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="disa_no" value="no"
-                       {{ old('disa_no', $psychiatric->disa_no) == 'no' ? 'checked' : '' }}>
-                <label class="form-check-label">ไม่ขึ้นทะเบียน</label>
+          <!-- การขึ้นทะเบียนคนพิการ -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">การขึ้นทะเบียนคนพิการ</label>
+              <div class="d-flex align-items-center gap-3 mt-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="disa_no" value="yes" id="edit_disa_yes">
+                  <label class="form-check-label" for="edit_disa_yes">ขึ้นทะเบียน</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="disa_no" value="no" id="edit_disa_no">
+                  <label class="form-check-label" for="edit_disa_no">ไม่ขึ้นทะเบียน</label>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-success btn-sm">
-              <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-1"></i> ปิด
-            </button>
-          </div>
-        </form>
-      </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -307,66 +366,115 @@
 
 @push('scripts')
 <script>
+document.addEventListener("DOMContentLoaded", function() {
 
+  // ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
+  function resetForm(modalEl) {
+    const form = modalEl.querySelector('form');
+    if (form) {
+      form.reset();
+      form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+    }
+    // ซ่อน drug_name_field ถ้ามี
+    const drugField = modalEl.querySelector('[id^="drug_name_field_"]');
+    if (drugField) {
+      drugField.style.display = 'none';
+      const drugInput = drugField.querySelector('input[name="drug_name"]');
+      if (drugInput) drugInput.value = '';
+    }
+  }
 
-  // ✅ Toggle การรักษา (รับยา/ไม่รับยา) สำหรับ Create
+  // ✅ Toggle drug_name สำหรับ modal create
   const drugYesNew   = document.getElementById('drug_yes_new');
   const drugNoNew    = document.getElementById('drug_no_new');
   const drugFieldNew = document.getElementById('drug_name_field_new');
-  const drugInputNew = document.querySelector('#drug_name_field_new input[name="drug_name"]');
+  const drugInputNew = drugFieldNew ? drugFieldNew.querySelector('input[name="drug_name"]') : null;
 
   function toggleDrugFieldNew() {
     if (drugYesNew && drugYesNew.checked) {
       drugFieldNew.style.display = 'block';
     } else {
       drugFieldNew.style.display = 'none';
-      if (drugInputNew) drugInputNew.value = '';
+      if (drugInputNew) drugInputNew.value = ''; // ✅ ล้างค่าชื่อยาเมื่อเลือก "ไม่รับยา"
     }
   }
   if (drugYesNew) drugYesNew.addEventListener('change', toggleDrugFieldNew);
   if (drugNoNew)  drugNoNew.addEventListener('change', toggleDrugFieldNew);
   toggleDrugFieldNew();
 
-  // ✅ Toggle การรักษา (รับยา/ไม่รับยา) สำหรับ Edit
-  document.querySelectorAll('.modal[id^="editPsychiatricModal"]').forEach(function(modalEl) {
-    modalEl.addEventListener('shown.bs.modal', function () {
-      const id = modalEl.getAttribute('id').replace('editPsychiatricModal','');
-      const drugYes = document.getElementById('drug_yes_' + id);
-      const drugNo  = document.getElementById('drug_no_' + id);
-      const drugField = document.getElementById('drug_name_field_' + id);
-      const drugInput = drugField ? drugField.querySelector('input[name="drug_name"]') : null;
-
-      function toggleDrugField() {
-        if (drugYes && drugYes.checked) {
-          drugField.style.display = 'block';
-        } else {
-          drugField.style.display = 'none';
-          if (drugInput) drugInput.value = '';
-        }
-      }
-
-      toggleDrugField();
-      if (drugYes) drugYes.addEventListener('change', toggleDrugField);
-      if (drugNo)  drugNo.addEventListener('change', toggleDrugField);
-    });
-  });
-
-  // ✅ Toggle ปุ่มเปิด/ปิดฟอร์ม (ถ้าใช้ collapse)
-  const collapsePsychiatric = document.getElementById('psychiatricForm');
-  const togglePsychiatricBtn = document.getElementById('togglePsychiatricBtn');
-  if (collapsePsychiatric && togglePsychiatricBtn) {
-    const icon = togglePsychiatricBtn.querySelector('i');
-    const text = togglePsychiatricBtn.querySelector('span');
-    collapsePsychiatric.addEventListener('shown.bs.collapse', function () {
-      icon.className = 'bi bi-dash-circle me-1';
-      text.textContent = 'ซ่อน/ฟอร์ม';
-    });
-    collapsePsychiatric.addEventListener('hidden.bs.collapse', function () {
-      icon.className = 'bi bi-plus-circle me-1';
-      text.textContent = 'เพิ่มข้อมูล';
-    });
+  // ✅ Reset ฟอร์มเมื่อเปิด/ปิด modal create
+  const createBtn   = document.getElementById('btn-create-psychiatric');
+  const createModal = document.getElementById('createPsychiatricModal');
+  if (createBtn && createModal) {
+    createBtn.addEventListener('click', () => resetForm(createModal));
+    createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
   }
 
+  // ✅ โหลดข้อมูลลงฟอร์ม edit (ใช้ JSON)
+  window.openEditPsychiatric = function(id) {
+    fetch(`/psychiatric/edit-json/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        const modalEl = document.getElementById('editPsychiatricModal');
+        const form = modalEl.querySelector('form');
+        form.action = `/psychiatric/${data.id}`;
+
+        // เติมค่าในฟอร์ม
+        modalEl.querySelector('#edit_sent_date').value = data.sent_date;
+        modalEl.querySelector('#edit_hotpital').value = data.hotpital ?? '';
+        modalEl.querySelector('#edit_psycho_id').value = data.psycho_id;
+        modalEl.querySelector('#edit_diagnose').value = data.diagnose ?? '';
+        modalEl.querySelector('#edit_appoin_date').value = data.appoin_date ?? '';
+
+        const drugYes = modalEl.querySelector('#edit_drug_yes');
+        const drugNo  = modalEl.querySelector('#edit_drug_no');
+        const drugField = modalEl.querySelector('#edit_drug_name_field');
+        const drugInput = modalEl.querySelector('#edit_drug_name');
+
+        function toggleDrugField() {
+          if (drugYes.checked) {
+            drugField.style.display = 'block';
+          } else {
+            drugField.style.display = 'none';
+            drugInput.value = ''; // ✅ ล้างค่าชื่อยาเมื่อเลือก "ไม่รับยา"
+          }
+        }
+
+        // ตั้งค่าเริ่มต้นจากข้อมูล JSON
+        if (data.drug_no === 'yes') {
+          drugYes.checked = true;
+          drugField.style.display = 'block';
+          drugInput.value = data.drug_name ?? '';
+        } else {
+          drugNo.checked = true;
+          drugField.style.display = 'none';
+          drugInput.value = ''; // ✅ ล้างค่าออก
+        }
+
+        // bind event toggle
+        drugYes.addEventListener('change', toggleDrugField);
+        drugNo.addEventListener('change', toggleDrugField);
+
+        // การขึ้นทะเบียนคนพิการ
+        if (data.disa_no === 'yes') {
+          modalEl.querySelector('#edit_disa_yes').checked = true;
+        } else {
+          modalEl.querySelector('#edit_disa_no').checked = true;
+        }
+
+        // เปิด modal
+        new bootstrap.Modal(modalEl).show();
+      });
+  }
+
+  // ✅ Reset ฟอร์มเมื่อปิด modal edit
+  const editModal = document.getElementById('editPsychiatricModal');
+  if (editModal) {
+    editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
+  }
+
+});
 </script>
 @endpush
 @endsection

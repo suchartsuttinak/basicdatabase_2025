@@ -77,14 +77,14 @@
                   <!-- วันที่ / ครู / โทรศัพท์ -->
                   <div class="row mb-2">
                    <div class="col-4 mb-3">
-  <label class="form-label fw-bold small">วันที่ตรวจ</label>
-  <input type="date" name="date"
-         class="form-control form-control-sm @error('date') is-invalid @enderror"
-         value="{{ old('date', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
-  @error('date')
-    <div class="invalid-feedback">{{ $message }}</div>
-  @enderror
-</div>
+                        <label class="form-label fw-bold small">วันที่ตรวจ</label>
+                        <input type="date" name="date"
+                              class="form-control form-control-sm @error('date') is-invalid @enderror"
+                              value="{{ old('date', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
+                        @error('date')
+                          <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                      </div>
                     <div class="col-4 mb-3">
                       <label class="form-label fw-bold small">ครูประจำชั้น</label>
                       <input type="text" name="teacher_name"
@@ -403,7 +403,6 @@ function openEditFollowup(id){
         }
     });
 }
-
 </script>
 
 @endpush

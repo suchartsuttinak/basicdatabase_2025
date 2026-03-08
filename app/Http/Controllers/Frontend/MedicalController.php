@@ -86,9 +86,6 @@ class MedicalController extends Controller
     return redirect()->route('medical.add', $medical->client_id)
                      ->with('success', 'อัปเดตข้อมูลเรียบร้อย');
 }
-
-
-
     // ลบข้อมูล
     public function MedicalDelete($id)
     {

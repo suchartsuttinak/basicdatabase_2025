@@ -356,25 +356,28 @@ require __DIR__.'/auth.php';
 });
 
 
-// 🏫 บันทึกการการรักษาพยาบาลในหน่วยงาน
-    Route::prefix('medical')->name('medical.')->group(function () {
-    // แสดงฟอร์มเพิ่มข้อมูล (client_id จำเป็น)
+// 🏫 บันทึกการรักษาพยาบาลในหน่วยงาน
+Route::prefix('medical')->name('medical.')->group(function () {
+    // ✅ แสดงฟอร์มเพิ่มข้อมูลใหม่ (client_id จำเป็น)
     Route::get('/add/{client_id}', [MedicalController::class, 'MedicalAdd'])->name('add');
 
-    // บันทึกข้อมูลใหม่
+    // ✅ บันทึกข้อมูลใหม่
     Route::post('/store', [MedicalController::class, 'MedicalStore'])->name('store');
 
-    // ใช้ฟอร์มเดิมในการแก้ไข (ส่ง accident id)
+    // ✅ ใช้ฟอร์มเดิมในการแก้ไข (ส่ง medical id)
     Route::get('/edit/{id}', [MedicalController::class, 'MedicalEdit'])->name('edit');
 
-    // อัปเดตข้อมูล (PUT)
+    // ✅ อัปเดตข้อมูล (PUT)
     Route::put('/update/{id}', [MedicalController::class, 'MedicalUpdate'])->name('update');
 
-    // ลบข้อมูล
+    // ✅ ลบข้อมูล
     Route::delete('/delete/{id}', [MedicalController::class, 'MedicalDelete'])->name('delete');
 
     // ✅ เพิ่ม route สำหรับรายงาน (ตรงกับปุ่มใน view)
     Route::get('/report/{id}', [MedicalController::class, 'MedicalReport'])->name('report');
+
+    // ✅ เพิ่ม route สำหรับโหลดข้อมูล JSON (ใช้กับ modal edit)
+    Route::get('/json/{id}', [MedicalController::class, 'EditMedicalJson'])->name('json');
 });
 
 
@@ -396,25 +399,39 @@ require __DIR__.'/auth.php';
     Route::delete('/delete/{id}', [VaccinationController::class, 'VaccineDelete'])->name('delete');
 });
 
-// บันทึกการตรวจวินิจฉัยทางจิตเวช Psychiatric
-    Route::prefix('psychiatric')->group(function(){
-    Route::get('/add/{client_id}', [PsychiatricController::class, 'AddPsychiatric'])->name('psychiatric.create');
-    Route::post('/store', [PsychiatricController::class, 'StorePsychiatric'])->name('psychiatric.store');
-    Route::get('/edit/{id}', [PsychiatricController::class, 'EditPsychiatric'])->name('psychiatric.edit');
-    Route::put('/update/{id}', [PsychiatricController::class, 'UpdatePsychiatric'])->name('psychiatric.update');
-    Route::delete('/delete/{id}', [PsychiatricController::class, 'DeletePsychiatric'])->name('psychiatric.delete');
-});
+        // บันทึกการตรวจวินิจฉัยทางจิตเวช Psychiatric
+        Route::prefix('psychiatric')->group(function () {
+            // เพิ่มข้อมูลใหม่
+            Route::get('/add/{client_id}', [PsychiatricController::class, 'AddPsychiatric'])
+                ->name('psychiatric.create');
 
-Route::prefix('addictive')->group(function(){
-    Route::get('/add/{client_id}', [AddictiveController::class, 'AddAddictive'])->name('addictive.create');
-    Route::post('/store', [AddictiveController::class, 'StoreAddictive'])->name('addictive.store');
-    Route::get('/edit/{id}', [AddictiveController::class, 'EditAddictive'])->name('addictive.edit');
-    Route::put('/update/{id}', [AddictiveController::class, 'UpdateAddictive'])->name('addictive.update');
-    Route::delete('/delete/{id}', [AddictiveController::class, 'DeleteAddictive'])->name('addictive.delete');
+            // บันทึกข้อมูลใหม่
+            Route::post('/store', [PsychiatricController::class, 'StorePsychiatric'])
+                ->name('psychiatric.store');
 
-    // ✅ JSON สำหรับโหลดข้อมูลไปใส่ใน modal edit
-    Route::get('/json/{id}', [AddictiveController::class, 'EditAddictiveJson'])->name('addictive.json');
-});
+            // สำหรับเรียกข้อมูลมาแก้ไข (JSON)
+            Route::get('/edit-json/{id}', [PsychiatricController::class, 'EditPsychiatricJson'])
+                ->name('psychiatric.edit.json');
+
+            // สำหรับอัปเดตข้อมูล (PUT)
+            Route::put('/{id}', [PsychiatricController::class, 'UpdatePsychiatric'])
+                ->name('psychiatric.update');
+
+            // ลบข้อมูล
+            Route::delete('/delete/{id}', [PsychiatricController::class, 'DeletePsychiatric'])
+                ->name('psychiatric.delete');
+        });
+
+            Route::prefix('addictive')->group(function(){
+            Route::get('/add/{client_id}', [AddictiveController::class, 'AddAddictive'])->name('addictive.create');
+            Route::post('/store', [AddictiveController::class, 'StoreAddictive'])->name('addictive.store');
+            Route::get('/edit/{id}', [AddictiveController::class, 'EditAddictive'])->name('addictive.edit');
+            Route::put('/update/{id}', [AddictiveController::class, 'UpdateAddictive'])->name('addictive.update');
+            Route::delete('/delete/{id}', [AddictiveController::class, 'DeleteAddictive'])->name('addictive.delete');
+
+            // ✅ JSON สำหรับโหลดข้อมูลไปใส่ใน modal edit
+            Route::get('/json/{id}', [AddictiveController::class, 'EditAddictiveJson'])->name('addictive.json');
+        });
 
 // Routes สำหรับพฤติกรรม (Observe)
     Route::prefix('observe')->group(function(){

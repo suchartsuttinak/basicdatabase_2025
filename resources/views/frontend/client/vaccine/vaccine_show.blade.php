@@ -7,13 +7,16 @@
             <i class="bi bi-capsule-pill me-2 text-primary"></i> ประวัติการให้วัคซีน
         </h5>
         <!-- ✅ ปุ่มเปิด Modal -->
-        <button type="button" 
-                class="btn btn-sm btn-primary d-flex align-items-center shadow-sm px-3"
-                data-bs-toggle="modal"
-                data-bs-target="#add-vaccine-modal">
-            <i class="bi bi-plus-circle me-1"></i>
-            <span>เพิ่มข้อมูล</span>
-        </button>
+      <button type="button" 
+        id="btn-add-vaccine"
+        class="btn btn-sm btn-primary d-flex align-items-center shadow-sm px-3"
+        data-bs-toggle="modal"
+        data-bs-target="#add-vaccine-modal">
+        <i class="bi bi-plus-circle me-1"></i>
+        <span>เพิ่มข้อมูล</span>
+       </button>
+
+
     </div>
      {{-- ข้อมูล client --}}
             <div class="card mb-0 shadow-sm">
@@ -64,10 +67,11 @@
                         <td>{{ $item->recorder }}</td>
                         <td class="text-center">
                             <button type="button" class="btn btn-success btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#edit-vaccine-modal"
-                                onclick="vaccineEdit({{ $item->id }})">
-                                <i class="bi bi-pencil-square"></i> แก้ไข
+                                 onclick="vaccineEdit({{ $item->id }})">
+                                <i class="bi bi-pencil-square"></i>
+                                <span>แก้ไข</span>
+
+
                             </button>
 
                             <!-- ✅ ฟอร์มลบแบบซ่อน -->
@@ -99,65 +103,83 @@
     @endif   <!-- ✅ ปิดเงื่อนไข -->
 </div>
 
-<!-- ✅ Modal Add Vaccine -->
-<div class="modal fade" id="add-vaccine-modal" tabindex="-1" aria-hidden="true">
+
+{{-- ✅ Modal Add Vaccine --}}
+<div class="modal fade" id="add-vaccine-modal" tabindex="-1" aria-labelledby="addVaccineLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form action="{{ route('vaccine.store') }}" method="POST" id="add-vaccine-form">
+      <form action="{{ route('vaccine.store') }}" method="POST" id="add-vaccine-form" novalidate>
         @csrf
         <input type="hidden" name="client_id" value="{{ $client->id }}">
 
-        <div class="modal-header">
-          <h5 class="modal-title">เพิ่มข้อมูลวัคซีน</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!-- Header -->
+        <div class="modal-header bg-primary text-white py-2">
+          <h5 class="modal-title fw-bold" id="addVaccineLabel">
+            <i class="bi bi-capsule-pill me-2"></i> เพิ่มข้อมูลวัคซีน
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
 
+        <!-- Body -->
         <div class="modal-body">
-        <div class="mb-3 col-4">
-                    <label class="form-label">วันรับวัคซีน</label>
-                    <input type="date" 
-                        name="date" 
-                        class="form-control @error('date') is-invalid @enderror" 
-                        value="{{ old('date') }}">
-                    @error('date')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold">วันรับวัคซีน</label>
+              <input type="date" name="date"
+                     class="form-control form-control-sm @error('date') is-invalid @enderror"
+                     value="{{ old('date') }}">
+              @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+            <div class="col-md-8">
+              <label class="form-label fw-bold">ชนิดวัคซีน</label>
+              <input type="text" name="vaccine_name"
+                     class="form-control form-control-sm @error('vaccine_name') is-invalid @enderror"
+                     value="{{ old('vaccine_name') }}">
+              @error('vaccine_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+          </div>
 
-                <div class="mb-3">
-                    <label class="form-label">ชนิดวัคซีน</label>
-                    <input type="text" 
-                        name="vaccine_name" 
-                        class="form-control @error('vaccine_name') is-invalid @enderror" 
-                        value="{{ old('vaccine_name') }}">
-                    @error('vaccine_name')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
           <div class="mb-3">
-            <label class="form-label">สถานพยาบาล</label>
-            <input type="text" name="hospital" class="form-control">
+            <label class="form-label fw-bold">สถานพยาบาล</label>
+            <input type="text" name="hospital" class="form-control form-control-sm" value="{{ old('hospital') }}">
           </div>
+
           <div class="mb-3">
-            <label class="form-label">หมายเหตุ</label>
-            <textarea name="remark" class="form-control"></textarea>
+            <label class="form-label fw-bold">หมายเหตุ</label>
+            <textarea name="remark" class="form-control form-control-sm" rows="2">{{ old('remark') }}</textarea>
           </div>
+
           <div class="mb-3">
-            <label class="form-label">ผู้บันทึก</label>
-            <input type="text" name="recorder" class="form-control">
+            <label class="form-label fw-bold">ผู้บันทึก</label>
+            <input type="text" name="recorder" class="form-control form-control-sm" value="{{ old('recorder') }}">
           </div>
         </div>
 
+        <!-- Footer -->
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save me-1"></i> บันทึก
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Modal Edit Vaccine -->
-<div class="modal fade" id="edit-vaccine-modal" tabindex="-1" aria-hidden="true">
+{{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
+@if ($errors->any() && !session('edit_mode'))
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addModal = new bootstrap.Modal(document.getElementById('add-vaccine-modal'));
+    addModal.show();
+});
+</script>
+@endif
+<!-- ✅ Modal Edit Vaccine -->
+<div class="modal fade" id="edit-vaccine-modal" tabindex="-1" aria-labelledby="editVaccineLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <!-- ✅ ให้ action มีค่า default -->
@@ -165,49 +187,58 @@
         @csrf
         @method('PUT')
 
-        <div class="modal-header">
-          <h5 class="modal-title">แก้ไขข้อมูลวัคซีน</h5>
+        <!-- Header -->
+        <div class="modal-header bg-warning text-dark py-2">
+          <h5 class="modal-title fw-bold" id="editVaccineLabel">
+            <i class="bi bi-pencil-square me-2"></i> แก้ไขข้อมูลวัคซีน
+          </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+
+        <!-- Body -->
         <div class="modal-body">
-         <div class="mb-3 col-4">
-    <label class="form-label">วันที่รับวัคซีน</label>
-    <input type="date" 
-           name="date" 
-           id="edit_date" 
-           class="form-control @error('date') is-invalid @enderror" 
-           value="{{ old('date') }}">
-    @error('date')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
+        <div class="row mb-3">
+  <div class="col-md-4">
+    <label class="form-label fw-bold">วันที่รับวัคซีน</label>
+    <input type="date" name="date" id="edit_date"
+           class="form-control form-control-sm @error('date') is-invalid @enderror"
+           value="{{ old('date', $vaccination->date ?? '') }}">
+    @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+  </div>
+
+  <div class="col-md-8">
+    <label class="form-label fw-bold">ชนิดวัคซีน</label>
+    <input type="text" name="vaccine_name" id="edit_vaccine_name"
+           class="form-control form-control-sm @error('vaccine_name') is-invalid @enderror"
+           value="{{ old('vaccine_name', $vaccination->vaccine_name ?? '') }}">
+    @error('vaccine_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+  </div>
 </div>
 
-<div class="mb-3">
-    <label class="form-label">ชนิดวัคซีน</label>
-    <input type="text" 
-           name="vaccine_name" 
-           id="edit_vaccine_name" 
-           class="form-control @error('vaccine_name') is-invalid @enderror" 
-           value="{{ old('vaccine_name') }}">
-    @error('vaccine_name')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
           <div class="mb-3">
-            <label class="form-label">สถานพยาบาล</label>
-            <input type="text" name="hospital" id="edit_hospital" class="form-control">
+            <label class="form-label fw-bold">สถานพยาบาล</label>
+            <input type="text" name="hospital" id="edit_hospital" class="form-control form-control-sm">
           </div>
+
           <div class="mb-3">
-            <label class="form-label">เจ้าหน้าที่</label>
-            <input type="text" name="recorder" id="edit_recorder" class="form-control">
+            <label class="form-label fw-bold">เจ้าหน้าที่</label>
+            <input type="text" name="recorder" id="edit_recorder" class="form-control form-control-sm">
           </div>
+
           <div class="mb-3">
-            <label class="form-label">หมายเหตุ</label>
-            <textarea name="remark" id="edit_remark" class="form-control"></textarea>
+            <label class="form-label fw-bold">หมายเหตุ</label>
+            <textarea name="remark" id="edit_remark" class="form-control form-control-sm" rows="2"></textarea>
           </div>
         </div>
+
+        <!-- Footer -->
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">อัปเดต</button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
         </div>
       </form>
     </div>
@@ -215,44 +246,112 @@
 </div>
 @endsection
 
+
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
-        $('#datatable-vaccine').DataTable({
-            responsive: true,
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
-            }
-        });
+  function resetForm(modalEl) {
+    const form = modalEl.querySelector('form');
+    if (form) {
+      form.reset();
+      form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    $('#datatable-vaccine').DataTable({
+      responsive: true,
+      language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }
     });
 
-    function vaccineEdit(id){
-        $.ajax({
-            url: "/vaccine/edit/" + id,
-            type:"GET",
-            dataType:"json",
-            success:function(data){
-                $('#edit_date').val(data.date);
-                $('#edit_vaccine_name').val(data.vaccine_name);
-                $('#edit_hospital').val(data.hospital);
-                $('#edit_recorder').val(data.recorder);
-                $('#edit_remark').val(data.remark);
+    const createModal = document.getElementById('add-vaccine-modal');
+    const editModal   = document.getElementById('edit-vaccine-modal');
 
-                // ✅ เซ็ต action ของ form ให้ถูกต้อง
-                $('#edit-vaccine-form').attr('action', '/vaccine/update/' + data.id);
-            }
-        });
+    if (createModal) {
+      createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
+    }
+    if (editModal) {
+      editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
     }
 
-    // ✅ เปิด modal edit เมื่อมี error
-    $(document).ready(function() {
-        @if ($errors->any() && session('edit_mode') && session('edit_id'))
-            $('#edit-vaccine-modal').modal('show');
-            $('#edit-vaccine-form').attr('action', '/vaccine/update/' + "{{ session('edit_id') }}");
-        @endif
-    });
- 
+    // ✅ เปิด modal edit อัตโนมัติเมื่อมี error
+    @if ($errors->any() && session('edit_mode') && session('edit_id'))
+      const editInstance = bootstrap.Modal.getOrCreateInstance(editModal);
+      editInstance.show();
+      const form = document.getElementById('edit-vaccine-form');
+      form.setAttribute('action', '/vaccine/update/' + "{{ session('edit_id') }}");
+
+      // เติมค่า old() กลับไปในช่อง input
+      document.getElementById('edit_date').value        = "{{ old('date') }}";
+      document.getElementById('edit_vaccine_name').value= "{{ old('vaccine_name') }}";
+      document.getElementById('edit_hospital').value    = "{{ old('hospital') }}";
+      document.getElementById('edit_recorder').value    = "{{ old('recorder') }}";
+      document.getElementById('edit_remark').value      = "{{ old('remark') }}";
+    @endif
+
+    // ✅ เปิด modal create อัตโนมัติเมื่อมี error
+    @if ($errors->any() && !session('edit_mode'))
+      const addInstance = bootstrap.Modal.getOrCreateInstance(createModal);
+      addInstance.show();
+    @endif
+  });
+
+  // ✅ โหลดข้อมูลลงฟอร์ม edit (ใช้ JSON)
+  function vaccineEdit(id){
+    fetch(`/vaccine/edit/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        const modalEl = document.getElementById('edit-vaccine-modal');
+        const form = modalEl.querySelector('form');
+
+        modalEl.querySelector('#edit_date').value        = data.date;
+        modalEl.querySelector('#edit_vaccine_name').value= data.vaccine_name ?? '';
+        modalEl.querySelector('#edit_hospital').value    = data.hospital ?? 'ไม่ระบุ';
+        modalEl.querySelector('#edit_recorder').value    = data.recorder ?? '';
+        modalEl.querySelector('#edit_remark').value      = data.remark ?? '';
+
+        form.action = `/vaccine/update/${data.id}`;
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+      })
+      .catch(err => console.error(err));
+  }
 </script>
 
+    <script>
+      // ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
+      function resetForm(modalEl) {
+        const form = modalEl.querySelector('form');
+        if (form) {
+          form.reset();
+          form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+          form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+        }
+        // ✅ ตั้งค่า default วันที่เป็นวันนี้ ถ้ามี field date
+        const dateInput = form?.querySelector('input[name="date"]');
+        if (dateInput) {
+          const today = new Date().toISOString().split('T')[0];
+          dateInput.value = today;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const createModal = document.getElementById('add-vaccine-modal');
+        const editModal   = document.getElementById('edit-vaccine-modal');
+        const addBtn      = document.getElementById('btn-add-vaccine');
+
+        // ✅ กดปุ่ม “เพิ่มข้อมูล” → reset ฟอร์มก่อนเปิด modal
+        addBtn?.addEventListener('click', () => {
+          if (createModal) resetForm(createModal);
+        });
+
+        // ✅ ปิด modal → reset ฟอร์ม
+        if (createModal) {
+          createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
+        }
+        if (editModal) {
+          editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
+        }
+      });
+    </script>
 @endpush
