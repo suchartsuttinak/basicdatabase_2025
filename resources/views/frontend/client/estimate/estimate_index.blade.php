@@ -1,38 +1,40 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+@if ($errors->any() && session('form') === 'add-estimate')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // เปิด modal Add Estimate
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('add-estimate-modal')).show();
 
-<!-- ✅ แสดงข้อผิดพลาดจากการ validate -->
-@if ($errors->any())
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด',
-            html: '{!! implode("<br>", $errors->all()) !!}',
-            timer: 2000,              // ✅ ปิดเองใน 3 วินาที
-            timerProgressBar: true    // ✅ แสดง progress bar ด้านบน
-        });
-        // ✅ เปิด modal กลับมาอัตโนมัติ
-        var addModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
-        addModal.show();
-    </script>
+    // SweetAlert แจ้งเตือน error
+    Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        html: `{!! implode('<br>', $errors->all()) !!}`,
+        confirmButtonText: 'ตกลง'
+    });
+});
+</script>
 @endif
 
-@if (session('message'))
-    <script>
-        Swal.fire({
-            icon: '{{ session('alert-type') }}',
-            title: '{{ session('message') }}',
-            timer: 3000,              // ✅ ปิดเองใน 3 วินาที
-            timerProgressBar: true
-        });
-    </script>
+@if ($errors->any() && session('form') === 'edit-estimate')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // เปิด modal Edit Estimate
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('edit-estimate-modal')).show();
+
+    // SweetAlert แจ้งเตือน error
+    Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        html: `{!! implode('<br>', $errors->all()) !!}`,
+        confirmButtonText: 'ตกลง'
+    });
+});
+</script>
 @endif
-<!-- สิ้นสุด✅ แสดงข้อผิดพลาดจากการ validate -->
-
-
 
 <div class="card shadow-sm border-0 mt-3">
     <div class="card-header bg-light fw-bold text-dark py-2 px-3 d-flex justify-content-between align-items-center">
@@ -152,26 +154,29 @@
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
-        <div class="mb-3">
-    <label class="form-label">การดำเนินงาน</label><br>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง" {{ old('follo_no') == 'หน่วยงานไปเอง' ? 'checked' : '' }}>
-        <label class="form-check-label">หน่วยงานไปเอง</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์" {{ old('follo_no') == 'โทรศัพท์' ? 'checked' : '' }}>
-        <label class="form-check-label">โทรศัพท์</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย" {{ old('follo_no') == 'จดหมาย' ? 'checked' : '' }}>
-        <label class="form-check-label">จดหมาย</label>
-    </div>
+                <!-- ส่วนฟอร์ม follo_no -->
+                    <div class="mb-3">
+                        <label class="form-label">การดำเนินงาน</label><br>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง"
+                                {{ old('follo_no') == 'หน่วยงานไปเอง' ? 'checked' : '' }}>
+                            <label class="form-check-label">หน่วยงานไปเอง</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์"
+                                {{ old('follo_no') == 'โทรศัพท์' ? 'checked' : '' }}>
+                            <label class="form-check-label">โทรศัพท์</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย"
+                                {{ old('follo_no') == 'จดหมาย' ? 'checked' : '' }}>
+                            <label class="form-check-label">จดหมาย</label>
+                        </div>
 
-    <!-- แสดงข้อความ error -->
-    @error('follo_no')
-        <span class="text-danger">{{ $message }}</span>
-    @enderror
-</div>
+                        @error('follo_no')
+                            <span id="follo_no-error" class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
 
             <div class="mb-3">
                 <label class="form-label">ผลการติดตาม</label>
@@ -206,20 +211,22 @@
   </div>
 </div>
     {{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
-    @if ($errors->any())
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var myModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
-        myModal.show();
-    });
-    </script>
-    @endif
+    {{-- ✅ เปิด modal Add เมื่อ error มาจาก Add --}}
+@if ($errors->any() && session('form') === 'add')
+<script> ... เปิด add-estimate-modal ... </script>
+@endif
+
+{{-- ✅ เปิด modal Edit เมื่อ error มาจาก Edit --}}
+@if ($errors->any() && session('form') === 'edit')
+<script> ... เปิด edit-estimate-modal ... </script>
+@endif
     
 <!-- ✅ Modal Edit Estimate -->
 <div class="modal fade" id="edit-estimate-modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form method="POST" id="edit-estimate-form" action="{{ route('estimate.update', 0) }}" enctype="multipart/form-data">
+      <!-- ใช้ placeholder 0 แต่ JS จะเปลี่ยนเป็น id จริง -->
+      <form method="POST" id="edit-estimate-form" action="{{ route('estimate.update', 0) }}" enctype="multipart/form-data" data-id="">
         @csrf
         @method('PUT')
 
@@ -257,7 +264,7 @@
               <label class="form-check-label">จดหมาย</label>
             </div>
             @error('follo_no')
-              <span class="text-danger">{{ $message }}</span>
+              <div class="text-danger" id="follo_no-error">{{ $message }}</div>
             @enderror
           </div>
 
@@ -303,21 +310,84 @@
         </div>
 
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">อัปเดต</button>
+          <!-- ปุ่มอัปเดตจะถูก disable/enable โดย JS -->
+          <button type="submit" class="btn btn-primary" id="btn-update-estimate">อัปเดต</button>
           <button type="button" class="btn btn-secondary btn-cancel" data-bs-dismiss="modal">ยกเลิก</button>
         </div>
       </form>
     </div>
   </div>
 </div>
-@endsection
+
+{{-- ✅ เปิด modal Add เมื่อ error มาจาก Add --}}
+@if ($errors->any() && session('form') === 'add')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var myModal = new bootstrap.Modal(document.getElementById('add-estimate-modal'));
+    myModal.show();
+});
+</script>
+@endif
+
+{{-- ✅ ตรวจสอบวันที่ซ้ำ ปิด/เปิดปุ่มอัปเดต --}}
+<script>
+async function checkDuplicateDate(clientId, date, estimateId) {
+    const response = await fetch(`/estimate/check-duplicate?client_id=${clientId}&date=${date}&id=${estimateId}`);
+    const result = await response.json();
+    return result.duplicate;
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    const dateInput = document.getElementById('edit_date');
+    const updateBtn = document.getElementById('btn-update-estimate');
+
+    dateInput.addEventListener('change', async function() {
+        const date = this.value;
+        const clientId = document.querySelector('#edit-estimate-form input[name="client_id"]')?.value;
+        const estimateId = document.querySelector('#edit-estimate-form').getAttribute('data-id');
+
+        if (!date || !clientId || !estimateId) return;
+
+        const duplicate = await checkDuplicateDate(clientId, date, estimateId);
+
+        if (duplicate) {
+            let errorEl = this.closest('.mb-3').querySelector('.invalid-feedback');
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.className = 'invalid-feedback';
+                this.closest('.mb-3').appendChild(errorEl);
+            }
+            errorEl.textContent = 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น';
+            errorEl.style.display = 'block';
+            this.classList.add('is-invalid');
+            updateBtn.disabled = true;
+        } else {
+            const errorEl = this.closest('.mb-3').querySelector('.invalid-feedback');
+            if (errorEl) errorEl.style.display = 'none';
+            this.classList.remove('is-invalid');
+            updateBtn.disabled = false;
+        }
+    });
+});
+</script>
+
+{{-- ✅ เปิด modal Edit เมื่อ error มาจาก Edit --}}
+@if ($errors->any() && session('form') === 'edit')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var myModal = new bootstrap.Modal(document.getElementById('edit-estimate-modal'));
+    myModal.show();
+});
+</script>
+@endif
+
+
+
 
 
 @push('scripts')
 <script>
-/**
- * ฟังก์ชัน preview ไฟล์ใหม่ (ใช้ได้ทั้ง Add และ Edit)
- */
+/** ฟังก์ชัน preview ไฟล์ใหม่ (ใช้ได้ทั้ง Add และ Edit) */
 function previewFiles(inputId, previewId) {
     const input = document.getElementById(inputId);
     const previewArea = document.getElementById(previewId);
@@ -368,32 +438,32 @@ function previewFiles(inputId, previewId) {
     });
 }
 
-// ✅ ใช้งาน preview สำหรับ Add และ Edit
+// ✅ preview สำหรับ Add และ Edit
 previewFiles('pictures-input-add', 'preview-area-add');
 previewFiles('pictures-input-edit', 'preview-area-edit');
 
-/**
- * โหลดข้อมูลสำหรับ Edit และเติมค่าในฟอร์ม
- */
+/** โหลดข้อมูลสำหรับ Edit */
 function estimateEdit(id){
     $.ajax({
         url: "/estimate/edit/" + id,
         type: "GET",
         dataType: "json",
         success: function(data){
-            // เติมค่าฟอร์ม
+            // ✅ เปลี่ยน action ของฟอร์มให้เป็น id จริง
+            $('#edit-estimate-form').attr('action', '/estimate/update/' + data.id);
+            $('#edit-estimate-form').attr('data-id', data.id); // เก็บ id ไว้ใช้ตรวจ duplicate
+
+            // เติมค่าลงฟอร์ม
             $('#edit_date').val(data.date);
             $('#edit_results').val(data.results ?? '');
             $('#edit_teacher').val(data.teacher ?? '');
             $('#edit_remark').val(data.remark ?? '');
-            $('#edit-estimate-form').attr('action', '/estimate/update/' + data.id);
 
-            // เซ็ตค่า radio follo_no
             $('input[name="follo_no"]').each(function(){
                 $(this).prop('checked', $(this).val() === data.follo_no);
             });
 
-            // แสดงรูปเดิมพร้อมปุ่มลบ
+            // แสดงรูปเดิม
             const preview = $('#preview-area-edit');
             preview.html('');
             if(Array.isArray(data.pictures)){
@@ -408,17 +478,14 @@ function estimateEdit(id){
                 });
             }
 
-            // ✅ ใช้ instance เดียว ไม่สร้างใหม่ทุกครั้ง
+            // เปิด modal edit
             const modalEl = document.getElementById('edit-estimate-modal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
         }
     });
 }
 
-/**
- * ฟังก์ชันลบรูปเดิม
- */
+/** ลบรูปเดิม */
 function removeOldPicture(picId, btn){
     $(btn).closest('div').remove();
     $('#edit-estimate-form').append(
@@ -426,9 +493,7 @@ function removeOldPicture(picId, btn){
     );
 }
 
-/**
- * ✅ เคลียร์ฟอร์มเมื่อกดปุ่มยกเลิก (ทั้ง Add และ Edit)
- */
+/** เคลียร์ฟอร์มเมื่อกดปุ่มยกเลิก */
 document.querySelector('#add-estimate-modal .btn-secondary[data-bs-dismiss="modal"]')
     ?.addEventListener('click', function(){
         document.getElementById('add-estimate-form').reset();
@@ -441,14 +506,119 @@ document.querySelector('#edit-estimate-modal .btn-secondary[data-bs-dismiss="mod
         document.getElementById('preview-area-edit').innerHTML = "";
     });
 
-/**
- * ✅ reset ฟอร์มทุกครั้งที่กดปุ่ม "เพิ่มข้อมูล"
- */
+/** reset ฟอร์มทุกครั้งที่กดปุ่ม "เพิ่มข้อมูล" */
 document.getElementById('btn-add-estimate')?.addEventListener('click', function(){
-    document.getElementById('add-estimate-form').reset();
+    const addForm = document.getElementById('add-estimate-form');
+    if (addForm) {
+        addForm.reset();
+    }
     document.getElementById('preview-area-add').innerHTML = "";
+    document.querySelectorAll('#add-estimate-form .invalid-feedback, #add-estimate-form .text-danger')
+        .forEach(el => el.innerHTML = "");
     const today = new Date().toISOString().split('T')[0];
     document.querySelector('#add-estimate-form input[name="date"]').value = today;
 });
+
+/** ✅ ซ่อนข้อความ error เมื่อเลือก radio follo_no และเมื่อเปลี่ยนวันที่ */
+document.addEventListener("DOMContentLoaded", function() {
+    // radio follo_no
+    document.querySelectorAll('input[name="follo_no"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const errorEl = document.getElementById('follo_no-error');
+            if (errorEl) {
+                errorEl.style.display = "none";
+            }
+        });
+    });
+
+    // date input
+    document.querySelectorAll('input[name="date"]').forEach(dateInput => {
+        dateInput.addEventListener('change', function() {
+            const errorEl = dateInput.closest('.mb-3').querySelector('.invalid-feedback');
+            if (errorEl) {
+                errorEl.style.display = "none";
+            }
+            dateInput.classList.remove('is-invalid');
+        });
+    });
+});
+
+/** ตรวจสอบวันที่ซ้ำก่อนอัปเดต */
+async function checkDuplicateDate(clientId, date, estimateId) {
+    const response = await fetch(`/estimate/check-duplicate?client_id=${clientId}&date=${date}&id=${estimateId}`);
+    const result = await response.json();
+    return result.duplicate; // true ถ้าวันที่ซ้ำ
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    const dateInput = document.getElementById('edit_date');
+    const updateBtn = document.querySelector('#edit-estimate-form button[type="submit"]');
+
+    dateInput.addEventListener('change', async function() {
+        const date = this.value;
+        const clientId = document.querySelector('#edit-estimate-form input[name="client_id"]').value;
+        const estimateId = document.querySelector('#edit-estimate-form').getAttribute('data-id');
+
+        const duplicate = await checkDuplicateDate(clientId, date, estimateId);
+
+        if (duplicate) {
+            let errorEl = this.closest('.mb-3').querySelector('.invalid-feedback');
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.className = 'invalid-feedback';
+                this.closest('.mb-3').appendChild(errorEl);
+            }
+            errorEl.textContent = 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น';
+            errorEl.style.display = 'block';
+            this.classList.add('is-invalid');
+            updateBtn.disabled = true;
+        } else {
+            const errorEl = this.closest('.mb-3').querySelector('.invalid-feedback');
+            if (errorEl) errorEl.style.display = 'none';
+            this.classList.remove('is-invalid');
+            updateBtn.disabled = false;
+        }
+    });
+});
 </script>
+
+@if ($errors->any() && session('form') === 'edit')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const modalEl = document.getElementById('edit-estimate-modal');
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+});
+
+$('#saveBtn').on('click', function(e) {
+    e.preventDefault();
+    $.ajax({
+        url: '/save-data',
+        type: 'POST',
+        data: $('#formData').serialize(),
+        success: function(response) {
+            Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อย', 'success');
+            $('#myModal').modal('hide');
+        },
+        error: function(xhr) {
+            let errors = xhr.responseJSON.errors;
+            $('#myModal').modal('show'); // เปิด modal เมื่อ error
+            $.each(errors, function(key, value) {
+                let input = $('[name="'+key+'"]');
+                input.addClass('is-invalid');
+                input.next('.invalid-feedback').remove(); 
+                input.after('<div class="invalid-feedback">'+value[0]+'</div>');
+            });
+        }
+    });
+});
+
+// ลบข้อความ error ทันทีเมื่อแก้ไข
+$(document).on('input change', 'input, select, textarea', function() {
+    $(this).removeClass('is-invalid');
+    $(this).next('.invalid-feedback').remove();
+});
+</script>
+@endif
+
 @endpush
+@endsection
