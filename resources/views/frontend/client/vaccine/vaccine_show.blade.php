@@ -197,23 +197,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
         <!-- Body -->
         <div class="modal-body">
-        <div class="row mb-3">
-  <div class="col-md-4">
-    <label class="form-label fw-bold">วันที่รับวัคซีน</label>
-    <input type="date" name="date" id="edit_date"
-           class="form-control form-control-sm @error('date') is-invalid @enderror"
-           value="{{ old('date', $vaccination->date ?? '') }}">
-    @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
-  </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold">วันที่รับวัคซีน</label>
+              <input type="date" name="date" id="edit_date"
+                     class="form-control form-control-sm @error('date') is-invalid @enderror"
+                     value="">
+              @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
 
-  <div class="col-md-8">
-    <label class="form-label fw-bold">ชนิดวัคซีน</label>
-    <input type="text" name="vaccine_name" id="edit_vaccine_name"
-           class="form-control form-control-sm @error('vaccine_name') is-invalid @enderror"
-           value="{{ old('vaccine_name', $vaccination->vaccine_name ?? '') }}">
-    @error('vaccine_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-  </div>
-</div>
+            <div class="col-md-8">
+              <label class="form-label fw-bold">ชนิดวัคซีน</label>
+              <input type="text" name="vaccine_name" id="edit_vaccine_name"
+                     class="form-control form-control-sm @error('vaccine_name') is-invalid @enderror"
+                     value="">
+              @error('vaccine_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+          </div>
 
           <div class="mb-3">
             <label class="form-label fw-bold">สถานพยาบาล</label>
@@ -244,11 +244,11 @@ document.addEventListener("DOMContentLoaded", function() {
     </div>
   </div>
 </div>
-@endsection
 
 
 @push('scripts')
 <script>
+  // ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
   function resetForm(modalEl) {
     const form = modalEl.querySelector('form');
     if (form) {
@@ -256,9 +256,29 @@ document.addEventListener("DOMContentLoaded", function() {
       form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
       form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
     }
+    // ✅ ตั้งค่า default วันที่เป็นวันนี้ ถ้ามี field date
+    const dateInput = form?.querySelector('input[name="date"]');
+    if (dateInput) {
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.value = today;
+    }
+  }
+
+  // ✅ เคลียร์ error ทันทีเมื่อผู้ใช้เริ่มกรอกใหม่
+  function attachRealtimeValidationClear(form) {
+    form.querySelectorAll('input, select, textarea').forEach(el => {
+      el.addEventListener('input', () => {
+        el.classList.remove('is-invalid');
+        const feedback = el.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+          feedback.remove();
+        }
+      });
+    });
   }
 
   document.addEventListener("DOMContentLoaded", function() {
+    // ✅ DataTable
     $('#datatable-vaccine').DataTable({
       responsive: true,
       language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }
@@ -266,12 +286,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const createModal = document.getElementById('add-vaccine-modal');
     const editModal   = document.getElementById('edit-vaccine-modal');
+    const addBtn      = document.getElementById('btn-add-vaccine');
 
+    // ✅ กดปุ่ม “เพิ่มข้อมูล” → reset ฟอร์มก่อนเปิด modal
+    addBtn?.addEventListener('click', () => {
+      if (createModal) resetForm(createModal);
+    });
+
+    // ✅ ปิด modal → reset ฟอร์ม
     if (createModal) {
       createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
+      attachRealtimeValidationClear(createModal.querySelector('form'));
     }
     if (editModal) {
       editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
+      attachRealtimeValidationClear(editModal.querySelector('form'));
     }
 
     // ✅ เปิด modal edit อัตโนมัติเมื่อมี error
@@ -282,11 +311,11 @@ document.addEventListener("DOMContentLoaded", function() {
       form.setAttribute('action', '/vaccine/update/' + "{{ session('edit_id') }}");
 
       // เติมค่า old() กลับไปในช่อง input
-      document.getElementById('edit_date').value        = "{{ old('date') }}";
-      document.getElementById('edit_vaccine_name').value= "{{ old('vaccine_name') }}";
-      document.getElementById('edit_hospital').value    = "{{ old('hospital') }}";
-      document.getElementById('edit_recorder').value    = "{{ old('recorder') }}";
-      document.getElementById('edit_remark').value      = "{{ old('remark') }}";
+      document.getElementById('edit_date').value         = "{{ old('date') }}";
+      document.getElementById('edit_vaccine_name').value = "{{ old('vaccine_name') }}";
+      document.getElementById('edit_hospital').value     = "{{ old('hospital') }}";
+      document.getElementById('edit_recorder').value     = "{{ old('recorder') }}";
+      document.getElementById('edit_remark').value       = "{{ old('remark') }}";
     @endif
 
     // ✅ เปิด modal create อัตโนมัติเมื่อมี error
@@ -304,54 +333,26 @@ document.addEventListener("DOMContentLoaded", function() {
         const modalEl = document.getElementById('edit-vaccine-modal');
         const form = modalEl.querySelector('form');
 
-        modalEl.querySelector('#edit_date').value        = data.date;
-        modalEl.querySelector('#edit_vaccine_name').value= data.vaccine_name ?? '';
-        modalEl.querySelector('#edit_hospital').value    = data.hospital ?? 'ไม่ระบุ';
-        modalEl.querySelector('#edit_recorder').value    = data.recorder ?? '';
-        modalEl.querySelector('#edit_remark').value      = data.remark ?? '';
+        // ✅ เคลียร์ error ที่ค้างจาก create ก่อน
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+        // ✅ เติมข้อมูลลงฟอร์ม
+        modalEl.querySelector('#edit_date').value         = data.date ?? '';
+        modalEl.querySelector('#edit_vaccine_name').value = data.vaccine_name ?? '';
+        modalEl.querySelector('#edit_hospital').value     = data.hospital ?? 'ไม่ระบุ';
+        modalEl.querySelector('#edit_recorder').value     = data.recorder ?? '';
+        modalEl.querySelector('#edit_remark').value       = data.remark ?? '';
 
         form.action = `/vaccine/update/${data.id}`;
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
+
+        // ✅ ผูก event เคลียร์ error แบบ real-time
+        attachRealtimeValidationClear(form);
       })
       .catch(err => console.error(err));
   }
 </script>
-
-    <script>
-      // ✅ ฟังก์ชันกลางสำหรับ reset ฟอร์มและ error
-      function resetForm(modalEl) {
-        const form = modalEl.querySelector('form');
-        if (form) {
-          form.reset();
-          form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-          form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
-        }
-        // ✅ ตั้งค่า default วันที่เป็นวันนี้ ถ้ามี field date
-        const dateInput = form?.querySelector('input[name="date"]');
-        if (dateInput) {
-          const today = new Date().toISOString().split('T')[0];
-          dateInput.value = today;
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", function() {
-        const createModal = document.getElementById('add-vaccine-modal');
-        const editModal   = document.getElementById('edit-vaccine-modal');
-        const addBtn      = document.getElementById('btn-add-vaccine');
-
-        // ✅ กดปุ่ม “เพิ่มข้อมูล” → reset ฟอร์มก่อนเปิด modal
-        addBtn?.addEventListener('click', () => {
-          if (createModal) resetForm(createModal);
-        });
-
-        // ✅ ปิด modal → reset ฟอร์ม
-        if (createModal) {
-          createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
-        }
-        if (editModal) {
-          editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
-        }
-      });
-    </script>
 @endpush
+@endsection

@@ -95,9 +95,9 @@ class PsychiatricController extends Controller
     {
             $psychiatric = Psychiatric::findOrFail($id);
 
-            $data = $request->validate([
+         $data = $request->validate([
             'sent_date'   => 'required|date',
-            'hotpital'    => 'nullable|string|max:255',
+            'hotpital'    => 'required|string|max:255',
             'psycho_id'   => 'required|exists:psychos,id',
             'diagnose'    => 'nullable|string',
             'appoin_date' => 'nullable|date',
@@ -108,21 +108,23 @@ class PsychiatricController extends Controller
         ],[
             'sent_date.required'   => 'กรุณาระบุวันที่ส่ง',
             'sent_date.date'       => 'รูปแบบวันที่ส่งไม่ถูกต้อง',
-            'hotpital.string'      => 'ชื่อสถานพยาบาลต้องเป็นข้อความ',
-            'hotpital.max'         => 'ชื่อสถานพยาบาลต้องไม่เกิน 255 ตัวอักษร',
-            'psycho_id.required'   => 'กรุณาเลือกผลการตรวจ',
-            'psycho_id.exists'     => 'ผลการตรวจที่เลือกไม่ถูกต้อง',
+            'hotpital.required'    => 'กรุณาระบุชื่อโรงพยาบาล',
+            'hotpital.string'      => 'ชื่อโรงพยาบาลต้องเป็นข้อความ',
+            'hotpital.max'         => 'ชื่อโรงพยาบาลต้องไม่เกิน 255 ตัวอักษร',
+            'psycho_id.required'   => 'กรุณาเลือกนักจิตวิทยา',
+            'psycho_id.exists'     => 'นักจิตวิทยาที่เลือกไม่ถูกต้อง',
             'diagnose.string'      => 'การวินิจฉัยต้องเป็นข้อความ',
             'appoin_date.date'     => 'รูปแบบวันที่นัดหมายไม่ถูกต้อง',
-            'drug_no.required'     => 'กรุณาระบุการรักษา',
-            'drug_no.in'           => 'การรักษาต้องเป็น yes หรือ no เท่านั้น',
+            'drug_no.required'     => 'กรุณาระบุการใช้ยา',
+            'drug_no.in'           => 'การใช้ยาต้องเป็น yes หรือ no เท่านั้น',
             'drug_name.string'     => 'ชื่อยาต้องเป็นข้อความ',
             'drug_name.max'        => 'ชื่อยาต้องไม่เกิน 255 ตัวอักษร',
-            'disa_no.required'     => 'กรุณาระบุการขึ้นทะเบียนคนพิการ',
-            'disa_no.in'           => 'การขึ้นทะเบียนต้องเป็น yes หรือ no เท่านั้น',
+            'disa_no.required'     => 'กรุณาระบุความพิการ',
+            'disa_no.in'           => 'ความพิการต้องเป็น yes หรือ no เท่านั้น',
             'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
             'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
         ]);
+
 
         if ($data['drug_no'] === 'no') {
             $data['drug_name'] = null;

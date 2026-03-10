@@ -10,11 +10,12 @@
                 <i class="bi bi-hospital me-2"></i> บันทึกข้อมูลการรักษาพยาบาลเด็ก
             </div>
             <!-- ปุ่ม toggle medical -->
-            <button type="button" class="btn btn-sm btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#createMedicalModal">
-      <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูล
-    </button>
+            <button type="button" id="btn-add-medical"
+                  class="btn btn-primary btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#add-medical-modal">
+              <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูล
+          </button>
         </div>
 
          {{-- ข้อมูล client --}}
@@ -65,10 +66,9 @@
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1">
                                         <button type="button" class="btn btn-sm btn-warning"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editMedicalModal{{ $medical->id }}">
-                                            <i class="bi bi-pencil-square"></i> แก้ไข
-                                        </button>
+                                            onclick="openEditMedical({{ $medical->id }})">
+                                      <i class="bi bi-pencil-square"></i> แก้ไข
+                                    </button>
                                         <button type="button" class="btn btn-sm btn-danger"
                                                 onclick="confirmDelete('delete-form-medical-{{ $medical->id }}', 'คุณต้องการลบข้อมูลทางการแพทย์นี้ใช่หรือไม่')">
                                             <i class="bi bi-trash"></i> ลบ
@@ -99,63 +99,88 @@
 @endif
 </div>
 
-<!-- Modal เพิ่มข้อมูลการรักษาพยาบาล -->
-<div class="modal fade" id="createMedicalModal" tabindex="-1" aria-hidden="true">
+{{-- ✅ Modal Add Medical --}}
+<div class="modal fade" id="add-medical-modal" tabindex="-1" aria-labelledby="addMedicalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">เพิ่มข้อมูลการรักษาพยาบาล</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form action="{{ route('medical.store') }}" method="POST">
-          @csrf
-          <input type="hidden" name="client_id" value="{{ $client->id }}">
+      <form action="{{ route('medical.store') }}" method="POST" id="add-medical-form" novalidate>
+        @csrf
+        <input type="hidden" name="client_id" value="{{ $client->id }}">
 
-          <div class="row mb-2">
-            <div class="col-12 col-md-2">
+        <!-- Header -->
+        <div class="modal-header bg-success text-white py-2">
+          <h5 class="modal-title fw-bold" id="addMedicalLabel">
+            <i class="bi bi-hospital me-2"></i> เพิ่มข้อมูลการรักษาพยาบาล
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-3">
               <label class="form-label fw-bold">วันที่</label>
-              <input type="date" name="medical_date" class="form-control form-control-sm" required>
+              <input type="date" name="medical_date"
+                     class="form-control form-control-sm @error('medical_date') is-invalid @enderror"
+                     value="{{ old('medical_date') }}">
+              @error('medical_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-md-4">
               <label class="form-label fw-bold">ชื่อโรค</label>
-              <input type="text" name="disease_name" class="form-control form-control-sm">
+              <input type="text" name="disease_name"
+                     class="form-control form-control-sm @error('disease_name') is-invalid @enderror"
+                     value="{{ old('disease_name') }}">
+              @error('disease_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-md-5">
               <label class="form-label fw-bold">อาการป่วย</label>
-              <textarea name="illness" class="form-control form-control-sm" rows="2"></textarea>
+              <textarea name="illness"
+                        class="form-control form-control-sm @error('illness') is-invalid @enderror"
+                        rows="2">{{ old('illness') }}</textarea>
+              @error('illness') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
 
-          <div class="mb-2">
+          <div class="mb-3">
             <label class="form-label fw-bold">การรักษา/การปฐมพยาบาล</label>
-            <textarea name="treatment" class="form-control form-control-sm" rows="2"></textarea>
+            <textarea name="treatment"
+                      class="form-control form-control-sm @error('treatment') is-invalid @enderror"
+                      rows="2">{{ old('treatment') }}</textarea>
+            @error('treatment') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
 
-          <div class="row mb-2">
-            <div class="col-12 col-md-6">
+          <div class="row mb-3">
+            <div class="col-md-6">
               <label class="form-label fw-bold">การพบแพทย์</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="refer" id="refer_yes_new" value="พบแพทย์">
+                <input class="form-check-input" type="radio" name="refer" id="refer_yes_new" value="พบแพทย์"
+                       {{ old('refer') == 'พบแพทย์' ? 'checked' : '' }}>
                 <label class="form-check-label" for="refer_yes_new">พบแพทย์</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="refer" id="refer_no_new" value="ไม่พบแพทย์" checked>
+                <input class="form-check-input" type="radio" name="refer" id="refer_no_new" value="ไม่พบแพทย์"
+                       {{ old('refer','ไม่พบแพทย์') == 'ไม่พบแพทย์' ? 'checked' : '' }}>
                 <label class="form-check-label" for="refer_no_new">ไม่พบแพทย์</label>
               </div>
+              @error('refer') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
             </div>
           </div>
 
-          <!-- ฟิลด์ diagnosis และ appt_date จะแสดงเฉพาะเมื่อเลือก "พบแพทย์" -->
           <div id="medical-section-new" style="display:none;">
-            <div class="row mb-2">
-              <div class="col-12 col-md-9">
+            <div class="row mb-3">
+              <div class="col-md-9">
                 <label class="form-label fw-bold">การวินิจฉัย</label>
-                <textarea name="diagnosis" class="form-control form-control-sm" rows="2"></textarea>
+                <textarea name="diagnosis"
+                          class="form-control form-control-sm @error('diagnosis') is-invalid @enderror"
+                          rows="2">{{ old('diagnosis') }}</textarea>
+                @error('diagnosis') <div class="invalid-feedback">{{ $message }}</div> @enderror
               </div>
-              <div class="col-12 col-md-3">
+              <div class="col-md-3">
                 <label class="form-label fw-bold">วันที่แพทย์นัด</label>
-                <input type="date" name="appt_date" class="form-control form-control-sm">
+                <input type="date" name="appt_date"
+                       class="form-control form-control-sm @error('appt_date') is-invalid @enderror"
+                       value="{{ old('appt_date') }}">
+                @error('appt_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
               </div>
             </div>
           </div>
@@ -163,90 +188,109 @@
           <div class="row mb-3">
             <div class="col-md-4">
               <label class="form-label fw-bold">ผู้ดูแล</label>
-              <input type="text" name="teacher" class="form-control form-control-sm">
+              <input type="text" name="teacher"
+                     class="form-control form-control-sm @error('teacher') is-invalid @enderror"
+                     value="{{ old('teacher') }}">
+              @error('teacher') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-8">
               <label class="form-label fw-bold">หมายเหตุ</label>
-              <textarea name="remark" class="form-control form-control-sm" rows="2"></textarea>
+              <textarea name="remark"
+                        class="form-control form-control-sm @error('remark') is-invalid @enderror"
+                        rows="2">{{ old('remark') }}</textarea>
+              @error('remark') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
+        </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-success btn-sm">
-              <i class="bi bi-save me-1"></i> บันทึกผล
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-1"></i> ปิด
-            </button>
-          </div>
-        </form>
-      </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save me-1"></i> บันทึกผล
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-@foreach ($medicals as $medical)
-<div class="modal fade" id="editMedicalModal{{ $medical->id }}" tabindex="-1" aria-hidden="true">
+{{-- ✅ เปิด modal อัตโนมัติเมื่อมี error --}}
+@if ($errors->any() && !session('edit_mode'))
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addModal = new bootstrap.Modal(document.getElementById('add-medical-modal'));
+    addModal.show();
+});
+</script>
+@endif
+
+<!-- ✅ Modal Edit Medical -->
+<div class="modal fade" id="editMedicalModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">แก้ไขข้อมูลการรักษาพยาบาล</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form action="{{ route('medical.update', $medical->id) }}" method="POST">
-          @csrf
-          @method('PUT')
-          <input type="hidden" name="client_id" value="{{ $client->id }}">
+      <!-- ✅ ให้ action มีค่า default -->
+      <form id="editMedicalForm" method="POST" action="{{ route('medical.update', 0) }}">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="client_id" id="edit_client_id">
+        <input type="hidden" name="id" id="edit_medical_id">
 
+        <!-- Header -->
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-pencil-square me-2"></i> แก้ไขข้อมูลการรักษาพยาบาล
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
           <div class="row mb-2">
-            <div class="col-12 col-md-2">
+            <div class="col-md-2">
               <label class="form-label fw-bold">วันที่</label>
-              <input type="date" name="medical_date" class="form-control form-control-sm"
-                     value="{{ old('medical_date', $medical->medical_date) }}" required>
+              <input type="date" name="medical_date" id="edit_medical_date"
+                     class="form-control form-control-sm @error('medical_date') is-invalid @enderror" required>
+              @error('medical_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-md-4">
               <label class="form-label fw-bold">ชื่อโรค</label>
-              <input type="text" name="disease_name" class="form-control form-control-sm"
-                     value="{{ old('disease_name', $medical->disease_name) }}">
+              <input type="text" name="disease_name" id="edit_disease_name"
+                     class="form-control form-control-sm @error('disease_name') is-invalid @enderror">
+              @error('disease_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-md-6">
               <label class="form-label fw-bold">อาการป่วย</label>
-              <textarea name="illness" class="form-control form-control-sm" rows="2">{{ old('illness', $medical->illness) }}</textarea>
+              <textarea name="illness" id="edit_illness"
+                        class="form-control form-control-sm @error('illness') is-invalid @enderror" rows="2"></textarea>
+              @error('illness') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
 
           <div class="mb-2">
             <label class="form-label fw-bold">การรักษา/การปฐมพยาบาล</label>
-            <textarea name="treatment" class="form-control form-control-sm" rows="2">{{ old('treatment', $medical->treatment) }}</textarea>
+            <textarea name="treatment" id="edit_treatment" class="form-control form-control-sm"></textarea>
           </div>
 
           <div class="row mb-2">
-            <div class="col-12 col-md-6">
+            <div class="col-md-6">
               <label class="form-label fw-bold">การพบแพทย์</label><br>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="refer" id="refer_yes_{{ $medical->id }}" value="พบแพทย์"
-                       {{ old('refer', $medical->refer) == 'พบแพทย์' ? 'checked' : '' }}>
-                <label class="form-check-label" for="refer_yes_{{ $medical->id }}">พบแพทย์</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="refer" id="refer_no_{{ $medical->id }}" value="ไม่พบแพทย์"
-                       {{ old('refer', $medical->refer) == 'ไม่พบแพทย์' ? 'checked' : '' }}>
-                <label class="form-check-label" for="refer_no_{{ $medical->id }}">ไม่พบแพทย์</label>
-              </div>
+              <input type="radio" name="refer" id="edit_refer_yes" value="พบแพทย์"> พบแพทย์
+              <input type="radio" name="refer" id="edit_refer_no" value="ไม่พบแพทย์"> ไม่พบแพทย์
             </div>
           </div>
 
-          <div id="medical-section-{{ $medical->id }}" style="display: {{ old('refer', $medical->refer) == 'พบแพทย์' ? 'block' : 'none' }};">
+          <div id="edit_medical_section" style="display:none;">
             <div class="row mb-2">
-              <div class="col-12 col-md-9">
+              <div class="col-md-9">
                 <label class="form-label fw-bold">การวินิจฉัย</label>
-                <textarea name="diagnosis" class="form-control form-control-sm" rows="2">{{ old('diagnosis', $medical->diagnosis) }}</textarea>
+                <textarea name="diagnosis" id="edit_diagnosis" class="form-control form-control-sm" rows="2"></textarea>
               </div>
-              <div class="col-12 col-md-3">
+              <div class="col-md-3">
                 <label class="form-label fw-bold">วันที่แพทย์นัด</label>
-                <input type="date" name="appt_date" class="form-control form-control-sm"
-                       value="{{ old('appt_date', $medical->appt_date) }}">
+                <input type="date" name="appt_date" id="edit_appt_date" class="form-control form-control-sm">
               </div>
             </div>
           </div>
@@ -254,78 +298,142 @@
           <div class="row mb-3">
             <div class="col-md-4">
               <label class="form-label fw-bold">ผู้ดูแล</label>
-              <input type="text" name="teacher" class="form-control form-control-sm"
-                     value="{{ old('teacher', $medical->teacher) }}">
+              <input type="text" name="teacher" id="edit_teacher" class="form-control form-control-sm">
             </div>
             <div class="col-md-8">
               <label class="form-label fw-bold">หมายเหตุ</label>
-              <textarea name="remark" class="form-control form-control-sm" rows="2">{{ old('remark', $medical->remark) }}</textarea>
+              <textarea name="remark" id="edit_remark" class="form-control form-control-sm" rows="2"></textarea>
             </div>
           </div>
+        </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-success btn-sm">
-              <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
-            </button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-1"></i> ปิด
-            </button>
-          </div>
-        </form>
-      </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success btn-sm">
+            <i class="bi bi-save me-1"></i> อัปเดตข้อมูล
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> ปิด
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-@endforeach
+@if ($errors->any() && !session('edit_mode'))
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addModal = document.getElementById('add-medical-modal');
+    if (addModal) {
+        bootstrap.Modal.getOrCreateInstance(addModal).show();
+    }
+});
+</script>
+@endif
+@endsection
+
 
 @push('scripts')
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // reset form
+  function resetForm(modalEl) {
+    const form = modalEl.querySelector('form');
+    if (form) form.reset();
+    const invalids = modalEl.querySelectorAll('.is-invalid');
+    invalids.forEach(el => el.classList.remove('is-invalid'));
+  }
 
+  // toggle section
+  function toggleSection(sectionEl, referYesEl, referNoEl) {
+    if (referYesEl.checked) sectionEl.style.display = "block";
+    else sectionEl.style.display = "none";
+  }
 
-  // ✅ Toggle ฟิลด์การวินิจฉัย/วันที่แพทย์นัด สำหรับ Create
-  const referYesNew   = document.getElementById('refer_yes_new');
-  const referNoNew    = document.getElementById('refer_no_new');
-  const sectionNew    = document.getElementById('medical-section-new');
+  // realtime clear
+  function attachRealtimeValidationClear(form) {
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+      el.addEventListener('input', () => {
+        if (el.classList.contains('is-invalid')) {
+          el.classList.remove('is-invalid');
+          const feedback = el.nextElementSibling;
+          if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.remove();
+          }
+        }
+      });
+    });
+  }
 
-  function toggleMedicalSectionNew() {
-    if (referYesNew && referYesNew.checked) {
-      sectionNew.style.display = 'block';
-    } else {
-      sectionNew.style.display = 'none';
-      const inputs = sectionNew.querySelectorAll('input, textarea');
-      inputs.forEach(el => el.value = '');
+  // ✅ Add Modal
+  const addModal = document.getElementById('add-medical-modal');
+  if (addModal) {
+    addModal.addEventListener('hidden.bs.modal', () => resetForm(addModal));
+    const addForm = addModal.querySelector('form');
+    if (addForm) attachRealtimeValidationClear(addForm);
+
+    // toggle พบแพทย์/ไม่พบแพทย์
+    const sectionNew  = document.getElementById('medical-section-new');
+    const referYesNew = document.getElementById('refer_yes_new');
+    const referNoNew  = document.getElementById('refer_no_new');
+    if (referYesNew && referNoNew && sectionNew) {
+      toggleSection(sectionNew, referYesNew, referNoNew);
+      referYesNew.addEventListener('change', () => toggleSection(sectionNew, referYesNew, referNoNew));
+      referNoNew.addEventListener('change', () => toggleSection(sectionNew, referYesNew, referNoNew));
     }
   }
-  if (referYesNew) referYesNew.addEventListener('change', toggleMedicalSectionNew);
-  if (referNoNew)  referNoNew.addEventListener('change', toggleMedicalSectionNew);
-  toggleMedicalSectionNew();
 
-  // ✅ Toggle ฟิลด์การวินิจฉัย/วันที่แพทย์นัด สำหรับ Edit
-  document.querySelectorAll('.modal[id^="editMedicalModal"]').forEach(function(modalEl) {
-    modalEl.addEventListener('shown.bs.modal', function () {
-      const id = modalEl.getAttribute('id').replace('editMedicalModal','');
-      const referYes = document.getElementById('refer_yes_' + id);
-      const referNo  = document.getElementById('refer_no_' + id);
-      const section  = document.getElementById('medical-section-' + id);
+  // ✅ Edit Modal
+  const editModal = document.getElementById('editMedicalModal');
+  if (editModal) {
+    editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
+    editModal.addEventListener('shown.bs.modal', function () {
+      const section  = document.getElementById('edit_medical_section');
+      const referYes = document.getElementById('edit_refer_yes');
+      const referNo  = document.getElementById('edit_refer_no');
+      if (referYes && referNo && section) {
+        toggleSection(section, referYes, referNo);
+        referYes.addEventListener('change', () => toggleSection(section, referYes, referNo));
+        referNo.addEventListener('change', () => toggleSection(section, referYes, referNo));
+      }
+      const form = editModal.querySelector('form');
+      if (form) attachRealtimeValidationClear(form);
+    });
+  }
+});
 
-      function toggleMedicalSection() {
-        if (referYes && referYes.checked) {
-          section.style.display = 'block';
-        } else {
-          section.style.display = 'none';
-          const inputs = section.querySelectorAll('input, textarea');
-          inputs.forEach(el => el.value = '');
-        }
+// ✅ ฟังก์ชัน global สำหรับเปิด modal edit
+function openEditMedical(id) {
+  fetch(`/medical/json/${id}`)
+    .then(res => res.json())
+    .then(data => {
+      const form = document.getElementById('editMedicalForm');
+      form.action = `/medical/update/${data.id}`;
+      document.getElementById('edit_medical_id').value   = data.id;
+      document.getElementById('edit_client_id').value    = data.client_id;
+      document.getElementById('edit_medical_date').value = data.medical_date ?? '';
+      document.getElementById('edit_disease_name').value = data.disease_name ?? '';
+      document.getElementById('edit_illness').value      = data.illness ?? '';
+      document.getElementById('edit_treatment').value    = data.treatment ?? '';
+      document.getElementById('edit_diagnosis').value    = data.diagnosis ?? '';
+      document.getElementById('edit_appt_date').value    = data.appt_date ?? '';
+      document.getElementById('edit_teacher').value      = data.teacher ?? '';
+      document.getElementById('edit_remark').value       = data.remark ?? '';
+
+      const referYes = document.getElementById('edit_refer_yes');
+      const referNo  = document.getElementById('edit_refer_no');
+      const section  = document.getElementById('edit_medical_section');
+      if (data.refer === "พบแพทย์") {
+        referYes.checked = true;
+        section.style.display = "block";
+      } else {
+        referNo.checked = true;
+        section.style.display = "none";
       }
 
-      toggleMedicalSection();
-      if (referYes) referYes.addEventListener('change', toggleMedicalSection);
-      if (referNo)  referNo.addEventListener('change', toggleMedicalSection);
-    });
-  });
-
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('editMedicalModal')).show();
+    })
+    .catch(err => console.error(err));
+}
 </script>
 @endpush
-
-
-@endsection

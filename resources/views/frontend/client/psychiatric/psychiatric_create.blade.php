@@ -281,23 +281,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <!-- วันที่ส่งตรวจ / สถานพยาบาล / ผลการตรวจ -->
           <div class="row mb-3">
-            <div class="col-md-3">
-              <label class="form-label fw-bold">วันที่ส่งตรวจ</label>
-              <input type="date" name="sent_date" id="edit_sent_date" class="form-control form-control-sm" required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-bold">สถานพยาบาล</label>
-              <input type="text" name="hotpital" id="edit_hotpital" class="form-control form-control-sm">
-            </div>
-            <div class="col-md-5">
-              <label class="form-label fw-bold">ผลการตรวจวินิจฉัย</label>
-              <select name="psycho_id" id="edit_psycho_id" class="form-select form-select-sm" required>
-                <option value="">-- เลือกผลการตรวจ --</option>
-                @foreach($psycho as $p)
-                  <option value="{{ $p->id }}">{{ $p->psycho_name }}</option>
-                @endforeach
-              </select>
-            </div>
+           <div class="col-md-3">
+                  <label class="form-label fw-bold">วันที่ส่งตรวจ</label>
+                  <input type="date" name="sent_date" id="edit_sent_date" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">สถานพยาบาล</label>
+                  <input type="text" name="hotpital" id="edit_hotpital" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-5">
+                  <label class="form-label fw-bold">ผลการตรวจวินิจฉัย</label>
+                  <select name="psycho_id" id="edit_psycho_id" class="form-select form-select-sm">
+                    <option value="">-- เลือกผลการตรวจ --</option>
+                    @foreach($psycho as $p)
+                      <option value="{{ $p->id }}">{{ $p->psycho_name }}</option>
+                    @endforeach
+                  </select>
+                </div>
           </div>
 
           <!-- สรุปผล -->
@@ -374,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (form) {
       form.reset();
       form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-      form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+      form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
     }
     // ซ่อน drug_name_field ถ้ามี
     const drugField = modalEl.querySelector('[id^="drug_name_field_"]');
@@ -383,6 +385,58 @@ document.addEventListener("DOMContentLoaded", function() {
       const drugInput = drugField.querySelector('input[name="drug_name"]');
       if (drugInput) drugInput.value = '';
     }
+  }
+
+  // ✅ ฟังก์ชันแสดง error ภาษาไทย
+  function showError(el, message) {
+    el.classList.add('is-invalid');
+    let feedback = el.parentElement.querySelector('.invalid-feedback');
+    if (!feedback) {
+      feedback = document.createElement('div');
+      feedback.classList.add('invalid-feedback');
+      el.parentElement.appendChild(feedback);
+    }
+    feedback.innerText = message;
+  }
+
+  // ✅ ฟังก์ชันเคลียร์ error แบบ real-time
+  function attachRealtimeValidationClear(form) {
+    form.querySelectorAll('input, select').forEach(el => {
+      ['input','change'].forEach(evt => {
+        el.addEventListener(evt, () => {
+          el.classList.remove('is-invalid');
+          const feedback = el.parentElement.querySelector('.invalid-feedback');
+          if (feedback) feedback.remove();
+        });
+      });
+    });
+  }
+
+  // ✅ Validation ภาษาไทยก่อน submit
+  function attachThaiValidation(form) {
+    form.addEventListener('submit', function(e) {
+      let valid = true;
+
+      const sentDate = form.querySelector('[name="sent_date"]');
+      if (!sentDate.value) {
+        showError(sentDate, 'กรุณาระบุวันที่ส่งตรวจ');
+        valid = false;
+      }
+
+      const hospital = form.querySelector('[name="hotpital"]');
+      if (!hospital.value.trim()) {
+        showError(hospital, 'กรุณาระบุสถานพยาบาล');
+        valid = false;
+      }
+
+      const psycho = form.querySelector('[name="psycho_id"]');
+      if (!psycho.value) {
+        showError(psycho, 'กรุณาเลือกผลการตรวจวินิจฉัย');
+        valid = false;
+      }
+
+      if (!valid) e.preventDefault();
+    });
   }
 
   // ✅ Toggle drug_name สำหรับ modal create
@@ -396,7 +450,7 @@ document.addEventListener("DOMContentLoaded", function() {
       drugFieldNew.style.display = 'block';
     } else {
       drugFieldNew.style.display = 'none';
-      if (drugInputNew) drugInputNew.value = ''; // ✅ ล้างค่าชื่อยาเมื่อเลือก "ไม่รับยา"
+      if (drugInputNew) drugInputNew.value = ''; // ✅ ล้างข้อมูลเมื่อเลือก "ไม่รับยา"
     }
   }
   if (drugYesNew) drugYesNew.addEventListener('change', toggleDrugFieldNew);
@@ -407,6 +461,11 @@ document.addEventListener("DOMContentLoaded", function() {
   const createBtn   = document.getElementById('btn-create-psychiatric');
   const createModal = document.getElementById('createPsychiatricModal');
   if (createBtn && createModal) {
+    const form = createModal.querySelector('form');
+    if (form) {
+      attachRealtimeValidationClear(form);
+      attachThaiValidation(form);
+    }
     createBtn.addEventListener('click', () => resetForm(createModal));
     createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
   }
@@ -421,27 +480,27 @@ document.addEventListener("DOMContentLoaded", function() {
         form.action = `/psychiatric/${data.id}`;
 
         // เติมค่าในฟอร์ม
-        modalEl.querySelector('#edit_sent_date').value = data.sent_date;
+        modalEl.querySelector('#edit_sent_date').value = data.sent_date ?? '';
         modalEl.querySelector('#edit_hotpital').value = data.hotpital ?? '';
-        modalEl.querySelector('#edit_psycho_id').value = data.psycho_id;
+        modalEl.querySelector('#edit_psycho_id').value = data.psycho_id ?? '';
         modalEl.querySelector('#edit_diagnose').value = data.diagnose ?? '';
         modalEl.querySelector('#edit_appoin_date').value = data.appoin_date ?? '';
 
+        // ✅ การรักษา (รับยา/ไม่รับยา)
         const drugYes = modalEl.querySelector('#edit_drug_yes');
         const drugNo  = modalEl.querySelector('#edit_drug_no');
         const drugField = modalEl.querySelector('#edit_drug_name_field');
         const drugInput = modalEl.querySelector('#edit_drug_name');
 
-        function toggleDrugField() {
+        function toggleDrugFieldEdit() {
           if (drugYes.checked) {
             drugField.style.display = 'block';
           } else {
             drugField.style.display = 'none';
-            drugInput.value = ''; // ✅ ล้างค่าชื่อยาเมื่อเลือก "ไม่รับยา"
+            drugInput.value = ''; // ✅ ล้างข้อมูลเมื่อเลือก "ไม่รับยา"
           }
         }
 
-        // ตั้งค่าเริ่มต้นจากข้อมูล JSON
         if (data.drug_no === 'yes') {
           drugYes.checked = true;
           drugField.style.display = 'block';
@@ -449,21 +508,25 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
           drugNo.checked = true;
           drugField.style.display = 'none';
-          drugInput.value = ''; // ✅ ล้างค่าออก
+          drugInput.value = '';
         }
 
-        // bind event toggle
-        drugYes.addEventListener('change', toggleDrugField);
-        drugNo.addEventListener('change', toggleDrugField);
+        drugYes.addEventListener('change', toggleDrugFieldEdit);
+        drugNo.addEventListener('change', toggleDrugFieldEdit);
 
-        // การขึ้นทะเบียนคนพิการ
+        // ✅ การขึ้นทะเบียนคนพิการ
+        const disaYes = modalEl.querySelector('#edit_disa_yes');
+        const disaNo  = modalEl.querySelector('#edit_disa_no');
         if (data.disa_no === 'yes') {
-          modalEl.querySelector('#edit_disa_yes').checked = true;
+          disaYes.checked = true;
         } else {
-          modalEl.querySelector('#edit_disa_no').checked = true;
+          disaNo.checked = true;
         }
 
-        // เปิด modal
+        // ✅ เคลียร์ error และ validation ภาษาไทยสำหรับ edit form
+        attachRealtimeValidationClear(form);
+        attachThaiValidation(form);
+
         new bootstrap.Modal(modalEl).show();
       });
   }
@@ -471,6 +534,11 @@ document.addEventListener("DOMContentLoaded", function() {
   // ✅ Reset ฟอร์มเมื่อปิด modal edit
   const editModal = document.getElementById('editPsychiatricModal');
   if (editModal) {
+    const form = editModal.querySelector('form');
+    if (form) {
+      attachRealtimeValidationClear(form);
+      attachThaiValidation(form);
+    }
     editModal.addEventListener('hidden.bs.modal', () => resetForm(editModal));
   }
 

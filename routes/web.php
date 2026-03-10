@@ -364,8 +364,8 @@ Route::prefix('medical')->name('medical.')->group(function () {
     // ✅ บันทึกข้อมูลใหม่
     Route::post('/store', [MedicalController::class, 'MedicalStore'])->name('store');
 
-    // ✅ ใช้ฟอร์มเดิมในการแก้ไข (ส่ง medical id)
-    Route::get('/edit/{id}', [MedicalController::class, 'MedicalEdit'])->name('edit');
+    // ❌ ตัดออก: ไม่ต้องใช้ MedicalEdit แล้ว
+    // Route::get('/edit/{id}', [MedicalController::class, 'MedicalEdit'])->name('edit');
 
     // ✅ อัปเดตข้อมูล (PUT)
     Route::put('/update/{id}', [MedicalController::class, 'MedicalUpdate'])->name('update');
@@ -373,11 +373,11 @@ Route::prefix('medical')->name('medical.')->group(function () {
     // ✅ ลบข้อมูล
     Route::delete('/delete/{id}', [MedicalController::class, 'MedicalDelete'])->name('delete');
 
-    // ✅ เพิ่ม route สำหรับรายงาน (ตรงกับปุ่มใน view)
+    // ✅ รายงาน
     Route::get('/report/{id}', [MedicalController::class, 'MedicalReport'])->name('report');
 
-    // ✅ เพิ่ม route สำหรับโหลดข้อมูล JSON (ใช้กับ modal edit)
-    Route::get('/json/{id}', [MedicalController::class, 'EditMedicalJson'])->name('json');
+    // ✅ โหลดข้อมูล JSON สำหรับ modal edit
+    Route::get('/json/{id}', [MedicalController::class, 'editMedicalJson'])->name('json');
 });
 
 

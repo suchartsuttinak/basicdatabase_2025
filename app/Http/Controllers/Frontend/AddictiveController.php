@@ -100,19 +100,32 @@ class AddictiveController extends Controller
         $addictive = Addictive::findOrFail($id);
 
         $data = $request->validate([
-            'date'     => 'required|date',
-            'exam'     => 'required|in:0,1',
-            'refer'    => 'nullable|in:1,2',
-            'record'   => 'nullable|string',
-            'recorder' => 'nullable|string|max:255',
+            'date'       => 'required|date',
+            'exam'       => 'required|in:0,1',
+            'refer'      => 'nullable|in:1,2',
+            'record'     => 'nullable|string',
+            'recorder'   => 'required|string|max:255',
+            'client_id'  => 'required|exists:clients,id',
+        ], [
+            'date.required'      => 'กรุณาระบุวันที่ตรวจ',
+            'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'exam.required'      => 'กรุณาเลือกผลการตรวจ',
+            'exam.in'            => 'ค่าที่เลือกไม่ถูกต้อง',
+            'refer.in'           => 'ค่าการส่งต่อไม่ถูกต้อง',
+            'record.string'      => 'บันทึกผลต้องเป็นข้อความ',
+            'recorder.required'  => 'กรุณาระบุชื่อผู้ตรวจ',
+            'recorder.string'    => 'ชื่อผู้ตรวจต้องเป็นข้อความ',
+            'recorder.max'       => 'ชื่อผู้ตรวจต้องไม่เกิน 255 ตัวอักษร',
+            'client_id.required' => 'ไม่พบรหัสผู้รับบริการ',
+            'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
         ]);
 
         if ($data['exam'] == 0) {
             $data['refer'] = null;
         }
-        if (empty($data['recorder'])) {
-            $data['recorder'] = 'ไม่ระบุ';
-        }
+        // if (empty($data['recorder'])) {
+        //     $data['recorder'] = 'ไม่ระบุ';
+        // }
 
         $addictive->update($data);
 

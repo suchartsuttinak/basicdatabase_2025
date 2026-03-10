@@ -487,5 +487,61 @@ function openEditAddictive(id) {
     })
     .catch(err => console.error('โหลดข้อมูลไม่สำเร็จ', err));
 }
+
+// ✅ ฟังก์ชันเคลียร์ error แบบ real-time
+function attachRealtimeValidationClear(form) {
+  form.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.remove('is-invalid');
+      const feedback = el.parentElement.querySelector('.invalid-feedback');
+      if (feedback) {
+        feedback.remove();   // ลบข้อความ error ออกทันที
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  const createModal = document.getElementById('createAddictiveModal');
+  if (createModal) {
+    const form = createModal.querySelector('form');
+    if (form) {
+      attachRealtimeValidationClear(form);
+    }
+    // ✅ reset เมื่อปิด modal
+    createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
+  }
+});
+
+// ✅ ฟังก์ชันเคลียร์ error แบบ real-time
+function attachRealtimeValidationClear(form) {
+  form.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.remove('is-invalid');
+      const feedback = el.parentElement.querySelector('.invalid-feedback');
+      if (feedback) {
+        feedback.remove();   // ลบข้อความ error ออกทันที
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  // ✅ สำหรับ modal create
+  const createModal = document.getElementById('createAddictiveModal');
+  if (createModal) {
+    const form = createModal.querySelector('form');
+    if (form) attachRealtimeValidationClear(form);
+    createModal.addEventListener('hidden.bs.modal', () => resetForm(createModal));
+  }
+
+  // ✅ สำหรับ modal edit (หลาย modal)
+  document.querySelectorAll('.modal[id^="editAddictiveModal"]').forEach(modalEl => {
+    const form = modalEl.querySelector('form');
+    if (form) attachRealtimeValidationClear(form);
+
+    modalEl.addEventListener('hidden.bs.modal', () => resetForm(modalEl));
+  });
+});
 </script>
 @endpush
