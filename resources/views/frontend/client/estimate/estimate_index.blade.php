@@ -51,6 +51,8 @@ document.addEventListener("DOMContentLoaded", function() {
     <i class="bi bi-plus-circle me-1"></i>
     <span>เพิ่มข้อมูล</span>
 </button>
+
+
     </div>
 
     <!-- ✅ แสดงชื่อและอายุ -->
@@ -71,63 +73,70 @@ document.addEventListener("DOMContentLoaded", function() {
             ยังไม่มีข้อมูลการติดตามและประเมิน
         </div>
     @else
-        <table id="datatable-estimate" class="table table-bordered table-striped align-middle">
-            <thead class="table-primary">
-                <tr>
-                    <th scope="col">ครั้งที่</th>
-                    <th scope="col">วันที่ติดตาม</th>
-                    <th scope="col">การดำเนินงาน</th>
-                    <th scope="col">ผลการติดตาม</th>
-                    <th scope="col">ผู้ประเมิน</th>
-                    <th scope="col">หมายเหตุ</th>
-                    <th scope="col">รูปภาพ</th>
-                    <th scope="col" class="text-center">การจัดการ</th>
-                </tr>
-            </thead>
-            <tbody>
-        @foreach ($client->estimates->sortByDesc('date') as $item)
-        <tr>
-            <td>{{ $item->count }}</td>
-            <td>{{ \Carbon\Carbon::parse($item->date)->format('d/m/Y') }}</td>
-            <td>{{ $item->follo_no }}</td>
-            <td>{{ $item->results }}</td>
-            <td>{{ $item->teacher }}</td>
-            <td>{{ $item->remark }}</td>
-            <td>
-                @foreach($item->pictures as $pic)
-                    <img src="{{ asset('storage/'.$pic->path) }}" 
-                         class="img-thumbnail me-1 mb-1" 
-                         style="width:80px; height:auto;">
-                @endforeach
-            </td>
-            <td class="text-center">
-                <!-- ปุ่มแก้ไข -->
-                <button type="button"  
-                        class="btn btn-success btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#edit-estimate-modal"
-                        onclick="estimateEdit({{ $item->id }})">
-                    <i class="bi bi-pencil-square"></i> แก้ไข
-                </button>
+        <!-- ✅ ครอบด้วย table-responsive -->
+        <div class="table-responsive">
+            <table id="datatable-estimate" class="table table-bordered table-striped align-middle w-100">
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">ครั้งที่</th>
+                        <th scope="col">วันที่ติดตาม</th>
+                        <th scope="col">การดำเนินงาน</th>
+                        <th scope="col">ผลการติดตาม</th>
+                        <th scope="col">ผู้ประเมิน</th>
+                        <th scope="col">หมายเหตุ</th>
+                        <th scope="col">รูปภาพ</th>
+                        <th scope="col" class="text-center">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($client->estimates->sortByDesc('date') as $item)
+                        <tr>
+                            <td>{{ $item->count }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->date)->format('d/m/Y') }}</td>
+                            <td>{{ $item->follo_no }}</td>
+                            <td>{{ $item->results }}</td>
+                            <td>{{ $item->teacher }}</td>
+                            <td>{{ $item->remark }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap align-items-start gap-2">
+                                    @foreach($item->pictures as $pic)
+                                        <div style="width:80px;">
+                                            <img src="{{ asset('storage/'.$pic->path) }}"
+                                                 class="img-thumbnail"
+                                                 style="width:100%; height:auto;">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <!-- ปุ่มแก้ไข -->
+                                <button type="button"
+                                        class="btn btn-success btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#edit-estimate-modal"
+                                        onclick="estimateEdit({{ $item->id }})">
+                                    <i class="bi bi-pencil-square"></i> แก้ไข
+                                </button>
 
-                <!-- ฟอร์มลบ -->
-                <form id="delete-form-item-{{ $item->id }}"
-                      action="{{ route('estimate.delete', $item->id) }}"
-                      method="POST" style="display:none;">
-                    @csrf
-                    @method('DELETE')
-                </form>
+                                <!-- ฟอร์มลบ -->
+                                <form id="delete-form-item-{{ $item->id }}"
+                                      action="{{ route('estimate.delete', $item->id) }}"
+                                      method="POST" style="display:none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
 
-                <button type="button"  
-                        class="btn btn-sm btn-danger d-inline-flex align-items-center ms-1"
-                        onclick="confirmDelete('delete-form-item-{{ $item->id }}', 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่')">
-                    <i class="bi bi-trash-fill me-1"></i> ลบ
-                </button>
-            </td>
-        </tr>
-    @endforeach
-</tbody>
-        </table>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger d-inline-flex align-items-center ms-1"
+                                        onclick="confirmDelete('delete-form-item-{{ $item->id }}', 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่')">
+                                    <i class="bi bi-trash-fill me-1"></i> ลบ
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 </div>
 
@@ -237,13 +246,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         <div class="modal-body">
           <div class="mb-3 col-4">
-            <label class="form-label">วันที่ติดตาม</label>
+             <label class="form-label">วันที่ติดตาม</label>
             <input type="date" name="date" id="edit_date"
-                   class="form-control @error('date') is-invalid @enderror"
-                   value="{{ old('date') }}">
-            @error('date')
-              <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+           class="form-control"
+           value="{{ old('date') }}">
           </div>
 
           <div class="mb-3">
@@ -263,9 +269,9 @@ document.addEventListener("DOMContentLoaded", function() {
                      {{ old('follo_no') == 'จดหมาย' ? 'checked' : '' }}>
               <label class="form-check-label">จดหมาย</label>
             </div>
-            @error('follo_no')
+            {{-- @error('follo_no')
               <div class="text-danger" id="follo_no-error">{{ $message }}</div>
-            @enderror
+            @enderror --}}
           </div>
 
           <div class="mb-3">
@@ -382,9 +388,6 @@ document.addEventListener("DOMContentLoaded", function() {
 @endif
 
 
-
-
-
 @push('scripts')
 <script>
 /** ฟังก์ชัน preview ไฟล์ใหม่ (ใช้ได้ทั้ง Add และ Edit) */
@@ -449,11 +452,9 @@ function estimateEdit(id){
         type: "GET",
         dataType: "json",
         success: function(data){
-            // ✅ เปลี่ยน action ของฟอร์มให้เป็น id จริง
             $('#edit-estimate-form').attr('action', '/estimate/update/' + data.id);
-            $('#edit-estimate-form').attr('data-id', data.id); // เก็บ id ไว้ใช้ตรวจ duplicate
+            $('#edit-estimate-form').attr('data-id', data.id);
 
-            // เติมค่าลงฟอร์ม
             $('#edit_date').val(data.date);
             $('#edit_results').val(data.results ?? '');
             $('#edit_teacher').val(data.teacher ?? '');
@@ -463,7 +464,6 @@ function estimateEdit(id){
                 $(this).prop('checked', $(this).val() === data.follo_no);
             });
 
-            // แสดงรูปเดิม
             const preview = $('#preview-area-edit');
             preview.html('');
             if(Array.isArray(data.pictures)){
@@ -478,7 +478,6 @@ function estimateEdit(id){
                 });
             }
 
-            // เปิด modal edit
             const modalEl = document.getElementById('edit-estimate-modal');
             bootstrap.Modal.getOrCreateInstance(modalEl).show();
         }
@@ -493,51 +492,61 @@ function removeOldPicture(picId, btn){
     );
 }
 
+/** ฟังก์ชัน reset ฟอร์ม + เคลียร์ error + เคลียร์ preview + เคลียร์ไฟล์ */
+function resetForm(formId, previewId, setToday = false) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    form.reset();
+
+    form.querySelectorAll(".is-invalid").forEach(el => {
+        el.classList.remove("is-invalid");
+    });
+
+    form.querySelectorAll(".invalid-feedback, .text-danger").forEach(el => {
+        el.style.display = "none";
+        el.textContent = "";
+    });
+
+    const previewArea = document.getElementById(previewId);
+    if (previewArea) previewArea.innerHTML = "";
+
+    // เคลียร์ไฟล์ input
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(fi => fi.value = "");
+
+    if (setToday) {
+        const dateInput = form.querySelector('input[name="date"]');
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    }
+}
+
 /** เคลียร์ฟอร์มเมื่อกดปุ่มยกเลิก */
 document.querySelector('#add-estimate-modal .btn-secondary[data-bs-dismiss="modal"]')
-    ?.addEventListener('click', function(){
-        document.getElementById('add-estimate-form').reset();
-        document.getElementById('preview-area-add').innerHTML = "";
-    });
+    ?.addEventListener('click', () => resetForm('add-estimate-form','preview-area-add'));
 
 document.querySelector('#edit-estimate-modal .btn-secondary[data-bs-dismiss="modal"]')
-    ?.addEventListener('click', function(){
-        document.getElementById('edit-estimate-form').reset();
-        document.getElementById('preview-area-edit').innerHTML = "";
-    });
+    ?.addEventListener('click', () => resetForm('edit-estimate-form','preview-area-edit'));
 
 /** reset ฟอร์มทุกครั้งที่กดปุ่ม "เพิ่มข้อมูล" */
-document.getElementById('btn-add-estimate')?.addEventListener('click', function(){
-    const addForm = document.getElementById('add-estimate-form');
-    if (addForm) {
-        addForm.reset();
-    }
-    document.getElementById('preview-area-add').innerHTML = "";
-    document.querySelectorAll('#add-estimate-form .invalid-feedback, #add-estimate-form .text-danger')
-        .forEach(el => el.innerHTML = "");
-    const today = new Date().toISOString().split('T')[0];
-    document.querySelector('#add-estimate-form input[name="date"]').value = today;
-});
+document.getElementById('btn-add-estimate')
+    ?.addEventListener('click', () => resetForm('add-estimate-form','preview-area-add',true));
 
 /** ✅ ซ่อนข้อความ error เมื่อเลือก radio follo_no และเมื่อเปลี่ยนวันที่ */
 document.addEventListener("DOMContentLoaded", function() {
-    // radio follo_no
     document.querySelectorAll('input[name="follo_no"]').forEach(radio => {
         radio.addEventListener('change', function() {
             const errorEl = document.getElementById('follo_no-error');
-            if (errorEl) {
-                errorEl.style.display = "none";
-            }
+            if (errorEl) errorEl.style.display = "none";
         });
     });
 
-    // date input
     document.querySelectorAll('input[name="date"]').forEach(dateInput => {
         dateInput.addEventListener('change', function() {
             const errorEl = dateInput.closest('.mb-3').querySelector('.invalid-feedback');
-            if (errorEl) {
-                errorEl.style.display = "none";
-            }
+            if (errorEl) errorEl.style.display = "none";
             dateInput.classList.remove('is-invalid');
         });
     });
@@ -547,7 +556,7 @@ document.addEventListener("DOMContentLoaded", function() {
 async function checkDuplicateDate(clientId, date, estimateId) {
     const response = await fetch(`/estimate/check-duplicate?client_id=${clientId}&date=${date}&id=${estimateId}`);
     const result = await response.json();
-    return result.duplicate; // true ถ้าวันที่ซ้ำ
+    return result.duplicate;
 }
 
 document.addEventListener("DOMContentLoaded", function(){
@@ -581,44 +590,5 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 });
 </script>
-
-@if ($errors->any() && session('form') === 'edit')
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const modalEl = document.getElementById('edit-estimate-modal');
-    bootstrap.Modal.getOrCreateInstance(modalEl).show();
-});
-
-$('#saveBtn').on('click', function(e) {
-    e.preventDefault();
-    $.ajax({
-        url: '/save-data',
-        type: 'POST',
-        data: $('#formData').serialize(),
-        success: function(response) {
-            Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อย', 'success');
-            $('#myModal').modal('hide');
-        },
-        error: function(xhr) {
-            let errors = xhr.responseJSON.errors;
-            $('#myModal').modal('show'); // เปิด modal เมื่อ error
-            $.each(errors, function(key, value) {
-                let input = $('[name="'+key+'"]');
-                input.addClass('is-invalid');
-                input.next('.invalid-feedback').remove(); 
-                input.after('<div class="invalid-feedback">'+value[0]+'</div>');
-            });
-        }
-    });
-});
-
-// ลบข้อความ error ทันทีเมื่อแก้ไข
-$(document).on('input change', 'input, select, textarea', function() {
-    $(this).removeClass('is-invalid');
-    $(this).next('.invalid-feedback').remove();
-});
-</script>
-@endif
-
 @endpush
 @endsection
