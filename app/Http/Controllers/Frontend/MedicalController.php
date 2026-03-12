@@ -50,31 +50,37 @@ class MedicalController extends Controller
 
         Medical::create($data);
 
-        return redirect()->back()->with('success', 'บันทึกข้อมูลเรียบร้อย');
+         $notification = [
+            'message' => 'บันทึกข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
+
+        return redirect()->back()->with($notification);
     }
 
     // โหลดข้อมูลสำหรับแก้ไข (JSON)
     public function editMedicalJson($id)
-    {
-        $medical = Medical::findOrFail($id);
+{
+    $medical = Medical::findOrFail($id);
 
-        return response()->json([
-            'id'           => $medical->id,
-            'medical_date' => $medical->medical_date ? \Carbon\Carbon::parse($medical->medical_date)->format('Y-m-d') : null,
-            'disease_name' => $medical->disease_name,
-            'illness'      => $medical->illness,
-            'treatment'    => $medical->treatment,
-            'refer'        => $medical->refer,
-            'diagnosis'    => $medical->diagnosis,
-            'appt_date'    => $medical->appt_date ? \Carbon\Carbon::parse($medical->appt_date)->format('Y-m-d') : null,
-            'teacher'      => $medical->teacher,
-            'remark'       => $medical->remark,
-            'client_id'    => $medical->client_id,
-        ]);
-    }
+    return response()->json([
+        'id'           => $medical->id,
+        'medical_date' => $medical->medical_date ? \Carbon\Carbon::parse($medical->medical_date)->format('Y-m-d') : null,
+        'disease_name' => $medical->disease_name,
+        'illness'      => $medical->illness,
+        'treatment'    => $medical->treatment,
+        'refer'        => $medical->refer,
+        'diagnosis'    => $medical->diagnosis,
+        'appt_date'    => $medical->appt_date ? \Carbon\Carbon::parse($medical->appt_date)->format('Y-m-d') : null,
+        'teacher'      => $medical->teacher,
+        'remark'       => $medical->remark,
+        'client_id'    => $medical->client_id,
+    ]);
+}
 
-    // อัปเดตข้อมูล
-   public function MedicalUpdate(Request $request, $id)
+// ✅ อัปเดตข้อมูล
+public function MedicalUpdate(Request $request, $id)
 {
     $medical = Medical::findOrFail($id);
 
@@ -98,6 +104,7 @@ class MedicalController extends Controller
     ]);
 
     if ($validator->fails()) {
+        // ❌ Validation fail → กลับไปหน้าเดิม + เปิด modal edit พร้อม error
         return back()
             ->withErrors($validator)
             ->withInput()
@@ -108,6 +115,8 @@ class MedicalController extends Controller
     }
 
     $data = $validator->validated();
+
+    // ถ้าเลือก "ไม่พบแพทย์" → clear diagnosis และ appt_date
     if ($data['refer'] === 'ไม่พบแพทย์') {
         $data['diagnosis'] = null;
         $data['appt_date'] = null;
@@ -115,11 +124,17 @@ class MedicalController extends Controller
 
     $medical->update($data);
 
-    // ✅ สำเร็จ → redirect ไปหน้าตาราง (เช่น medical.index)
-   return redirect()->route('medical.add', $medical->client_id)
-                 ->with('success', 'อัปเดตข้อมูลเรียบร้อย');
-}
 
+     $notification = [
+            'message' => 'อัปเดตข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
+    // ✅ สำเร็จ → redirect ไปหน้าตาราง (เช่น medical.index หรือ medical.add)
+    return redirect()
+        ->route('medical.add', $medical->client_id)
+        ->with($notification);
+}
     // ลบข้อมูล
     public function MedicalDelete($id)
     {

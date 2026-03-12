@@ -136,6 +136,7 @@ class AbsentController extends Controller
 
     /** เปิดฟอร์มแก้ไขการขาดเรียน */
    // ✅ คืนค่า JSON สำหรับ AJAX
+/** โหลดข้อมูลเดิมสำหรับแก้ไข (JSON) */
 public function AbsentEdit($id)
 {
     $absent = Absent::findOrFail($id);
@@ -151,7 +152,7 @@ public function AbsentEdit($id)
     ]);
 }
 
-// ✅ คืนค่า view สำหรับหน้าเต็ม (ถ้าคุณยังต้องใช้)
+/** คืนค่า view สำหรับหน้าเต็ม (ถ้าคุณยังต้องใช้) */
 public function AbsentEditView($id)
 {
     $absent = Absent::findOrFail($id);
@@ -181,31 +182,63 @@ public function AbsentEditView($id)
     ]);
 }
 
-    /** อัปเดตข้อมูลการขาดเรียน */
-    public function AbsentUpdate(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'client_id'           => 'required|integer|exists:clients,id',
-            'education_record_id' => 'nullable|integer',
-            'absent_date'         => 'required|date',
-            'cause'               => 'nullable|string|max:255',
-            'operation'           => 'nullable|string|max:255',
-            'remark'              => 'nullable|string|max:500',
-            'record_date'         => 'required|date',
-            'teacher'             => 'nullable|string|max:255'
+/** อัปเดตข้อมูลการขาดเรียน */
+public function AbsentUpdate(Request $request, $id)
+{
+    $validated = $request->validate([
+        'client_id'           => 'required|integer|exists:clients,id',
+        'education_record_id' => 'nullable|integer',
+        'absent_date'         => 'required|date',
+        'record_date'         => 'required|date',
+        'cause'               => 'required|string|max:255',
+        'operation'           => 'nullable|string|max:255',
+        'remark'              => 'nullable|string|max:500',
+        'teacher'             => 'required|string|max:255',
+    ], [
+        'client_id.required'       => 'กรุณาระบุรหัสเด็ก',
+        'client_id.integer'        => 'รหัสเด็กต้องเป็นตัวเลข',
+        'client_id.exists'         => 'ไม่พบข้อมูลเด็กในระบบ',
+
+        'absent_date.required'     => 'กรุณาเลือกวันที่ขาดเรียน',
+        'absent_date.date'         => 'รูปแบบวันที่ขาดเรียนไม่ถูกต้อง',
+
+        'record_date.required'     => 'กรุณาเลือกวันที่บันทึกข้อมูล',
+        'record_date.date'         => 'รูปแบบวันที่บันทึกไม่ถูกต้อง',
+
+        'cause.required'           => 'กรุณาระบุสาเหตุที่ขาดเรียน',
+        'cause.string'             => 'สาเหตุที่ขาดเรียนต้องเป็นข้อความ',
+        'cause.max'                => 'สาเหตุที่ขาดเรียนต้องไม่เกิน 255 ตัวอักษร',
+
+        'operation.string'         => 'การดำเนินงานต้องเป็นข้อความ',
+        'operation.max'            => 'การดำเนินงานต้องไม่เกิน 255 ตัวอักษร',
+
+        'remark.string'            => 'หมายเหตุต้องเป็นข้อความ',
+        'remark.max'               => 'หมายเหตุต้องไม่เกิน 500 ตัวอักษร',
+
+        'teacher.required'         => 'กรุณากรอกชื่อผู้ดูแลเด็ก',
+        'teacher.string'           => 'ชื่อผู้ดูแลเด็กต้องเป็นข้อความ',
+        'teacher.max'              => 'ชื่อผู้ดูแลเด็กต้องไม่เกิน 255 ตัวอักษร',
+    ]);
+
+    $absent = Absent::findOrFail($id);
+    $absent->update($validated);
+
+    // ✅ รองรับ AJAX + SweetAlert2
+    if ($request->ajax()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+            'data'    => $absent
         ]);
-
-        $absent = Absent::findOrFail($id);
-        $absent->update($validated);
-
-        return redirect()
-            ->route('absent.add', $absent->client_id)
-            ->with([
-                'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success'
-            ]);
     }
 
+    return redirect()
+        ->route('absent.add', $absent->client_id)
+        ->with([
+            'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+            'alert-type' => 'success'
+        ]);
+}
     /** ลบข้อมูลการขาดเรียน */
     public function AbsentDelete($id)
     {

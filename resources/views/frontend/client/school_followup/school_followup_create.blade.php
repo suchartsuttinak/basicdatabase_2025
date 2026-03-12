@@ -78,12 +78,12 @@
                   <div class="row mb-2">
                    <div class="col-4 mb-3">
                         <label class="form-label fw-bold small">วันที่ตรวจ</label>
-                        <input type="date" name="date"
-                              class="form-control form-control-sm @error('date') is-invalid @enderror"
-                              value="{{ old('date', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
-                        @error('date')
-                          <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                       <input type="date" name="follow_date"
+                            class="form-control form-control-sm @error('follow_date') is-invalid @enderror"
+                            value="{{ old('follow_date', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
+                      @error('follow_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
                       </div>
                     <div class="col-4 mb-3">
                       <label class="form-label fw-bold small">ครูประจำชั้น</label>

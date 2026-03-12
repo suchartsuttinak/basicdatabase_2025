@@ -235,8 +235,8 @@ document.addEventListener("DOMContentLoaded", function() {
       <form id="editMedicalForm" method="POST" action="{{ route('medical.update', 0) }}">
         @csrf
         @method('PUT')
-        <input type="hidden" name="client_id" id="edit_client_id">
-        <input type="hidden" name="id" id="edit_medical_id">
+        <input type="hidden" name="client_id" id="edit_client_id" value="{{ old('client_id') }}">
+        <input type="hidden" name="id" id="edit_medical_id" value="{{ old('id') }}">
 
         <!-- Header -->
         <div class="modal-header bg-warning text-dark">
@@ -252,33 +252,40 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="col-md-2">
               <label class="form-label fw-bold">วันที่</label>
               <input type="date" name="medical_date" id="edit_medical_date"
-                     class="form-control form-control-sm @error('medical_date') is-invalid @enderror" required>
+                     class="form-control form-control-sm @error('medical_date') is-invalid @enderror"
+                     value="{{ old('medical_date') }}" required>
               @error('medical_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-4">
               <label class="form-label fw-bold">ชื่อโรค</label>
               <input type="text" name="disease_name" id="edit_disease_name"
-                     class="form-control form-control-sm @error('disease_name') is-invalid @enderror">
+                     class="form-control form-control-sm @error('disease_name') is-invalid @enderror"
+                     value="{{ old('disease_name') }}">
               @error('disease_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-6">
               <label class="form-label fw-bold">อาการป่วย</label>
               <textarea name="illness" id="edit_illness"
-                        class="form-control form-control-sm @error('illness') is-invalid @enderror" rows="2"></textarea>
+                        class="form-control form-control-sm @error('illness') is-invalid @enderror"
+                        rows="2">{{ old('illness') }}</textarea>
               @error('illness') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
           </div>
 
           <div class="mb-2">
             <label class="form-label fw-bold">การรักษา/การปฐมพยาบาล</label>
-            <textarea name="treatment" id="edit_treatment" class="form-control form-control-sm"></textarea>
+            <textarea name="treatment" id="edit_treatment"
+                      class="form-control form-control-sm">{{ old('treatment') }}</textarea>
           </div>
 
           <div class="row mb-2">
             <div class="col-md-6">
               <label class="form-label fw-bold">การพบแพทย์</label><br>
-              <input type="radio" name="refer" id="edit_refer_yes" value="พบแพทย์"> พบแพทย์
-              <input type="radio" name="refer" id="edit_refer_no" value="ไม่พบแพทย์"> ไม่พบแพทย์
+              <input type="radio" name="refer" id="edit_refer_yes" value="พบแพทย์"
+                     {{ old('refer') === 'พบแพทย์' ? 'checked' : '' }}> พบแพทย์
+              <input type="radio" name="refer" id="edit_refer_no" value="ไม่พบแพทย์"
+                     {{ old('refer') === 'ไม่พบแพทย์' ? 'checked' : '' }}> ไม่พบแพทย์
+              @error('refer') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
             </div>
           </div>
 
@@ -286,11 +293,14 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="row mb-2">
               <div class="col-md-9">
                 <label class="form-label fw-bold">การวินิจฉัย</label>
-                <textarea name="diagnosis" id="edit_diagnosis" class="form-control form-control-sm" rows="2"></textarea>
+                <textarea name="diagnosis" id="edit_diagnosis"
+                          class="form-control form-control-sm" rows="2">{{ old('diagnosis') }}</textarea>
               </div>
               <div class="col-md-3">
                 <label class="form-label fw-bold">วันที่แพทย์นัด</label>
-                <input type="date" name="appt_date" id="edit_appt_date" class="form-control form-control-sm">
+                <input type="date" name="appt_date" id="edit_appt_date"
+                       class="form-control form-control-sm"
+                       value="{{ old('appt_date') }}">
               </div>
             </div>
           </div>
@@ -298,11 +308,14 @@ document.addEventListener("DOMContentLoaded", function() {
           <div class="row mb-3">
             <div class="col-md-4">
               <label class="form-label fw-bold">ผู้ดูแล</label>
-              <input type="text" name="teacher" id="edit_teacher" class="form-control form-control-sm">
+              <input type="text" name="teacher" id="edit_teacher"
+                     class="form-control form-control-sm"
+                     value="{{ old('teacher') }}">
             </div>
             <div class="col-md-8">
               <label class="form-label fw-bold">หมายเหตุ</label>
-              <textarea name="remark" id="edit_remark" class="form-control form-control-sm" rows="2"></textarea>
+              <textarea name="remark" id="edit_remark"
+                        class="form-control form-control-sm" rows="2">{{ old('remark') }}</textarea>
             </div>
           </div>
         </div>
@@ -320,7 +333,15 @@ document.addEventListener("DOMContentLoaded", function() {
     </div>
   </div>
 </div>
-@if ($errors->any() && !session('edit_mode'))
+
+<!-- ✅ เปิด modal ที่ถูกต้องตามสถานการณ์ -->
+@if ($errors->any() && session('edit_mode') && session('edit_id'))
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    openEditMedical({{ session('edit_id') }});
+});
+</script>
+@elseif ($errors->any() && !session('edit_mode'))
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const addModal = document.getElementById('add-medical-modal');

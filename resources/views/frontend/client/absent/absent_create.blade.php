@@ -236,6 +236,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 @endif
 
+
 <!-- ✅ Modal Edit ตัวเดียว -->
 <div class="modal fade" id="editAbsentModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -244,50 +245,76 @@ document.addEventListener("DOMContentLoaded", function() {
                 @csrf
                 @method('PUT')
 
-                <div class="modal-header bg-primary text-white py-2">
-                    <h5 class="modal-title">
-                        <i class="bi bi-pencil-square"></i> แก้ไขการบันทึกการขาดเรียน
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
+               <div class="modal-header bg-primary text-white py-2">
+    <h5 class="modal-title">
+        <i class="bi bi-pencil-square"></i> แก้ไขการบันทึกการขาดเรียน
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
 
-                <div class="modal-body small">
-                    <input type="hidden" name="client_id" value="{{ $client->id }}">
-                    <input type="hidden" name="education_record_id" value="{{ $educationRecord->id ?? '' }}">
+<div class="modal-body small">
+    <input type="hidden" name="client_id" value="{{ $client->id }}">
+    <input type="hidden" name="education_record_id" value="{{ $educationRecord->id ?? '' }}">
 
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold small">วันที่ขาดเรียน</label>
-                            <input type="date" id="edit_absent_date" name="absent_date" class="form-control form-control-sm" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold small">วันที่บันทึก</label>
-                            <input type="date" id="edit_record_date" name="record_date" class="form-control form-control-sm" required>
-                        </div>
-                    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label fw-bold small">วันที่ขาดเรียน</label>
+            <input type="date" id="edit_absent_date" name="absent_date"
+                   class="form-control form-control-sm @error('absent_date') is-invalid @enderror" required>
+            @error('absent_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold small">วันที่บันทึก</label>
+            <input type="date" id="edit_record_date" name="record_date"
+                   class="form-control form-control-sm @error('record_date') is-invalid @enderror" required>
+            @error('record_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small">สาเหตุที่ขาดเรียน</label>
-                            <textarea id="edit_cause" name="cause" class="form-control form-control-sm" rows="2"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small">การดำเนินงาน</label>
-                            <textarea id="edit_operation" name="operation" class="form-control form-control-sm" rows="2"></textarea>
-                        </div>
-                    </div>
+                <div class="row mb-3">
+                <div class="col-md-6">
+                <label class="form-label fw-bold small">สาเหตุที่ขาดเรียน</label>
+                <textarea id="edit_cause" name="cause"
+                        class="form-control form-control-sm @error('cause') is-invalid @enderror" rows="2"></textarea>
+                @error('cause')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small">หมายเหตุ</label>
-                            <textarea id="edit_remark" name="remark" class="form-control form-control-sm" rows="2"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small">ชื่อ-สกุล ผู้ดูแลเด็ก</label>
-                            <input type="text" id="edit_teacher" name="teacher" class="form-control form-control-sm">
-                        </div>
-                    </div>
-                </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-bold small">การดำเนินงาน</label>
+            <textarea id="edit_operation" name="operation"
+                      class="form-control form-control-sm @error('operation') is-invalid @enderror" rows="2"></textarea>
+            @error('operation')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold small">หมายเหตุ</label>
+            <textarea id="edit_remark" name="remark"
+                      class="form-control form-control-sm @error('remark') is-invalid @enderror" rows="2"></textarea>
+            @error('remark')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold small">ชื่อ-สกุล ผู้ดูแลเด็ก</label>
+            <input type="text" id="edit_teacher" name="teacher"
+                   class="form-control form-control-sm @error('teacher') is-invalid @enderror">
+            @error('teacher')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+</div>
 
                 <!-- Footer -->
                 <div class="modal-footer">
@@ -328,6 +355,49 @@ document.addEventListener("DOMContentLoaded", function() {
             responsive: true,
             language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }
         });
+
+        // ✅ Submit Edit Form ผ่าน AJAX + SweetAlert2
+        $('#edit-absent-form').on('submit', function(e){
+            e.preventDefault();
+            const form = $(this);
+            const actionUrl = form.attr('action');
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: actionUrl,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res){
+                    if(res.success){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ',
+                            text: res.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            bootstrap.Modal.getOrCreateInstance(document.getElementById('editAbsentModal')).hide();
+                            location.reload(); // หรือ refresh table ด้วย AJAX
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ผิดพลาด',
+                            text: res.message || 'ไม่สามารถแก้ไขข้อมูลได้'
+                        });
+                    }
+                },
+                error: function(){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ผิดพลาด',
+                        text: 'สาเหตุการขาดเรียน/ผู้ดูแลเด็ก ต้องไม่เป็นค่าว่าง'
+                    });
+                }
+            });
+        });
     });
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -348,20 +418,14 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        // ✅ กดปุ่ม "เพิ่มการขาดเรียน"
         addBtn?.addEventListener('click', resetAbsentForm);
-
-        // ✅ กดปุ่ม "ปิด/ยกเลิก" → reset input (ไม่ refresh หน้า)
         cancelBtn?.addEventListener('click', resetAbsentForm);
-
-        // ✅ เมื่อ Add modal ถูกปิด → reset input (ไม่ refresh หน้า)
         absentModal?.addEventListener('hidden.bs.modal', resetAbsentForm);
     });
 
     // ✅ ฟังก์ชันเปิด Edit modal
     function openEditAbsent(id){
         const form = $('#edit-absent-form');
-        // เคลียร์ค่าเก่า + error feedback ก่อน
         form[0].reset();
         form.find('.is-invalid').removeClass('is-invalid');
         form.find('.invalid-feedback').remove();
@@ -371,7 +435,6 @@ document.addEventListener("DOMContentLoaded", function() {
             type: "GET",
             dataType: "json",
             success: function(data){
-                // เติมค่าฟอร์ม Edit
                 $('#edit_absent_date').val(data.absent_date ?? '');
                 $('#edit_record_date').val(data.record_date ?? '');
                 $('#edit_cause').val(data.cause ?? '');
@@ -380,10 +443,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 $('#edit_teacher').val(data.teacher ?? '');
                 $('#edit-absent-form').attr('action', '/absent/update/' + data.id);
 
-                // เปิด Edit modal
                 const modalEl = document.getElementById('editAbsentModal');
-                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                modal.show();
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
             }
         });
     }
