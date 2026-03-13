@@ -25,27 +25,41 @@ class CheckBodyController extends Controller
     // 🟢 บันทึกข้อมูลใหม่
     public function CheckBodyStore(Request $request)
     {
-        $validated = $request->validate([
-            'client_id'     => 'required|exists:clients,id',
-            'assessor_date' => 'required|date',
-            'development'   => 'required|string',
-            'detail'        => 'nullable|string',
-            'weight'        => 'nullable|numeric',
-            'height'        => 'nullable|numeric',
-            'oral'          => 'nullable|string|max:255',
-            'appearance'    => 'nullable|string|max:255',
-            'wound'         => 'nullable|string|max:255',
-            'disease'       => 'nullable|string|max:255',
-            'hygiene'       => 'nullable|string|max:255',
-            'health'        => 'nullable|string|max:255',
-            'inoculation'   => 'nullable|string|max:255',
-            'injection'     => 'nullable|string|max:255',
-            'vaccination'   => 'nullable|string|max:255',
-            'contagious'    => 'nullable|string|max:255',
-            'other'         => 'nullable|string|max:255',
-            'drug_allergy'  => 'nullable|string|max:255',
-            'recorder'      => 'required|string|max:255',
-            'remark'        => 'nullable|string',
+                $validated = $request->validate([
+            'client_id'     => ['required', 'exists:clients,id'],
+            'assessor_date' => ['required', 'date'],
+            'development'   => ['required', 'string'],
+            'detail'        => ['nullable', 'string'],
+            'weight'        => ['nullable', 'numeric', 'min:0'],
+            'height'        => ['nullable', 'numeric', 'min:0'],
+            'oral'          => ['nullable', 'string', 'max:255'],
+            'appearance'    => ['nullable', 'string', 'max:255'],
+            'wound'         => ['nullable', 'string', 'max:255'],
+            'disease'       => ['nullable', 'string', 'max:255'],
+            'hygiene'       => ['nullable', 'string', 'max:255'],
+            'health'        => ['nullable', 'string', 'max:255'],
+            'inoculation'   => ['nullable', 'string', 'max:255'],
+            'injection'     => ['nullable', 'string', 'max:255'],
+            'vaccination'   => ['nullable', 'string', 'max:255'],
+            'contagious'    => ['nullable', 'string', 'max:255'],
+            'other'         => ['nullable', 'string', 'max:255'],
+            'drug_allergy'  => ['nullable', 'string', 'max:255'],
+            'recorder'      => ['required', 'string', 'max:255'],
+            'remark'        => ['nullable', 'string'],
+        ], [
+            // ✅ ข้อความ error ภาษาไทย
+            'client_id.required'     => 'กรุณาเลือกเด็กที่ต้องการบันทึกข้อมูล',
+            'client_id.exists'       => 'ข้อมูลเด็กไม่ถูกต้อง',
+            'assessor_date.required' => 'กรุณาระบุวันที่ตรวจ',
+            'assessor_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'development.required'   => 'กรุณากรอกข้อมูลการพัฒนา',
+            'weight.numeric'         => 'น้ำหนักต้องเป็นตัวเลข',
+            'weight.min'             => 'น้ำหนักต้องไม่น้อยกว่า 0',
+            'height.numeric'         => 'ส่วนสูงต้องเป็นตัวเลข',
+            'height.min'             => 'ส่วนสูงต้องไม่น้อยกว่า 0',
+            'recorder.required'      => 'กรุณาระบุชื่อผู้บันทึกข้อมูล',
+            'recorder.string'        => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+            'recorder.max'           => 'ชื่อผู้บันทึกต้องไม่เกิน 255 ตัวอักษร',
         ]);
 
         CheckBody::create($validated);
@@ -69,28 +83,43 @@ class CheckBodyController extends Controller
     // 🟢 อัปเดตข้อมูล
     public function CheckBodyUpdate(Request $request, $id)
 {
-    $validated = $request->validate([
-        'assessor_date' => 'required|date',
-        'development'   => 'required|string',
-        'detail'        => 'nullable|string',
-        'weight'        => 'nullable|numeric',
-        'height'        => 'nullable|numeric',
-        'oral'          => 'nullable|string|max:255',
-        'appearance'    => 'nullable|string|max:255',
-        'wound'         => 'nullable|string|max:255',
-        'disease'       => 'nullable|string|max:255',
-        'hygiene'       => 'nullable|string|max:255',
-        'health'        => 'nullable|string|max:255',
-        'inoculation'   => 'nullable|string|max:255',
-        'injection'     => 'nullable|string|max:255',
-        'vaccination'   => 'nullable|string|max:255',
-        'contagious'    => 'nullable|string|max:255',
-        'other'         => 'nullable|string|max:255',
-        'drug_allergy'  => 'nullable|string|max:255',
-        'recorder'      => 'required|string|max:255',
-        'remark'        => 'nullable|string',
-        'client_id'     => 'required|exists:clients,id',
-    ]);
+     $validated = $request->validate([
+            'client_id'     => ['required', 'exists:clients,id'],
+            'assessor_date' => ['required', 'date'],
+            'development'   => ['required', 'string'],
+            'detail'        => ['nullable', 'string'],
+            'weight'        => ['nullable', 'numeric', 'min:0'],
+            'height'        => ['nullable', 'numeric', 'min:0'],
+            'oral'          => ['nullable', 'string', 'max:255'],
+            'appearance'    => ['nullable', 'string', 'max:255'],
+            'wound'         => ['nullable', 'string', 'max:255'],
+            'disease'       => ['nullable', 'string', 'max:255'],
+            'hygiene'       => ['nullable', 'string', 'max:255'],
+            'health'        => ['nullable', 'string', 'max:255'],
+            'inoculation'   => ['nullable', 'string', 'max:255'],
+            'injection'     => ['nullable', 'string', 'max:255'],
+            'vaccination'   => ['nullable', 'string', 'max:255'],
+            'contagious'    => ['nullable', 'string', 'max:255'],
+            'other'         => ['nullable', 'string', 'max:255'],
+            'drug_allergy'  => ['nullable', 'string', 'max:255'],
+            'recorder'      => ['required', 'string', 'max:255'],
+            'remark'        => ['nullable', 'string'],
+        ], [
+            // ✅ ข้อความ error ภาษาไทย
+            'client_id.required'     => 'กรุณาเลือกเด็กที่ต้องการบันทึกข้อมูล',
+            'client_id.exists'       => 'ข้อมูลเด็กไม่ถูกต้อง',
+            'assessor_date.required' => 'กรุณาระบุวันที่ตรวจ',
+            'assessor_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'development.required'   => 'กรุณากรอกข้อมูลการพัฒนา',
+            'weight.numeric'         => 'น้ำหนักต้องเป็นตัวเลข',
+            'weight.min'             => 'น้ำหนักต้องไม่น้อยกว่า 0',
+            'height.numeric'         => 'ส่วนสูงต้องเป็นตัวเลข',
+            'height.min'             => 'ส่วนสูงต้องไม่น้อยกว่า 0',
+            'recorder.required'      => 'กรุณาระบุชื่อผู้บันทึกข้อมูล',
+            'recorder.string'        => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+            'recorder.max'           => 'ชื่อผู้บันทึกต้องไม่เกิน 255 ตัวอักษร',
+        ]);
+
 
     // ✅ ถ้าเลือก "สมวัย" → ล้างค่า detail
     if ($validated['development'] === 'สมวัย') {

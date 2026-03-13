@@ -40,15 +40,16 @@
                 </div>
             </div>
 
-
         <!-- ฟอร์มซ่อน/แสดง -->
         <div id="healthForm" class="collapse {{ isset($checkbody) ? 'show' : '' }}">
             <div class="card-body p-3">
-                <form action="{{ isset($checkbody) ? route('check_body.update', $checkbody->id) : route('check_body.store') }}" method="POST" class="position-relative">
-                    @csrf
-                    @if(isset($checkbody))
-                        @method('PUT')
-                    @endif
+               <form id="checkbody-form"
+              action="{{ isset($checkbody) ? route('check_body.update', $checkbody->id) : route('check_body.store') }}"
+              method="POST" class="position-relative">
+            @csrf
+            @if(isset($checkbody))
+                @method('PUT')
+            @endif
                 <!-- ปุ่มมุมขวาบน ภายในฟอร์ม -->
                 <div class="d-flex justify-content-end mb-3">
                 <button type="submit" class="btn btn-sm btn-success px-3 me-2">
@@ -68,17 +69,25 @@
 
                 <!-- วันที่ตรวจ + ผู้ตรวจ -->
                 <div class="row align-items-start mb-3 g-2">
-                    <div class="col-6 col-md-3">
-                        <label class="form-label">วันที่ตรวจ</label>
-                        <input type="date" name="assessor_date" class="form-control form-control-sm"
-                               value="{{ old('assessor_date', $checkbody->assessor_date ?? '') }}">
-                    </div>
+                  <div class="col-6 col-md-3">
+                            <label class="form-label fw-bold small">วันที่ตรวจ</label>
+                            <input type="date" name="assessor_date"
+                                class="form-control form-control-sm @error('assessor_date') is-invalid @enderror"
+                                value="{{ old('assessor_date', $checkbody->assessor_date ?? '') }}">
+                            @error('assessor_date')
+                                <div class="invalid-feedback text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                    <div class="col-6 col-md-3">
-                        <label class="form-label">ผู้ตรวจ</label>
-                        <input type="text" name="recorder" class="form-control form-control-sm"
-                               value="{{ old('recorder', $checkbody->recorder ?? '') }}">
-                    </div>
+                                        <div class="col-6 col-md-3">
+                            <label class="form-label fw-bold small">ผู้ตรวจ</label>
+                            <input type="text" name="recorder"
+                                class="form-control form-control-sm @error('recorder') is-invalid @enderror"
+                                value="{{ old('recorder', $checkbody->recorder ?? '') }}">
+                            @error('recorder')
+                                <div class="invalid-feedback text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                     <!-- พัฒนาการ -->
                    <div class="col-12 col-md-5 ms-md-5">
@@ -110,16 +119,25 @@
 
                 <!-- น้ำหนัก / ส่วนสูง / สุขภาพช่องปาก / รูปร่าง -->
                 <div class="row mb-3">
-                    <div class="col-md-2">
-                        <label class="form-label">น้ำหนัก (กก.)</label>
-                        <input type="text" name="weight" class="form-control form-control-sm"
-                               value="{{ old('weight', $checkbody->weight ?? '') }}">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">ส่วนสูง (ซม.)</label>
-                        <input type="text" name="height" class="form-control form-control-sm"
-                               value="{{ old('height', $checkbody->height ?? '') }}">
-                    </div>
+                   <div class="col-md-2">
+                            <label class="form-label fw-bold small">น้ำหนัก (กก.)</label>
+                            <input type="text" name="weight"
+                                class="form-control form-control-sm @error('weight') is-invalid @enderror"
+                                value="{{ old('weight', $checkbody->weight ?? '') }}">
+                            @error('weight')
+                                <div class="invalid-feedback text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">ส่วนสูง (ซม.)</label>
+                            <input type="text" name="height"
+                                class="form-control form-control-sm @error('height') is-invalid @enderror"
+                                value="{{ old('height', $checkbody->height ?? '') }}">
+                            @error('height')
+                                <div class="invalid-feedback text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
                     <div class="col-md-4">
                         <label class="form-label">สุขภาพช่องปาก</label>
                         <input type="text" name="oral" class="form-control form-control-sm"
@@ -266,8 +284,9 @@
 @endif
 @endsection
 
+
 @push('scripts')
-    <!-- ✅ Init DataTable -->
+    <!-- ✅ Init DataTable 555555555 -->
     <script>
         $(document).ready(function() {
             $('#datatable-checkbody').DataTable({
@@ -304,25 +323,67 @@
         }
     </script>
 
-        <!-- Script toggle ซ่อน/แสดง form สุขภาพ -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const collapseHealth = document.getElementById('healthForm');
-                const toggleHealthBtn = document.getElementById('toggleHealthBtn');
+    <!-- Script toggle ซ่อน/แสดง form สุขภาพ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const collapseHealth = document.getElementById('healthForm');
+            const toggleHealthBtn = document.getElementById('toggleHealthBtn');
 
-                if (collapseHealth && toggleHealthBtn) {
-                    collapseHealth.addEventListener('shown.bs.collapse', function () {
-                        toggleHealthBtn.querySelector('i').className = 'bi bi-chevron-up';
-                        toggleHealthBtn.querySelector('span').textContent = 'ซ่อน/ฟอร์ม';
-                    });
+            if (collapseHealth && toggleHealthBtn) {
+                collapseHealth.addEventListener('shown.bs.collapse', function () {
+                    toggleHealthBtn.querySelector('i').className = 'bi bi-chevron-up';
+                    toggleHealthBtn.querySelector('span').textContent = 'ซ่อน/ฟอร์ม';
+                });
 
-                    collapseHealth.addEventListener('hidden.bs.collapse', function () {
-                        toggleHealthBtn.querySelector('i').className = 'bi bi-chevron-down';
-                        toggleHealthBtn.querySelector('span').textContent = 'เพิ่มข้อมูล';
-                    });
-                }
+                collapseHealth.addEventListener('hidden.bs.collapse', function () {
+                    toggleHealthBtn.querySelector('i').className = 'bi bi-chevron-down';
+                    toggleHealthBtn.querySelector('span').textContent = 'เพิ่มข้อมูล';
+                });
+            }
+        });
+    </script>
+
+    <!-- ✅ SweetAlert2 แจ้งเตือนเมื่อมี error validation -->
+    @if ($errors->any())
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // เปิด collapse ฟอร์มสุขภาพอัตโนมัติ (หน้าอัปเดตจะค้างไว้เสมอ)
+            var collapseHealth = new bootstrap.Collapse(document.getElementById('healthForm'), {
+                show: true
             });
-        </script>
 
+            // รวมข้อความ error ทั้งหมด
+            let errorMessages = `{!! implode('<br>', $errors->all()) !!}`;
 
+            // แสดง SweetAlert2
+            Swal.fire({
+                title: 'พบข้อผิดพลาด',
+                html: errorMessages,
+                icon: 'error',
+                confirmButtonText: 'ตกลง'
+            });
+        });
+    </script>
+    @endif
+
+    <!-- ✅ เคลียร์ error ทันทีเมื่อกรอกข้อมูลใหม่ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector('#checkbody-form'); // ต้องใส่ id="checkbody-form" ให้ฟอร์ม
+            if(form){
+                form.querySelectorAll('input, textarea, select').forEach(function(field){
+                    field.addEventListener('input', function(){
+                        if(field.classList.contains('is-invalid')){
+                            field.classList.remove('is-invalid');
+                            // หา invalid-feedback ที่อยู่ถัดจาก input แล้วลบออกจาก DOM
+                            const feedback = field.parentElement.querySelector('.invalid-feedback');
+                            if(feedback){
+                                feedback.remove(); // ✅ ลบ element ออกไปเลย
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 @endpush
