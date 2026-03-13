@@ -24,7 +24,6 @@
                 </div>
                 </div>
             </div>
-
 <!-- Modal ฟอร์มติดตาม -->
 <div class="modal fade" id="followupModal" tabindex="-1" aria-labelledby="followupModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-sm-down">
@@ -39,7 +38,9 @@
       </div>
 
       <!-- Form -->
-      <form method="POST" action="{{ isset($followup) ? route('school_followup.update', $followup->id) : route('school_followup_store') }}">
+      <form id="{{ isset($followup) ? 'edit-followup-form' : 'create-followup-form' }}"
+            method="POST"
+            action="{{ isset($followup) ? route('school_followup.update', $followup->id) : route('school_followup_store') }}">
         @csrf
         @if(isset($followup)) @method('PUT') @endif
 
@@ -161,15 +162,20 @@
         </div>
 
         <!-- Footer -->
-        <div class="modal-footer justify-content-between py-2">
-          <button type="button" class="btn btn-outline-secondary btn-sm px-3" id="btn-cancel-followup" data-bs-dismiss="modal">
-            <i class="bi bi-x-circle me-1"></i> ยกเลิกการบันทึกข้อมูล
-          </button>
-          <button type="submit" class="btn btn-success btn-sm px-4 fw-bold">
-            <i class="bi bi-save me-1"></i> {{ isset($followup) ? 'อัปเดตข้อมูล' : 'บันทึกผล' }}
-          </button>
-        </div>
+          <div class="modal-footer justify-content-end gap-2 py-2">
+            <!-- ปุ่มยกเลิก -->
+            <button type="button" 
+                    class="btn btn-danger btn-sm fw-bold d-flex align-items-center px-3"
+                    id="btn-cancel-followup" data-bs-dismiss="modal">
+              <i class="bi bi-arrow-left-circle me-2 fs-5"></i> ยกเลิก
+            </button>
 
+            <!-- ปุ่มบันทึก -->
+            <button type="submit" 
+                    class="btn btn-success btn-sm fw-bold d-flex align-items-center px-3">
+              <i class="bi bi-check-circle-fill me-2 fs-5"></i> {{ isset($followup) ? 'อัปเดตข้อมูล' : 'บันทึกผล' }}
+            </button>
+          </div>
       </form>
     </div>
   </div>
@@ -265,24 +271,28 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="modal-body">
           <input type="hidden" name="client_id" value="{{ $client->id }}">
           <input type="hidden" name="education_record_id" value="{{ $educationRecord->id ?? '' }}">
+          <input type="hidden" id="edit_followup_id">
 
           <div class="row mb-3">
             <div class="col-md-4">
-              <label class="form-label">วันที่ติดตาม</label>
+              <label class="form-label">วันที่ติดตาม <span class="text-danger">*</span></label>
               <input type="date" id="edit_follow_date" name="follow_date" class="form-control form-control-sm" required>
+              <div class="invalid-feedback"></div>
             </div>
             <div class="col-md-4">
               <label class="form-label">ครูประจำชั้น</label>
               <input type="text" id="edit_teacher_name" name="teacher_name" class="form-control form-control-sm">
+              <div class="invalid-feedback"></div>
             </div>
             <div class="col-md-4">
               <label class="form-label">โทรศัพท์</label>
               <input type="text" id="edit_tel" name="tel" class="form-control form-control-sm">
+              <div class="invalid-feedback"></div>
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">การดำเนินงาน</label>
+            <label class="form-label">การดำเนินงาน <span class="text-danger">*</span></label>
             <div class="d-flex flex-wrap small">
               <div class="form-check me-3">
                 <input class="form-check-input" type="radio" name="follow_type" value="self" id="edit_follow_self">
@@ -297,25 +307,41 @@ document.addEventListener("DOMContentLoaded", function() {
                 <label class="form-check-label" for="edit_follow_other">อื่นๆ</label>
               </div>
             </div>
+            <div class="invalid-feedback d-block"></div>
           </div>
 
           <div class="row mb-3">
-            <div class="col-md-6">
-              <label class="form-label">ผลการติดตาม</label>
-              <textarea id="edit_result" name="result" class="form-control form-control-sm" rows="3"></textarea>
-            </div>
+     <div class="col-md-6">
+  <label class="form-label">ผลการติดตาม <span class="text-danger">*</span></label>
+  <textarea id="edit_result" name="result" class="form-control form-control-sm" rows="3"></textarea>
+  <!-- ✅ ข้อความเตือนภาษาไทย สีแดง -->
+  <div class="invalid-feedback text-danger">
+    กรุณาระบุผลการติดตาม
+  </div>
+</div>
             <div class="col-md-6">
               <label class="form-label">หมายเหตุ</label>
               <textarea id="edit_remark" name="remark" class="form-control form-control-sm" rows="3"></textarea>
+              <div class="invalid-feedback"></div>
             </div>
           </div>
 
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label class="form-label">ชื่อผู้ติดตาม</label>
-              <input type="text" id="edit_contact_name" name="contact_name" class="form-control form-control-sm">
-            </div>
-          </div>
+        <div class="row mb-3">
+<div class="row mb-3">
+  <div class="col-md-6">
+    <label class="form-label">ชื่อผู้ติดตาม <span class="text-danger">*</span></label>
+    <input type="text" id="edit_contact_name" name="contact_name" class="form-control form-control-sm" required>
+    <!-- ✅ ข้อความเตือนภาษาไทย สีแดง -->
+    <div class="invalid-feedback text-danger">
+      กรุณาระบุชื่อผู้ติดตาม (ต้องไม่เกิน 255 ตัวอักษร)
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+
         </div>
 
         <div class="modal-footer">
@@ -337,7 +363,25 @@ $(document).ready(function() {
         responsive: true,
         language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }
     });
+
+    // ✅ Instant clear error เมื่อแก้ไข input/textarea ของฟอร์มแก้ไข
+    $('#edit-followup-form').on('input change', '.form-control, .form-check-input', function(){
+        $(this).removeClass('is-invalid'); // ลบ class error
+        $(this).closest('.col-md-4, .col-md-6, .mb-3')
+               .find('.invalid-feedback')
+               .text(''); // เคลียร์ข้อความเตือน
+    });
+
+    // ✅ Instant clear error เมื่อแก้ไข input/textarea ของฟอร์มเพิ่มข้อมูล
+    $('#create-followup-form').on('input change', '.form-control, .form-check-input', function(){
+        $(this).removeClass('is-invalid'); // ลบ class error
+        $(this).closest('.col-md-4, .col-md-6, .mb-3')
+               .find('.invalid-feedback')
+               .text(''); // เคลียร์ข้อความเตือน
+    });
 });
+
+
 
 // ✅ SweetAlert2 สำหรับยืนยันการลบ
 function confirmDelete(id) {
@@ -355,54 +399,90 @@ function confirmDelete(id) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    // ====== Followup (Add modal) ======
-    const followupModal = document.getElementById('followupModal');
-    const cancelFollowupBtn = document.getElementById('btn-cancel-followup');
-    const followupForm = followupModal?.querySelector('form');
-
-    function resetFollowupForm(){
-        if(followupForm){
-            followupForm.reset();
-            followupForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            followupForm.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
-        }
-    }
-
-    cancelFollowupBtn?.addEventListener('click', resetFollowupForm);
-    followupModal?.addEventListener('hidden.bs.modal', resetFollowupForm);
-});
-
 // ====== ฟังก์ชันเปิด Edit modal (Followup) ======
 function openEditFollowup(id){
     const form = $('#edit-followup-form');
     form[0].reset();
     form.find('.is-invalid').removeClass('is-invalid');
-    form.find('.invalid-feedback').remove();
+    form.find('.invalid-feedback').text('');
 
     $.ajax({
         url: "/school_followup/edit/" + id,
         type: "GET",
         dataType: "json",
-        success: function(data){
-            $('#edit_follow_date').val(data.follow_date ?? '');
-            $('#edit_teacher_name').val(data.teacher_name ?? '');
-            $('#edit_tel').val(data.tel ?? '');
-            $('#edit_result').val(data.result ?? '');
-            $('#edit_remark').val(data.remark ?? '');
-            $('#edit_contact_name').val(data.contact_name ?? '');
+        success: function(res){
+            if(res.success){
+                let data = res.data;
+                $('#edit_follow_date').val(data.follow_date ?? '');
+                $('#edit_teacher_name').val(data.teacher_name ?? '');
+                $('#edit_tel').val(data.tel ?? '');
+                $('#edit_result').val(data.result ?? '');
+                $('#edit_remark').val(data.remark ?? '');
+                $('#edit_contact_name').val(data.contact_name ?? '');
 
-            $('input[name="follow_type"]').prop('checked', false);
-            $('input[name="follow_type"][value="'+data.follow_type+'"]').prop('checked', true);
+                $('input[name="follow_type"]').prop('checked', false);
+                $('input[name="follow_type"][value="'+data.follow_type+'"]').prop('checked', true);
 
-            $('#edit-followup-form').attr('action', '/school_followup/update/' + data.id);
+                $('#edit_followup_id').val(data.id);
+                $('#edit-followup-form').attr('action', '/school_followup/update/' + data.id);
 
-            const modalEl = document.getElementById('editFollowupModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
+                const modalEl = document.getElementById('editFollowupModal');
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            } else {
+                Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', text: res.message });
+            }
+        },
+        error: function(){
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูลได้' });
         }
     });
 }
+
+// ====== Submit Edit Form (AJAX) ======
+$('#edit-followup-form').on('submit', function(e){
+    e.preventDefault();
+    let form = $(this);
+    let id = $('#edit_followup_id').val();
+    let url = '/school_followup/update/' + id;
+
+    $.ajax({
+        url: url,
+        method: 'POST',   // ✅ ใช้ POST + @method('PUT') ในฟอร์ม
+        data: form.serialize(),
+        success: function(res){
+            if(res.success){
+                Swal.fire({
+                    icon: 'success',
+                    title: res.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            }
+        },
+        error: function(xhr){
+            let errors = xhr.responseJSON.errors;
+            form.find('.invalid-feedback').text('');
+            form.find('.form-control, .form-check-input').removeClass('is-invalid');
+
+            $.each(errors, function(key, messages){
+                let input = form.find('[name="'+key+'"]');
+                input.addClass('is-invalid'); // ทำให้ invalid-feedback โชว์
+                input.closest('.col-md-4, .col-md-6, .mb-3')
+                     .find('.invalid-feedback')
+                     .text(messages[0]); // ✅ แสดงข้อความภาษาไทย
+            });
+
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'กรุณาตรวจสอบข้อมูลที่กรอก'
+            });
+        }
+    });
+});
 </script>
 
 @endpush

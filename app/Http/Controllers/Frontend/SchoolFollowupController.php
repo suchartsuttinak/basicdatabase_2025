@@ -52,7 +52,7 @@ public function SchoolFollowupStore(Request $request)
     'teacher_name'        => 'nullable|string|max:255',
     'tel'                 => 'nullable|string|max:20',
     'follow_type'         => 'required|string|in:self,phone,other',
-    'result'              => 'nullable|string',
+    'result'              => 'required|string',
     'remark'              => 'nullable|string',
     'contact_name'        => 'required|string|max:255',
 ], [
@@ -63,6 +63,7 @@ public function SchoolFollowupStore(Request $request)
     'follow_date.date'      => 'วันที่ติดตามไม่ถูกต้อง',
     'follow_type.required'  => 'กรุณาเลือกวิธีการติดตาม',
     'follow_type.in'        => 'วิธีการติดตามไม่ถูกต้อง',
+    'result.required'       => 'กรุณาระบุผลการติดตาม',
     'teacher_name.max'      => 'ชื่อครูต้องไม่เกิน 255 ตัวอักษร',
     'tel.max'               => 'เบอร์โทรศัพท์ต้องไม่เกิน 20 ตัวอักษร',
     'contact_name.max'      => 'ชื่อผู้ติดตามต้องไม่เกิน 255 ตัวอักษร',
@@ -81,45 +82,108 @@ public function SchoolFollowupStore(Request $request)
      */
  public function SchoolFollowupEdit($id)
 {
-    $followup = SchoolFollowup::findOrFail($id);
+    try {
+        $followup = SchoolFollowup::findOrFail($id);
 
-    return response()->json([
-        'id'           => $followup->id,
-        'follow_date'  => \Carbon\Carbon::parse($followup->follow_date)->format('Y-m-d'),
-        'teacher_name' => $followup->teacher_name,
-        'tel'          => $followup->tel,
-        'follow_type'  => $followup->follow_type,
-        'result'       => $followup->result,
-        'remark'       => $followup->remark,
-        'contact_name' => $followup->contact_name,
-    ]);
+        return response()->json([
+            'success'      => true,
+            'message'      => 'โหลดข้อมูลเรียบร้อยแล้ว',
+            'data'         => [
+                'id'           => $followup->id,
+                'follow_date'  => \Carbon\Carbon::parse($followup->follow_date)->format('Y-m-d'),
+                'teacher_name' => $followup->teacher_name,
+                'tel'          => $followup->tel,
+                'follow_type'  => $followup->follow_type,
+                'result'       => $followup->result,
+                'remark'       => $followup->remark,
+                'contact_name' => $followup->contact_name,
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'ไม่พบข้อมูลการติดตามที่ต้องการแก้ไข',
+            'errors'  => [$e->getMessage()]
+        ], 404);
+    }
 }
     /**
      * อัปเดตข้อมูลการติดตาม
      */
     public function SchoolFollowupUpdate(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'follow_date'  => 'required|date',
-            'teacher_name' => 'nullable|string|max:255',
-            'tel'          => 'nullable|string|max:20',
-            'follow_type'  => 'required|string|in:self,phone,other',
-            'result'       => 'nullable|string',
-            'remark'       => 'nullable|string',
-            'contact_name' => 'nullable|string|max:255',
-        ]);
+{
+    $followup = SchoolFollowup::findOrFail($id);
 
-        $followup = SchoolFollowup::findOrFail($id);
-        $followup->update($validated);
+    $validated = $request->validate($this->rules(true), $this->messages());
 
-        return redirect()
-            ->route('school_followup_add', $followup->client_id)
-            ->with([
-                'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success'
-            ]);
+     // ✅ ถ้า contact_name ว่าง → ใส่ค่า "ไม่ระบุข้อมูล"
+    if (empty($validated['contact_name'])) {
+        $validated['contact_name'] = 'ไม่ระบุข้อมูล';
     }
 
+
+
+    $followup->update($validated);
+
+    // ถ้าเป็น AJAX → ส่ง JSON กลับ
+    if ($request->ajax()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+            'data'    => $followup
+        ]);
+    }
+
+    // ถ้าไม่ใช่ AJAX → redirect กลับไปหน้า edit พร้อมข้อความ
+    return redirect()->route('school_followup_add', $followup->client_id)
+                     ->with(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+}
+
+/**
+ * Validation Rules
+ */
+private function rules($isUpdate = false)
+{
+    return [
+        'client_id'           => $isUpdate ? 'sometimes|integer|exists:clients,id' : 'required|integer|exists:clients,id',
+        'education_record_id' => 'nullable|integer',
+        'follow_date'         => 'required|date|after_or_equal:today', // ✅ ต้องเป็นวันที่ปัจจุบันหรืออนาคต
+        'teacher_name'        => 'nullable|string|max:255',
+        'tel'                 => 'nullable|string|max:20',
+        'follow_type'         => 'required|string|in:self,phone,other',
+        'result'              => $isUpdate ? 'required|string|max:255' : 'required|string|max:255', // ✅ ต้องกรอกผลการติดตามเสมอ
+        'remark'              => 'nullable|string',
+        'contact_name'        => $isUpdate ? 'required|string|max:255' : 'required|string|max:255',
+    ];
+}
+
+/**
+ * Validation Messages
+ */
+private function messages()
+{
+    return [
+        'client_id.required'    => 'กรุณาเลือกเด็กนักเรียน',
+        'client_id.integer'     => 'รหัสนักเรียนต้องเป็นตัวเลข',
+        'client_id.exists'      => 'ไม่พบข้อมูลนักเรียนที่เลือก',
+
+        'follow_date.required'  => 'กรุณาระบุวันที่ติดตาม',
+        'follow_date.date'      => 'วันที่ติดตามไม่ถูกต้อง',
+        'follow_date.after_or_equal' => 'วันที่ติดตามต้องไม่ย้อนหลัง',
+
+        'follow_type.required'  => 'กรุณาเลือกวิธีการติดตาม',
+        'follow_type.in'        => 'วิธีการติดตามไม่ถูกต้อง',
+
+        'result.required'       => 'กรุณาระบุผลการติดตาม',
+        'result.max'            => 'ผลการติดตามต้องไม่เกิน 255 ตัวอักษร',
+
+        'teacher_name.max'      => 'ชื่อครูต้องไม่เกิน 255 ตัวอักษร',
+        'tel.max'               => 'เบอร์โทรศัพท์ต้องไม่เกิน 20 ตัวอักษร',
+
+        'contact_name.required' => 'กรุณาระบุชื่อผู้ติดตาม',
+        'contact_name.max'      => 'ชื่อผู้ติดตามต้องไม่เกิน 255 ตัวอักษร',
+    ];
+}
     /**
      * ลบข้อมูลการติดตาม
      */
