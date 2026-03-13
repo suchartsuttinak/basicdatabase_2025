@@ -44,118 +44,152 @@
             </div>
 
         <!-- ฟอร์มซ่อน/แสดง -->
-        <div id="accidentForm" class="collapse {{ isset($accident) ? 'show' : '' }}">
-            <div class="card-body p-3">
-                <form action="{{ $accident ? route('accident.update', $accident->id) : route('accident.store') }}" method="POST">
-                    @csrf
-                    @if($accident)
-                        @method('PUT')
-                    @endif
+        <!-- ฟอร์มซ่อน/แสดง -->
+<div id="accidentForm" class="collapse {{ isset($accident) ? 'show' : '' }}">
+    <div class="card-body p-3">
+        <form id="accident-form"
+              action="{{ isset($accident) ? route('accident.update', $accident->id) : route('accident.store') }}"
+              method="POST" class="position-relative">
+            @csrf
+            @if(isset($accident))
+                @method('PUT')
+            @endif
 
-                    <input type="hidden" name="client_id" value="{{ $client->id }}">
+            <input type="hidden" name="client_id" value="{{ $client->id }}">
 
-                    <div class="row mb-2">
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold">วันที่เกิดเหตุ</label>
-                            <input type="date" name="incident_date" class="form-control form-control-sm"
-                                value="{{ old('incident_date', $accident->incident_date ?? '') }}" required>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold">สถานที่เกิดเหตุ</label>
-                            <input type="text" name="location" class="form-control form-control-sm"
-                                value="{{ old('location', $accident->location ?? '') }}">
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-bold">ผู้เห็นเหตุการณ์</label>
-                            <input type="text" name="eyewitness" class="form-control form-control-sm"
-                                value="{{ old('eyewitness', $accident->eyewitness ?? '') }}">
-                        </div>
-                    </div>
+            <div class="row mb-2">
+                <div class="col-6 col-md-3">
+                    <label class="form-label fw-bold small">วันที่ตรวจ</label>
+                    <input type="date" name="incident_date"
+                        class="form-control @error('incident_date') is-invalid @enderror"
+                        value="{{ old('incident_date', $accident->incident_date ?? '') }}">
+                    @error('incident_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">รายละเอียดเหตุการณ์</label>
-                        <textarea name="detail" class="form-control form-control-sm" rows="2">{{ old('detail', $accident->detail ?? '') }}</textarea>
-                    </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-bold">สถานที่เกิดเหตุ</label>
+                    <input type="text" name="location"
+                           class="form-control form-control-sm @error('location') is-invalid @enderror"
+                           value="{{ old('location', $accident->location ?? '') }}">
+                    @error('location')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                    <div class="row mb-2">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold">สาเหตุ</label>
-                            <textarea name="cause" class="form-control form-control-sm" rows="2">{{ old('cause', $accident->cause ?? '') }}</textarea>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold">การรักษาพยาบาล</label><br>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="treat_no" id="treat_yes" value="พบแพทย์"
-                                    {{ old('treat_no', $accident->treat_no ?? '') == 'พบแพทย์' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="treat_yes">พบแพทย์</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="treat_no" id="treat_no" value="ไม่พบแพทย์"
-                                    {{ old('treat_no', $accident->treat_no ?? 'ไม่พบแพทย์') == 'ไม่พบแพทย์' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="treat_no">ไม่พบแพทย์</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- ฟิลด์ที่จะแสดงเมื่อเลือก "พบแพทย์" --}}
-                    <div id="medical-section" style="display: {{ old('treat_no', $accident->treat_no ?? '') == 'พบแพทย์' ? 'block' : 'none' }};">
-                        <div class="row mb-2">
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-bold">ชื่อสถานพยาบาล</label>
-                                <input type="text" name="hospital" class="form-control form-control-sm"
-                                    value="{{ old('hospital', $accident->hospital ?? '') }}">
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-bold">การวินิจฉัย</label>
-                                <textarea name="diagnosis" class="form-control form-control-sm" rows="2">{{ old('diagnosis', $accident->diagnosis ?? '') }}</textarea>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-bold">นัดครั้งต่อไป</label>
-                                <input type="text" name="appointment" class="form-control form-control-sm"
-                                    value="{{ old('appointment', $accident->appointment ?? '') }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold">การรักษา</label>
-                            <textarea name="treatment" class="form-control form-control-sm" rows="2">{{ old('treatment', $accident->treatment ?? '') }}</textarea>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-bold">การแก้ไขและป้องกัน</label>
-                            <textarea name="protection" class="form-control form-control-sm" rows="2">{{ old('protection', $accident->protection ?? '') }}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col-12 col-md-3">
-                            <label class="form-label fw-bold">ผู้ดูแล</label>
-                            <input type="text" name="caretaker" class="form-control form-control-sm"
-                                value="{{ old('caretaker', $accident->caretaker ?? '') }}">
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <label class="form-label fw-bold">วันที่บันทึก</label>
-                            <input type="date" name="record_date" class="form-control form-control-sm"
-                                value="{{ old('record_date', $accident->record_date ?? '') }}" required>
-                        </div>
-                        <div class="col-12 col-md-6 d-flex justify-content align-items-end">
-                            <button type="submit" class="btn btn-sm btn-success px-3">
-                                <i class="bi bi-save me-1"></i>
-                                {{ isset($accident) ? 'อัปเดตข้อมูล' : 'บันทึกผล' }}
-                            </button>
-                            @if(isset($accident))
-                                <a href="{{ route('accident.add', $client->id) }}" class="btn btn-sm btn-secondary px-3 ms-1">
-                                    <i class="bi bi-arrow-left-circle me-1"></i> กลับไปหน้าก่อน
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </form>
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-bold">ผู้เห็นเหตุการณ์</label>
+                    <input type="text" name="eyewitness" class="form-control form-control-sm"
+                           value="{{ old('eyewitness', $accident->eyewitness ?? '') }}">
+                </div>
             </div>
-        </div>
+
+            <div class="mb-2">
+                <label class="form-label fw-bold">รายละเอียดเหตุการณ์</label>
+                <textarea name="detail"
+                          class="form-control form-control-sm @error('detail') is-invalid @enderror"
+                          rows="2">{{ old('detail', $accident->detail ?? '') }}</textarea>
+                @error('detail')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold">สาเหตุ</label>
+                    <textarea name="cause"
+                              class="form-control form-control-sm @error('cause') is-invalid @enderror"
+                              rows="2">{{ old('cause', $accident->cause ?? '') }}</textarea>
+                    @error('cause')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold">การรักษาพยาบาล</label><br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input @error('treat_no') is-invalid @enderror"
+                               type="radio" name="treat_no" id="treat_yes" value="พบแพทย์"
+                               {{ old('treat_no', $accident->treat_no ?? '') == 'พบแพทย์' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="treat_yes">พบแพทย์</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input @error('treat_no') is-invalid @enderror"
+                               type="radio" name="treat_no" id="treat_no" value="ไม่พบแพทย์"
+                               {{ old('treat_no', $accident->treat_no ?? 'ไม่พบแพทย์') == 'ไม่พบแพทย์' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="treat_no">ไม่พบแพทย์</label>
+                    </div>
+                    @error('treat_no')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            {{-- ฟิลด์ที่จะแสดงเมื่อเลือก "พบแพทย์" --}}
+            <div id="medical-section" style="display: {{ old('treat_no', $accident->treat_no ?? '') == 'พบแพทย์' ? 'block' : 'none' }};">
+                <div class="row mb-2">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold">ชื่อสถานพยาบาล</label>
+                        <input type="text" name="hospital" class="form-control form-control-sm"
+                               value="{{ old('hospital', $accident->hospital ?? '') }}">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold">การวินิจฉัย</label>
+                        <textarea name="diagnosis" class="form-control form-control-sm" rows="2">{{ old('diagnosis', $accident->diagnosis ?? '') }}</textarea>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold">นัดครั้งต่อไป</label>
+                        <input type="text" name="appointment" class="form-control form-control-sm"
+                               value="{{ old('appointment', $accident->appointment ?? '') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold">การรักษา</label>
+                    <textarea name="treatment" class="form-control form-control-sm" rows="2">{{ old('treatment', $accident->treatment ?? '') }}</textarea>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold">การแก้ไขและป้องกัน</label>
+                    <textarea name="protection" class="form-control form-control-sm" rows="2">{{ old('protection', $accident->protection ?? '') }}</textarea>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-bold">ผู้ดูแล</label>
+                    <input type="text" name="caretaker" class="form-control form-control-sm"
+                           value="{{ old('caretaker', $accident->caretaker ?? '') }}">
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-bold">วันที่บันทึก</label>
+                    <input type="date" name="record_date"
+                            class="form-control @error('record_date') is-invalid @enderror"
+                            value="{{ old('record_date', $accident->record_date ?? '') }}">
+                        @error('record_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+
+                </div>
+                <div class="col-12 col-md-6 d-flex justify-content align-items-end">
+                    <button type="submit" class="btn btn-sm btn-success px-3">
+                        <i class="bi bi-save me-1"></i>
+                        {{ isset($accident) ? 'อัปเดตข้อมูล' : 'บันทึกผล' }}
+                    </button>
+                    @if(isset($accident))
+                        <a href="{{ route('accident.add', $client->id) }}" class="btn btn-sm btn-secondary px-3 ms-1">
+                            <i class="bi bi-arrow-left-circle me-1"></i> กลับไปหน้าก่อน
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
     </div>
 </div>
 <!-- ตารางอุบัติเหตุ -->
@@ -261,18 +295,13 @@
             const medicalSection = document.getElementById('medical-section');
 
             function toggleMedicalSection() {
-                if (treatYes.checked) {
-                    medicalSection.style.display = 'block';
-                } else {
-                    medicalSection.style.display = 'none';
-                }
+                medicalSection.style.display = treatYes.checked ? 'block' : 'none';
             }
 
             if (treatYes && treatNo && medicalSection) {
                 treatYes.addEventListener('change', toggleMedicalSection);
                 treatNo.addEventListener('change', toggleMedicalSection);
-                // เรียกครั้งแรกเพื่อ set ค่าเริ่มต้น
-                toggleMedicalSection();
+                toggleMedicalSection(); // set ค่าเริ่มต้น
             }
         });
     </script>
@@ -292,6 +321,46 @@
                 collapseAccident.addEventListener('hidden.bs.collapse', function () {
                     toggleAccidentBtn.querySelector('i').className = 'bi bi-chevron-down';
                     toggleAccidentBtn.querySelector('span').textContent = 'เพิ่มข้อมูล';
+                });
+            }
+        });
+    </script>
+
+    <!-- ✅ SweetAlert2 แจ้งเตือนเมื่อมี error validation -->
+    @if ($errors->any())
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var collapseAccident = new bootstrap.Collapse(document.getElementById('accidentForm'), {
+                show: true
+            });
+
+            let errorMessages = `{!! implode('<br>', $errors->all()) !!}`;
+
+            Swal.fire({
+                title: 'พบข้อผิดพลาด',
+                html: errorMessages,
+                icon: 'error',
+                confirmButtonText: 'ตกลง'
+            });
+        });
+    </script>
+    @endif
+
+    <!-- ✅ เคลียร์ error ทันทีเมื่อกรอกข้อมูลใหม่ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector('#accident-form'); // ต้องใส่ id="accident-form" ให้ฟอร์ม
+            if(form){
+                form.querySelectorAll('input, textarea, select').forEach(function(field){
+                    field.addEventListener('input', function(){
+                        if(field.classList.contains('is-invalid')){
+                            field.classList.remove('is-invalid');
+                            // ✅ ลบ invalid-feedback ที่อยู่ถัดไป
+                            if(field.nextElementSibling && field.nextElementSibling.classList.contains('invalid-feedback')){
+                                field.nextElementSibling.style.display = 'none'; // ซ่อนข้อความสีแดง
+                            }
+                        }
+                    });
                 });
             }
         });
