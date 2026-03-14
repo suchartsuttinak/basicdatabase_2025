@@ -12,13 +12,13 @@
             <div class="btn-group">
             <!-- ปุ่มเปิด Modal -->
            <button type="button"
-    class="btn btn-sm rounded-pill shadow-sm me-2 
-           {{ isset($observe) ? 'btn-warning' : 'btn-success' }}"
-    data-bs-toggle="modal"
-    data-bs-target="#observeModal">
-    <i class="bi {{ isset($observe) ? 'bi-pencil-square' : 'bi-plus-circle' }} me-1"></i>
-    {{ isset($observe) ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูล' }}
-</button>
+                    class="btn btn-sm rounded-pill shadow-sm me-2  
+                        {{ isset($observe) ? 'btn-warning' : 'btn-success' }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#observeModal">
+                    <i class="bi {{ isset($observe) ? 'bi-pencil-square' : 'bi-plus-circle' }} me-1"></i>
+                    {{ isset($observe) ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูล' }}
+                </button>
             <!-- ปุ่มไปหน้า observe.create -->
             <button type="button" class="btn btn-sm btn-outline-danger rounded-pill shadow-sm"
                     onclick="window.location.href='{{ route('observe.create', ['client_id' => $client->id]) }}'">
@@ -198,7 +198,7 @@
       <div class="modal-body">
 
         <!-- Error Alert -->
-        @if ($errors->any())
+        {{-- @if ($errors->any())
           <div class="alert alert-danger py-2 mb-3">
             <h6 class="fw-bold mb-2">พบข้อผิดพลาด:</h6>
             <ul class="mb-0 small">
@@ -207,7 +207,7 @@
               @endforeach
             </ul>
           </div>
-        @endif
+        @endif --}}
 
         <!-- ฟอร์มบันทึกพฤติกรรม -->
         <form action="{{ isset($observe) ? route('observe.update', $observe->id) : route('observe.store') }}"
@@ -313,6 +313,14 @@
     </div>
   </div>
 </div>
+@if ($errors->any())
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var observeModal = new bootstrap.Modal(document.getElementById('observeModal'));
+        observeModal.show();
+    });
+</script>
+@endif
 
    <!-- ถ้าต้องการใช้ observe เดียว (เช่นหน้าแก้ไข)-->
 @if($observe)
@@ -452,11 +460,46 @@
     </div>
 @endif
 
-@if (session('success'))
+{{-- @if (session('success'))
   <div class="alert alert-success text-center fw-bold py-2 mb-3">
     {{ session('success') }}
   </div>
+@endif --}}
+
+
+{{-- ตรวจสอบว่ามี error หรือไม่ --}}
+@if ($errors->any())
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                html: `
+                    <ul style="text-align:left;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                `,
+                confirmButtonText: 'ตกลง'
+            });
+        });
+    </script>
 @endif
 
-     
+{{-- ตรวจสอบว่ามีข้อความแจ้งเตือนจาก session --}}
+{{-- Success --}}
+@if (session('success'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                icon: 'success',
+                title: '{{ session('success') }}',
+                showConfirmButton: true,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+@endif
 @endsection

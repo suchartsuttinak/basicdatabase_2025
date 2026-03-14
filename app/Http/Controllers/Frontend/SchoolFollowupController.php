@@ -147,7 +147,10 @@ private function rules($isUpdate = false)
     return [
         'client_id'           => $isUpdate ? 'sometimes|integer|exists:clients,id' : 'required|integer|exists:clients,id',
         'education_record_id' => 'nullable|integer',
-        'follow_date'         => 'required|date|after_or_equal:today', // ✅ ต้องเป็นวันที่ปัจจุบันหรืออนาคต
+        // 'follow_date'         => 'required|date|after_or_equal:today', // ✅ ต้องเป็นวันที่ปัจจุบันหรืออนาคต
+        
+          // ✅ อนุญาตให้ย้อนหลังได้
+        'follow_date'         => 'required|date', 
         'teacher_name'        => 'nullable|string|max:255',
         'tel'                 => 'nullable|string|max:20',
         'follow_type'         => 'required|string|in:self,phone,other',
@@ -169,7 +172,7 @@ private function messages()
 
         'follow_date.required'  => 'กรุณาระบุวันที่ติดตาม',
         'follow_date.date'      => 'วันที่ติดตามไม่ถูกต้อง',
-        'follow_date.after_or_equal' => 'วันที่ติดตามต้องไม่ย้อนหลัง',
+        // 'follow_date.after_or_equal' => 'วันที่ติดตามต้องไม่ย้อนหลัง',
 
         'follow_type.required'  => 'กรุณาเลือกวิธีการติดตาม',
         'follow_type.in'        => 'วิธีการติดตามไม่ถูกต้อง',

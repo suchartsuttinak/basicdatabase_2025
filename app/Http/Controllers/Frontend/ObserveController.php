@@ -29,29 +29,57 @@ class ObserveController extends Controller
     public function StoreObserve(Request $request)
     {
         $data = $request->validate([
-            'date' => 'required|date',
-            'behavior' => 'nullable|string',
-            'cause' => 'nullable|string',
-            'solution' => 'nullable|string',
-            'action' => 'nullable|string',
-            'obstacles' => 'nullable|string',
-            'result' => 'nullable|string',
-            'record_date' => 'nullable|date',
-            'recorder' => 'nullable|string|max:100',
-            'misbehavior_id' => 'required|integer',
-            'client_id' => 'required|integer',
+            'date'          => 'required|date',
+            'behavior'      => 'required|string',
+            'cause'         => 'required|string',
+            'solution'      => 'required|string',
+            'action'        => 'required|string',
+            'obstacles'     => 'nullable|string',
+            'result'        => 'required|string',
+            'record_date'   => 'required|date',
+            'recorder'      => 'nullable|string|max:100',
+            'misbehavior_id'=> 'required|integer',
+            'client_id'     => 'required|integer',
+        ], [
+            'date.required'        => 'กรุณาระบุวันที่',
+            'date.date'            => 'วันที่ไม่ถูกต้อง',
+
+            'behavior.required'    => 'กรุณาระบุพฤติกรรม',
+            'behavior.string'      => 'พฤติกรรมต้องเป็นข้อความ',
+
+            'cause.required'       => 'กรุณาระบุสาเหตุ',
+            'cause.string'         => 'สาเหตุต้องเป็นข้อความ',
+
+            'solution.required'    => 'กรุณาระบุแนวทางแก้ไข',
+            'solution.string'      => 'แนวทางแก้ไขต้องเป็นข้อความ',
+
+            'action.required'      => 'กรุณาระบุการดำเนินการ',
+            'action.string'        => 'การดำเนินการต้องเป็นข้อความ',
+
+            'obstacles.string'     => 'อุปสรรคต้องเป็นข้อความ',
+
+            'result.required'      => 'กรุณาระบุผลการดำเนินการ',
+            'result.string'        => 'ผลการดำเนินการต้องเป็นข้อความ',
+
+            'record_date.required' => 'กรุณาระบุวันที่บันทึก',
+            'record_date.date'     => 'วันที่บันทึกไม่ถูกต้อง',
+
+            'recorder.string'      => 'ผู้บันทึกต้องเป็นข้อความ',
+            'recorder.max'         => 'ชื่อผู้บันทึกต้องไม่เกิน 100 ตัวอักษร',
+
+            'misbehavior_id.required' => 'กรุณาเลือกประเภทพฤติกรรมไม่เหมาะสม',
+            'misbehavior_id.integer'  => 'รหัสพฤติกรรมต้องเป็นตัวเลข',
+
+            'client_id.required'   => 'กรุณาเลือกนักเรียน',
+            'client_id.integer'    => 'รหัสนักเรียนต้องเป็นตัวเลข',
         ]);
-
         Observe::create($data);
+         // ส่งข้อความ success ไปที่ session โดยตรง
+            return redirect()->route('observe.create', $data['client_id'])
+            ->with('success', 'บันทึกข้อมูลเรียบร้อย');
+            }           
 
-        $notification = [
-            'message' => 'บันทึกข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
 
-        return redirect()->route('observe.create', $data['client_id'])
-                         ->with($notification);
-    }
 
     // หน้าแก้ไข
     public function EditObserve($id)
@@ -73,28 +101,58 @@ class ObserveController extends Controller
         $observe = Observe::findOrFail($id);
 
         $data = $request->validate([
-            'date' => 'required|date',
-            'behavior' => 'nullable|string',
-            'cause' => 'nullable|string',
-            'solution' => 'nullable|string',
-            'action' => 'nullable|string',
-            'obstacles' => 'nullable|string',
-            'result' => 'nullable|string',
-            'record_date' => 'nullable|date',
-            'recorder' => 'nullable|string|max:100',
-            'misbehavior_id' => 'required|integer',
-            'client_id' => 'required|integer',
+            'date'          => 'required|date',
+            'behavior'      => 'required|string',
+            'cause'         => 'required|string',
+            'solution'      => 'required|string',
+            'action'        => 'required|string',
+            'obstacles'     => 'nullable|string',
+            'result'        => 'required|string',
+            'record_date'   => 'required|date',
+            'recorder'      => 'nullable|string|max:100',
+            'misbehavior_id'=> 'required|integer',
+            'client_id'     => 'required|integer',
+        ], [
+            'date.required'        => 'กรุณาระบุวันที่',
+            'date.date'            => 'วันที่ไม่ถูกต้อง',
+
+            'behavior.required'    => 'กรุณาระบุพฤติกรรม',
+            'behavior.string'      => 'พฤติกรรมต้องเป็นข้อความ',
+
+            'cause.required'       => 'กรุณาระบุสาเหตุ',
+            'cause.string'         => 'สาเหตุต้องเป็นข้อความ',
+
+            'solution.required'    => 'กรุณาระบุแนวทางแก้ไข',
+            'solution.string'      => 'แนวทางแก้ไขต้องเป็นข้อความ',
+
+            'action.required'      => 'กรุณาระบุการดำเนินการ',
+            'action.string'        => 'การดำเนินการต้องเป็นข้อความ',
+
+            'obstacles.string'     => 'อุปสรรคต้องเป็นข้อความ',
+
+            'result.required'      => 'กรุณาระบุผลการดำเนินการ',
+            'result.string'        => 'ผลการดำเนินการต้องเป็นข้อความ',
+
+            'record_date.required' => 'กรุณาระบุวันที่บันทึก',
+            'record_date.date'     => 'วันที่บันทึกไม่ถูกต้อง',
+
+            'recorder.string'      => 'ผู้บันทึกต้องเป็นข้อความ',
+            'recorder.max'         => 'ชื่อผู้บันทึกต้องไม่เกิน 100 ตัวอักษร',
+
+            'misbehavior_id.required' => 'กรุณาเลือกประเภทพฤติกรรมไม่เหมาะสม',
+            'misbehavior_id.integer'  => 'รหัสพฤติกรรมต้องเป็นตัวเลข',
+
+            'client_id.required'   => 'กรุณาเลือกนักเรียน',
+            'client_id.integer'    => 'รหัสนักเรียนต้องเป็นตัวเลข',
         ]);
 
         $observe->update($data);
 
-        $notification = [
-            'message' => 'อัปเดตข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
+     
 
-        return redirect()->route('observe.create', $data['client_id'])
-                         ->with($notification);
+       // ส่งข้อความ success ไปที่ session โดยตรง
+    return redirect()->route('observe.create', $data['client_id'])
+                     ->with('success', 'อัปเดตข้อมูลเรียบร้อย');
     }
 
     // ลบข้อมูล

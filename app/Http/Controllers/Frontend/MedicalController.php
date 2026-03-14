@@ -98,8 +98,8 @@ public function MedicalUpdate(Request $request, $id)
     ], [
         'medical_date.required' => 'กรุณาระบุวันที่รักษา',
         'medical_date.date'     => 'วันที่รักษาไม่ถูกต้อง',
-        'disease_name.required' => 'กรุณาระบุชื่อโรค',
-        'illness.required'      => 'กรุณาระบุอาการเจ็บป่วย',
+        'disease_name.required' => 'ชื่อโรคต้องไม่เป็นค่าว่าง',
+        'illness.required'      => 'อาการเจ็บป่วยต้องไม่เป็นค่าว่าง',
         'refer.required'        => 'กรุณาเลือกการส่งต่อ',
     ]);
 
