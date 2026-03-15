@@ -96,7 +96,7 @@ class CaseOutsideController extends Controller
             'outside_id.exists'   => 'ข้อมูลภายนอกไม่ถูกต้อง',
             'follo_no.required'   => 'กรุณาเลือกการดำเนินงาน',
             'results.string'      => 'ผลการติดตามต้องเป็นข้อความ',
-            'results.required'    => 'กรุณากรอกผลการติดตาม',
+            'results.required'    => 'ผลการติดตามต้องไม่เป็นค่าว่าง',
             'teacher.string'      => 'ชื่อครูต้องเป็นข้อความ',
             'remerk.string'       => 'หมายเหตุต้องเป็นข้อความ',
             'dormitory.required'  => 'สถานที่พักต้องมีข้อมูล',

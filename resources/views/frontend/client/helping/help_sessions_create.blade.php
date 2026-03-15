@@ -115,28 +115,80 @@
     });
 
     // Preview ภาพที่เลือก
-    document.getElementById('images').addEventListener('change', function (event) {
-        const preview = document.getElementById('preview-images');
-        preview.innerHTML = ''; // เคลียร์ภาพเดิมก่อน
+    const imagesInput = document.getElementById('images');
+    if (imagesInput) {
+        imagesInput.addEventListener('change', function (event) {
+            const preview = document.getElementById('preview-images');
+            preview.innerHTML = ''; // เคลียร์ภาพเดิมก่อน
 
-        const files = event.target.files;
-        if (files) {
-            Array.from(files).forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.classList.add('img-thumbnail');
-                        img.style.width = '150px';
-                        img.style.height = 'auto';
-                        preview.appendChild(img);
+            const files = event.target.files;
+            if (files) {
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.classList.add('img-thumbnail');
+                            img.style.width = '150px';
+                            img.style.height = 'auto';
+                            preview.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
                     }
-                    reader.readAsDataURL(file);
-                }
-            });
+                });
+            }
+        });
+    }
+
+    // ✅ ตรวจสอบวันที่ซ้ำแบบ AJAX
+    document.getElementById('help_date').addEventListener('change', function () {
+        const selectedDate = this.value;
+        const clientId = "{{ $client->id }}";
+
+        if (selectedDate) {
+            fetch(`/check-duplicate-date/${clientId}?date=${selectedDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'วันที่ซ้ำ',
+                            text: `วันที่ ${selectedDate} มีการบันทึกแล้ว`,
+                            confirmButtonText: 'ตกลง'
+                        });
+                        this.value = ""; // เคลียร์ค่าออกเพื่อบังคับให้เลือกใหม่
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     });
+
     toggleSaveButton();
 </script>
+
+{{-- ต้องมี SweetAlert2 --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if($errors->has('help_date'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'ไม่สามารถบันทึกได้',
+        text: '{{ $errors->first("help_date") }}',
+        confirmButtonText: 'ตกลง'
+    });
+</script>
+@endif
+
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'สำเร็จ',
+        text: '{{ session("success") }}',
+        confirmButtonText: 'ตกลง'
+    });
+</script>
+@endif
 @endsection

@@ -298,12 +298,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 messages.push('กรุณาเลือกสาเหตุที่พักอาศัยภายนอก');
             }
 
+             // สถานที่พัก
+            const dormitoryInput = form.querySelector('input[name="dormitory"]');
+            if (!dormitoryInput.value.trim()) {
+                valid = false;
+                messages.push('กรุณากรอกสถานที่พัก');
+            }
+
             // การดำเนินงาน
             const radios = form.querySelectorAll('input[name="follo_no"]');
             if (![...radios].some(r => r.checked)) {
                 valid = false;
                 messages.push('กรุณาเลือกการดำเนินงาน');
             }
+
+             // ผลการติดตาม
+            const resultsInput = form.querySelector('textarea[name="results"]');
+            if (!resultsInput.value.trim()) {
+                valid = false;
+                messages.push('กรุณากรอกผลการติดตาม');
+            }
+
+
 
             if (!valid) {
                 e.preventDefault();

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\HelpSession;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class HelpSessionController extends Controller
 {
@@ -27,12 +28,24 @@ class HelpSessionController extends Controller
 
     public function store(Request $request, Client $client)
     {
-       $validated = $request->validate([
-        'help_date' => 'required|date',
+      $validated = $request->validate([
+        'help_date' => [
+            'required',
+            'date',
+            Rule::unique('help_sessions', 'help_date')
+                ->where(fn($query) => $query->where('client_id', $client->id)),
+        ],
         'items.*.item_name' => 'required|string',
-        'items.*.quantity' => 'required|integer|min:1',
-        'items.*.unit_price' => 'required|numeric|min:0',
+        'items.*.quantity'  => 'required|integer|min:1',
+        'items.*.unit_price'=> 'required|numeric|min:0',
+    ], [
+        'help_date.required' => 'กรุณากรอกวันที่',
+        'help_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+        'help_date.unique'   => 'วันที่นี้มีการบันทึกช่วยเหลือแล้ว ห้ามซ้ำ',
+        // … ข้อความ error อื่น ๆ …
     ]);
+
+
 
     DB::transaction(function () use ($validated, $client) {
         $session = HelpSession::create([
@@ -56,8 +69,13 @@ class HelpSessionController extends Controller
         $session->update(['total_amount' => $total]);
     });
 
+    $notification = [
+            'message' => 'บันทึกข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
     return redirect()->route('help_sessions.show', $client->id)
-                     ->with('success', 'บันทึกการช่วยเหลือเรียบร้อย');
+                     ->with($notification);
 }
 
 
@@ -66,8 +84,13 @@ class HelpSessionController extends Controller
     {
         $session->delete();
 
+        $notification = [
+            'message' => 'ลบข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('help_sessions.show', $client->id)
-                         ->with('success', 'ลบการช่วยเหลือเรียบร้อย');
+                         ->with($notification);
     }
 
     public function create(Client $client)
@@ -86,36 +109,52 @@ public function edit(Client $client, HelpSession $session)
 public function update(Request $request, Client $client, HelpSession $session)
 {
     $validated = $request->validate([
-        'help_date' => 'required|date',
+        'help_date' => [
+            'required',
+            'date',
+            Rule::unique('help_sessions', 'help_date')
+                ->where(fn($query) => $query->where('client_id', $client->id))
+                ->ignore($session->id),
+        ],
         'items.*.item_name' => 'required|string',
-        'items.*.quantity' => 'required|integer|min:1',
-        'items.*.unit_price' => 'required|numeric|min:0',
+        'items.*.quantity'  => 'required|integer|min:1',
+        'items.*.unit_price'=> 'required|numeric|min:0',
+    ], [
+        'help_date.required' => 'กรุณากรอกวันที่',
+        'help_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+        'help_date.unique'   => 'วันที่นี้มีการบันทึกช่วยเหลือแล้ว ห้ามซ้ำ',
+        'items.*.item_name.required' => 'กรุณากรอกรายการ',
+        'items.*.quantity.required'  => 'กรุณากรอกจำนวน',
+        'items.*.unit_price.required'=> 'กรุณากรอกราคา',
     ]);
 
-    // อัปเดตวันที่
-    $session->update([
-        'help_date' => $validated['help_date'],
-    ]);
+    DB::transaction(function () use ($validated, $session) {
+        $session->update(['help_date' => $validated['help_date']]);
+        $session->items()->delete();
 
-    // ลบรายการเดิมทั้งหมด
-    $session->items()->delete();
+        $total = 0;
+        foreach ($validated['items'] as $itemData) {
+            $itemTotal = $itemData['quantity'] * $itemData['unit_price'];
+            $session->items()->create([
+                'item_name'   => $itemData['item_name'],
+                'quantity'    => $itemData['quantity'],
+                'unit_price'  => $itemData['unit_price'],
+                'total_price' => $itemTotal,
+            ]);
+            $total += $itemTotal;
+        }
 
-    $total = 0;
-    foreach ($validated['items'] as $itemData) {
-        $itemTotal = $itemData['quantity'] * $itemData['unit_price'];
-        $session->items()->create([
-            'item_name' => $itemData['item_name'],
-            'quantity' => $itemData['quantity'],
-            'unit_price' => $itemData['unit_price'],
-            'total_price' => $itemTotal,
-        ]);
-        $total += $itemTotal;
-    }
+        $session->update(['total_amount' => $total]);
+    });
 
-    // อัปเดตยอดรวม
-    $session->update(['total_amount' => $total]);
+     $notification = [
+            'message' => 'แก้ไขข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
 
     return redirect()->route('help_sessions.show', $client->id)
-                     ->with('success', 'แก้ไขการช่วยเหลือเรียบร้อยแล้ว');
+                     ->with($notification);
 }
+
+
 }
