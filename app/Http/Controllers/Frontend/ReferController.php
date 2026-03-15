@@ -30,19 +30,29 @@ class ReferController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'refer_date'   => 'required|date',
-            'translate_id' => 'required|exists:translates,id',
-            'destination'  => 'nullable|string',
-            'address'      => 'nullable|string',
-            'guardian'     => 'required|in:มี,ไม่มี',
-            'parent_name'  => 'nullable|string',
-            'parent_tel'   => 'nullable|string',
-            'member'       => 'nullable|string',
-            'teacher'      => 'nullable|string',
-            'remark'       => 'nullable|string',
-            'client_id'    => 'required|exists:clients,id',
-        ]);
+      $validated = $request->validate([
+        'refer_date'   => 'required|date',
+        'translate_id' => 'required|exists:translates,id',
+        'destination'  => 'nullable|string',
+        'address'      => 'nullable|string',
+        'guardian'     => 'required|in:มี,ไม่มี',
+        'parent_name'  => 'nullable|string',
+        'parent_tel'   => 'nullable|string',
+        'member'       => 'nullable|string',
+        'teacher'      => 'required|string',
+        'remark'       => 'nullable|string',
+        'client_id'    => 'required|exists:clients,id',
+    ],[
+        'refer_date.required'   => 'กรุณาระบุวันที่ส่งต่อ',
+        'refer_date.date'       => 'รูปแบบวันที่ไม่ถูกต้อง',
+        'translate_id.required' => 'กรุณาเลือกการแปล',
+        'translate_id.exists'   => 'ข้อมูลการแปลไม่ถูกต้อง',
+        'guardian.required'     => 'กรุณาเลือกว่ามีผู้ปกครองหรือไม่',
+        'guardian.in'           => 'ค่าที่เลือกไม่ถูกต้อง',
+        'teacher.required'      => 'กรุณาระบุชื่อผู้นำส่ง',
+        'client_id.required'    => 'กรุณาเลือกผู้รับบริการ',
+        'client_id.exists'      => 'ข้อมูลผู้รับบริการไม่ถูกต้อง',
+    ]);
 
         // ✅ บันทึก refer
         $refer = Refer::create($validated);

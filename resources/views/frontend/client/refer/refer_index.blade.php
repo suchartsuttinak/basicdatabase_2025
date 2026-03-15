@@ -8,11 +8,14 @@
             <div>
                 <i class="bi bi-box-arrow-right me-2"></i> ตารางการจำหน่ายผู้รับออกจากสถานสงเคราะห์
             </div>
-            <button type="button" class="btn btn-sm btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#createReferModal">
-                <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูลจำหน่าย
-            </button>
+            <!-- ปุ่มเปิด Modal -->
+<button type="button" class="btn btn-sm btn-primary"
+    data-bs-toggle="modal"
+    data-bs-target="#createReferModal">
+    <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูลจำหน่าย
+</button>
+
+
         </div>
 
          {{-- ข้อมูล client --}}
@@ -93,92 +96,109 @@
     </div>
 </div>
 
-<!-- Modal เพิ่มข้อมูลการจำหน่าย -->
+
 <div class="modal fade" id="createReferModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content shadow">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i> เพิ่มข้อมูลการจำหน่าย</h5>
+    <div class="modal-content border-0 shadow-lg">
+      
+      <!-- Header -->
+      <div class="modal-header bg-dark text-white border-bottom-0">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-file-earmark-plus me-2"></i> แบบฟอร์มบันทึกข้อมูลการจำหน่าย
+        </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-      <form action="{{ route('refers.store') }}" method="POST">
-    @csrf
-    <input type="hidden" name="client_id" value="{{ $client->id }}">
-    <input type="hidden" name="status" value="refer">
 
+      <!-- Body -->
+      <div class="modal-body bg-light">
+        <form action="{{ route('refers.store') }}" method="POST" id="referForm" class="needs-validation" novalidate>
+          @csrf
+          <input type="hidden" name="client_id" value="{{ $client->id }}">
+          <input type="hidden" name="status" value="refer">
 
-    <input type="hidden" name="status" value="refer">
+          <!-- วันที่นำส่ง -->
           <div class="row mb-3">
             <div class="col-md-4">
-              <label class="form-label fw-bold">วันที่นำส่ง</label>
+              <label class="form-label fw-bold text-dark">วันที่นำส่ง <span class="text-danger">*</span></label>
               <input type="date" name="refer_date" class="form-control form-control-sm" required>
+              <div class="invalid-feedback">กรุณาเลือกวันที่นำส่ง</div>
             </div>
             <div class="col-md-8">
-              <label class="form-label fw-bold">สาเหตุการจำหน่าย</label>
+              <label class="form-label fw-bold text-dark">สาเหตุการจำหน่าย <span class="text-danger">*</span></label>
               <select name="translate_id" class="form-select form-select-sm" required>
                 <option value="">-- เลือก --</option>
                 @foreach($translates as $t)
-                    <option value="{{ $t->id }}">{{ $t->translate_name }}</option>
+                  <option value="{{ $t->id }}">{{ $t->translate_name }}</option>
                 @endforeach
               </select>
+              <div class="invalid-feedback">กรุณาเลือกสาเหตุการจำหน่าย</div>
             </div>
           </div>
 
+          <!-- สถานที่นำส่ง -->
           <div class="mb-3">
-            <label class="form-label fw-bold">ชื่อสถานที่นำส่ง</label>
-            <input type="text" name="destination" class="form-control form-control-sm">
+            <label class="form-label fw-bold text-dark">ชื่อสถานที่นำส่ง <span class="text-danger">*</span></label>
+            <input type="text" name="destination" class="form-control form-control-sm" required>
+            <div class="invalid-feedback">กรุณากรอกชื่อสถานที่นำส่ง</div>
           </div>
 
+          <!-- ที่อยู่ -->
           <div class="mb-3">
-            <label class="form-label fw-bold">ที่อยู่</label>
-            <textarea name="address" class="form-control form-control-sm" rows="2"></textarea>
+            <label class="form-label fw-bold text-dark">ที่อยู่ <span class="text-danger">*</span></label>
+            <textarea name="address" class="form-control form-control-sm" rows="2" required></textarea>
+            <div class="invalid-feedback">กรุณากรอกที่อยู่</div>
           </div>
 
+          <!-- Guardian -->
           <div class="mb-3">
-            <label class="form-label fw-bold">ผู้ดูแล</label><br>
+            <label class="form-label fw-bold text-dark">ผู้ดูแล <span class="text-danger">*</span></label><br>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="guardian" value="มี" onclick="toggleGuardian(true)">
+              <input class="form-check-input" type="radio" name="guardian" value="มี" onclick="toggleGuardian(true)" required>
               <label class="form-check-label">มี</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="guardian" value="ไม่มี" onclick="toggleGuardian(false)">
+              <input class="form-check-input" type="radio" name="guardian" value="ไม่มี" onclick="toggleGuardian(false)" required>
               <label class="form-check-label">ไม่มี</label>
             </div>
+            <div class="invalid-feedback d-block">กรุณาเลือกว่ามีผู้ดูแลหรือไม่</div>
           </div>
 
+          <!-- Guardian Fields -->
           <div id="guardianFields" style="display:none;">
             <div class="row mb-3">
               <div class="col-md-4">
-                <label class="form-label fw-bold">ชื่อผู้รับตัว</label>
+                <label class="form-label fw-bold text-dark">ชื่อผู้รับตัว</label>
                 <input type="text" name="parent_name" class="form-control form-control-sm">
               </div>
               <div class="col-md-4">
-                <label class="form-label fw-bold">โทรศัพท์</label>
+                <label class="form-label fw-bold text-dark">โทรศัพท์</label>
                 <input type="text" name="parent_tel" class="form-control form-control-sm">
               </div>
               <div class="col-md-4">
-                <label class="form-label fw-bold">ความสัมพันธ์</label>
+                <label class="form-label fw-bold text-dark">ความสัมพันธ์</label>
                 <input type="text" name="member" class="form-control form-control-sm">
               </div>
             </div>
           </div>
 
+          <!-- Teacher -->
           <div class="mb-3">
-            <label class="form-label fw-bold">ชื่อผู้นำส่ง</label>
+            <label class="form-label fw-bold text-dark">ชื่อผู้นำส่ง</label>
             <input type="text" name="teacher" class="form-control form-control-sm">
           </div>
 
+          <!-- Remark -->
           <div class="mb-3">
-            <label class="form-label fw-bold">หมายเหตุ</label>
+            <label class="form-label fw-bold text-dark">หมายเหตุ</label>
             <textarea name="remark" class="form-control form-control-sm" rows="2"></textarea>
           </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-success btn-sm">
+          <!-- Footer -->
+          <div class="modal-footer border-top-0 d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-save me-1"></i> บันทึกผล
             </button>
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               <i class="bi bi-x-circle me-1"></i> ปิด
             </button>
           </div>
@@ -188,53 +208,141 @@
   </div>
 </div>
 
+@push('scripts')
 <script>
-$(document).ready(function() {
-    var table = $('#datatable-refer').DataTable({
-        responsive: true,
-        autoWidth: false,
-        pageLength: 10,
-        ordering: true,
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json'
-        }
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    const openBtn = document.querySelector('[data-bs-target="#createReferModal"]');
+    const form = document.getElementById('referForm');
+    const guardianFields = document.getElementById('guardianFields');
+    const guardianRadios = form.querySelectorAll('input[name="guardian"]');
 
-    // ตั้งค่า CSRF สำหรับทุก Ajax
-    $.ajaxSetup({
-        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-    });
+    // ✅ รีเซ็ตฟอร์มทุกครั้งที่เปิด Modal
+    if (openBtn && form) {
+        openBtn.addEventListener('click', function () {
+            form.reset();
+            guardianFields.style.display = 'none';
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+        });
+    }
 
-    // ✅ ให้ปุ่ม Restore ทำงานแม้ DataTables re-render
-    $('#datatable-refer').on('submit', 'form', function(e) {
-        e.preventDefault();
-        var form = this;
-        $.ajax({
-            url: form.action,
-            type: 'POST', // Laravel จะอ่าน _method=PUT จาก form
-            data: $(form).serialize(),
-            success: function(res) {
-                alert(res.message || 'Restore สำเร็จ');
-                location.reload(); // รีโหลดทั้งหน้าเพื่อให้ข้อมูลใหม่แสดง
-            },
-            error: function(xhr) {
-                alert('Restore ไม่สำเร็จ: ' + (xhr.responseJSON?.message || 'เกิดข้อผิดพลาด'));
+    // ✅ ให้ radio ผู้ดูแลทำงานเหมือนเดิม
+    guardianRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (this.value === 'มี') {
+                toggleGuardian(true);
+            } else {
+                toggleGuardian(false);
             }
         });
     });
-});
-</script>
 
-<script>
+    // ✅ Client-side validation
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            let valid = true;
+            let messages = [];
+
+            const dateInput = form.querySelector('input[name="refer_date"]');
+            if (!dateInput.value) {
+                valid = false;
+                messages.push('กรุณาเลือกวันที่นำส่ง');
+                dateInput.classList.add('is-invalid');
+            }
+
+            const translateSelect = form.querySelector('select[name="translate_id"]');
+            if (!translateSelect.value) {
+                valid = false;
+                messages.push('กรุณาเลือกสาเหตุการจำหน่าย');
+                translateSelect.classList.add('is-invalid');
+            }
+
+            const destinationInput = form.querySelector('input[name="destination"]');
+            if (!destinationInput.value.trim()) {
+                valid = false;
+                messages.push('กรุณากรอกชื่อสถานที่นำส่ง');
+                destinationInput.classList.add('is-invalid');
+            }
+
+             const teacherInput = form.querySelector('input[name="teacher"]');
+            if (!teacherInput.value.trim()) {
+                valid = false;
+                messages.push('กรุณากรอกชื่อผู้นำส่ง');
+                teacherInput.classList.add('is-invalid');
+            }
+
+
+
+            const addressInput = form.querySelector('textarea[name="address"]');
+            if (!addressInput.value.trim()) {
+                valid = false;
+                messages.push('กรุณากรอกที่อยู่');
+                addressInput.classList.add('is-invalid');
+            }
+
+            if (![...guardianRadios].some(r => r.checked)) {
+                valid = false;
+                messages.push('กรุณาเลือกว่ามีผู้ดูแลหรือไม่');
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    html: messages.join('<br>'),
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        });
+
+        // ✅ ลบ error เมื่อแก้ไข input
+        form.addEventListener('input', function (e) {
+            if (e.target.classList.contains('is-invalid')) {
+                e.target.classList.remove('is-invalid');
+                const nextEl = e.target.nextElementSibling;
+                if (nextEl && nextEl.classList.contains('invalid-feedback')) {
+                    nextEl.remove();
+                }
+            }
+        });
+    }
+
+    // ✅ Error จาก Laravel (server-side)
+    @if ($errors->any())
+        const modalEl = document.getElementById('createReferModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+        Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            html: `{!! implode('<br>', $errors->all()) !!}`,
+            confirmButtonText: 'ตกลง'
+        });
+    @endif
+
+    // ✅ Success message
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'สำเร็จ',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            confirmButtonText: 'ตกลง'
+        });
+    @endif
+});
+
+// ✅ ฟังก์ชัน toggleGuardian
 function toggleGuardian(show) {
     const guardianFields = document.getElementById('guardianFields');
     if (show) {
         guardianFields.style.display = 'block';
     } else {
         guardianFields.style.display = 'none';
-        // เคลียร์ค่าฟิลด์เมื่อเลือก "ไม่มี"
         guardianFields.querySelectorAll('input').forEach(el => el.value = '');
     }
 }
 </script>
+@endpush
 @endsection
