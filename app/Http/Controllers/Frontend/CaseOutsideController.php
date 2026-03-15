@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;   // ✅ import ที่นี่เท่านั้น
 use App\Models\Client;
 use App\Models\CaseOutside;
 use App\Models\Outside;
@@ -17,7 +18,6 @@ class CaseOutsideController extends Controller
         $outside = Outside::all();
         $client  = Client::findOrFail($client_id);
 
-        // แสดงผลเรียงตาม count จากมากไปน้อย (ตาม requirement หน้าแสดงผล)
         $caseoutsides = CaseOutside::where('client_id', $client->id)
             ->orderBy('count', 'desc')
             ->get();
@@ -41,17 +41,26 @@ class CaseOutsideController extends Controller
             'results'    => 'nullable|string',
             'teacher'    => 'nullable|string',
             'remerk'     => 'nullable|string',
-            'dormitory'  => 'nullable|string',
+            'dormitory'  => 'required|string',
             'client_id'  => 'required|exists:clients,id',
         ], [
-            'date.unique' => 'วันที่ติดตามนี้มีอยู่แล้ว ห้ามซ้ำ',
+            'date.required'     => 'กรุณากรอกวันที่',
+            'date.date'         => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'date.unique'       => 'วันที่ติดตามนี้มีอยู่แล้ว ห้ามซ้ำ',
+            'outside_id.required' => 'กรุณาเลือกข้อมูลภายนอก',
+            'outside_id.exists'   => 'ข้อมูลภายนอกไม่ถูกต้อง',
+            'follo_no.required'   => 'กรุณากรอกเลขที่ติดตาม',
+            'results.string'      => 'ผลการติดตามต้องเป็นข้อความ',
+            'teacher.string'      => 'ชื่อครูต้องเป็นข้อความ',
+            'remerk.string'       => 'หมายเหตุต้องเป็นข้อความ',
+            'dormitory.required'  => 'กรุณากรอกหอพัก',
+            'dormitory.string'    => 'หอพักต้องเป็นข้อความ',
+            'client_id.required'  => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.exists'    => 'ผู้รับบริการไม่ถูกต้อง',
         ]);
 
         DB::transaction(function () use ($validated) {
-            // สร้าง record ใหม่ (ยังไม่กำหนด count ที่นี่)
             $case = CaseOutside::create($validated);
-
-            // ✅ reindex count ใหม่ทั้งหมดตามวัน (asc) ของ client เดียวกัน
             $this->reindexCounts($case->client_id);
         });
 
@@ -63,37 +72,55 @@ class CaseOutsideController extends Controller
     {
         $case = CaseOutside::findOrFail($id);
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'date' => [
                 'required',
                 'date',
-                Rule::unique('case_outsides')->where(function ($query) use ($case, $request) {
-                    return $query->where('client_id', $case->client_id);
-                })->ignore($case->id),
+                Rule::unique('case_outsides', 'date')
+                    ->where(fn($query) => $query->where('client_id', $case->client_id))
+                    ->ignore($case->id),
             ],
             'outside_id' => 'required|exists:outsides,id',
             'follo_no'   => 'required',
             'results'    => 'nullable|string',
             'teacher'    => 'nullable|string',
             'remerk'     => 'nullable|string',
-            'dormitory'  => 'nullable|string',
+            'dormitory'  => 'required|string',
+            'client_id'  => 'required|exists:clients,id',
         ], [
-            'date.unique' => 'วันที่ติดตามนี้มีอยู่แล้ว ห้ามซ้ำ',
+            'date.required'       => 'กรุณากรอกวันที่',
+            'date.date'           => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'date.unique'         => 'วันที่ติดตามนี้มีอยู่แล้ว ห้ามซ้ำ',
+            'outside_id.required' => 'กรุณาเลือกข้อมูลภายนอก',
+            'outside_id.exists'   => 'ข้อมูลภายนอกไม่ถูกต้อง',
+            'follo_no.required'   => 'กรุณาเลือกการดำเนินงาน',
+            'results.string'      => 'ผลการติดตามต้องเป็นข้อความ',
+            'teacher.string'      => 'ชื่อครูต้องเป็นข้อความ',
+            'remerk.string'       => 'หมายเหตุต้องเป็นข้อความ',
+            'dormitory.required'  => 'กรุณากรอกสถานที่พัก',
+            'dormitory.string'    => 'สถานที่พักต้องเป็นข้อความ',
+            'client_id.required'  => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.exists'    => 'ผู้รับบริการไม่ถูกต้อง',
         ]);
 
-        DB::transaction(function () use ($case, $validated) {
-            // อัปเดตข้อมูล
-            $case->update($validated);
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validator)
+                ->withInput($request->all() + ['case_id' => $id]);
+        }
 
-            // ✅ reindex count ใหม่ทั้งหมดตามวัน (asc) ของ client เดียวกัน
+        DB::transaction(function () use ($case, $validator) {
+            $case->update($validator->validated());
             $this->reindexCounts($case->client_id);
         });
 
-        return redirect()->route('case_outside.show', $case->client_id)
+        return redirect()
+            ->route('case_outside.show', $case->client_id)
             ->with('success', 'แก้ไขข้อมูลเรียบร้อย');
     }
 
-    public function DeleteCaseOutside($id)
+     public function DeleteCaseOutside($id)
     {
         $case = CaseOutside::findOrFail($id);
         $client_id = $case->client_id;
@@ -127,6 +154,3 @@ class CaseOutsideController extends Controller
         }
     }
 }
-
-
-

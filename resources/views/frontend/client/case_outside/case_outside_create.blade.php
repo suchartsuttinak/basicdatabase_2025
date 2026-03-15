@@ -93,8 +93,10 @@
         </div>
         <div class="modal-body">
           <form action="{{ route('case_outside.update',$case->id) }}" method="POST">
-            @csrf @method('PUT')
-            <input type="hidden" name="client_id" value="{{ $client->id }}">
+    @csrf @method('PUT')
+    <input type="hidden" name="client_id" value="{{ $client->id }}">
+    <input type="hidden" name="case_id" value="{{ $case->id }}"> <!-- ✅ ส่ง case_id กลับ -->
+
 
             <div class="row mb-2">
               <div class="col-12 col-md-4">
@@ -176,6 +178,8 @@
 @endif
     </div>
 </div>
+
+
 <!-- Modal เพิ่มข้อมูล CaseOutside -->
 <div class="modal fade" id="createCaseOutsideModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -187,59 +191,55 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form action="{{ route('case_outside.store') }}" method="POST">
+        <form id="createCaseOutsideForm" action="{{ route('case_outside.store') }}" method="POST">
           @csrf
           <input type="hidden" name="client_id" value="{{ $client->id }}">
 
           <div class="row mb-2">
             <div class="col-12 col-md-4">
               <label class="form-label fw-bold">วันที่ติดตาม</label>
-              <input type="date" name="date" class="form-control form-control-sm" required>
+              <input type="date" name="date" value="{{ old('date') }}" class="form-control form-control-sm">
             </div>
             <div class="col-12 col-md-6">
               <label class="form-label fw-bold">สาเหตุที่พักอาศัยอยู่ภายนอก</label>
-              <select name="outside_id" class="form-select form-select-sm" required>
+              <select name="outside_id" class="form-select form-select-sm">
                 <option value="">-- เลือกสาเหตุ --</option>
                 @foreach($outside as $o)
-                  <option value="{{ $o->id }}">{{ $o->outside_name }}</option>
+                  <option value="{{ $o->id }}" {{ old('outside_id') == $o->id ? 'selected' : '' }}>
+                    {{ $o->outside_name }}
+                  </option>
                 @endforeach
               </select>
             </div>
             <div class="col-12 col-md-12 mt-2">
               <label class="form-label fw-bold">สถานที่พัก</label>
-              <input type="text" name="dormitory" class="form-control form-control-sm">
+              <input type="text" name="dormitory" value="{{ old('dormitory') }}" class="form-control form-control-sm">
             </div>
           </div>
 
           <div class="mb-2">
             <label class="form-label fw-bold">การดำเนินงาน</label><br>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="follo_no" value="หน่วยงานไปเอง" id="follo_self">
-              <label class="form-check-label" for="follo_self">หน่วยงานไปเอง</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="follo_no" value="โทรศัพท์" id="follo_phone">
-              <label class="form-check-label" for="follo_phone">โทรศัพท์</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="follo_no" value="จดหมาย" id="follo_letter">
-              <label class="form-check-label" for="follo_letter">จดหมาย</label>
-            </div>
+            @foreach(['หน่วยงานไปเอง','โทรศัพท์','จดหมาย'] as $option)
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="follo_no" value="{{ $option }}" {{ old('follo_no') == $option ? 'checked' : '' }}>
+                <label class="form-check-label">{{ $option }}</label>
+              </div>
+            @endforeach
           </div>
 
           <div class="mb-2 mt-2">
             <label class="form-label fw-bold">ผลการติดตาม</label>
-            <textarea name="results" class="form-control form-control-sm" rows="2"></textarea>
+            <textarea name="results" class="form-control form-control-sm" rows="2">{{ old('results') }}</textarea>
           </div>
 
           <div class="row mb-2 mt-2">
             <div class="col-12 col-md-6">
               <label class="form-label fw-bold">ผู้ติดตาม</label>
-              <input type="text" name="teacher" class="form-control form-control-sm">
+              <input type="text" name="teacher" value="{{ old('teacher') }}" class="form-control form-control-sm">
             </div>
             <div class="col-12 col-md-12 mt-2">
               <label class="form-label fw-bold">หมายเหตุ</label>
-              <textarea name="remerk" class="form-control form-control-sm" rows="2"></textarea>
+              <textarea name="remerk" class="form-control form-control-sm" rows="2">{{ old('remerk') }}</textarea>
             </div>
           </div>
 
@@ -257,4 +257,107 @@
   </div>
 </div>
 
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // ✅ รีเซ็ตฟอร์มทุกครั้งที่กดปุ่ม "เพิ่มข้อมูล"
+    const openBtn = document.querySelector('[data-bs-target="#createCaseOutsideModal"]');
+    const form = document.getElementById('createCaseOutsideForm');
+
+    if (openBtn && form) {
+        openBtn.addEventListener('click', function () {
+            form.reset(); // รีเซ็ตค่าทั้งหมดในฟอร์ม
+
+            // รีเซ็ต select ให้กลับไปค่าแรก
+            const selects = form.querySelectorAll('select');
+            selects.forEach(sel => sel.selectedIndex = 0);
+
+            // รีเซ็ต radio ให้ไม่ถูกเลือก
+            const radios = form.querySelectorAll('input[type=radio]');
+            radios.forEach(r => r.checked = false);
+        });
+    }
+
+    // ✅ ตรวจสอบฟอร์ม create แบบ client-side
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            let valid = true;
+            let messages = [];
+
+            // วันที่ติดตาม
+            const dateInput = form.querySelector('input[name="date"]');
+            if (!dateInput.value) {
+                valid = false;
+                messages.push('กรุณากรอกวันที่ติดตาม');
+            }
+
+            // สาเหตุที่พักภายนอก
+            const outsideSelect = form.querySelector('select[name="outside_id"]');
+            if (!outsideSelect.value) {
+                valid = false;
+                messages.push('กรุณาเลือกสาเหตุที่พักอาศัยภายนอก');
+            }
+
+            // การดำเนินงาน
+            const radios = form.querySelectorAll('input[name="follo_no"]');
+            if (![...radios].some(r => r.checked)) {
+                valid = false;
+                messages.push('กรุณาเลือกการดำเนินงาน');
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    html: messages.join('<br>'),
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        });
+    }
+
+    // ✅ ตรวจสอบ error จาก Laravel
+    @if ($errors->any())
+        @if (old('case_id'))
+            // กรณี error จาก edit → เปิด modal edit ของ record นั้น
+            const modalId = 'editCaseOutsideModal' + {{ old('case_id') }};
+            const modalEl = document.getElementById(modalId);
+            if (modalEl) {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            }
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                confirmButtonText: 'ตกลง'
+            });
+        @else
+            // กรณี error จาก create → เปิด modal create
+            const modalEl = document.getElementById('createCaseOutsideModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                confirmButtonText: 'ตกลง'
+            });
+        @endif
+    @endif
+
+    // ✅ success message
+    @if (session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'สำเร็จ',
+            text: '{{ session('success') }}',
+             timer: 3000,              // ปิดอัตโนมัติใน 3 วินาที
+            confirmButtonText: 'ตกลง'
+        });
+    @endif
+});
+</script>
+@endpush
 @endsection
