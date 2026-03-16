@@ -92,6 +92,9 @@
                             <li>
                                 <a href="{{ route('help_type.show') }}" class="tp-link">ประเภทการช่วยเหลือ</a>
                             </li>
+                            <li>
+                                <a href="{{ route('translate.show') }}" class="tp-link">ประเภทการพ้นอุปการะ</a>
+                            </li>
                              
                                 <a href="auth-logout.html" class="tp-link">Logout</a>
                             </li>
