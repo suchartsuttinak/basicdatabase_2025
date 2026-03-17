@@ -5,20 +5,44 @@
     <div class="container-fluid">
 
         <!-- Title -->
-        <h4 class="fs-18 fw-semibold mb-4">Dashboard สถิติ</h4>
+       <div class="text-center mt-4 mb-4">
+    <h2 class="fw-bold text-primary d-inline-flex align-items-center" style="font-size: 32px;">
+        <i data-feather="users" class="me-2 text-primary"></i>
+        ข้อมูลผู้รับบริการ
+    </h2>
+    <hr class="mx-auto mt-2" style="width: 180px; border-top: 3px solid #0d6efd; border-radius: 2px;">
+</div>
 
         <!-- Filter Form -->
         <form method="GET" action="{{ route('statistics.index') }}" class="row g-3 mb-4">
-            <!-- ปี พ.ศ. -->
-            <div class="col-md-2">
-                <label>ปี พ.ศ.</label>
-                <select name="year" class="form-select">
-                    <option value="">ทั้งหมด</option>
-                    @for($y=2550; $y<=date('Y')+543; $y++)
-                        <option value="{{ $y }}" {{ ($year ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endfor
-                </select>
-            </div>
+     <div class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label fw-semibold text-dark d-block mb-2">สถานะผู้รับบริการ</label>
+        <div class="btn-group w-100" role="group" aria-label="สถานะ">
+
+            <!-- ทั้งหมด -->
+            <input type="radio" class="btn-check" name="release_status" id="statusAll" value="all"
+                   {{ ($releaseStatus ?? '')=='all' ? 'checked' : '' }}>
+            <label class="btn btn-outline-secondary rounded-3 shadow-sm d-flex align-items-center justify-content-center" for="statusAll">
+                <i data-feather="list" class="me-2"></i> ทั้งหมด
+            </label>
+
+            <!-- อยู่อาศัย -->
+            <input type="radio" class="btn-check" name="release_status" id="statusShow" value="show"
+                   {{ ($releaseStatus ?? '')=='show' ? 'checked' : '' }}>
+            <label class="btn btn-outline-success rounded-3 shadow-sm d-flex align-items-center justify-content-center" for="statusShow">
+                <i data-feather="home" class="me-2"></i> อยู่อาศัย
+            </label>
+
+            <!-- ถูกจำหน่าย -->
+            <input type="radio" class="btn-check" name="release_status" id="statusRefer" value="refer"
+                   {{ ($releaseStatus ?? '')=='refer' ? 'checked' : '' }}>
+            <label class="btn btn-outline-danger rounded-3 shadow-sm d-flex align-items-center justify-content-center" for="statusRefer">
+                <i data-feather="x-circle" class="me-2"></i> ถูกจำหน่าย
+            </label>
+        </div>
+    </div>
+</div>
             <!-- เพศ -->
             <div class="col-md-2">
                 <label>เพศ</label>
@@ -28,6 +52,7 @@
                     <option value="female" {{ ($gender ?? '')=='female'?'selected':'' }}>หญิง</option>
                 </select>
             </div>
+        
             <!-- อายุ -->
             <div class="col-md-2">
                 <label>อายุต่ำสุด</label>
@@ -37,6 +62,18 @@
                 <label>อายุสูงสุด</label>
                 <input type="number" name="age_max" class="form-control" value="{{ $ageMax ?? 99 }}" min="1" max="99">
             </div>
+
+              <div class="col-md-3">
+                    <label>สถานศึกษา</label>
+                    <select name="institution_id" class="form-select">
+                        <option value="">ทั้งหมด</option>
+                        @foreach(\App\Models\Institution::all() as $inst)
+                            <option value="{{ $inst->id }}" {{ ($institution_id ?? '')==$inst->id ? 'selected' : '' }}>
+                                {{ $inst->institution_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             <!-- การศึกษา -->
             <div class="col-md-2">
                 <label>ระดับการศึกษา</label>
@@ -49,7 +86,63 @@
                     @endforeach
                 </select>
             </div>
-          
+
+             {{-- <!-- ปี พ.ศ. -->
+            <div class="col-md-2">
+                <label>ปี พ.ศ.</label>
+                <select name="year" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    @for($y=2550; $y<=date('Y')+543; $y++)
+                        <option value="{{ $y }}" {{ ($year ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endfor
+                </select>
+            </div> --}}
+
+         <div class="row mb-3 mt-3">
+    <!-- ปี พ.ศ. เริ่มต้น -->
+    <div class="col-md-2">
+        <label>ปี พ.ศ. เริ่มต้น</label>
+        <select name="year_min" class="form-select">
+            <option value="">ทั้งหมด</option>
+            @for($y = date('Y')+543; $y >= 2550; $y--)
+                <option value="{{ $y }}" {{ ($yearMin ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
+            @endfor
+        </select>
+    </div>
+
+    <!-- ปี พ.ศ. สิ้นสุด -->
+    <div class="col-md-2">
+        <label>ปี พ.ศ. สิ้นสุด</label>
+        <select name="year_max" class="form-select">
+            <option value="">ทั้งหมด</option>
+            @for($y = date('Y')+543; $y >= 2550; $y--)
+                <option value="{{ $y }}" {{ ($yearMax ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
+            @endfor
+        </select>
+    </div>
+
+    <!-- เดือน -->
+    <div class="col-md-2">
+        <label>เดือน</label>
+        <select name="month" class="form-select">
+            <option value="">ทั้งหมด</option>
+            @php
+                $months = [
+                    1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม',
+                    4 => 'เมษายน', 5 => 'พฤษภาคม', 6 => 'มิถุนายน',
+                    7 => 'กรกฎาคม', 8 => 'สิงหาคม', 9 => 'กันยายน',
+                    10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+                ];
+            @endphp
+            @foreach($months as $num => $name)
+                <option value="{{ $num }}" {{ ($month ?? '')==$num ? 'selected' : '' }}>
+                    {{ $name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+</div>
+
           <!-- ปุ่ม -->
                 <div class="col-12">
                     <button type="submit" 
@@ -59,51 +152,55 @@
                     </button>
                 </div>
         </form>
-
- <!-- Cards -->
-<div class="row g-3">
-    <!-- จำนวนทั้งหมด -->
-    <div class="col-md-4">
-        <div class="card text-dark shadow-sm border-0 rounded-4" 
-             style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
-            <div class="card-body text-center">
-                <div class="mb-3 text-primary">
-                    <i data-feather="users" class="feather-36"></i>
-                </div>
-                <h6 class="fw-semibold">จำนวนทั้งหมด</h6>
-                <p class="fs-28 fw-bold mb-0 text-primary">{{ $clients->count() ?? 0 }}</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ชาย -->
-    <div class="col-md-4">
-        <div class="card text-dark shadow-sm border-0 rounded-4" 
-             style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
-            <div class="card-body text-center">
-                <div class="mb-3 text-success">
-                    <i data-feather="user" class="feather-36"></i>
-                </div>
-                <h6 class="fw-semibold">ชาย</h6>
-                <p class="fs-28 fw-bold mb-0 text-success">{{ $maleCount ?? 0 }}</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- หญิง -->
-    <div class="col-md-4">
-        <div class="card text-dark shadow-sm border-0 rounded-4" 
-             style="background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);">
-            <div class="card-body text-center">
-                <div class="mb-3 text-danger">
-                    <i data-feather="user-check" class="feather-36"></i>
-                </div>
-                <h6 class="fw-semibold">หญิง</h6>
-                <p class="fs-28 fw-bold mb-0 text-danger">{{ $femaleCount ?? 0 }}</p>
-            </div>
-        </div>
     </div>
 </div>
+
+    <!-- Card -->
+        <div class="row g-3">
+            <!-- จำนวนทั้งหมด -->
+            <div class="col-md-4">
+                <div class="card text-white shadow-sm border-0 rounded-4"  
+                    style="background: linear-gradient(135deg, #90caf9 0%, #42a5f5 100%);">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i data-feather="users" class="feather-36"></i>
+                        </div>
+                        <h6 class="fw-semibold">จำนวนทั้งหมด</h6>
+                        <p class="fs-28 fw-bold mb-0">{{ $clients->count() ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ชาย -->
+            <div class="col-md-4">
+                <div class="card text-white shadow-sm border-0 rounded-4"  
+                    style="background: linear-gradient(135deg, #a5d6a7 0%, #66bb6a 100%);">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i data-feather="user" class="feather-36"></i>
+                        </div>
+                        <h6 class="fw-semibold">ชาย</h6>
+                        <p class="fs-28 fw-bold mb-0">{{ $maleCount ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- หญิง -->
+            <div class="col-md-4">
+                <div class="card text-white shadow-sm border-0 rounded-4"  
+                    style="background: linear-gradient(135deg, #f48fb1 0%, #f06292 100%);">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i data-feather="user-check" class="feather-36"></i>
+                        </div>
+                        <h6 class="fw-semibold">หญิง</h6>
+                        <p class="fs-28 fw-bold mb-0">{{ $femaleCount ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <!--End Card -->
+         
 
         <!-- Charts Row -->
         <div class="row mt-4">
