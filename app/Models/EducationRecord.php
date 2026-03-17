@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class EducationRecord extends Model
 {
+    protected $table = 'education_records';
     protected $guarded = [];
+    
 
     /**
      * ความสัมพันธ์กับ Subject (pivot table education_record_subjects)
@@ -49,4 +51,9 @@ class EducationRecord extends Model
     {
         return $this->belongsTo(Semester::class, 'semester_id');
     }
+
+    public function educationRecords()
+{
+    return $this->hasMany(EducationRecord::class, 'client_id');
+}
 }

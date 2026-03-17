@@ -4,6 +4,22 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StatisticsController;
+
+
+
+
+
+// ประมวลผล/สถิติ
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');
+    Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+});
+
+
+
+
+
 
 
 
@@ -11,9 +27,9 @@ use Illuminate\Support\Facades\Route;
     return view('welcome');
 });
 
-    Route::get('/dashboard', function () {
-    return view('admin.index');
-})->middleware(['auth', 'verified'])->name('dashboard');
+//     Route::get('/dashboard', function () {
+//     return view('admin.index');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 // User Profile
     Route::middleware('auth')->group(function () {

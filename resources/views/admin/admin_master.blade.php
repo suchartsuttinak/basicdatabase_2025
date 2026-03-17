@@ -87,109 +87,117 @@
         </div>
     </div>
 
-    <!-- Vendor JS -->
-    <script src="{{ asset('backend/assets/libs/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/simplebar/simplebar.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/node-waves/waves.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/waypoints/lib/jquery.waypoints.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/jquery.counterup/jquery.counterup.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/feather-icons/feather.min.js') }}"></script>
+   <!-- Vendor JS -->
+<script src="{{ asset('backend/assets/libs/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/simplebar/simplebar.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/node-waves/waves.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/waypoints/lib/jquery.waypoints.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/jquery.counterup/jquery.counterup.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/feather-icons/feather.min.js') }}"></script>
 
-    <!-- Apexcharts -->
-    <script src="{{ asset('backend/assets/libs/apexcharts/apexcharts.min.js') }}"></script>
-    <script src="https://apexcharts.com/samples/assets/stock-prices.js"></script>
+<!-- ApexCharts (ใช้ไฟล์เดียว ไม่ซ้ำ) -->
+<script src="{{ asset('backend/assets/libs/apexcharts/apexcharts.min.js') }}"></script>
 
-    <!-- Dashboard Init -->
-    <script src="{{ asset('backend/assets/js/pages/analytics-dashboard.init.js') }}"></script>
+<!-- App JS -->
+<script src="{{ asset('backend/assets/js/app.js') }}"></script>
 
-    <!-- App JS -->
-    <script src="{{ asset('backend/assets/js/app.js') }}"></script>
+<!-- DataTables JS -->
+<script src="{{ asset('backend/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('backend/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
 
-    <!-- Datatables JS -->
-    <script src="{{ asset('backend/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ asset('backend/assets/js/pages/datatable.init.js') }}"></script>
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="{{ asset('backend/assets/js/code.js') }}"></script>
 
-    <!-- ✅ DataTables ภาษาไทย -->
-    <script>
-    $(document).ready(function() {
-        $('#datatable').DataTable({
-            destroy: true, // บังคับให้ทับค่า init เดิม
-            language: {
-                search: "ค้นหา:",
-                lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
-                info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                infoEmpty: "ไม่มีข้อมูลให้แสดง",
-                infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
-                zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
-                paginate: {
-                    first: "หน้าแรก",
-                    last: "หน้าสุดท้าย",
-                    next: "ถัดไป",
-                    previous: "ก่อนหน้า"
-                },
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!-- Datepicker JS + Thai locale -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
+
+<!-- ✅ Custom Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // ✅ Chart
+    var options = {
+        chart: { type: 'pie', height: 350 },
+        series: [
+            {{ $maleCount ?? 0 }},
+            {{ $femaleCount ?? 0 }}
+        ],
+        labels: ['ชาย','หญิง'],
+        colors: ['#28a745','#dc3545'],
+        legend: { position: 'bottom' }
+    };
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+    chart.render();
+
+    // ✅ DataTable ภาษาไทย
+    $('#clientsTable').DataTable({
+        language: {
+            search: "ค้นหา:",
+            lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+            info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+            infoEmpty: "ไม่มีข้อมูลให้แสดง",
+            infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+            zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+            paginate: {
+                first: "หน้าแรก",
+                last: "หน้าสุดท้าย",
+                next: "ถัดไป",
+                previous: "ก่อนหน้า"
             }
-        });
+        }
     });
-    </script>
 
-    <!-- SweetAlert -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script src="{{ asset('backend/assets/js/code.js') }}"></script>
-
-    <!-- Toastr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-    <!-- ✅ Datepicker JS + Thai locale -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
-
-    <!-- ✅ Init Datepicker Thai -->
-    <script>
-    $(function() {
-        $('.datepicker-th').datepicker({
-            format: 'dd/mm/yyyy',
-            language: 'th',
-            thaiyear: true,
-            autoclose: true,
-            todayHighlight: true
-        }).on('show', function() {
-            setTimeout(function() {
-                $('.datepicker-switch').each(function() {
-                    const text = $(this).text();
-                    const match = text.match(/(\d{4})$/);
-                    if (match) {
-                        const year = parseInt(match[1]);
-                        if (year < 2500) {
-                            $(this).text(text.replace(year, year + 543));
-                        }
-                    }
-                });
-                $('.datepicker-years .year').each(function() {
-                    const year = parseInt($(this).text());
+    // ✅ Datepicker Thai
+    $('.datepicker-th').datepicker({
+        format: 'dd/mm/yyyy',
+        language: 'th',
+        thaiyear: true,
+        autoclose: true,
+        todayHighlight: true
+    }).on('show', function() {
+        setTimeout(function() {
+            $('.datepicker-switch').each(function() {
+                const text = $(this).text();
+                const match = text.match(/(\d{4})$/);
+                if (match) {
+                    const year = parseInt(match[1]);
                     if (year < 2500) {
-                        $(this).text(year + 543);
+                        $(this).text(text.replace(year, year + 543));
                     }
-                });
-            }, 10);
-        });
+                }
+            });
+            $('.datepicker-years .year').each(function() {
+                const year = parseInt($(this).text());
+                if (year < 2500) {
+                    $(this).text(year + 543);
+                }
+            });
+        }, 10);
     });
-    </script>
+});
+</script>
 
-    <!-- Toastr Alert -->
-    <script>
-        @if(Session::has('message'))
-            var type = "{{ Session::get('alert-type','info') }}";
-            switch(type){
-                case 'info': toastr.info("{{ Session::get('message') }}"); break;
-                case 'success': toastr.success("{{ Session::get('message') }}"); break;
-                case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
-                case 'error': toastr.error("{{ Session::get('message') }}"); break;
-            }
-        @endif
-    </script>
+<!-- ✅ Toastr Alert -->
+<script>
+@if(Session::has('message'))
+    var type = "{{ Session::get('alert-type','info') }}";
+    switch(type){
+        case 'info': toastr.info("{{ Session::get('message') }}"); break;
+        case 'success': toastr.success("{{ Session::get('message') }}"); break;
+        case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
+        case 'error': toastr.error("{{ Session::get('message') }}"); break;
+    }
+@endif
+</script>
+ <!-- ✅ Custom Script -->
+    @stack('scripts')
 
-   </body>
+</body>
 </html>
+

@@ -110,15 +110,21 @@ class Client extends Model
     return $this->hasMany(Refer::class);
 }
 
-
-
-
-
-
     //ตาราง บิดา มารดา สามี/ภรรยา และญาติ
      public function father()       { return $this->hasOne(Father::class);}
      public function mother()       { return $this->hasOne(Mother::class);}
      public function spouse()       { return $this->hasOne(Spouse::class);}
      public function relative()     { return $this->hasOne(Relative::class);}
 
+
+ public function educationRecords()
+    {
+        return $this->hasMany(EducationRecord::class, 'client_id');
+    }
+
+
+
+
+
+     
 }
