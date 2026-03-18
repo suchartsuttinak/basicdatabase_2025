@@ -5,13 +5,25 @@
     <div class="container-fluid">
 
         {{-- Header --}}
-        <div class="py-3 d-flex flex-sm-row flex-column">
-            <div class="ms-sm-auto">
-                <a href="{{ route('client.add') }}" class="btn btn-secondary w-100 w-sm-auto">
-                    เพิ่มรายการ
-                </a>
-            </div>
-        </div>
+     <div class="py-3 d-flex flex-sm-row flex-column">
+    <!-- ปุ่มย้อนกลับไป Dashboard -->
+   <div class="me-sm-2 mb-2 mb-sm-0">
+    <a href="{{ route('dashboard') }}" 
+       class="btn btn-primary btn-sm d-inline-flex align-items-center shadow rounded-3 px-3">
+        <i data-feather="arrow-left-circle" class="me-2"></i>
+        ย้อนกลับ
+    </a>
+</div>
+
+    <!-- ปุ่มเพิ่มรายการ -->
+    <div class="ms-sm-auto">
+        <a href="{{ route('client.add') }}" 
+           class="btn btn-success w-100 w-sm-auto d-inline-flex align-items-center rounded-3 shadow-sm px-3 custom-hover">
+            <i data-feather="plus-circle" class="me-2"></i>
+            เพิ่มรายการ
+        </a>
+    </div>
+</div>
 
         {{-- DataTable --}}
         <div class="row">

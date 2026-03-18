@@ -7,20 +7,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StatisticsController;
 
 
-
-
-
-// ประมวลผล/สถิติ
+// ประมวลผล/สถิติ หน้า dashboard
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 });
-
-
-
-
-
-
 
 
     Route::get('/', function () {
