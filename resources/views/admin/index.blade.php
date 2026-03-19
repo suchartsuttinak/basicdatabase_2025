@@ -22,6 +22,54 @@
             $year = $thaiDate->year + 543; // ปี พ.ศ.
         @endphp
 
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0 fw-bold">การแจ้งเตือนการพบแพทย์ (ล่วงหน้า 5 วัน)</h5>
+    </div>
+    <div class="card-body">
+        @if($appointmentCount > 0)
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center">ชื่อ - สกุล</th>
+                            <th class="text-center">อายุ</th>
+                            <th class="text-center">ประเภทการนัด</th>
+                            <th class="text-center">วันที่นัด</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($appointments as $record)
+                            @php
+                                $daysDiff = \Carbon\Carbon::parse($record['date'])->diffInDays(\Carbon\Carbon::today());
+                                if ($daysDiff === 0) {
+                                    $rowClass = 'table-danger fw-bold'; // นัดวันนี้
+                                } elseif ($daysDiff === 1) {
+                                    $rowClass = 'table-warning fw-semibold'; // นัดพรุ่งนี้
+                                } else {
+                                    $rowClass = 'table-success'; // นัดใน 3-5 วัน
+                                }
+                            @endphp
+                            <tr class="{{ $rowClass }}">
+                                <td>{{ $record['fullname'] }}</td>
+                                <td class="text-center">{{ $record['age'] }} ปี</td>
+                                <td class="text-center">{{ $record['type'] }}</td>
+                                <td class="text-center text-danger fw-bold">
+                                    {{ \Carbon\Carbon::parse($record['date'])->locale('th')->translatedFormat('d F') }}
+                                    {{ \Carbon\Carbon::parse($record['date'])->year + 543 }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <p class="text-muted mb-0">ไม่มีนัดหมายใน 5 วันถัดไป</p>
+        @endif
+    </div>
+</div>
+
         <div class="row mt-4">
             <!-- การขาดเรียน -->
             <div class="col-md-4 mb-4">
@@ -154,7 +202,7 @@
 
             <!-- สภาพปัญหา ปี พ.ศ. และ เดือน -->
             <div class="row mt-3">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label class="form-label fw-semibold">สภาพปัญหา</label>
                     <select name="problem" class="form-select">
                         <option value="">ทั้งหมด</option>
@@ -166,27 +214,9 @@
                     </select>
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">ปี พ.ศ. เริ่มต้น</label>
-                    <select name="year_min" class="form-select">
-                        <option value="">ทั้งหมด</option>
-                        @for($y = date('Y')+543; $y >= 2550; $y--)
-                            <option value="{{ $y }}" {{ ($yearMin ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
-                        @endfor
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">ปี พ.ศ. สิ้นสุด</label>
-                    <select name="year_max" class="form-select">
-                        <option value="">ทั้งหมด</option>
-                        @for($y = date('Y')+543; $y >= 2550; $y--)
-                            <option value="{{ $y }}" {{ ($yearMax ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
-                        @endfor
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">เดือน</label>
-                    <select name="month" class="form-select">
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">เดือนเริ่มต้น</label>
+                    <select name="start_month" class="form-select">
                         <option value="">ทั้งหมด</option>
                         @php
                             $months = [
@@ -197,10 +227,42 @@
                             ];
                         @endphp
                         @foreach($months as $num => $name)
-                            <option value="{{ $num }}" {{ ($month ?? '')==$num ? 'selected' : '' }}>
+                            <option value="{{ $num }}" {{ ($startMonth ?? '')==$num ? 'selected' : '' }}>
                                 {{ $name }}
                             </option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">ปี พ.ศ. เริ่มต้น</label>
+                    <select name="start_year" class="form-select">
+                        <option value="">ทั้งหมด</option>
+                        @for($y = date('Y')+543; $y >= 2550; $y--)
+                            <option value="{{ $y }}" {{ ($startYear ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">เดือนสิ้นสุด</label>
+                    <select name="end_month" class="form-select">
+                        <option value="">ทั้งหมด</option>
+                        @foreach($months as $num => $name)
+                            <option value="{{ $num }}" {{ ($endMonth ?? '')==$num ? 'selected' : '' }}>
+                                {{ $name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">ปี พ.ศ. สิ้นสุด</label>
+                    <select name="end_year" class="form-select">
+                        <option value="">ทั้งหมด</option>
+                        @for($y = date('Y')+543; $y >= 2550; $y--)
+                            <option value="{{ $y }}" {{ ($endYear ?? '')==$y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
                     </select>
                 </div>
             </div>

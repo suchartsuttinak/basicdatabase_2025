@@ -9,6 +9,8 @@ use App\Models\Accident;
 use App\Models\Escape;
 use App\Models\Education;
 use App\Models\Problem;
+use App\Models\Medical;
+use App\Models\Psychiatric;
 use Carbon\Carbon;
 
 class StatisticsController extends Controller
@@ -24,9 +26,14 @@ class StatisticsController extends Controller
         $education     = $request->input('education', null);
         $institutionId = $request->input('institution_id', null);
         $releaseStatus = $request->input('release_status', 'show');
-        $problemId     = $request->input('problem', null); // ✅ เพิ่ม filter สภาพปัญหา
+        $problemId     = $request->input('problem', null);
 
-        // preload educationRecords และกรอง educationRecords ให้ตรงกับ filter
+        // ✅ เพิ่มตัวแปรสำหรับเดือน/ปีเริ่มต้นและสิ้นสุด
+        $startMonth = $request->input('start_month', null);
+        $startYear  = $request->input('start_year', null);
+        $endMonth   = $request->input('end_month', null);
+        $endYear    = $request->input('end_year', null);
+
         $query = Client::with(['educationRecords' => function($q) use ($education, $institutionId) {
             if ($education) {
                 $q->where('education_id', $education);
@@ -35,21 +42,28 @@ class StatisticsController extends Controller
                 $q->where('institution_id', $institutionId);
             }
             $q->with(['education','semester','institution']);
-        }, 'problems']); // ✅ preload ความสัมพันธ์ problems ด้วย
+        }, 'problems']);
 
-        // กรองตามช่วงปี พ.ศ.
-        if ($yearMin && $yearMax) {
+        // ✅ กรองตามช่วงเดือน/ปี (start → end)
+        if ($startMonth && $startYear && $endMonth && $endYear) {
+            $startYearAD = $startYear - 543;
+            $endYearAD   = $endYear - 543;
+
+            $startDate = Carbon::createFromDate($startYearAD, $startMonth, 1)->startOfMonth();
+            $endDate   = Carbon::createFromDate($endYearAD, $endMonth, 1)->endOfMonth();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($yearMin && $yearMax) {
+            // fallback: กรองตามปี พ.ศ.
             $query->whereBetween('created_at', [
                 ($yearMin - 543).'-01-01',
                 ($yearMax - 543).'-12-31'
             ]);
         }
 
-        // กรองตามเดือน
         if ($month) {
             $query->whereMonth('created_at', $month);
         }
-
         if ($gender) {
             $query->where('gender', $gender);
         }
@@ -69,15 +83,11 @@ class StatisticsController extends Controller
                 $q->where('institution_id', $institutionId);
             });
         }
-
-        // ✅ กรองตามสภาพปัญหา
         if ($problemId) {
             $query->whereHas('problems', function($q) use ($problemId) {
                 $q->where('problems.id', $problemId);
             });
         }
-
-        // release_status (ไม่กรองถ้าเลือก "all")
         if (!empty($releaseStatus) && $releaseStatus !== 'all') {
             $query->whereIn('release_status', (array) $releaseStatus);
         }
@@ -87,7 +97,6 @@ class StatisticsController extends Controller
         $maleCount   = $clients->where('gender', 'male')->count();
         $femaleCount = $clients->where('gender', 'female')->count();
 
-        // นับจำนวนตามระดับการศึกษา
         $educationCounts = [];
         foreach ($clients as $client) {
             if ($client->educationRecords->isNotEmpty()) {
@@ -99,10 +108,10 @@ class StatisticsController extends Controller
             }
         }
 
-        // ✅ ตรวจสอบเฉพาะ "วันปัจจุบัน" เท่านั้น
-        $today = Carbon::today()->toDateString();
+        $today = Carbon::today();
+        $fiveDaysLater = Carbon::today()->addDays(5);
 
-        // การขาดเรียน
+        // ✅ ขาดเรียนวันนี้
         $absentRecords = Absent::with('client')
             ->whereDate('absent_date', $today)
             ->groupBy('client_id')
@@ -111,7 +120,7 @@ class StatisticsController extends Controller
         $absentCount = $absentRecords->count();
         $absentNames = $absentRecords->map(fn($record) => $record->client->fullname)->toArray();
 
-        // การเจ็บป่วย
+        // ✅ การบาดเจ็บวันนี้
         $accidentRecords = Accident::with('client')
             ->whereDate('incident_date', $today)
             ->groupBy('client_id')
@@ -120,7 +129,7 @@ class StatisticsController extends Controller
         $accidentCount = $accidentRecords->count();
         $accidentNames = $accidentRecords->map(fn($record) => $record->client->fullname)->toArray();
 
-        // การออกโดยไม่ได้รับอนุญาต
+        // ✅ หลบหนีวันนี้
         $escapeRecords = Escape::with('client')
             ->whereDate('retire_date', $today)
             ->groupBy('client_id')
@@ -129,34 +138,98 @@ class StatisticsController extends Controller
         $escapeCount = $escapeRecords->count();
         $escapeNames = $escapeRecords->map(fn($record) => $record->client->fullname)->toArray();
 
-        // ✅ ดึงข้อมูล dropdown filter
+        // ✅ การนัดหมายแพทย์ล่วงหน้า 5 วัน
+$appointments = collect();
+
+// Medical
+$medicalRecords = Medical::with('client')
+    ->whereBetween('appt_date', [$today, $fiveDaysLater])
+    ->get();
+foreach ($medicalRecords as $m) {
+    $age = Carbon::parse($m->client->birth_date)->age;
+    $prefix = $m->client->gender === 'male' ? 'เด็กชาย' : 'เด็กหญิง';
+    $appointments->push([
+        'fullname' => $prefix . $m->client->fullname,
+        'age'      => $age,
+        'type'     => 'พบแพทย์',
+        'date'     => $m->appt_date
+    ]);
+}
+
+// Psychiatric
+$psychiatricRecords = Psychiatric::with('client')
+    ->whereBetween('appoin_date', [$today, $fiveDaysLater])
+    ->get();
+foreach ($psychiatricRecords as $p) {
+    $age = Carbon::parse($p->client->birth_date)->age;
+    $prefix = $p->client->gender === 'male' ? 'เด็กชาย' : 'เด็กหญิง';
+    $appointments->push([
+        'fullname' => $prefix . $p->client->fullname,
+        'age'      => $age,
+        'type'     => 'พบจิตแพทย์',
+        'date'     => $p->appoin_date
+    ]);
+}
+
+// Accident ที่มี appointment
+$accidentAppointments = Accident::with('client')
+    ->whereNotNull('appointment')
+    ->whereBetween('appointment', [$today, $fiveDaysLater])
+    ->get();
+foreach ($accidentAppointments as $a) {
+    $age = Carbon::parse($a->client->birth_date)->age;
+    $prefix = $a->client->gender === 'male' ? 'เด็กชาย' : 'เด็กหญิง';
+    $appointments->push([
+        'fullname' => $prefix . $a->client->fullname,
+        'age'      => $age,
+        'type'     => $a->treat_no,
+        'date'     => $a->appointment
+    ]);
+}
+
+$appointments = $appointments->sortBy('date');
+$appointmentCount = $appointments->count();
+
         $educations = Education::all();
         $problems   = Problem::all();
 
-        return view('admin.index', [
-            'clients'          => $clients,
-            'yearMin'          => $yearMin ?? '',
-            'yearMax'          => $yearMax ?? '',
-            'month'            => $month ?? '',
-            'gender'           => $gender ?? '',
-            'ageMin'           => $ageMin ?? '',
-            'ageMax'           => $ageMax ?? '',
-            'education'        => $education ?? '',
-            'institution_id'   => $institutionId ?? '',
-            'releaseStatus'    => $releaseStatus ?? [],
-            'problem'          => $problemId ?? '', // ✅ ส่งค่า problem ไปด้วย
-            'maleCount'        => $maleCount,
-            'femaleCount'      => $femaleCount,
-            'educationCounts'  => $educationCounts,
-            'absentCount'      => $absentCount,
-            'absentNames'      => $absentNames,
-            'accidentCount'    => $accidentCount,
-            'accidentNames'    => $accidentNames,
-            'escapeCount'      => $escapeCount,
-            'escapeNames'      => $escapeNames,
-            'today'            => $today,
-            'educations'       => $educations,
-            'problems'         => $problems,
-        ]);
-    }
+
+
+       return view('admin.index', [
+    'clients'          => $clients,
+    'yearMin'          => $yearMin ?? '',
+    'yearMax'          => $yearMax ?? '',
+    'month'            => $month ?? '',
+    'gender'           => $gender ?? '',
+    'ageMin'           => $ageMin ?? '',
+    'ageMax'           => $ageMax ?? '',
+    'education'        => $education ?? '',
+    'institution_id'   => $institutionId ?? '',
+    'releaseStatus'    => $releaseStatus ?? [],
+    'problem'          => $problemId ?? '',
+    'maleCount'        => $maleCount,
+    'femaleCount'      => $femaleCount,
+    'educationCounts'  => $educationCounts,
+    'absentCount'      => $absentCount,
+    'absentNames'      => $absentNames,
+    'accidentCount'    => $accidentCount,
+    'accidentNames'    => $accidentNames,
+    'escapeCount'      => $escapeCount,
+    'escapeNames'      => $escapeNames,
+
+    // ✅ ส่ง Carbon object ไปเลย
+    'today'            => $today,
+
+    'educations'       => $educations,
+    'problems'         => $problems,
+    'startMonth'       => $startMonth ?? '',
+    'startYear'        => $startYear ?? '',
+    'endMonth'         => $endMonth ?? '',
+    'endYear'          => $endYear ?? '',
+
+    // ✅ การนัดหมายแพทย์ล่วงหน้า 5 วัน
+    'appointments'     => $appointments,
+    'appointmentCount' => $appointmentCount,
+]);
+}
 }

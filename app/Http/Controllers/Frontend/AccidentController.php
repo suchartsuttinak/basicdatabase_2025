@@ -36,7 +36,7 @@ public function AccidentStore(Request $request)
         'treat_no'      => 'required|string|max:255',
         'hospital'      => 'nullable|string|max:255',
         'diagnosis'     => 'nullable|string|max:255',
-        'appointment'   => 'nullable|string|max:255',
+        'appointment'   => 'nullable|date',   // ✅ แก้ตรงนี้
         'protection'    => 'nullable|string|max:255',
         'treatment'     => 'nullable|string|max:255',
         'caretaker'     => 'nullable|string|max:255',
@@ -57,8 +57,10 @@ public function AccidentStore(Request $request)
         'treat_no.max'      => 'การรักษาพยาบาลต้องไม่เกิน 255 ตัวอักษร',
         'record_date.required'   => 'กรุณาระบุวันที่บันทึก',
         'record_date.date'       => 'วันที่บันทึกต้องเป็นรูปแบบวันที่',
+        // ... ข้อความ error อื่น ๆ ตามเดิม
+        'appointment.date' => 'วันที่นัดครั้งต่อไปต้องเป็นรูปแบบวันที่',
+        
     ]);
-
 
     // ถ้าเลือก "ไม่พบแพทย์" → ล้างค่าฟิลด์ที่เกี่ยวข้อง
     if (!empty($validated['treat_no']) && $validated['treat_no'] === 'ไม่พบแพทย์') {
@@ -104,7 +106,7 @@ public function AccidentUpdate(Request $request, $id)
         'treat_no'      => 'required|string|max:255',
         'hospital'      => 'nullable|string|max:255',
         'diagnosis'     => 'nullable|string|max:255',
-        'appointment'   => 'nullable|string|max:255',
+        'appointment'   => 'nullable|date',   // ✅ แก้ตรงนี้
         'protection'    => 'nullable|string|max:255',
         'treatment'     => 'nullable|string|max:255',
         'caretaker'     => 'nullable|string|max:255',

@@ -138,14 +138,14 @@
                         <textarea name="diagnosis" class="form-control form-control-sm" rows="2">{{ old('diagnosis', $accident->diagnosis ?? '') }}</textarea>
                     </div>
                 </div>
-                <div class="row mb-2">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">นัดครั้งต่อไป</label>
-                        <input type="text" name="appointment" class="form-control form-control-sm"
-                               value="{{ old('appointment', $accident->appointment ?? '') }}">
+               <div class="row mb-2">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label fw-bold">นัดครั้งต่อไป</label>
+                            <input type="date" name="appointment" class="form-control form-control-sm"
+                                value="{{ old('appointment', $accident->appointment ?? '') }}">
+                        </div>
                     </div>
                 </div>
-            </div>
 
             <div class="row mb-2">
                 <div class="col-12 col-md-6">
