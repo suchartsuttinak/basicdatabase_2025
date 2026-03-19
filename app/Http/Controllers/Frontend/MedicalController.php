@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Medical;
 use Illuminate\Support\Facades\Validator; // ✅ ใช้ namespace ที่ถูกต้อง
+use Illuminate\Validation\Rule;
+
+
 
 class MedicalController extends Controller
 {
@@ -25,23 +28,31 @@ class MedicalController extends Controller
     public function MedicalStore(Request $request)
     {
         $data = $request->validate([
-            'medical_date' => 'required|date',
-            'disease_name' => 'required|string|max:255',
-            'illness'      => 'required|string',
-            'treatment'    => 'nullable|string',
-            'refer'        => 'required|in:พบแพทย์,ไม่พบแพทย์',
-            'diagnosis'    => 'nullable|string',
-            'appt_date'    => 'nullable|date',
-            'teacher'      => 'nullable|string|max:255',
-            'remark'       => 'nullable|string',
-            'client_id'    => 'required|exists:clients,id',
-        ], [
-            'medical_date.required' => 'กรุณาระบุวันที่รักษา',
-            'medical_date.date'     => 'วันที่รักษาไม่ถูกต้อง',
-            'disease_name.required' => 'กรุณาระบุชื่อโรค',
-            'illness.required'      => 'กรุณาระบุอาการเจ็บป่วย',
-            'refer.required'        => 'กรุณาเลือกการส่งต่อ',
-        ]);
+        'medical_date' => [
+            'required',
+            'date',
+            Rule::unique('medicals')->where(function ($query) use ($request) {
+                return $query->where('client_id', $request->client_id);
+            }),
+        ],
+        'disease_name' => 'required|string|max:255',
+        'illness'      => 'required|string',
+        'treatment'    => 'nullable|string',
+        'refer'        => 'required|in:พบแพทย์,ไม่พบแพทย์',
+        'diagnosis'    => 'nullable|string',
+        'appt_date'    => 'nullable|date',
+        'teacher'      => 'nullable|string|max:255',
+        'remark'       => 'nullable|string',
+        'client_id'    => 'required|exists:clients,id',
+    ], [
+        'medical_date.required' => 'กรุณาระบุวันที่รักษา',
+        'medical_date.date'     => 'วันที่รักษาไม่ถูกต้อง',
+        'medical_date.unique'   => 'มีการบันทึกวันที่รักษานี้แล้ว',
+        'disease_name.required' => 'กรุณาระบุชื่อโรค',
+        'illness.required'      => 'กรุณาระบุอาการเจ็บป่วย',
+        'refer.required'        => 'กรุณาเลือกการส่งต่อ',
+    ]);
+
 
         if ($data['refer'] === 'ไม่พบแพทย์') {
             $data['diagnosis'] = null;
@@ -85,7 +96,15 @@ public function MedicalUpdate(Request $request, $id)
     $medical = Medical::findOrFail($id);
 
     $validator = Validator::make($request->all(), [
-        'medical_date' => 'required|date',
+        'medical_date' => [
+            'required',
+            'date',
+            Rule::unique('medicals')
+                ->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                })
+                ->ignore($medical->id), // ✅ ยกเว้น record ที่กำลังแก้ไข
+        ],
         'disease_name' => 'required|string|max:255',
         'illness'      => 'required|string',
         'treatment'    => 'nullable|string',
@@ -98,10 +117,13 @@ public function MedicalUpdate(Request $request, $id)
     ], [
         'medical_date.required' => 'กรุณาระบุวันที่รักษา',
         'medical_date.date'     => 'วันที่รักษาไม่ถูกต้อง',
+        'medical_date.unique'   => 'มีการบันทึกวันที่รักษานี้แล้ว',
         'disease_name.required' => 'ชื่อโรคต้องไม่เป็นค่าว่าง',
         'illness.required'      => 'อาการเจ็บป่วยต้องไม่เป็นค่าว่าง',
         'refer.required'        => 'กรุณาเลือกการส่งต่อ',
     ]);
+
+
 
     if ($validator->fails()) {
         // ❌ Validation fail → กลับไปหน้าเดิม + เปิด modal edit พร้อม error

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\CheckBody;
+use Illuminate\Validation\Rule;
+
+
 
 class CheckBodyController extends Controller
 {
@@ -25,9 +28,15 @@ class CheckBodyController extends Controller
     // 🟢 บันทึกข้อมูลใหม่
     public function CheckBodyStore(Request $request)
     {
-                $validated = $request->validate([
+               $validated = $request->validate([
             'client_id'     => ['required', 'exists:clients,id'],
-            'assessor_date' => ['required', 'date'],
+            'assessor_date' => [
+                'required',
+                'date',
+                Rule::unique('check_bodies')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                }),
+            ],
             'development'   => ['required', 'string'],
             'detail'        => ['nullable', 'string'],
             'weight'        => ['nullable', 'numeric', 'min:0'],
@@ -52,6 +61,7 @@ class CheckBodyController extends Controller
             'client_id.exists'       => 'ข้อมูลเด็กไม่ถูกต้อง',
             'assessor_date.required' => 'กรุณาระบุวันที่ตรวจ',
             'assessor_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'assessor_date.unique'   => 'เด็กคนนี้มีการบันทึกวันที่ตรวจนี้แล้ว',
             'development.required'   => 'กรุณากรอกข้อมูลการพัฒนา',
             'weight.numeric'         => 'น้ำหนักต้องเป็นตัวเลข',
             'weight.min'             => 'น้ำหนักต้องไม่น้อยกว่า 0',
@@ -61,6 +71,8 @@ class CheckBodyController extends Controller
             'recorder.string'        => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
             'recorder.max'           => 'ชื่อผู้บันทึกต้องไม่เกิน 255 ตัวอักษร',
         ]);
+
+
 
         CheckBody::create($validated);
 
@@ -83,9 +95,15 @@ class CheckBodyController extends Controller
     // 🟢 อัปเดตข้อมูล
     public function CheckBodyUpdate(Request $request, $id)
 {
-     $validated = $request->validate([
+        $validated = $request->validate([
             'client_id'     => ['required', 'exists:clients,id'],
-            'assessor_date' => ['required', 'date'],
+            'assessor_date' => [
+                'required',
+                'date',
+                Rule::unique('check_bodies')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                }),
+            ],
             'development'   => ['required', 'string'],
             'detail'        => ['nullable', 'string'],
             'weight'        => ['nullable', 'numeric', 'min:0'],
@@ -110,6 +128,7 @@ class CheckBodyController extends Controller
             'client_id.exists'       => 'ข้อมูลเด็กไม่ถูกต้อง',
             'assessor_date.required' => 'กรุณาระบุวันที่ตรวจ',
             'assessor_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'assessor_date.unique'   => 'เด็กคนนี้มีการบันทึกวันที่ตรวจนี้แล้ว',
             'development.required'   => 'กรุณากรอกข้อมูลการพัฒนา',
             'weight.numeric'         => 'น้ำหนักต้องเป็นตัวเลข',
             'weight.min'             => 'น้ำหนักต้องไม่น้อยกว่า 0',
@@ -119,6 +138,7 @@ class CheckBodyController extends Controller
             'recorder.string'        => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
             'recorder.max'           => 'ชื่อผู้บันทึกต้องไม่เกิน 255 ตัวอักษร',
         ]);
+
 
 
     // ✅ ถ้าเลือก "สมวัย" → ล้างค่า detail
