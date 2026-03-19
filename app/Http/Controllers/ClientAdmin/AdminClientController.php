@@ -61,21 +61,24 @@ class AdminClientController extends Controller
         $appointmentCount = $appointments->count();
 
         // ✅ พฤติกรรม (ล่าสุด)
-        $observeLatest = Observe::where('client_id', $id)
-            ->orderBy('record_date', 'desc')
-            ->first();
-        $observeDate = $observeLatest ? $observeLatest->record_date : null;
+// ✅ พฤติกรรม (ล่าสุด) ใช้ฟิลด์ date
+$observeLatest = Observe::where('client_id', $id)
+    ->orderBy('date', 'desc')
+    ->first();
 
-        // ✅ การบาดเจ็บ (เฉพาะ incident_date = วันนี้)
-        $accidents = Accident::where('client_id', $id)
-            ->whereDate('incident_date', $today)
-            ->get();
-        $accidentCount = $accidents->count();
+// ถ้าไม่มีข้อมูล ให้ใช้วันที่ปัจจุบัน
+$observeDate = $observeLatest ? $observeLatest->date : $today;
 
-        // ✅ วัน เดือน ปี (พ.ศ.)
-        $day   = $today->locale('th')->translatedFormat('d');
-        $month = $today->locale('th')->translatedFormat('F');
-        $year  = $today->year + 543; // ปี พ.ศ.
+// ✅ การบาดเจ็บ (เฉพาะ incident_date = วันนี้)
+$accidents = Accident::where('client_id', $id)
+    ->whereDate('incident_date', $today)
+    ->get();
+$accidentCount = $accidents->count();
+
+// ✅ วัน เดือน ปี (พ.ศ.)
+$day   = $today->locale('th')->translatedFormat('d');
+$month = $today->locale('th')->translatedFormat('F');
+$year  = $today->year + 543; // ปี พ.ศ.
 
         return view('admin_client.index.client_index', compact(
             'client',

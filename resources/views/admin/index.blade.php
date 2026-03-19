@@ -27,47 +27,53 @@
     <div class="card-header bg-primary text-white">
         <h5 class="mb-0 fw-bold">การแจ้งเตือนการพบแพทย์ (ล่วงหน้า 5 วัน)</h5>
     </div>
-    <div class="card-body">
-        @if($appointmentCount > 0)
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-center">ชื่อ - สกุล</th>
-                            <th class="text-center">อายุ</th>
-                            <th class="text-center">ประเภทการนัด</th>
-                            <th class="text-center">วันที่นัด</th>
+   <div class="card-body">
+    @if($appointmentCount > 0)
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center">ชื่อ - สกุล</th>
+                        <th class="text-center">อายุ</th>
+                        <th class="text-center">ประเภทการนัด</th>
+                        <th class="text-center">วันที่นัด</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($appointments as $record)
+                        @php
+                            $dateObj  = \Carbon\Carbon::parse($record['date']);
+                            $daysDiff = $dateObj->diffInDays(\Carbon\Carbon::today());
+
+                            if ($daysDiff === 0) {
+                                $rowClass = 'table-danger fw-bold'; // นัดวันนี้
+                            } elseif ($daysDiff === 1) {
+                                $rowClass = 'table-warning fw-semibold'; // นัดพรุ่งนี้
+                            } else {
+                                $rowClass = 'table-success'; // นัดใน 3-5 วัน
+                            }
+                        @endphp
+                        <tr class="{{ $rowClass }}">
+                      <td>{{ $record['fullname'] }}</td>
+
+
+
+
+                            <td class="text-center">{{ $record['age'] }} ปี</td>
+                            <td class="text-center">{{ $record['type'] }}</td>
+                            <td class="text-center text-danger fw-bold">
+                                {{ $dateObj->locale('th')->translatedFormat('d F') }}
+                                {{ $dateObj->year + 543 }}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($appointments as $record)
-                            @php
-                                $daysDiff = \Carbon\Carbon::parse($record['date'])->diffInDays(\Carbon\Carbon::today());
-                                if ($daysDiff === 0) {
-                                    $rowClass = 'table-danger fw-bold'; // นัดวันนี้
-                                } elseif ($daysDiff === 1) {
-                                    $rowClass = 'table-warning fw-semibold'; // นัดพรุ่งนี้
-                                } else {
-                                    $rowClass = 'table-success'; // นัดใน 3-5 วัน
-                                }
-                            @endphp
-                            <tr class="{{ $rowClass }}">
-                                <td>{{ $record['fullname'] }}</td>
-                                <td class="text-center">{{ $record['age'] }} ปี</td>
-                                <td class="text-center">{{ $record['type'] }}</td>
-                                <td class="text-center text-danger fw-bold">
-                                    {{ \Carbon\Carbon::parse($record['date'])->locale('th')->translatedFormat('d F') }}
-                                    {{ \Carbon\Carbon::parse($record['date'])->year + 543 }}
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <p class="text-muted mb-0">ไม่มีนัดหมายใน 5 วันถัดไป</p>
-        @endif
-    </div>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <p class="text-muted mb-0">ไม่มีนัดหมายใน 5 วันถัดไป</p>
+    @endif
+</div>
 </div>
 
         <div class="row mt-4">

@@ -139,97 +139,92 @@ class StatisticsController extends Controller
         $escapeNames = $escapeRecords->map(fn($record) => $record->client->fullname)->toArray();
 
         // ✅ การนัดหมายแพทย์ล่วงหน้า 5 วัน
-$appointments = collect();
+        $appointments = collect();
 
-// Medical
-$medicalRecords = Medical::with('client')
-    ->whereBetween('appt_date', [$today, $fiveDaysLater])
-    ->get();
-foreach ($medicalRecords as $m) {
-    $age = Carbon::parse($m->client->birth_date)->age;
-    $prefix = $m->client->gender === 'male' ? 'เด็กชาย' : 'เด็กหญิง';
-    $appointments->push([
-        'fullname' => $prefix . $m->client->fullname,
-        'age'      => $age,
-        'type'     => 'พบแพทย์',
-        'date'     => $m->appt_date
-    ]);
-}
+        // Medical
+        $medicalRecords = Medical::with('client')
+            ->whereBetween('appt_date', [$today, $fiveDaysLater])
+            ->get();
+        foreach ($medicalRecords as $m) {
+            $age = Carbon::parse($m->client->birth_date)->age;
+           $appointments->push([
+            'fullname' => $m->client->fullname,   // ใช้ fullname อย่างเดียว
+            'age'      => $age,
+            'type'     => 'พบแพทย์',
+            'date'     => $m->appt_date
+        ]);
+    }
 
-// Psychiatric
-$psychiatricRecords = Psychiatric::with('client')
-    ->whereBetween('appoin_date', [$today, $fiveDaysLater])
-    ->get();
-foreach ($psychiatricRecords as $p) {
-    $age = Carbon::parse($p->client->birth_date)->age;
-    $prefix = $p->client->gender === 'male' ? 'เด็กชาย' : 'เด็กหญิง';
-    $appointments->push([
-        'fullname' => $prefix . $p->client->fullname,
-        'age'      => $age,
-        'type'     => 'พบจิตแพทย์',
-        'date'     => $p->appoin_date
-    ]);
-}
+        // Psychiatric
+        $psychiatricRecords = Psychiatric::with('client')
+            ->whereBetween('appoin_date', [$today, $fiveDaysLater])
+            ->get();
+        foreach ($psychiatricRecords as $p) {
+            $age = Carbon::parse($p->client->birth_date)->age;
+           $appointments->push([
+            'fullname' => $p->client->fullname,   // ใช้ fullname อย่างเดียว
+            'age'      => $age,
+            'type'     => 'พบจิตแพทย์',
+            'date'     => $p->appoin_date
+        ]);
+      }
 
-// Accident ที่มี appointment
-$accidentAppointments = Accident::with('client')
-    ->whereNotNull('appointment')
-    ->whereBetween('appointment', [$today, $fiveDaysLater])
-    ->get();
-foreach ($accidentAppointments as $a) {
-    $age = Carbon::parse($a->client->birth_date)->age;
-    $prefix = $a->client->gender === 'male' ? 'เด็กชาย' : 'เด็กหญิง';
-    $appointments->push([
-        'fullname' => $prefix . $a->client->fullname,
-        'age'      => $age,
-        'type'     => $a->treat_no,
-        'date'     => $a->appointment
-    ]);
-}
+        // Accident ที่มี appointment
+        $accidentAppointments = Accident::with('client')
+            ->whereNotNull('appointment')
+            ->whereBetween('appointment', [$today, $fiveDaysLater])
+            ->get();
+        foreach ($accidentAppointments as $a) {
+            $age = Carbon::parse($a->client->birth_date)->age;
+           $appointments->push([
+            'fullname' => $a->client->fullname,   // ใช้ fullname อย่างเดียว
+            'age'      => $age,
+            'type'     => $a->treat_no,
+            'date'     => $a->appointment
+        ]);
+     }
 
-$appointments = $appointments->sortBy('date');
-$appointmentCount = $appointments->count();
+        $appointments = $appointments->sortBy('date');
+        $appointmentCount = $appointments->count();
 
-        $educations = Education::all();
-        $problems   = Problem::all();
+                $educations = Education::all();
+                $problems   = Problem::all();
 
+            return view('admin.index', [
+            'clients'          => $clients,
+            'yearMin'          => $yearMin ?? '',
+            'yearMax'          => $yearMax ?? '',
+            'month'            => $month ?? '',
+            'gender'           => $gender ?? '',
+            'ageMin'           => $ageMin ?? '',
+            'ageMax'           => $ageMax ?? '',
+            'education'        => $education ?? '',
+            'institution_id'   => $institutionId ?? '',
+            'releaseStatus'    => $releaseStatus ?? [],
+            'problem'          => $problemId ?? '',
+            'maleCount'        => $maleCount,
+            'femaleCount'      => $femaleCount,
+            'educationCounts'  => $educationCounts,
+            'absentCount'      => $absentCount,
+            'absentNames'      => $absentNames,
+            'accidentCount'    => $accidentCount,
+            'accidentNames'    => $accidentNames,
+            'escapeCount'      => $escapeCount,
+            'escapeNames'      => $escapeNames,
 
+            // ✅ ส่ง Carbon object ไปเลย
+            'today'            => $today,
 
-       return view('admin.index', [
-    'clients'          => $clients,
-    'yearMin'          => $yearMin ?? '',
-    'yearMax'          => $yearMax ?? '',
-    'month'            => $month ?? '',
-    'gender'           => $gender ?? '',
-    'ageMin'           => $ageMin ?? '',
-    'ageMax'           => $ageMax ?? '',
-    'education'        => $education ?? '',
-    'institution_id'   => $institutionId ?? '',
-    'releaseStatus'    => $releaseStatus ?? [],
-    'problem'          => $problemId ?? '',
-    'maleCount'        => $maleCount,
-    'femaleCount'      => $femaleCount,
-    'educationCounts'  => $educationCounts,
-    'absentCount'      => $absentCount,
-    'absentNames'      => $absentNames,
-    'accidentCount'    => $accidentCount,
-    'accidentNames'    => $accidentNames,
-    'escapeCount'      => $escapeCount,
-    'escapeNames'      => $escapeNames,
+            'educations'       => $educations,
+            'problems'         => $problems,
+            'startMonth'       => $startMonth ?? '',
+            'startYear'        => $startYear ?? '',
+            'endMonth'         => $endMonth ?? '',
+            'endYear'          => $endYear ?? '',
 
-    // ✅ ส่ง Carbon object ไปเลย
-    'today'            => $today,
-
-    'educations'       => $educations,
-    'problems'         => $problems,
-    'startMonth'       => $startMonth ?? '',
-    'startYear'        => $startYear ?? '',
-    'endMonth'         => $endMonth ?? '',
-    'endYear'          => $endYear ?? '',
-
-    // ✅ การนัดหมายแพทย์ล่วงหน้า 5 วัน
-    'appointments'     => $appointments,
-    'appointmentCount' => $appointmentCount,
-]);
-}
-}
+            // ✅ การนัดหมายแพทย์ล่วงหน้า 5 วัน
+            'appointments'     => $appointments,
+            'appointmentCount' => $appointmentCount,
+        ]);
+     }
+ }

@@ -125,26 +125,28 @@
             </div>
         </div>
 
-        <!-- พฤติกรรม -->
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm border-0 bg-warning-subtle">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title text-warning fw-semibold">พฤติกรรม</h5>
-                    <h2 class="fw-bold text-danger">{{ $observeDate ? 1 : 0 }}</h2>
-                    <div class="mt-auto">
-                        <p class="text-muted small">
-                            @if($observeDate)
-                                บันทึกล่าสุดวันที่ 
-                                {{ \Carbon\Carbon::parse($observeDate)->locale('th')->translatedFormat('d F') }}
-                                {{ \Carbon\Carbon::parse($observeDate)->year + 543 }}
-                            @else
-                                ยังไม่มีข้อมูล
-                            @endif
-                        </p>
-                    </div>
-                </div>
+      <!-- พฤติกรรม -->
+<div class="col-md-4">
+    <div class="card h-100 text-center shadow-sm border-0 bg-warning-subtle">
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-warning fw-semibold">พฤติกรรม</h5>
+            <h2 class="fw-bold text-danger">{{ $observeDate ? 1 : 0 }}</h2>
+            <div class="mt-auto">
+                <p class="text-muted small">
+                    @php
+                        // ถ้าไม่มีข้อมูล ให้ใช้วันที่ปัจจุบัน
+                        $displayDate = $observeDate ?? $today;
+                        $carbonDate  = \Carbon\Carbon::parse($displayDate)->locale('th');
+                    @endphp
+
+                    บันทึกล่าสุดวันที่ 
+                    {{ $carbonDate->translatedFormat('d F') }}
+                    {{ $carbonDate->year + 543 }}
+                </p>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- การบาดเจ็บ -->
         <div class="col-md-4">
