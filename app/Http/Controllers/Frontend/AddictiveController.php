@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Models\Addictive;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Addictive;
 use App\Models\Client;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AddictiveController extends Controller
 {
@@ -26,8 +27,14 @@ class AddictiveController extends Controller
     // บันทึกข้อมูลใหม่
     public function StoreAddictive(Request $request)
     {
-        $data = $request->validate([
-            'date'       => 'required|date',
+       $data = $request->validate([
+        'date'       => [
+            'required',
+            'date',
+            Rule::unique('addictives')->where(function ($query) use ($request) {
+                return $query->where('client_id', $request->client_id);
+            }),
+            ],
             'exam'       => 'required|in:0,1',
             'refer'      => 'nullable|in:1,2',
             'record'     => 'nullable|string',
@@ -36,6 +43,7 @@ class AddictiveController extends Controller
         ], [
             'date.required'      => 'กรุณาระบุวันที่ตรวจ',
             'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'date.unique'        => 'วันที่นี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
             'exam.required'      => 'กรุณาเลือกผลการตรวจ',
             'exam.in'            => 'ค่าที่เลือกไม่ถูกต้อง',
             'refer.in'           => 'ค่าการส่งต่อไม่ถูกต้อง',
@@ -46,6 +54,8 @@ class AddictiveController extends Controller
             'client_id.required' => 'ไม่พบรหัสผู้รับบริการ',
             'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
         ]);
+
+
 
         // นับจำนวนครั้งล่าสุด
         $latestCount = Addictive::where('client_id', $data['client_id'])->max('count') ?? 0;
@@ -100,7 +110,13 @@ class AddictiveController extends Controller
         $addictive = Addictive::findOrFail($id);
 
         $data = $request->validate([
-            'date'       => 'required|date',
+            'date'       => [
+                'required',
+                'date',
+                Rule::unique('addictives')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                })->ignore($id),
+            ],
             'exam'       => 'required|in:0,1',
             'refer'      => 'nullable|in:1,2',
             'record'     => 'nullable|string',
@@ -109,6 +125,7 @@ class AddictiveController extends Controller
         ], [
             'date.required'      => 'กรุณาระบุวันที่ตรวจ',
             'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'date.unique'        => 'วันที่นี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
             'exam.required'      => 'กรุณาเลือกผลการตรวจ',
             'exam.in'            => 'ค่าที่เลือกไม่ถูกต้อง',
             'refer.in'           => 'ค่าการส่งต่อไม่ถูกต้อง',
@@ -119,6 +136,7 @@ class AddictiveController extends Controller
             'client_id.required' => 'ไม่พบรหัสผู้รับบริการ',
             'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
         ]);
+
 
         if ($data['exam'] == 0) {
             $data['refer'] = null;

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Client;
-use App\Models\Retire;
 use App\Models\Escape;
+use App\Models\Retire;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EscapeController extends Controller
 {
@@ -35,11 +36,29 @@ class EscapeController extends Controller
     // บันทึก Escape ใหม่
     public function StoreEscape(Request $request)
     {
-        $data = $request->validate([
-            'client_id'   => 'required|exists:clients,id',
-            'retire_date' => 'required|date',
+       $data = $request->validate([
+        'client_id'   => 'required|exists:clients,id',
+        'retire_date' => [
+            'required',
+            'date',
+            Rule::unique('escapes')->where(function ($query) use ($request) {
+                return $query->where('client_id', $request->client_id);
+            }),
+            ],
             'retire_id'   => 'required|exists:retires,id',
             'stories'     => 'nullable|string',
+        ], [
+            'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.exists'     => 'รหัสผู้รับบริการไม่ถูกต้อง',
+
+            'retire_date.required' => 'กรุณาระบุวันที่เกษียณ',
+            'retire_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'retire_date.unique'   => 'วันที่เกษียณนี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
+
+            'retire_id.required'   => 'กรุณาเลือกประเภทการเกษียณ',
+            'retire_id.exists'     => 'รหัสการเกษียณไม่ถูกต้อง',
+
+            'stories.string'       => 'เรื่องราวต้องเป็นข้อความ',
         ]);
 
         $escape = Escape::create($data);
@@ -62,12 +81,31 @@ class EscapeController extends Controller
     // อัปเดต Escape ที่มีอยู่แล้ว
     public function UpdateEscape(Request $request, $id)
     {
-        $escape = Escape::findOrFail($id);
+      $escape = Escape::findOrFail($id);
 
         $data = $request->validate([
-            'retire_date' => 'required|date',
+            'retire_date' => [
+                'required',
+                'date',
+                Rule::unique('escapes')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                })->ignore($id),
+            ],
             'retire_id'   => 'required|exists:retires,id',
             'stories'     => 'nullable|string',
+            'client_id'   => 'required|exists:clients,id',
+        ], [
+            'retire_date.required' => 'กรุณาระบุวันที่เกษียณ',
+            'retire_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'retire_date.unique'   => 'วันที่เกษียณนี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
+
+            'retire_id.required'   => 'กรุณาเลือกประเภทการเกษียณ',
+            'retire_id.exists'     => 'รหัสการเกษียณไม่ถูกต้อง',
+
+            'stories.string'       => 'เรื่องราวต้องเป็นข้อความ',
+
+            'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
+            'client_id.exists'     => 'รหัสผู้รับบริการไม่ถูกต้อง',
         ]);
 
         $escape->update($data);

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Psychiatric;
 use App\Models\Psycho;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PsychiatricController extends Controller
 {
@@ -26,8 +27,14 @@ class PsychiatricController extends Controller
     // บันทึกข้อมูลใหม่
     public function StorePsychiatric(Request $request)
     {
-            $data = $request->validate([
-            'sent_date'   => 'required|date',
+           $data = $request->validate([
+            'sent_date'   => [
+                'required',
+                'date',
+                Rule::unique('psychiatrics')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                }),
+            ],
             'hotpital'    => 'required|string|max:255',
             'psycho_id'   => 'required|exists:psychos,id',
             'diagnose'    => 'nullable|string',
@@ -39,6 +46,7 @@ class PsychiatricController extends Controller
         ],[
             'sent_date.required'   => 'กรุณาระบุวันที่ส่ง',
             'sent_date.date'       => 'รูปแบบวันที่ส่งไม่ถูกต้อง',
+            'sent_date.unique'     => 'วันที่ส่งนี้ถูกใช้แล้วสำหรับผู้รับบริการคนนี้',
             'hotpital.required'    => 'กรุณาระบุชื่อโรงพยาบาล',
             'hotpital.string'      => 'ชื่อโรงพยาบาลต้องเป็นข้อความ',
             'hotpital.max'         => 'ชื่อโรงพยาบาลต้องไม่เกิน 255 ตัวอักษร',
@@ -95,35 +103,44 @@ class PsychiatricController extends Controller
     {
             $psychiatric = Psychiatric::findOrFail($id);
 
-         $data = $request->validate([
-            'sent_date'   => 'required|date',
-            'hotpital'    => 'required|string|max:255',
-            'psycho_id'   => 'required|exists:psychos,id',
-            'diagnose'    => 'nullable|string',
-            'appoin_date' => 'nullable|date',
-            'drug_no'     => 'required|in:yes,no',
-            'drug_name'   => 'nullable|string|max:255',
-            'disa_no'     => 'required|in:yes,no',
-            'client_id'   => 'required|exists:clients,id',
-        ],[
-            'sent_date.required'   => 'กรุณาระบุวันที่ส่ง',
-            'sent_date.date'       => 'รูปแบบวันที่ส่งไม่ถูกต้อง',
-            'hotpital.required'    => 'กรุณาระบุชื่อโรงพยาบาล',
-            'hotpital.string'      => 'ชื่อโรงพยาบาลต้องเป็นข้อความ',
-            'hotpital.max'         => 'ชื่อโรงพยาบาลต้องไม่เกิน 255 ตัวอักษร',
-            'psycho_id.required'   => 'กรุณาเลือกนักจิตวิทยา',
-            'psycho_id.exists'     => 'นักจิตวิทยาที่เลือกไม่ถูกต้อง',
-            'diagnose.string'      => 'การวินิจฉัยต้องเป็นข้อความ',
-            'appoin_date.date'     => 'รูปแบบวันที่นัดหมายไม่ถูกต้อง',
-            'drug_no.required'     => 'กรุณาระบุการใช้ยา',
-            'drug_no.in'           => 'การใช้ยาต้องเป็น yes หรือ no เท่านั้น',
-            'drug_name.string'     => 'ชื่อยาต้องเป็นข้อความ',
-            'drug_name.max'        => 'ชื่อยาต้องไม่เกิน 255 ตัวอักษร',
-            'disa_no.required'     => 'กรุณาระบุความพิการ',
-            'disa_no.in'           => 'ความพิการต้องเป็น yes หรือ no เท่านั้น',
-            'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
-            'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
-        ]);
+                $data = $request->validate([
+                'sent_date'   => [
+                    'required',
+                    'date',
+                    Rule::unique('psychiatrics')
+                        ->where(function ($query) use ($request) {
+                            return $query->where('client_id', $request->client_id);
+                        })
+                        ->ignore($id), // ✅ ยกเว้นเรคอร์ดที่กำลังแก้ไข
+                ],
+                'hotpital'    => 'required|string|max:255',
+                'psycho_id'   => 'required|exists:psychos,id',
+                'diagnose'    => 'nullable|string',
+                'appoin_date' => 'nullable|date',
+                'drug_no'     => 'required|in:yes,no',
+                'drug_name'   => 'nullable|string|max:255',
+                'disa_no'     => 'required|in:yes,no',
+                'client_id'   => 'required|exists:clients,id',
+            ],[
+                'sent_date.required'   => 'กรุณาระบุวันที่ส่ง',
+                'sent_date.date'       => 'รูปแบบวันที่ส่งไม่ถูกต้อง',
+                'sent_date.unique'     => 'วันที่ส่งนี้ถูกใช้แล้วสำหรับผู้รับบริการคนนี้',
+                'hotpital.required'    => 'กรุณาระบุชื่อโรงพยาบาล',
+                'hotpital.string'      => 'ชื่อโรงพยาบาลต้องเป็นข้อความ',
+                'hotpital.max'         => 'ชื่อโรงพยาบาลต้องไม่เกิน 255 ตัวอักษร',
+                'psycho_id.required'   => 'กรุณาเลือกนักจิตวิทยา',
+                'psycho_id.exists'     => 'นักจิตวิทยาที่เลือกไม่ถูกต้อง',
+                'diagnose.string'      => 'การวินิจฉัยต้องเป็นข้อความ',
+                'appoin_date.date'     => 'รูปแบบวันที่นัดหมายไม่ถูกต้อง',
+                'drug_no.required'     => 'กรุณาระบุการใช้ยา',
+                'drug_no.in'           => 'การใช้ยาต้องเป็น yes หรือ no เท่านั้น',
+                'drug_name.string'     => 'ชื่อยาต้องเป็นข้อความ',
+                'drug_name.max'        => 'ชื่อยาต้องไม่เกิน 255 ตัวอักษร',
+                'disa_no.required'     => 'กรุณาระบุความพิการ',
+                'disa_no.in'           => 'ความพิการต้องเป็น yes หรือ no เท่านั้น',
+                'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
+                'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
+            ]);
 
 
         if ($data['drug_no'] === 'no') {
