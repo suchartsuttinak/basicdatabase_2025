@@ -1,34 +1,21 @@
-@extends('admin_client.admin_client')
-@section('content')
-
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 
 
-@if(session('info'))
-    <div class="alert alert-info">
-        {{ session('info') }}
-    </div>
-@endif
-
 @if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
+    <div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 
 @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
+    <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
+
    <div class="container-fluid py-4">
-    <!-- ปุ่มจัดการ + TAB -->
-       @include('admin_client.include.tabs')
     <!-- เปิดฟอร์ม -->
-    <form action="{{ route('factfinding.update', $factFinding->id) }}" method="POST" class="row g-3">
-    @csrf
-    <input type="hidden" name="client_id" value="{{ $client->id }}">
+     <form action="{{ route('factfinding.store') }}" method="POST" class="row g-3">
+            @csrf
+            <!-- ส่ง id ไปด้วย -->
+            <input type="hidden" name="client_id" value="{{$client->id}}">
         <div class="row">
             <!-- Card ฝั่งซ้าย -->
             <div class="col-lg-6 col-xl-6 mb-4">
@@ -48,7 +35,7 @@
                         <label for="date" class="form-label">วันที่นำส่ง: <span class="text-danger">*</span></label>
                         <input type="date" name="date" id="date"
                             class="form-control @error('date') is-invalid @enderror"
-                           value="{{ old('date', isset($factFinding) ? $factFinding->date : '') }}">
+                            value="{{ old('date') }}">
                         @error('date')
                             <small class="text-danger" id="date-error">{{ $message }}</small>
                         @enderror
@@ -58,7 +45,7 @@
                         <label for="fact_name" class="form-label">ผู้นำส่ง: <span class="text-danger">*</span></label>
                         <input type="text" name="fact_name" id="fact_name"
                             class="form-control @error('fact_name') is-invalid @enderror"
-                            value="{{ old('fact_name', isset($factFinding) ? $factFinding->fact_name : '') }}">
+                            value="{{ old('fact_name') }}">
                         @error('fact_name')
                             <div class="invalid-feedback" id="fact_name-error">{{ $message }}</div>
                         @enderror
@@ -69,7 +56,7 @@
                         <div class="form-group col-md-6 mb-3">
                             <label for="appearance" class="form-label">รูปพรรณสัณฐาน</label>
                             <input type="text" name="appearance" class="form-control" 
-                                value="{{ old('appearance', isset($factFinding) ? $factFinding->appearance : '') }}">
+                                value="{{ old('appearance') }}">
                             @error('appearance')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -78,7 +65,7 @@
                         <div class="form-group col-md-6 mb-3">
                             <label for="skin" class="form-label">สีผิว</label>
                             <input type="text" name="skin" class="form-control" 
-                                 value="{{ old('skin', isset($factFinding) ? $factFinding->skin : '') }}">
+                                value="{{ old('skin') }}">
                             @error('skin')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -89,7 +76,7 @@
                         <div class="form-group col-md-6 mb-3">
                             <label for="scar" class="form-label">ตำหนิ/แผลเป็น</label>
                             <input type="text" name="scar" class="form-control" 
-                               value="{{ old('scar', isset($factFinding) ? $factFinding->scar : '') }}">
+                                value="{{ old('scar') }}">
                             @error('scar')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -98,56 +85,54 @@
                             <div class="form-group col-md-6 mb-3">
                                 <label for="disability" class="form-label">ลักษณะความพิการ</label>
                                 <input type="text" name="disability" class="form-control" 
-                                value="{{ old('disability', isset($factFinding) ? $factFinding->disability : '') }}">
+                                value="{{ old('disability') }}">
                                 @error('disability')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                         </div>
                 </div>
 
-            <!-- สถานะการเจ็บป่วย -->
-                            <div class="form-group col-md-2 mb-3">
-                                <label class="form-label d-block">ประวัติการเจ็บป่วย : <span class="text-danger">*</span></label>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input @error('sick') is-invalid @enderror"
-                                        type="radio" name="sick" id="sickYes"
-                                        value="1"
-                                        {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? 'checked' : '' }} required>
-                                    <label class="form-check-label" for="sickYes">มี</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input @error('sick') is-invalid @enderror"
-                                        type="radio" name="sick" id="sickNo"
-                                        value="0"
-                                        {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 0 ? 'checked' : '' }} required>
-                                    <label class="form-check-label" for="sickNo">ไม่มี</label>
-                                </div>
-
-                                @error('sick')
-                                    <div class="text-danger small" id="sick-error">{{ $message }}</div>
-                                @enderror
+                <!-- Sick radio button -->
+                    <div class="form-group col-md-2 mb-3">
+                        <label class="form-label d-block">ประวัติการเจ็บป่วย : <span class="text-danger">*</span></label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input @error('sick') is-invalid @enderror"
+                                    type="radio" name="sick" id="sickYes"
+                                    value="1" {{ old('sick') === '1' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sickYes">มี</label>
                             </div>
 
-                            <!-- รายละเอียดการเจ็บป่วย -->
-                            <div class="form-group col-md-12 mb-3" id="sickDetailGroup"
-                                style="{{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? '' : 'display:none;' }}">
-                                <label for="sick_detail" class="form-label text-start">รายละเอียดการเจ็บป่วย</label>
-                                <textarea name="sick_detail" id="sick_detail"
-                                    class="form-control bg-white border rounded shadow-sm @error('sick_detail') is-invalid @enderror"
-                                    rows="4"
-                                    {{ old('sick', isset($factFinding) ? $factFinding->sick : '') == 1 ? 'required' : '' }}>{{ old('sick_detail', isset($factFinding) ? $factFinding->sick_detail : '') }}</textarea>
-                                @error('sick_detail')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input @error('sick') is-invalid @enderror"
+                                type="radio" name="sick" id="sickNo"
+                                value="0" {{ old('sick') === '0' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="sickNo">ไม่มี</label>
+                        </div>
+
+                        @error('sick')
+                            <div class="text-danger small" id="sick-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                      <!-- รายละเอียดการเจ็บป่วย -->
+                    <div class="form-group col-md-12 mb-3" id="sickDetailGroup"
+                        style="{{ old('sick') == 1 ? '' : 'display:none;' }}">
+                        <label for="sick_detail" class="form-label text-start">รายละเอียดการเจ็บป่วย : <span class="text-danger">*</span></label>
+                        <textarea name="sick_detail" id="sick_detail"
+                                class="form-control bg-white border rounded shadow-sm"
+                                style="text-align: left; padding-left: 1em; margin: 0;"
+                                rows="4"
+                                {{ old('sick') == 1 ? 'required' : '' }}>{{ old('sick_detail') }}</textarea>
+                        @error('sick_detail')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
 
                     <div class="row">
                         <div class="form-group col-md-6 mb-3">
                             <label for="treatment" class="form-label">การรักษาพยาบาล</label>
                             <input type="text" name="treatment" class="form-control"
-                          value="{{ old('treatment', isset($factFinding) ? $factFinding->treatment : '') }}">
+                            value="{{ old('treatment') }}">
                             @error('treatment')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -156,33 +141,34 @@
                     <div class="form-group col-md-6 mb-3">
                             <label for="hospital" class="form-label">สถานพยาบาล</label>
                             <input type="text" name="hospital" class="form-control" 
-                            value="{{ old('hospital',$factFinding->hospital) }}">
+                            value="{{ old('hospital') }}">
                             @error('hospital')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>      
                  </div>
-                    
+
                    <div class="row">
-                       <div class="form-group col-md-4 mb-3">
-                            <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
-                            <select name="blood_group" id="blood_group" class="form-control">
-                                <option value="">-- กรุณาเลือกกรุ๊ปเลือด --</option>
-                                <option value="A" {{ old('blood_group', $factFinding->blood_group ?? '') == 'A' ? 'selected' : '' }}>A</option>
-                                <option value="B" {{ old('blood_group', $factFinding->blood_group ?? '') == 'B' ? 'selected' : '' }}>B</option>
-                                <option value="AB" {{ old('blood_group', $factFinding->blood_group ?? '') == 'AB' ? 'selected' : '' }}>AB</option>
-                                <option value="O" {{ old('blood_group', $factFinding->blood_group ?? '') == 'O' ? 'selected' : '' }}>O</option>
-                                <option value="ไม่ระบุ" {{ old('blood_group', $factFinding->blood_group ?? '') == 'ไม่ระบุ' ? 'selected' : '' }}>ไม่ระบุ</option>               
-                            </select>
-                            @error('blood_group')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                          <div class="form-group col-md-4 mb-3">
+                                <label for="blood_group" class="form-label">กรุ๊ปเลือด</label>
+                                <select name="blood_group" id="blood_group" class="form-control">
+                                    <option value="">-- กรุณาเลือกกรุ๊ปเลือด --</option>
+                                    <option value="A" {{ old('blood_group') == 'A' ? 'selected' : '' }}>A</option>
+                                    <option value="B" {{ old('blood_group') == 'B' ? 'selected' : '' }}>B</option>
+                                    <option value="AB" {{ old('blood_group') == 'AB' ? 'selected' : '' }}>AB</option>
+                                    <option value="O" {{ old('blood_group') == 'O' ? 'selected' : '' }}>O</option>
+                                    <option value="ไม่ระบุ" {{ old('blood_group') == 'ไม่ระบุ' ? 'selected' : '' }}>ไม่ระบุ</option>
+                                </select>
+                                @error('blood_group')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                        <div class="form-group col-md-4 mb-3">
                             <label for="weight" class="form-label">น้ำหนัก</label>
                             <div class="d-flex align-items-center">
                                 <input type="text" name="weight" id="weight" class="form-control" 
-                                value="{{ old('weight', isset($factFinding) ? $factFinding->weight : '') }}">
+                                value="{{ old('weight') }}">
                                 <span class="ms-2">กิโลกรัม</span>
                             </div>
                             @error('weight')
@@ -194,20 +180,20 @@
                             <label for="height" class="form-label">ส่วนสูง</label>
                             <div class="d-flex align-items-center">
                                 <input type="text" name="height" id="height" class="form-control" 
-                                value="{{ old('height', isset($factFinding) ? $factFinding->height : '') }}">
+                                value="{{ old('height') }}">
                                 <span class="ms-2">เซนติเมตร</span>
                             </div>
                             @error('height')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                      </div>
-                 </div>    
-
+                 </div>   
+                 
                 <div class="row">
-                     <div class="form-group col-md-6 mb-3">
+                    <div class="form-group col-md-6 mb-3">
                             <label for="hygiene" class="form-label">ความสะอาดร่างกาย</label>
                             <input type="text" name="hygiene" class="form-control" 
-                            value="{{ old('hygiene', isset($factFinding) ? $factFinding->hygiene : '') }}">
+                            value="{{ old('hygiene') }}">
                             @error('hygiene')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -216,23 +202,23 @@
                       <div class="form-group col-md-6 mb-3">
                             <label for="oral_health" class="form-label">สุขภาพช่องปาก</label>
                             <input type="text" name="oral_health" class="form-control"  
-                            value="{{ old('oral_health', isset($factFinding) ? $factFinding->oral_health : '') }}">
+                            value="{{ old('oral_health') }}">
                             @error('oral_health')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>  
-                    </div> 
+                    </div>  
 
-                 <div class="row">
-                      <div class="form-group col-md-6 mb-3">
+                    <div class="row">
+                       <div class="form-group col-md-6 mb-3">
                             <label for="injury" class="form-label">การบาดเจ็บ/บาดแผล</label>
                             <input type="text" name="injury" class="form-control" 
-                            value="{{ old('injury', isset($factFinding) ? $factFinding->injury : '') }}">
+                            value="{{ old('injury') }}">
                             @error('injury')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>  
-                  
+                 
                     <div class="form-group col-md-6 mb-3">
                             <label class="form-label" for="marital_id">สถานะการสมรส : <span class="text-danger">*</span></label>
                             <select name="marital_id" id="marital_id"
@@ -240,7 +226,7 @@
                                 <option value="">--สถานะการสมรส--</option>
                                 @foreach ($maritals as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ old('marital_id', isset($factFinding) ? $factFinding->marital_id : '') == $item->id ? 'selected' : '' }}>
+                                        {{ old('marital_id') == $item->id ? 'selected' : '' }}>
                                         {{ $item->marital_name }}
                                     </option>
                                 @endforeach
@@ -250,14 +236,14 @@
                                 <div class="invalid-feedback" id="marital_id-error">{{ $message }}</div>
                             @enderror
                         </div>
-                </div>
+                 </div>
                 
             <div class="row">
                 <div class="form-group col-md-12 mb-3">
                         <label for="relation_parent" class="form-label">ความสัมพันธ์ระหว่างบิดา/มารดา</label>
                         <textarea name="relation_parent" id="relation_parent"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_parent') is-invalid @enderror"
-                                rows="3">{{ old('relation_parent', isset($factFinding) ? $factFinding->relation_parent : '') }}</textarea>
+                                rows="3">{{ old('relation_parent') }}</textarea>
                         @error('relation_parent')
                             <div class="invalid-feedback d-block" id="relation_parent-error">{{ $message }}</div>
                         @enderror
@@ -267,7 +253,7 @@
                         <label for="relation_family" class="form-label">ความสัมพันธ์ระหว่างบุคลลในครอบครัว</label>
                         <textarea name="relation_family" id="relation_family"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_family') is-invalid @enderror"
-                                rows="3">{{ old('relation_family', isset($factFinding) ? $factFinding->relation_family : '') }}</textarea>
+                                rows="3">{{ old('relation_family') }}</textarea>
                         @error('relation_family')
                             <div class="invalid-feedback d-block" id="relation_family-error">{{ $message }}</div>
                         @enderror
@@ -278,7 +264,7 @@
                         <label for="relation_child" class="form-label">ความสัมพันธ์ระหว่างเด็กกับบุคคลในครอบครัว</label>
                         <textarea name="relation_child" id="relation_child"
                                 class="form-control bg-white border rounded shadow-sm @error('relation_child') is-invalid @enderror"
-                                rows="3">{{ old('relation_child', isset($factFinding) ? $factFinding->relation_child : '') }}</textarea>
+                                rows="3">{{ old('relation_child') }}</textarea>
                         @error('relation_child')
                             <div class="invalid-feedback d-block" id="relation_child-error">{{ $message }}</div>
                         @enderror
@@ -287,35 +273,34 @@
                      <div class="form-group col-md-12 mb-3">
                                 <label for="evidence" class="form-label">เอกสารเพิ่มเติม</label>
                                 <input type="text" name="evidence" class="form-control" 
-                                value="{{ old('evidence', isset($factFinding) ? $factFinding->evidence : '') }}">
+                                value="{{ old('evidence') }}">
                                 @error('evidence')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror   
                         </div>  
 
-                     <div class="col-md-12 mb-3 ms-3">
-                        <label class="form-label fw-bold text-dark">
-                            เอกสารที่เกี่ยวข้อง 
-                            <span class="text-danger">* (เลือกได้มากกว่า 1 รายการ)</span>
-                        </label>
-                        <div class="row">
-                            @foreach($documents as $document)
-                            <div class="col-12 col-sm-6 col-lg-4 mb-2">
-                                <div class="d-flex align-items-start">
-                                    <input type="checkbox"
-                                        name="documents[]"
-                                        value="{{ $document->id }}"
-                                        id="document{{ $document->id }}"
-                                        {{ in_array($document->id, old('documents', $selectedDocs ?? [])) ? 'checked' : '' }}
-                                        class="me-2 mt-1">
-                                    <label for="document{{ $document->id }}" class="custom-checkbox flex-grow-1">
-                                        {{ $document->document_name }}
-                                    </label>
-                                </div>
+                    <div class="col-12 mb-3 ms-3">
+                            <label class="form-label fw-bold text-dark">
+                                เอกสารที่เกี่ยวข้อง 
+                                <span class="text-danger">* (เลือกได้มากกว่า 1 รายการ)</span>
+                            </label>
+                            <div class="row">
+                                @foreach($documents as $document)
+                                    <div class="col-12 col-sm-6 col-lg-4 mb-2">
+                                        <div class="d-flex align-items-start">
+                                            <input type="checkbox"
+                                                name="documents[]"
+                                                value="{{ $document->id }}"
+                                                id="document{{ $document->id }}"
+                                                class="me-2 mt-1">
+                                            <label for="document{{ $document->id }}" class="custom-checkbox flex-grow-1">
+                                                {{ $document->document_name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
-                            @endforeach
                         </div>
-                    </div>
 
             </div>  <!-- สิ้นสุด card-body -->
         </div>
@@ -339,7 +324,7 @@
                         <label for="ex_conditions" class="form-label">สภาพที่อยู่อาศัยภายนอก</label>
                         <textarea name="ex_conditions" id="ex_conditions"
                                 class="form-control bg-white border rounded shadow-sm @error('ex_conditions') is-invalid @enderror"
-                                rows="3">{{ old('ex_conditions', isset($factFinding) ? $factFinding->ex_conditions : '') }}</textarea>
+                                rows="3">{{ old('ex_conditions') }}</textarea>
                         @error('ex_conditions')
                             <div class="invalid-feedback d-block" id="ex_conditions-error">{{ $message }}</div>
                         @enderror
@@ -349,7 +334,7 @@
                         <label for="in_conditions" class="form-label">สภาพที่อยู่อาศัยภายใน</label>
                         <textarea name="in_conditions" id="in_conditions"
                                 class="form-control bg-white border rounded shadow-sm @error('in_conditions') is-invalid @enderror"
-                                rows="3">{{ old('in_conditions', isset($factFinding) ? $factFinding->in_conditions : '') }}</textarea>
+                                rows="3">{{ old('in_conditions') }}</textarea>
                         @error('in_conditions')
                             <div class="invalid-feedback d-block" id="in_conditions-error">{{ $message }}</div>
                         @enderror
@@ -359,7 +344,7 @@
                         <label for="environment" class="form-label">สภาพแวดล้อม</label>
                         <textarea name="environment" id="environment"
                                 class="form-control bg-white border rounded shadow-sm @error('environment') is-invalid @enderror"
-                                rows="4">{{ old('environment', isset($factFinding) ? $factFinding->environment : '') }}</textarea>
+                                rows="4">{{ old('environment') }}</textarea>
                         @error('environment')
                             <div class="invalid-feedback d-block" id="environment-error">{{ $message }}</div>
                         @enderror
@@ -369,7 +354,7 @@
                         <label for="cause_problem" class="form-label">สาเหตุที่เข้ารับการสงเคราะห์</label>
                         <textarea name="cause_problem" id="cause_problem"
                                 class="form-control bg-white border rounded shadow-sm @error('cause_problem') is-invalid @enderror"
-                                rows="3">{{ old('cause_problem', isset($factFinding) ? $factFinding->cause_problem : '') }}</textarea>
+                                rows="3">{{ old('cause_problem') }}</textarea>
                         @error('cause_problem')
                             <div class="invalid-feedback d-block" id="cause_problem-error">{{ $message }}</div>
                         @enderror
@@ -379,7 +364,7 @@
                         <label for="need" class="form-label">ความต้องการความช่วยเหลือ</label>
                         <textarea name="need" id="need"
                                 class="form-control bg-white border rounded shadow-sm @error('need') is-invalid @enderror"
-                                rows="3">{{ old('need', isset($factFinding) ? $factFinding->need : '') }}</textarea>
+                                rows="3">{{ old('need') }}</textarea>
                         @error('need')
                             <div class="invalid-feedback d-block" id="need-error">{{ $message }}</div>
                         @enderror
@@ -389,17 +374,17 @@
                         <label for="case_history" class="form-label">ประวัติความเป็นมา</label>
                         <textarea name="case_history" id="case_history"
                                 class="form-control bg-white border rounded shadow-sm @error('case_history') is-invalid @enderror"
-                                rows="4">{{ old('case_history', isset($factFinding) ? $factFinding->case_history : '') }}</textarea>
+                                rows="4">{{ old('case_history') }}</textarea>
                         @error('case_history')
                             <div class="invalid-feedback d-block" id="case_history-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                 <div class="form-group col-md-12 mb-3">
-                        <label for="information" class="form-label">ข้อเท็จจริงอื่น ๆ</label>
+                        <label for="information" class="form-label">ข้อเท็จจริงอื่นๆ</label>
                         <textarea name="information" id="information"
                                 class="form-control bg-white border rounded shadow-sm @error('information') is-invalid @enderror"
-                                rows="4">{{ old('information', isset($factFinding) ? $factFinding->information : '') }}</textarea>
+                                rows="4">{{ old('information') }}</textarea>
                         @error('information')
                             <div class="invalid-feedback d-block" id="information-error">{{ $message }}</div>
                         @enderror
@@ -409,7 +394,7 @@
                         <label for="diagnosis" class="form-label">การวินิจฉัยปัญหา</label>
                         <textarea name="diagnosis" id="diagnosis"
                                 class="form-control bg-white border rounded shadow-sm @error('diagnosis') is-invalid @enderror"
-                                rows="4">{{ old('diagnosis', isset($factFinding) ? $factFinding->diagnosis : '') }}</textarea>
+                                rows="4">{{ old('diagnosis') }}</textarea>
                         @error('diagnosis')
                             <div class="invalid-feedback d-block" id="diagnosis-error">{{ $message }}</div>
                         @enderror
@@ -417,10 +402,10 @@
 
                     <div class="row mb-3">
                         <div class="form-group col-md-4 mb-3">
-                                <label for="receive_date" class="form-label">วันที่บันทึก: <span class="text-danger">*</span></label>
+                                <label for="receive_date" class="form-label">วันที่บันทึก <span class="text-danger">*</span></label>
                                 <input type="date" name="receive_date" id="receive_date"
                                     class="form-control @error('receive_date') is-invalid @enderror"
-                                    value="{{ old('receive_date', isset($factFinding) ? $factFinding->receive_date : '') }}">
+                                    value="{{ old('receive_date') }}">
                                 @error('receive_date')
                                     <small class="text-danger" id="receive_date-error">{{ $message }}</small>
                                 @enderror
@@ -430,111 +415,103 @@
                                     <label for="recorder" class="form-label">ชื่อผู้บันทึก: <span class="text-danger">*</span></label>
                                     <input type="text" name="recorder" id="recorder"
                                         class="form-control @error('recorder') is-invalid @enderror"
-                                        value="{{ old('recorder', isset($factFinding) ? $factFinding->recorder : '') }}">
+                                        value="{{ old('recorder') }}">
                                     @error('recorder')
                                         <small class="text-danger" id="recorder-error">{{ $message }}</small>
                                     @enderror
                                 </div>
-                                <!-- ปุ่มบันทึก -->
+
                                 <div class="text-start">
-                                    <button type="submit" class="btn btn-success">แก้ไขข้อมูล</button>
+                                <button type="submit" class="btn btn-success">บันทึกข้อมูล</button>
                                 </div>
                         </div>                      
                     </div>
                 </div>
             </div> <!-- สิ้นสุด Card ฝั่งขวา -->
         </div> <!-- สิ้นสุด div class="row" -->
-
-                   
                 </form>
             </div>
             
-    <!-- ประวัติการรักษาพยาบาล -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const yes = document.getElementById('sickYes');
-        const no = document.getElementById('sickNo');
-        const detail = document.getElementById('sickDetailGroup');
-        const detailField = document.getElementById('sick_detail');
+ <!-- ประวัติการรักษาพยาบาล -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const yes = document.getElementById('sickYes');
+    const no = document.getElementById('sickNo');
+    const detail = document.getElementById('sickDetailGroup');
+    const detailField = document.getElementById('sick_detail');
 
-        function toggleDetail() {
-            if (yes.checked) {
-                detail.style.display = '';
-                detailField.setAttribute('required', 'required');
-            } else {
-                detail.style.display = 'none';
-                detailField.removeAttribute('required');
-                detailField.value = ''; // เคลียร์ค่าเมื่อเลือก "ไม่มี"
-            }
+    function toggleDetail() {
+        if (yes.checked) {
+            detail.style.display = '';
+            detailField.setAttribute('required', 'required');
+        } else {
+            detail.style.display = 'none';
+            detailField.removeAttribute('required');
+            detailField.value = ''; // เคลียร์ค่าเมื่อเลือก "ไม่มี"
         }
+    }
 
     yes.addEventListener('change', toggleDetail);
     no.addEventListener('change', toggleDetail);
     toggleDetail(); // init on load
+});
+</script>
 
-    // ลบ error เมื่อพิมพ์ใน sick_detail
-    detailField.addEventListener('input', function() {
+{{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
+<script>
+    // ลบ error เมื่อเปลี่ยนค่า radio sick
+    document.querySelectorAll('input[name="sick"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const errorMsg = document.getElementById('sick-error');
+            if (errorMsg) errorMsg.remove();
+            document.querySelectorAll('input[name="sick"]').forEach(function(r) {
+                r.classList.remove('is-invalid');
+            });
+        });
+    });
+
+    // ลบ error เมื่อกรอกข้อมูลใหม่
+    document.getElementById('date').addEventListener('input', function() {
+        const errorMsg = document.getElementById('date-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('receive_date').addEventListener('input', function() {
+        const errorMsg = document.getElementById('receive_date-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('recorder').addEventListener('input', function() {
+        const errorMsg = document.getElementById('recorder-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('fact_name').addEventListener('input', function() {
+        const errorMsg = document.getElementById('fact_name-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('case_history').addEventListener('input', function() {
+        const errorMsg = document.getElementById('case_history-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    document.getElementById('marital_id').addEventListener('input', function() {
+        const errorMsg = document.getElementById('marital_id-error');
+        if (errorMsg) errorMsg.remove();
+        this.classList.remove('is-invalid');
+    });
+
+    // ✅ เพิ่ม real-time validation สำหรับ sick_detail
+    document.getElementById('sick_detail').addEventListener('input', function() {
         const errorMsg = this.parentElement.querySelector('.text-danger');
         if (errorMsg) errorMsg.remove();
         this.classList.remove('is-invalid');
     });
-});
 </script>
-
-        {{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
-        <script>
-            document.querySelectorAll('input[name="sick"]').forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    const errorMsg = document.getElementById('sick-error');
-                    if (errorMsg) errorMsg.remove();
-                    document.querySelectorAll('input[name="sick"]').forEach(function(r) {
-                        r.classList.remove('is-invalid');
-                    });
-                });
-            });
-
-            document.getElementById('date').addEventListener('input', function() {
-                const errorMsg = document.getElementById('date-error');
-                if (errorMsg) errorMsg.remove();
-                this.classList.remove('is-invalid');
-            });
-
-            document.getElementById('receive_date').addEventListener('input', function() {
-                const errorMsg = document.getElementById('receive_date-error');
-                if (errorMsg) errorMsg.remove();
-                this.classList.remove('is-invalid');
-            });
-
-            document.getElementById('recorder').addEventListener('input', function() {
-                const errorMsg = document.getElementById('recorder-error');
-                if (errorMsg) errorMsg.remove();
-                this.classList.remove('is-invalid');
-            });
-
-            document.getElementById('fact_name').addEventListener('input', function() {
-                const errorMsg = document.getElementById('fact_name-error');
-                if (errorMsg) errorMsg.remove();
-                this.classList.remove('is-invalid');
-            });
-
-            document.getElementById('case_history').addEventListener('input', function() {
-                const errorMsg = document.getElementById('case_history-error');
-                if (errorMsg) errorMsg.remove();
-                this.classList.remove('is-invalid');
-            });
-
-            document.getElementById('marital_id').addEventListener('input', function() {
-                const errorMsg = document.getElementById('marital_id-error');
-                if (errorMsg) errorMsg.remove();
-                this.classList.remove('is-invalid');
-            });
-        </script>
-        {{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}
-@endsection
-
-        
-
-
-
-
-
+{{-- JavaScript สำหรับการตรวจสอบข้อมูล --}}

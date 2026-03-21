@@ -1,7 +1,10 @@
 @extends('admin_client.admin_client')
 @section('content')
 
+<link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!-- ปุ่มจัดการ + TAB -->
+       @include('admin_client.include.tabs')
 
 <form action="{{ route('member.update', $client->id) }}" method="POST">
     @csrf

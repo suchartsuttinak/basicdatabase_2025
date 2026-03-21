@@ -1,10 +1,5 @@
-@extends('admin_client.admin_client')
-@section('content')
-
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 
- <!-- ปุ่มจัดการ + TAB -->
-       @include('admin_client.include.tabs')
 
     <form action="{{ route('family.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -972,20 +967,3 @@ $(function () {
     bindLocationDropdowns('relative');
 });
 </script>
-
-
-
-
-
-
-@endsection
-
-        
-
-
-
-
-
-
-
-

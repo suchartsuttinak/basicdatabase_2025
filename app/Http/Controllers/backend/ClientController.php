@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
+use App\Models\Client;
+use App\Models\Contact;
+use App\Models\District;
+use App\Models\Document;
+use App\Models\Education;
 use App\Models\House;
 use App\Models\Income;
-use App\Models\Status;
-use App\Models\Target;
-use App\Models\Contact;
 use App\Models\Marital;
+use App\Models\National;
+use App\Models\Occupation;
 use App\Models\Problem;
 use App\Models\Project;
-use App\Models\District;
-use App\Models\National;
 use App\Models\Province;
 use App\Models\Religion;
-use App\Models\Client;
-use App\Models\Occupation;
+use App\Models\Status;
 use App\Models\SubDistrict;
-use Illuminate\Http\Request;
-use App\Models\Education;
+use App\Models\Target;
 use App\Models\Title;
+use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
@@ -246,53 +247,57 @@ public function ClientStore(Request $request)
     return redirect()->route('client.show')->with($notification);
 }
 
-public function ClientEdit($id )
+public function ClientEdit($id)
 {
-       $client       = Client::findOrFail($id);
-        $problems     = Problem::all();
-        $provinces    = Province::all();
-        $districts    = District::all();
-        $sub_districts= SubDistrict::all();
-        $nations      = National::all();
-        $religions    = Religion::all();
-        $maritals     = Marital::all();
-        $occupations  = Occupation::all();
-        $incomes      = Income::all();
-        $educations   = Education::all();
-        $contacts     = Contact::all();
-        $projects     = Project::all();
-        $statuses     = Status::all();
-        $houses       = House::all(); 
-        $targets      = Target::all(); 
-        $titles       = Title::all();  
+    $client        = Client::findOrFail($id);
+    $problems      = Problem::all();
+    $provinces     = Province::all();
+    $districts     = District::all();
+    $sub_districts = SubDistrict::all();
+    $nations       = National::all();
+    $religions     = Religion::all();
+    $maritals      = Marital::all();
+    $occupations   = Occupation::all();
+    $incomes       = Income::all();
+    $educations    = Education::all();
+    $contacts      = Contact::all();
+    $projects      = Project::all();
+    $statuses      = Status::all();
+    $houses        = House::all(); 
+    $targets       = Target::all(); 
+    $titles        = Title::all();  
 
-        // ✅ เพิ่มข้อมูลสำหรับ origin address
-        $origin_provinces     = Province::all();
-        $origin_districts     = District::all();
-        $origin_sub_districts = SubDistrict::all();
+    // ✅ เพิ่มข้อมูลสำหรับ origin address
+    $origin_provinces     = Province::all();
+    $origin_districts     = District::all();
+    $origin_sub_districts = SubDistrict::all();
 
-        return view('backend.client.client_edit', compact(
-            'client',
-            'problems',
-            'provinces',
-            'districts',
-            'sub_districts',
-            'nations',
-            'religions',
-            'maritals',
-            'occupations',
-            'incomes',
-            'educations',
-            'contacts',
-            'projects',
-            'statuses',
-            'houses',
-            'targets',
-            'titles',
-            'origin_provinces',
-            'origin_districts',
-            'origin_sub_districts'
-        ));        
+    // ✅ เพิ่มข้อมูลเอกสารที่เกี่ยวข้อง
+    $documents = Document::all();
+
+    return view('backend.client.client_edit', compact(
+        'client',
+        'problems',
+        'provinces',
+        'districts',
+        'sub_districts',
+        'nations',
+        'religions',
+        'maritals',
+        'occupations',
+        'incomes',
+        'educations',
+        'contacts',
+        'projects',
+        'statuses',
+        'houses',
+        'targets',
+        'titles',
+        'origin_provinces',
+        'origin_districts',
+        'origin_sub_districts',
+        'documents'   // ✅ ส่งไปที่ view
+    ));
 }
 
 public function ClientUpdate(Request $request)

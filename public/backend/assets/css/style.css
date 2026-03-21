@@ -1,0 +1,141 @@
+/* ปรับ input และ select */
+
+/* client */
+.form-control, .form-select {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  color: #000000;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #f1f3f4;
+  border-color: #bbb;
+  color: #000000;
+  box-shadow: none;
+}
+
+/* placeholder */
+::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+/* document */
+.small-text {
+  font-size: 0.9rem;
+}
+
+/* checkbox */
+.small-check .form-check-input {
+  width: 16px;
+  height: 16px;
+}
+
+.small-check .form-check-label {
+  font-size: 0.85rem;
+}
+
+/* เส้นแบ่ง */
+.row-divider {
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+/* เปลี่ยนสีเมนู tab */
+.nav-tabs .nav-link.active {
+    background-color: #0d6efd !important; /* สีฟ้า (ค่า default) */
+    color: #fff !important;
+    border-color: #0d6efd #0d6efd #fff !important;
+}
+/* end client */
+
+/* family/add */
+    /* ปรับ input และ select ให้มีพื้นหลังสีเทาอ่อน และตัวอักษรสีดำ */
+    .form-control, .form-select {
+      background-color: #f8f9fa; /* เทาอ่อน */
+      border: 1px solid #ddd;    /* ขอบสีเทาอ่อน */
+      color: #000000;            /* ตัวอักษรสีดำสนิท */
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: #f1f3f4; /* เทาอ่อนขึ้นเมื่อ focus */
+      border-color: #bbb;        /* ขอบเข้มขึ้นเล็กน้อย */
+      color: #000000;            /* ยังคงตัวอักษรสีดำ */
+      box-shadow: none;          /* ตัดเงา default ของ Bootstrap */
+    }
+    /* ปรับ placeholder ให้เป็นสีเทาอ่อนกว่าตัวอักษรจริง */
+    ::placeholder {
+      color: #6c757d; /* เทาอ่อน */
+      opacity: 1;
+    }
+
+/* ปรับ Tab */
+    .custom-tabs .nav-link {
+    border-radius: 6px 6px 0 0;
+    margin-right: 5px;
+    background-color: #f8f9fa;
+    color: #0d6efd; /* สีน้ำเงิน */
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.custom-tabs .nav-link:hover {
+    background-color: #e9ecef;
+    color: #0b5ed7; /* น้ำเงินเข้มขึ้นตอน hover */
+}
+
+.custom-tabs .nav-link.active {
+    background-color: #0d6efd; /* น้ำเงินหลัก */
+    color: #fff;              /* ตัวอักษรสีขาว */
+    font-weight: bold;
+}
+/* สิ้นสุด /* family/add */
+
+
+    /* กล่องรวมฟอร์ม factfinding */
+    .official-form {
+        border: 2px solid #0d6efd;   /* กรอบน้ำเงินกรม */
+        padding: 20px;
+        background-color: #fdfdfd;   /* พื้นหลังขาวสะอาด */
+        border-radius: 8px;
+    }
+
+    /* กล่อง checkbox */
+    .official-checkbox {
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        padding: 10px 14px;
+        border-radius: 6px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .official-checkbox:hover {
+        background-color: #e9f2ff;   /* hover น้ำเงินอ่อน */
+        border-color: #0d6efd;
+    }
+
+    /* checkbox ปรับขนาดและสี */
+    .styled-checkbox {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #0d6efd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .styled-checkbox:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        box-shadow: 0 0 4px rgba(13, 110, 253, 0.6);
+    }
+
+    /* label */
+    .form-check-label {
+        margin-left: 0.6em;
+        font-size: 1rem;
+    }
+    
+   /*end กล่องรวมฟอร์ม factfinding */
+
+

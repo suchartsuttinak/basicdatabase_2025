@@ -1,51 +1,7 @@
 @extends('admin.admin_master')
 @section('admin')
 
-<style>
-    /* ปรับ input และ select ให้มีพื้นหลังสีเทาอ่อน และตัวอักษรสีดำ */
-    .form-control, .form-select {
-      background-color: #f8f9fa; /* เทาอ่อน */
-      border: 1px solid #ddd;    /* ขอบสีเทาอ่อน */
-      color: #000000;            /* ตัวอักษรสีดำสนิท */
-    }
-    .form-control:focus, .form-select:focus {
-      background-color: #f1f3f4; /* เทาอ่อนขึ้นเมื่อ focus */
-      border-color: #bbb;        /* ขอบเข้มขึ้นเล็กน้อย */
-      color: #000000;            /* ยังคงตัวอักษรสีดำ */
-      box-shadow: none;          /* ตัดเงา default ของ Bootstrap */
-    }
-    /* ปรับ placeholder ให้เป็นสีเทาอ่อนกว่าตัวอักษรจริง */
-    ::placeholder {
-      color: #6c757d; /* เทาอ่อน */
-      opacity: 1;
-    }
-
-            /* document */    /* ปรับขนาดตัวอักษรให้เล็กลง  */
-        .small-text {
-            font-size: 0.9rem; /* เล็กกว่าปกติ */
-        }
-
-        /* ปรับขนาด checkbox */
-        .small-check .form-check-input {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* ปรับขนาด label ให้เล็กลง */
-        .small-check .form-check-label {
-            font-size: 0.85rem;
-        }
-
-   /* เส้นแบ่งภูมิลำเนาเดิม กับที่อยู่ปัจจุบัน */
-  .row-divider {
-    border-bottom: 2px solid #ddd; /* เส้นแบ่งสีเทาอ่อน */
-    margin-bottom: 1.5rem;         /* ระยะห่างด้านล่าง */
-    padding-bottom: 1rem;          /* ระยะห่างระหว่างเนื้อหากับเส้น */
-  }
-
-  </style>
-
-    <div class="container-fluid py-4">
+<link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
         <!-- เปิดฟอร์ม -->
        <form action="{{ route('client.store') }}" method="POST" enctype="multipart/form-data">
     @csrf

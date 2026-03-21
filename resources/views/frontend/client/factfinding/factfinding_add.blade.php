@@ -1,53 +1,7 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-<style>
-    /* กล่องรวมฟอร์ม */
-    .official-form {
-        border: 2px solid #0d6efd;   /* กรอบน้ำเงินกรม */
-        padding: 20px;
-        background-color: #fdfdfd;   /* พื้นหลังขาวสะอาด */
-        border-radius: 8px;
-    }
-
-    /* กล่อง checkbox */
-    .official-checkbox {
-        background-color: #ffffff;
-        border: 1px solid #dee2e6;
-        padding: 10px 14px;
-        border-radius: 6px;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .official-checkbox:hover {
-        background-color: #e9f2ff;   /* hover น้ำเงินอ่อน */
-        border-color: #0d6efd;
-    }
-
-    /* checkbox ปรับขนาดและสี */
-    .styled-checkbox {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #0d6efd;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-    }
-
-    .styled-checkbox:checked {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-        box-shadow: 0 0 4px rgba(13, 110, 253, 0.6);
-    }
-
-    /* label */
-    .form-check-label {
-        margin-left: 0.6em;
-        font-size: 1rem;
-    }
-    
-</style>
-
+<link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 
 
 @if(session('error'))
@@ -60,6 +14,8 @@
 
 
    <div class="container-fluid py-4">
+     <!-- ปุ่มจัดการ + TAB -->
+       @include('admin_client.include.tabs')
     <!-- เปิดฟอร์ม -->
      <form action="{{ route('factfinding.store') }}" method="POST" class="row g-3">
             @csrf

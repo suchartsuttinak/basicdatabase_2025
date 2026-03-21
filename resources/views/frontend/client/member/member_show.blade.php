@@ -1,9 +1,14 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-<h5 class="mb-3 text-center fw-bold mt-4" style="color:#0d47a1;">
-    บันทึกสมาชิกในครอบครัว
-</h5>
+<link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
+
+    <!-- ปุ่มจัดการ + TAB -->
+       @include('admin_client.include.tabs')
+
+        <h5 class="mb-3 text-center fw-bold mt-4" style="color:#0d47a1;">
+            บันทึกสมาชิกในครอบครัว
+        </h5>
 
 <!-- ปุ่มจัดการ + ข้อมูล client -->
 <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded shadow-sm bg-light">
