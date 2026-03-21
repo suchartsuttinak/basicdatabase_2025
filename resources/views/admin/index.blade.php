@@ -2,17 +2,30 @@
 
 @section('admin')
 
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
         <div class="content">
             <div class="container-fluid">
                 <!-- Title -->
-       <div class="mt-4 mb-4 d-flex justify-content-end">
-    <!-- ปุ่มไปหน้า client.show -->
-    <a href="{{ route('client.show') }}" 
-       class="btn btn-primary btn-sm d-inline-flex align-items-center shadow px-3 w-auto rounded-3">
-        <i data-feather="arrow-right-circle" class="me-2"></i>
-        ไปยังหน้าหลัก
-    </a>
-</div>
+            {{-- ข้อความหัวเรื่อง --}}
+            <div class="mt-4 mb-4 text-center">
+                <h4 class="fw-bold text-primary">
+                    <i class="bi bi-people-fill me-2"></i>
+                    ระบบฐานข้อมูลเด็กและสวัสดิการสังคม
+                </h4>
+            </div>
+
+            {{-- ปุ่มไปหน้า client.show --}}
+            <div class="mt-4 mb-4 d-flex justify-content-start">
+                <a href="{{ route('client.show') }}"  
+   class="btn btn-success btn-sm d-inline-flex align-items-center shadow px-3 w-auto rounded-3 ms-2">
+    <i data-feather="arrow-right-circle" class="me-2"></i>
+    ไปยังหน้าหลัก
+</a>
+
+
+            </div>
    
         <!-- การ์ดแสดงการขาดเรียน การเจ็บป่วย และการออกโดยไม่ได้รับอนุญาต -->
         @php

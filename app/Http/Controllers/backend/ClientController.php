@@ -239,13 +239,44 @@ public function ClientStore(Request $request)
         $client->problems()->attach($problems);
     }
 
-    $notification = [
-        'message' => 'บันทึกข้อมูลเรียบร้อย',
-        'alert-type' => 'success'
-    ];
+    // ✅ Flash message สำหรับ SweetAlert
+        session()->flash('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
-    return redirect()->route('client.show')->with($notification);
+
+
+    // ✅ ดึงข้อมูลทั้งหมด
+    $problems      = Problem::all();
+    $provinces     = Province::all();
+    $districts     = District::all();
+    $sub_districts = SubDistrict::all();
+    $nations       = National::all();
+    $religions     = Religion::all();
+    $maritals      = Marital::all();
+    $occupations   = Occupation::all();
+    $incomes       = Income::all();
+    $educations    = Education::all();
+    $contacts      = Contact::all();
+    $projects      = Project::all();
+    $statuses      = Status::all();
+    $houses        = House::all(); 
+    $targets       = Target::all(); 
+    $titles        = Title::all();  
+
+    // ✅ เพิ่มข้อมูลสำหรับ origin address
+    $origin_provinces     = Province::all();
+    $origin_districts     = District::all();
+    $origin_sub_districts = SubDistrict::all();
+
+    // ✅ เพิ่มข้อมูลเอกสารที่เกี่ยวข้อง
+    $documents = Document::all();
+ // ✅ redirect ไปหน้าแก้ไข พร้อม flash message
+    return redirect()
+        ->route('client.edit', $client->id)
+        ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+
+
 }
+
 
 public function ClientEdit($id)
 {
@@ -387,12 +418,10 @@ public function ClientUpdate(Request $request)
     // แนบ problems (many-to-many)
     $client->problems()->sync($problems);
 
-    $notification = [
-        'message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว',
-        'alert-type' => 'success'
-    ];
+    // ✅ Flash message สำหรับ SweetAlert
+    return redirect()->back()->with('success', 'แก้ไขข้อมูลเรียบร้อยแล้ว');
 
-    return redirect()->route('client.show', $client->id)->with($notification);
+
 }
 
 public function ClientDelete($id)

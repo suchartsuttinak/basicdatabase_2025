@@ -1,16 +1,25 @@
 @extends('admin.admin_master')
 @section('admin')
 
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
+<style>
+    .btn.back-home {
+    margin-top: -5px;   /* ยกขึ้นเล็กน้อย */
+    position: relative;
+    z-index: 1;         /* ให้ลอยเหนือเส้น */
+}
+</style>
 
 <div class="content">
     <div class="container-fluid">
 
-        {{-- Header --}}
+        {{-- ปุ่มย้อนกลับ --}}
         <div class="py-3 d-flex flex-sm-row flex-column">
             <div class="ms-sm-auto">
-                <a href="{{ route('client.add') }}" class="btn btn-secondary w-100 w-sm-auto">
-                    เพิ่มรายการ
+                <a href="{{ route('client.show') }}" class="btn btn-success w-100 w-sm-auto">
+                    <i class="bi bi-house-door-fill me-1"></i> กลับหน้าหลัก
                 </a>
             </div>
         </div>
@@ -81,9 +90,9 @@
                                               
                                             <td>
                                                 @if($client->release_status === 'show')
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">อยู่ในระบบ</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Refer</span>
+                                                    <span class="badge bg-secondary">ไม่อยู่ในระบบ</span>
                                                 @endif
                                             </td>
 
@@ -127,27 +136,54 @@
     </div> <!-- end container-fluid -->
 </div> <!-- end content -->
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@push('scripts')
+
 <script>
-    document.querySelectorAll('.change-status-form').forEach(form => {
+    $(document).ready(function() {
+        $('#datatable').DataTable({
+            responsive: true,
+            language: {
+                search: "ค้นหา:",
+                lengthMenu: "แสดง _MENU_ รายการ",
+                info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                paginate: {
+                    first: "หน้าแรก",
+                    last: "หน้าสุดท้าย",
+                    next: "ถัดไป",
+                    previous: "ก่อนหน้า"
+                },
+                zeroRecords: "ไม่พบข้อมูลที่ค้นหา"
+            }
+        });
+    });
+
+ 
+document.addEventListener('DOMContentLoaded', function () {
+    // ดักทุกฟอร์มที่มี class change-status-form
+    document.querySelectorAll('.change-status-form').forEach(function(form) {
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); // ป้องกันการ submit ทันที
+            e.preventDefault(); // กันการ submit ทันที
 
             Swal.fire({
-                title: 'ท่านแน่ใจ ?',
-                text: 'ต้องการปรับสถานะเป็น Active ใช่หรือไม่ ?',
+                title: 'ยืนยันการคืนค่า?',
+                text: "คุณต้องการปรับสถานะเป็น Active ใช่หรือไม่",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'ตกลง',
-                cancelButtonText: 'ยกเลิก',
-                reverseButtons: true
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, คืนค่า!',
+                cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit(); // ถ้ากดยืนยัน ค่อย submit
+                    form.submit(); // ถ้ากดตกลง ค่อย submit จริง
                 }
             });
         });
     });
+});
+
 </script>
- 
+
+@endpush
 @endsection
+

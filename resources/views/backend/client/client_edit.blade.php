@@ -1,6 +1,7 @@
 @extends('admin.admin_master')
 @section('admin')
 
+
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 {{-- <script src="{{ asset('backend/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script> --}}
 
@@ -765,7 +766,7 @@
                 </div>
                                 <!-- Image -->
                                     <div div class="text-start">
-                                        <button type="submit" class="btn btn-success">บันทึกข้อมูล</button>
+                                        <button type="submit" class="btn btn-success">แก้ไขข้อมูล</button>
                                     </div> 
                             </form>
                         </div>
@@ -775,6 +776,7 @@
 
  <!-- จังหวัด อำเภอ ตําบล รหัสไปรษณีย์ -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(function () {
     // เมื่อเลือกจังหวัด
@@ -972,11 +974,27 @@ $(function () {
                     }
                 });
             });
+            
             </script>
+        @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ!',
+                text: '{{ session('success') }}',
+                showConfirmButton: true,
+                timer: 2000
+            });
+        </script>
+        @endif
 
 @endsection
 
-        
+     
+ 
+
+
+
 
 
 

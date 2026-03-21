@@ -9,7 +9,15 @@
         </a>
     </li>
 
-    {{-- TAB 2: บันทึกบิดาและมารดา --}}
+     {{-- TAB 2 สอบข้อเท็จจริงเบื้องต้น --}}
+    <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('factfinding.add','factfinding.edit') ? 'active' : '' }}"
+           href="{{ route('factfinding.add', $client->id) }}" role="tab" aria-controls="factfinding">
+            <i class="bi bi-search-heart me-1"></i> สอบข้อเท็จจริงเบื้องต้น
+        </a>
+    </li>
+
+    {{-- TAB 3: บันทึกบิดาและมารดา --}}
     <li class="nav-item">
         <a class="nav-link {{ request()->routeIs('family.add','family.edit') ? 'active' : '' }}"
            href="{{ route('family.add', $client->id) }}" role="tab" aria-controls="family">
@@ -17,7 +25,7 @@
         </a>
     </li>
 
-    {{-- TAB 3: บันทึกสมาชิกครอบครัว --}}
+    {{-- TAB 4: บันทึกสมาชิกครอบครัว --}}
     <li class="nav-item">
         <a class="nav-link {{ request()->routeIs('member.create','member.show','member.edit') ? 'active' : '' }}"
            href="{{ route('member.create', $client->id) }}" role="tab" aria-controls="member">
@@ -25,11 +33,11 @@
         </a>
     </li>
 
-    {{-- TAB 4: สอบข้อเท็จจริงเบื้องต้น --}}
-    <li class="nav-item">
-        <a class="nav-link {{ request()->routeIs('factfinding.add','factfinding.edit') ? 'active' : '' }}"
-           href="{{ route('factfinding.add', $client->id) }}" role="tab" aria-controls="factfinding">
-            <i class="bi bi-search-heart me-1"></i> สอบข้อเท็จจริงเบื้องต้น
+
+  {{-- ปุ่มกลับหน้าหลัก --}}
+    <li class="nav-item ms-auto">
+        <a class="nav-link back-home" href="{{ route('client.show') }}">
+            <i class="bi bi-arrow-left-circle me-1"></i> กลับหน้าหลัก
         </a>
     </li>
-</ul>
+    </ul>

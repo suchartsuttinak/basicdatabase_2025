@@ -1,6 +1,28 @@
 @extends('admin_client.admin_client')
 @section('content')
 
+<style>
+    /* ปรับสีพื้นหลังของแท็บ Family */
+.nav-tabs.custom-tabs .nav-link {
+    background-color: #f0f0f0 !important;   /* สีพื้นหลังปกติ */
+    color: #333 !important;                 /* สีตัวอักษร */
+    border: 1px solid #ccc !important;      /* เส้นขอบ */
+}
+
+/* เมื่อแท็บถูกเลือก (active) ให้เป็นสีเขียว */
+.nav-tabs.custom-tabs .nav-link.active {
+    background-color: #28a745 !important;   /* สีเขียว Bootstrap */
+    color: #fff !important;                 /* สีตัวอักษร */
+    border-color: #28a745 !important;
+}
+
+/* เมื่อ hover */
+.nav-tabs.custom-tabs .nav-link:hover {
+    background-color: #d4edda !important;   /* เขียวอ่อน */
+    color: #000 !important;
+}
+</style>
+
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 
  <!-- ปุ่มจัดการ + TAB -->

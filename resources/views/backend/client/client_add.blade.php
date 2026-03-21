@@ -1,6 +1,9 @@
 @extends('admin.admin_master')
 @section('admin')
 
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
         <!-- เปิดฟอร์ม -->
        <form action="{{ route('client.store') }}" method="POST" enctype="multipart/form-data">
@@ -732,9 +735,17 @@
                     </div>
                 </div>  
                 <!-- Image -->
-                    <div div class="text-start">
-                        <button type="submit" class="btn btn-success">บันทึกข้อมูล</button>
-                    </div> 
+                  <div class="text-start d-flex gap-2">
+    {{-- ปุ่มบันทึก --}}
+    <button type="submit" class="btn btn-success">
+        <i class="bi bi-check-circle me-1"></i> บันทึกข้อมูล
+    </button>
+
+    {{-- ปุ่มยกเลิก --}}
+    <a href="{{ route('client.show') }}" class="btn btn-danger">
+        <i class="bi bi-x-circle me-1"></i> ยกเลิก
+    </a>
+</div>
             </form>
         </div>
     </div>
@@ -743,6 +754,7 @@
 
 <!-- จังหวัด อำเภอ ตำบล รหัสไปรษณีย์ -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 $(document).ready(function () {
@@ -965,7 +977,19 @@ $(document).ready(function () {
                     }
                 });
             });
-            </script>
+    </script>
+
+            @if(session('success'))
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ!',
+                        text: '{{ session('success') }}',
+                        showConfirmButton: true,
+                        timer: 2000
+                    });
+                </script>
+        @endif
 @endsection
 
         
