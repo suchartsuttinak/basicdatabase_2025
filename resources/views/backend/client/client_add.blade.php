@@ -38,16 +38,14 @@
               <div class="col-lg-12 col-xl-12">
                     <label class="form-label d-block">เพศ : <span class="text-danger">*</span></label>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                type="radio" name="gender" id="genderMale"
-                                value="male" {{ old('gender') == 'male' ? 'checked' : '' }}>
+                           <input type="radio" name="gender" 
+                           value="male" {{ old('gender') == 'male' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderMale">ชาย</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                type="radio" name="gender" id="genderFemale"
-                                value="female" {{ old('gender') == 'female' ? 'checked' : '' }}>
+                            <input type="radio" name="gender" 
+                            value="female" {{ old('gender') == 'female' ? 'checked' : '' }}>
                             <label class="form-check-label" for="genderFemale">หญิง</label>
                         </div>
 

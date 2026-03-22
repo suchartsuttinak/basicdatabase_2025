@@ -20,6 +20,7 @@ use App\Models\Status;
 use App\Models\SubDistrict;
 use App\Models\Target;
 use App\Models\Title;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -137,10 +138,10 @@ public function ClientStore(Request $request)
     $validated = $request->validate([
         'register_number' => 'nullable|string|max:255|unique:clients,register_number',
         'title_id'        => 'required|integer',
+        'gender'          => 'required|in:male,female',
         'nick_name'       => 'nullable|string|max:255',
         'first_name'      => 'required|string|max:255',
         'last_name'       => 'required|string|max:255',
-        'gender'          => 'required|in:male,female',
         'birth_date'      => 'required|date',
         'id_card'         => 'nullable|string|max:13|unique:clients,id_card',
         'national_id'     => 'required|integer',
@@ -189,9 +190,9 @@ public function ClientStore(Request $request)
         // ✅ ข้อความภาษาไทยสำหรับ validation
         'register_number.unique'   => 'เลขทะเบียนนี้ถูกใช้แล้ว',
         'title_id.required'        => 'กรุณาเลือกคำนำหน้า',
+        'gender.required'          => 'กรุณาเลือกเพศ',
         'first_name.required'      => 'กรุณากรอกชื่อ',
         'last_name.required'       => 'กรุณากรอกนามสกุล',
-        'gender.required'          => 'กรุณาเลือกเพศ',
         'birth_date.required'      => 'กรุณากรอกวัน/เดือน/ปีเกิด',
         'id_card.unique'           => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
         'national_id.required'     => 'กรุณาเลือกสัญชาติ',
@@ -216,66 +217,87 @@ public function ClientStore(Request $request)
         'image.max'                => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
     ]);
 
-    // ✅ จัดการไฟล์ภาพ
-    if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('upload/client_images'), $filename);
-        $validated['image'] = $filename;
-    }
+        // ตรวจสอบเพศกับคำนำหน้า
+         $title = Title::find($validated['title_id']);
+        if ($title) {
+            $age = Carbon::parse($validated['birth_date'])->age;
+            $errors = [];
 
-    // ✅ ดึง problems ออกมาแยก
-    $problems = $validated['problems'] ?? [];
-    unset($validated['problems']);
+            // ตรวจสอบเพศกับคำนำหน้า
+            if ($validated['gender'] === 'male' && !in_array($title->title_name, ['นาย','ด.ช.'])) {
+                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศชาย';
+            }
 
-    // ✅ กำหนดค่า release_status ให้เป็น 'show' เสมอเมื่อสร้างใหม่
-    $validated['release_status'] = 'show';
+            if ($validated['gender'] === 'female' && !in_array($title->title_name, ['นาง','นางสาว','ด.ญ.','เด็กหญิง'])) {
+                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศหญิง';
+            }
 
-    // ✅ บันทึก Client
-    $client = Client::create($validated);
+            // ✅ ตรวจสอบอายุ
+            if ($age >= 15 && in_array($title->title_name, ['เด็กชาย','ด.ช.','เด็กหญิง','ด.ญ.'])) {
+                $errors['title_id'] = 'อายุ 15 ปีขึ้นไป ไม่สามารถใช้คำนำหน้า '.$title->title_name.' ได้';
+            }
 
-    // ✅ แนบ problems (many-to-many)
-    if (!empty($problems)) {
-        $client->problems()->attach($problems);
-    }
+            if (!empty($errors)) {
+                return back()->withErrors($errors)->withInput();
+            }
+        }
 
-    // ✅ Flash message สำหรับ SweetAlert
-        session()->flash('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+            // ✅ จัดการไฟล์ภาพ
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('upload/client_images'), $filename);
+                $validated['image'] = $filename;
+            }
 
+            // ✅ ดึง problems ออกมาแยก
+            $problems = $validated['problems'] ?? [];
+            unset($validated['problems']);
 
+            // ✅ กำหนดค่า release_status ให้เป็น 'show' เสมอเมื่อสร้างใหม่
+            $validated['release_status'] = 'show';
 
-    // ✅ ดึงข้อมูลทั้งหมด
-    $problems      = Problem::all();
-    $provinces     = Province::all();
-    $districts     = District::all();
-    $sub_districts = SubDistrict::all();
-    $nations       = National::all();
-    $religions     = Religion::all();
-    $maritals      = Marital::all();
-    $occupations   = Occupation::all();
-    $incomes       = Income::all();
-    $educations    = Education::all();
-    $contacts      = Contact::all();
-    $projects      = Project::all();
-    $statuses      = Status::all();
-    $houses        = House::all(); 
-    $targets       = Target::all(); 
-    $titles        = Title::all();  
+            // ✅ บันทึก Client
+            $client = Client::create($validated);
 
-    // ✅ เพิ่มข้อมูลสำหรับ origin address
-    $origin_provinces     = Province::all();
-    $origin_districts     = District::all();
-    $origin_sub_districts = SubDistrict::all();
+            // ✅ แนบ problems (many-to-many)
+            if (!empty($problems)) {
+                $client->problems()->attach($problems);
+            }
 
-    // ✅ เพิ่มข้อมูลเอกสารที่เกี่ยวข้อง
-    $documents = Document::all();
- // ✅ redirect ไปหน้าแก้ไข พร้อม flash message
-    return redirect()
-        ->route('client.edit', $client->id)
-        ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+            // ✅ Flash message สำหรับ SweetAlert
+                session()->flash('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
+            // ✅ ดึงข้อมูลทั้งหมด
+            $problems      = Problem::all();
+            $provinces     = Province::all();
+            $districts     = District::all();
+            $sub_districts = SubDistrict::all();
+            $nations       = National::all();
+            $religions     = Religion::all();
+            $maritals      = Marital::all();
+            $occupations   = Occupation::all();
+            $incomes       = Income::all();
+            $educations    = Education::all();
+            $contacts      = Contact::all();
+            $projects      = Project::all();
+            $statuses      = Status::all();
+            $houses        = House::all(); 
+            $targets       = Target::all(); 
+            $titles        = Title::all();  
 
-}
+            // ✅ เพิ่มข้อมูลสำหรับ origin address
+            $origin_provinces     = Province::all();
+            $origin_districts     = District::all();
+            $origin_sub_districts = SubDistrict::all();
+
+            // ✅ เพิ่มข้อมูลเอกสารที่เกี่ยวข้อง
+            $documents = Document::all();
+        // ✅ redirect ไปหน้าแก้ไข พร้อม flash message
+            return redirect()
+                ->route('client.edit', $client->id)
+                ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+        }
 
 
 public function ClientEdit($id)
@@ -396,6 +418,40 @@ public function ClientUpdate(Request $request)
         'case_resident.required'   => 'กรุณาเลือกสถานะการอยู่อาศัย',
         'case_resident.in'         => 'สถานะการอยู่อาศัยต้องเป็น อยู่อาศัย หรือ ไม่อยู่อาศัย เท่านั้น',
     ]);
+
+
+            $title = Title::find($validated['title_id']);
+        if ($title) {
+            $age = Carbon::parse($validated['birth_date'])->age;
+            $errors = [];
+
+            // ตรวจสอบเพศกับคำนำหน้า
+            if ($validated['gender'] === 'male' && !in_array($title->title_name, ['นาย','ด.ช.','เด็กชาย'])) {
+                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศชาย';
+            }
+
+            if ($validated['gender'] === 'female' && !in_array($title->title_name, ['นาง','นางสาว','ด.ญ.','เด็กหญิง'])) {
+                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศหญิง';
+            }
+
+            // ✅ ตรวจสอบอายุ
+            if ($age >= 15 && in_array($title->title_name, ['เด็กชาย','ด.ช.','เด็กหญิง','ด.ญ.'])) {
+                $errors['title_id'] = 'อายุ 15 ปีขึ้นไป ไม่สามารถใช้คำนำหน้า '.$title->title_name.' ได้';
+            }
+
+            // ✅ ถ้าอายุน้อยกว่า 15 ปี ให้ปรับคำนำหน้าชื่ออัตโนมัติ
+            if ($age < 15) {
+                if ($validated['gender'] === 'male') {
+                    $validated['title_id'] = Title::whereIn('title_name', ['เด็กชาย','ด.ช.'])->first()->id ?? $validated['title_id'];
+                } elseif ($validated['gender'] === 'female') {
+                    $validated['title_id'] = Title::whereIn('title_name', ['เด็กหญิง','ด.ญ.'])->first()->id ?? $validated['title_id'];
+                }
+            }
+
+            if (!empty($errors)) {
+                return back()->withErrors($errors)->withInput();
+            }
+        }
 
     // จัดการไฟล์ภาพ
     if ($request->hasFile('image')) {

@@ -40,55 +40,58 @@
                 </div>
             </div>
 
-           <div class="form-group mb-3 row">
-                    <div class="col-lg-12 col-xl-12">
-                        <label class="form-label d-block">เพศ : <span class="text-danger">*</span></label>
+          <div class="form-group mb-3 row">
+    <div class="col-lg-12 col-xl-12">
+        <label class="form-label d-block">เพศ : <span class="text-danger">*</span></label>
 
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                type="radio" name="gender" id="genderMale"
-                                value="male"
-                                {{ old('gender', $client?->gender) == 'male' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="genderMale">ชาย</label>
-                        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input @error('gender') is-invalid @enderror"
+                type="radio" name="gender" id="genderMale"
+                value="male"
+                {{ old('gender', $client->gender ?? '') == 'male' ? 'checked' : '' }}>
+            <label class="form-check-label" for="genderMale">ชาย</label>
+        </div>
 
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input @error('gender') is-invalid @enderror"
-                                type="radio" name="gender" id="genderFemale"
-                                value="female"
-                                {{ old('gender', $client?->gender) == 'female' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="genderFemale">หญิง</label>
-                        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input @error('gender') is-invalid @enderror"
+                type="radio" name="gender" id="genderFemale"
+                value="female"
+                {{ old('gender', $client->gender ?? '') == 'female' ? 'checked' : '' }}>
+            <label class="form-check-label" for="genderFemale">หญิง</label>
+        </div>
 
-                        {{-- ✅ แสดง error ใต้ radio --}}
-                        @error('gender')
-                            <small class="text-danger d-block error-message" id="error-gender">{{ $message }}</small>
-                        @enderror
-                    </div>
-                </div>
+        {{-- ✅ แสดง error ใต้ radio --}}
+        @error('gender')
+            <small class="text-danger d-block error-message" id="error-gender">{{ $message }}</small>
+        @enderror
+    </div>
+</div>
+
 
 
             <div class="row">
                {{-- คำนำหน้าชื่อ --}}
-              <div class="form-group col-md-4 mb-3">
-                    <div class="form-group w-100">
-                        <label class="form-label" for="title_id">คำนำหน้าชื่อ : <span class="text-danger">*</span></label>
-                        <select name="title_id" id="title_id"
-                            class="form-control form-select @error('title_id') is-invalid @enderror">
-                            <option value="">--เลือกคำนำหน้าชื่อ--</option>
-                            @foreach ($titles as $item)
-                                <option value="{{ $item->id }}"
-                                    {{ old('title_id', $client?->title_id) == $item->id ? 'selected' : '' }}>
-                                    {{ $item->title_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        {{-- ✅ แสดง error ใต้ select --}}
-                        @error('title_id')
-                            <small class="text-danger error-message" id="error-title_id">{{ $message }}</small>
-                        @enderror
-                    </div>
-                </div>
+    <div class="form-group col-md-4 mb-3">
+        <div class="form-group w-100">
+            <label class="form-label" for="title_id">คำนำหน้าชื่อ : <span class="text-danger">*</span></label>
+            <select name="title_id" id="title_id"
+                class="form-control form-select @error('title_id') is-invalid @enderror">
+                <option value="">--เลือกคำนำหน้าชื่อ--</option>
+                @foreach ($titles as $item)
+                    <option value="{{ $item->id }}"
+                        {{ old('title_id', $client->title_id ?? '') == $item->id ? 'selected' : '' }}>
+                        {{ $item->title_name }}
+                    </option>
+                @endforeach
+            </select>
+            {{-- ✅ แสดง error ใต้ select --}}
+            @error('title_id')
+                <small class="text-danger error-message" id="error-title_id">{{ $message }}</small>
+            @enderror
+        </div>
+    </div>
+
+
 
                             <div class="form-group col-md-8 mb-3">
                                     <div class="form-group w-100">
