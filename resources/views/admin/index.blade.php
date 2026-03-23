@@ -16,17 +16,15 @@
                 </h4>
             </div>
 
-            {{-- ปุ่มไปหน้า client.show --}}
-            <div class="mt-4 mb-4 d-flex justify-content-start">
-                <a href="{{ route('client.show') }}"  
-   class="btn btn-success btn-sm d-inline-flex align-items-center shadow px-3 w-auto rounded-3 ms-2">
-    <i data-feather="arrow-right-circle" class="me-2"></i>
-    ไปยังหน้าหลัก
-</a>
-
-
-            </div>
-   
+           {{-- ปุ่มไปหน้า client.show --}}
+                <div class="mt-4 mb-4 d-flex justify-content-end">
+                    <a href="{{ route('client.show') }}" 
+                    class="btn btn-success d-inline-flex align-items-center shadow-sm px-3 py-1 rounded-pill">
+                        <i data-feather="arrow-right-circle" class="me-2"></i>
+                        <span class="fw-semibold small">แสดงรายชื่อ</span>
+                    </a>
+                </div>
+                
         <!-- การ์ดแสดงการขาดเรียน การเจ็บป่วย และการออกโดยไม่ได้รับอนุญาต -->
         @php
             $thaiDate = \Carbon\Carbon::parse($today)->locale('th');

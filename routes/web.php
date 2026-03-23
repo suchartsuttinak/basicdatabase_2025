@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
-use App\Http\Controllers\Frontend\ClientFileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
@@ -47,13 +46,7 @@ require __DIR__.'/auth.php';
     Route::get('/client/report/{id}', [AdminClientController::class, 'ClientReport'])->name('client.report');
 });
 
-    Route::prefix('clients/{client_id}')->group(function () {
-    Route::get('files', [ClientFileController::class, 'index'])->name('client_files.index');
-    Route::get('files/create', [ClientFileController::class, 'create'])->name('client_files.create');
-    Route::post('files', [ClientFileController::class, 'store'])->name('client_files.store');
-    Route::delete('files/{file}', [ClientFileController::class, 'destroy'])->name('client_files.destroy');
-    
-});
+  
 
   
     //Backend Route All
@@ -158,9 +151,11 @@ require __DIR__.'/auth.php';
     // บันทึกประวัติการรับวัคซีน
      require __DIR__.'/frontend/vaccination.php';
 
-    // บันทึกการช่วยเหลือเครื่องอุปโภค/บริโภค
-     require __DIR__.'/frontend/HelpSession.php';
+     // บันทึกการช่วยเหลือเครื่องอุปโภค/บริโภค
+      require __DIR__.'/frontend/HelpSession.php';
 
+     // บันทึกรายการเอกสาร
+      require __DIR__.'/frontend/client_files.php';
 
 
 

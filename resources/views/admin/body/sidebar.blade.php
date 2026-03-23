@@ -56,7 +56,7 @@
                 <li>
                     <a href="#sidebarAuth" data-bs-toggle="collapse">
                         <i data-feather="home"></i>
-                        <span> ข้อมูลผู้ใช้ </span>
+                        <span> ประเภท/หมวดหมู่ </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="sidebarAuth">

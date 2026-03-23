@@ -37,12 +37,17 @@
             <ul class="list-group list-group-flush">
                 @foreach($client->files as $file)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-file-earmark-pdf text-danger"></i>
-                            <strong>{{ $fileTypes[$file->file_type] ?? $file->file_type }}</strong> :
-                            <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="text-decoration-none text-primary">
-                                {{ $file->file_name }}
-                            </a>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                            <div class="ms-1">
+                                <strong>{{ $fileTypes[$file->file_type] ?? $file->file_type }}</strong>
+                                <span class="mx-1">:</span>
+                                <a href="{{ Storage::url($file->file_path) }}" 
+                                target="_blank" 
+                                class="text-decoration-none text-primary">
+                                    {{ $file->file_name }}
+                                </a>
+                            </div>
                         </div>
                         <form action="{{ route('client_files.destroy', [$client->id, $file->id]) }}" method="POST">
                             @csrf

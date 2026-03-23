@@ -21,7 +21,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center {{ Request::is('/') ? 'active fw-bold text-primary' : '' }}" href="#">
+                        <a class="nav-link d-flex align-items-center {{ Request::is('/') ? 'active fw-bold text-primary' : '' }}" 
+                          href="{{ route('dashboard') }}">
                             <i class="fas fa-home me-1"></i> หน้าหลัก
                         </a>
                     </li>

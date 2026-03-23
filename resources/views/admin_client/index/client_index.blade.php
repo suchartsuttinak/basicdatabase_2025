@@ -142,13 +142,14 @@
     <div class="card h-100 text-center shadow-sm border-0 bg-warning-subtle">
         <div class="card-body d-flex flex-column">
             <h5 class="card-title text-warning fw-semibold">พฤติกรรม</h5>
-            <h2 class="fw-bold text-danger">{{ $observeDate ? 1 : 0 }}</h2>
+            
+            {{-- ถ้ามีข้อมูลจริงให้แสดง 1 ถ้าไม่มีให้แสดง 0 --}}
+            <h2 class="fw-bold text-danger">{{ $observeLatest ? 1 : 0 }}</h2>
+
             <div class="mt-auto">
                 <p class="text-muted small">
                     @php
-                        // ถ้าไม่มีข้อมูล ให้ใช้วันที่ปัจจุบัน
-                        $displayDate = $observeDate ?? $today;
-                        $carbonDate  = \Carbon\Carbon::parse($displayDate)->locale('th');
+                        $carbonDate = \Carbon\Carbon::parse($observeDate)->locale('th');
                     @endphp
 
                     บันทึกล่าสุดวันที่ 
