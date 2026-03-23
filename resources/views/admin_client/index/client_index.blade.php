@@ -1,16 +1,28 @@
 @extends('admin_client.admin_client')
 
 @section('content')
-<div class="container-fluid py-4">
 
-    <!-- หัวข้อ -->
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h2 class="fw-bold text-primary">ข้อมูลผู้รับบริการ</h2>
-            <p class="text-muted">รายละเอียดเฉพาะรายของผู้รับบริการ</p>
-            <hr class="w-25 mx-auto border-primary">
-        </div>
-    </div>
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+        <div class="container-fluid py-4">
+           <div class="col-12 text-start mb-2">
+    <a href="{{ route('client.show') }}" 
+       class="btn btn-primary d-inline-flex align-items-center shadow-sm px-2 py-1 rounded-pill"
+       style="font-size: 0.85rem;">
+        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white text-primary me-2" 
+              style="width:28px; height:28px;">
+            <i class="bi bi-house-door-fill"></i>
+        </span>
+        <span class="fw-semibold">กลับหน้าหลัก</span>
+    </a>
+</div>
+                <div class="col-12 text-center">
+                    <h2 class="fw-bold text-primary">ข้อมูลผู้รับบริการ</h2>
+                    <p class="text-muted">รายละเอียดเฉพาะรายของผู้รับบริการ</p>
+                    <hr class="w-25 mx-auto border-primary">
+                </div>
+            </div>
 
     <!-- การ์ดข้อมูลผู้รับบริการ -->
     <div class="card shadow-sm border-0 mb-4">

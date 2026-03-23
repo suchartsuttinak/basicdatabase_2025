@@ -217,30 +217,44 @@ public function ClientStore(Request $request)
         'image.max'                => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
     ]);
 
-        // ตรวจสอบเพศกับคำนำหน้า
-         $title = Title::find($validated['title_id']);
-        if ($title) {
-            $age = Carbon::parse($validated['birth_date'])->age;
-            $errors = [];
+            // ตรวจสอบเพศกับคำนำหน้า และอายุ
+                $title = Title::find($validated['title_id']);
+                if ($title) {
+                    $age = Carbon::parse($validated['birth_date'])->age;
+                    $errors = [];
 
-            // ตรวจสอบเพศกับคำนำหน้า
-            if ($validated['gender'] === 'male' && !in_array($title->title_name, ['นาย','ด.ช.'])) {
-                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศชาย';
-            }
+                    // ตรวจสอบเพศกับคำนำหน้า
+                    if ($validated['gender'] === 'male' && !in_array($title->title_name, ['นาย','ด.ช.','เด็กชาย'])) {
+                        $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศชาย';
+                    }
 
-            if ($validated['gender'] === 'female' && !in_array($title->title_name, ['นาง','นางสาว','ด.ญ.','เด็กหญิง'])) {
-                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศหญิง';
-            }
+                    if ($validated['gender'] === 'female' && !in_array($title->title_name, ['นาง','นางสาว','ด.ญ.','เด็กหญิง'])) {
+                        $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศหญิง';
+                    }
 
-            // ✅ ตรวจสอบอายุ
-            if ($age >= 15 && in_array($title->title_name, ['เด็กชาย','ด.ช.','เด็กหญิง','ด.ญ.'])) {
-                $errors['title_id'] = 'อายุ 15 ปีขึ้นไป ไม่สามารถใช้คำนำหน้า '.$title->title_name.' ได้';
-            }
+                    // ✅ ปรับคำนำหน้าอัตโนมัติเมื่ออายุครบ 15 ปี
+                    if ($age >= 15) {
+                        if (in_array($title->title_name, ['ด.ช.','เด็กชาย']) && $validated['gender'] === 'male') {
+                            $validated['title_id'] = Title::where('title_name', 'นาย')->first()->id ?? $validated['title_id'];
+                        }
+                        if (in_array($title->title_name, ['ด.ญ.','เด็กหญิง']) && $validated['gender'] === 'female') {
+                            $validated['title_id'] = Title::where('title_name', 'นางสาว')->first()->id ?? $validated['title_id'];
+                        }
+                    }
 
-            if (!empty($errors)) {
-                return back()->withErrors($errors)->withInput();
-            }
-        }
+                    // ✅ ตรวจสอบอายุไม่ตรงกับคำนำหน้า (กรณีอื่น ๆ)
+                    if ($age >= 15 && in_array($title->title_name, ['ด.ช.','เด็กชาย','ด.ญ.','เด็กหญิง'])) {
+                        $errors['title_id'] = 'อายุ 15 ปีขึ้นไป ไม่สามารถใช้คำนำหน้า '.$title->title_name.' ได้';
+                    }
+
+                    if ($age < 15 && in_array($title->title_name, ['นาย','นาง','นางสาว'])) {
+                        $errors['title_id'] = 'อายุต่ำกว่า 15 ปี ไม่ควรใช้คำนำหน้า '.$title->title_name;
+                    }
+
+                    if (!empty($errors)) {
+                        return back()->withErrors($errors)->withInput();
+                    }
+                }
 
             // ✅ จัดการไฟล์ภาพ
             if ($request->hasFile('image')) {
@@ -420,38 +434,43 @@ public function ClientUpdate(Request $request)
     ]);
 
 
-            $title = Title::find($validated['title_id']);
-        if ($title) {
-            $age = Carbon::parse($validated['birth_date'])->age;
-            $errors = [];
+           $title = Title::find($validated['title_id']);
+            if ($title) {
+                $age = Carbon::parse($validated['birth_date'])->age;
+                $errors = [];
 
-            // ตรวจสอบเพศกับคำนำหน้า
-            if ($validated['gender'] === 'male' && !in_array($title->title_name, ['นาย','ด.ช.','เด็กชาย'])) {
-                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศชาย';
-            }
+                // ตรวจสอบเพศกับคำนำหน้า
+                if ($validated['gender'] === 'male' && !in_array($title->title_name, ['นาย','ด.ช.','เด็กชาย'])) {
+                    $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศชาย';
+                }
 
-            if ($validated['gender'] === 'female' && !in_array($title->title_name, ['นาง','นางสาว','ด.ญ.','เด็กหญิง'])) {
-                $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศหญิง';
-            }
+                if ($validated['gender'] === 'female' && !in_array($title->title_name, ['นาง','นางสาว','ด.ญ.','เด็กหญิง'])) {
+                    $errors['title_id'] = 'คำนำหน้าที่เลือกไม่ตรงกับเพศหญิง';
+                }
 
-            // ✅ ตรวจสอบอายุ
-            if ($age >= 15 && in_array($title->title_name, ['เด็กชาย','ด.ช.','เด็กหญิง','ด.ญ.'])) {
-                $errors['title_id'] = 'อายุ 15 ปีขึ้นไป ไม่สามารถใช้คำนำหน้า '.$title->title_name.' ได้';
-            }
+                // ✅ ปรับคำนำหน้าอัตโนมัติเมื่ออายุครบ 15 ปี
+                if ($age >= 15) {
+                    if (in_array($title->title_name, ['ด.ช.','เด็กชาย']) && $validated['gender'] === 'male') {
+                        $validated['title_id'] = Title::where('title_name', 'นาย')->first()->id ?? $validated['title_id'];
+                    }
+                    if (in_array($title->title_name, ['ด.ญ.','เด็กหญิง']) && $validated['gender'] === 'female') {
+                        $validated['title_id'] = Title::where('title_name', 'นางสาว')->first()->id ?? $validated['title_id'];
+                    }
+                }
 
-            // ✅ ถ้าอายุน้อยกว่า 15 ปี ให้ปรับคำนำหน้าชื่ออัตโนมัติ
-            if ($age < 15) {
-                if ($validated['gender'] === 'male') {
-                    $validated['title_id'] = Title::whereIn('title_name', ['เด็กชาย','ด.ช.'])->first()->id ?? $validated['title_id'];
-                } elseif ($validated['gender'] === 'female') {
-                    $validated['title_id'] = Title::whereIn('title_name', ['เด็กหญิง','ด.ญ.'])->first()->id ?? $validated['title_id'];
+                // ✅ ตรวจสอบอายุไม่ตรงกับคำนำหน้า (กรณีอื่น ๆ)
+                if ($age >= 15 && in_array($title->title_name, ['ด.ช.','เด็กชาย','ด.ญ.','เด็กหญิง'])) {
+                    $errors['title_id'] = 'อายุ 15 ปีขึ้นไป ไม่สามารถใช้คำนำหน้า '.$title->title_name.' ได้';
+                }
+
+                if ($age < 15 && in_array($title->title_name, ['นาย','นาง','นางสาว'])) {
+                    $errors['title_id'] = 'อายุต่ำกว่า 15 ปี ไม่ควรใช้คำนำหน้า '.$title->title_name;
+                }
+
+                if (!empty($errors)) {
+                    return back()->withErrors($errors)->withInput();
                 }
             }
-
-            if (!empty($errors)) {
-                return back()->withErrors($errors)->withInput();
-            }
-        }
 
     // จัดการไฟล์ภาพ
     if ($request->hasFile('image')) {

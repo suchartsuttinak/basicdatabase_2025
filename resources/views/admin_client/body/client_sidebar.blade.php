@@ -49,6 +49,7 @@
                         </ul>
                     </div>
                 </li>
+                 
 
                 <li class="menu-title">กระบวนการ</li>
 
@@ -75,9 +76,10 @@
                                 </li>
                                 <li>
                                  <a href="{{ route('estimate.show', $client->id) }}" class="tp-link">ประเมินครอบครัว</a>
-
-
                                 </li>
+                                  <li>
+                                <a href="{{ route('client_files.index', $client->id) }}" class="tp-link">รายการไฟล์เอกสาร</a>
+                            </li>
                             </ul>
                         </div>
                     </li>
@@ -166,7 +168,7 @@
                             </li>
                              <li>
                                 <a href="{{ route('help_sessions.show', $client->id) }}" class="tp-link">รายการการช่วยเหลือ</a>
-                            </li>
+                            </li>   
                           
                         </ul>
                     </div>

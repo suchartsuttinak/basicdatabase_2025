@@ -122,6 +122,12 @@ class Client extends Model
         return $this->hasMany(EducationRecord::class, 'client_id');
     }
 
+ // ความสัมพันธ์กับ ClientFile
+    public function files()
+    {
+        return $this->hasMany(ClientFile::class, 'client_id');
+    }
+
 
 
 
