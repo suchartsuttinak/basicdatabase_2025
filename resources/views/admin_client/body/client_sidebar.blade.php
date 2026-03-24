@@ -46,6 +46,12 @@
                                 </a>
                             </li>
                            
+                            <li>
+                                 <li>
+                                    <a href="{{ route('issues.index') }}" class="tp-link">ขอความช่วยเหลือ</a>
+                                </li>
+                            </li>
+                           
                         </ul>
                     </div>
                 </li>

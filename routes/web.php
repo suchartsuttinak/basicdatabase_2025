@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
+use App\Http\Controllers\Landing\IssueController;
+use App\Http\Controllers\Landing\LandingController;
+use App\Http\Controllers\Landing\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
@@ -13,10 +16,30 @@ Route::middleware('auth')->group(function () {
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 });
 
+// Landing Issue donation
+Route::get('/issues', [IssueController::class, 'index'])->name('issues.index');
+Route::post('/issues', [IssueController::class, 'store'])->name('issues.store');
 
-    Route::get('/', function () {
-    return view('welcome');
-});
+
+
+// หน้า Landing
+Route::get('/', [LandingController::class, 'index'])->name('landing.index');
+
+// หน้า News CRUD
+Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
+
+
+//     Route::get('/', function () {
+//     return view('welcome');
+// });
+
+// Route::get('/', function () {
+//     return view('landing'); // ชี้ไปที่ resources/views/landing.blade.php
+// });
+
 
 //     Route::get('/dashboard', function () {
 //     return view('admin.index');
