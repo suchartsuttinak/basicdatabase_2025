@@ -28,11 +28,12 @@
  <!-- ปุ่มจัดการ + TAB -->
        @include('admin_client.include.tabs')
 
-    <form action="{{ route('family.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+    <form id="familyForm" action="{{ route('family.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    <input type="hidden" name="client_id" value="{{ $client->id }}">
+    <input type="hidden" name="active_tab" id="active_tab" value="">
 
-          <!-- ส่ง id ไปด้วย -->
-            <input type="hidden" name="client_id" value="{{$client->id}}">
+
 
         <!-- Tabs ด้านบน -->
         <ul class="nav nav-tabs custom-tabs mb-3" id="familyTabs" role="tablist">
@@ -52,6 +53,8 @@
 
         <!-- เนื้อหาแต่ละ Tab -->
         <div class="tab-content" id="familyTabsContent">
+
+            
             <!-- บิดา -->
             <div class="tab-pane fade show active" id="father" role="tabpanel">
                 <div class="row">
@@ -892,8 +895,11 @@
     
 
 
-<!-- จังหวัด อำเภอ ตำบล รหัสไปรษณีย์ -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
 <script>
 $(function () {
 
@@ -903,13 +909,9 @@ $(function () {
         const subdistrict = $('#' + prefix + '_subdistrict');
         const zipcode     = $('#' + prefix + '_zipcode');
 
-        // Reset defaults
-        district.html('<option value="">--เลือกอำเภอ--</option>');
-        subdistrict.html('<option value="">--เลือกตำบล--</option>');
-        zipcode.val('');
-
         // Province change
-        province.on('change', function () {
+        province.on('change', function (e) {
+            e.preventDefault();
             const province_id = $(this).val();
             district.html('<option value="">--เลือกอำเภอ--</option>');
             subdistrict.html('<option value="">--เลือกตำบล--</option>');
@@ -925,7 +927,8 @@ $(function () {
         });
 
         // District change
-        district.on('change', function () {
+        district.on('change', function (e) {
+            e.preventDefault();
             const district_id = $(this).val();
             subdistrict.html('<option value="">--เลือกตำบล--</option>');
             zipcode.val('');
@@ -940,7 +943,8 @@ $(function () {
         });
 
         // Subdistrict change
-        subdistrict.on('change', function () {
+        subdistrict.on('change', function (e) {
+            e.preventDefault();
             const subdistrict_id = $(this).val();
             zipcode.val('');
             if (subdistrict_id) {
@@ -950,15 +954,13 @@ $(function () {
             }
         });
 
-        // ✅ Preload existing selections
+        // ✅ Preload selections
         const selectedProvince    = province.data('selected') || '';
         const selectedDistrict    = district.data('selected') || '';
         const selectedSubdistrict = subdistrict.data('selected') || '';
 
         if (selectedProvince) {
             province.val(selectedProvince);
-
-            // Load districts and select saved one
             $.get('/get-districts/' + selectedProvince).done(function (data) {
                 district.html('<option value="">--เลือกอำเภอ--</option>');
                 $.each(data, function (i, value) {
@@ -966,7 +968,6 @@ $(function () {
                     district.append('<option value="' + value.id + '"' + selected + '>' + value.dist_name + '</option>');
                 });
 
-                // Load subdistricts and select saved one
                 if (selectedDistrict) {
                     $.get('/get-subdistricts/' + selectedDistrict).done(function (data2) {
                         subdistrict.html('<option value="">--เลือกตำบล--</option>');
@@ -975,7 +976,6 @@ $(function () {
                             subdistrict.append('<option value="' + value.id + '"' + selected + '>' + value.subd_name + '</option>');
                         });
 
-                        // Load zipcode
                         if (selectedSubdistrict) {
                             $.get('/get-zipcode/' + selectedSubdistrict).done(function (data3) {
                                 zipcode.val(data3.zipcode || '');
@@ -987,16 +987,65 @@ $(function () {
         }
     }
 
-    // ใช้กับทุก prefix
     bindLocationDropdowns('father');
     bindLocationDropdowns('mother');
     bindLocationDropdowns('spouse');
     bindLocationDropdowns('relative');
+
+   // เก็บค่า tab ก่อน submit
+    $('form').on('submit', function() {
+        let activeTab = $('.nav-tabs .nav-link.active').attr('id'); 
+        $('#active_tab').val(activeTab);
+    });
+
+    // เปิด tab เดิมหลัง redirect
+    let activeTab = "{{ session('active_tab') }}";
+    if (activeTab) {
+        let tabTriggerEl = document.getElementById(activeTab);
+        if (tabTriggerEl) {
+            let tab = new bootstrap.Tab(tabTriggerEl);
+            tab.show();
+        }
+    }
 });
+
 </script>
 
+<script>
+$(function () {
+    $('#familyForm').on('submit', function(e) {
+        e.preventDefault(); // ❌ ป้องกันการ reload หน้า
 
+        // เก็บค่า tab ปัจจุบัน
+        let activeTab = $('#familyTabs .nav-link.active').attr('id'); 
+        $('#active_tab').val(activeTab);
 
+        // ส่งข้อมูลด้วย AJAX
+        $.ajax({
+            url: $(this).attr('action'),
+            method: $(this).attr('method'),
+            data: $(this).serialize(),
+            success: function(response) {
+              Swal.fire({
+                icon: 'success',
+                title: 'บันทึกข้อมูลเรียบร้อย',
+                showConfirmButton: true,   // ✅ แสดงปุ่ม OK
+                confirmButtonText: 'OK',   // ✅ ข้อความบนปุ่ม
+                timer: 3000,               // ✅ ปิดเองใน 3 วินาที
+                timerProgressBar: true     // ✅ แสดงแถบเวลา
+            });
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: xhr.responseJSON?.message || 'ไม่สามารถบันทึกได้',
+                });
+            }
+        });
+    });
+});
+</script>
 
 
 

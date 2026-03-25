@@ -65,6 +65,7 @@ class FamilyController extends Controller
     // บันทึกข้อมูล
     public function FamilyStore(Request $request)
     {
+          
         $request->validate([
             'client_id' => 'required|integer|exists:clients,id',
 
@@ -135,7 +136,16 @@ class FamilyController extends Controller
             ? 'บันทึกข้อมูลครอบครัวเรียบร้อย'
             : 'แก้ไขข้อมูลครอบครัวเรียบร้อย';
 
-        return redirect()->route('family.add', $request->client_id)
-            ->with(['message' => $message, 'alert-type' => 'success']);
+        return redirect()
+    ->route('family.add', $request->client_id)
+    ->with([
+        'message' => $message,
+        'alert-type' => 'success',
+        'active_tab' => $request->input('active_tab')
+    ]);
+
+            
+
+
     }
 }
