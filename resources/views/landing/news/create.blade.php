@@ -1,4 +1,4 @@
-@extends('layouts.landing')
+@extends('layouts.landing_pages')
 
 @section('content')
 <section class="py-16 bg-gradient-to-b from-gray-50 to-gray-100">

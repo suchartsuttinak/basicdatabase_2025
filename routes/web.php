@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
+use App\Http\Controllers\Landing\AboutController;
 use App\Http\Controllers\Landing\IssueController;
 use App\Http\Controllers\Landing\LandingController;
 use App\Http\Controllers\Landing\NewsController;
@@ -16,10 +17,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 });
 
-// Landing Issue donation
-Route::get('/issues', [IssueController::class, 'index'])->name('issues.index');
+
+
 Route::post('/issues', [IssueController::class, 'store'])->name('issues.store');
 
+// Landing Issue donation
+
+Route::middleware('auth')->group(function () {
+Route::get('/issues', [IssueController::class, 'index'])->name('issues.index');
+
+});
 
 
 // หน้า Landing
@@ -30,6 +37,23 @@ Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
 Route::post('/news', [NewsController::class, 'store'])->name('news.store');
 Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
+
+
+
+
+
+// หน้า about (ฟอร์มกรอกข้อมูล)
+Route::get('/about', [AboutController::class, 'index'])->name('landing.about.index');
+Route::post('/about', [AboutController::class, 'store'])->name('landing.about.store');
+
+
+
+
+
+
+
+
+
 
 
 //     Route::get('/', function () {

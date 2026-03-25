@@ -1,8 +1,8 @@
-@extends('layouts.landing')
+@extends('layouts.landing_pages')
 
 @section('content')
     @include('landing.hero')
-    @include('landing.about-mission')
+    @include('landing.about-mission')   <!-- ใช้ $history, $objective, $mission -->
     @include('landing.donation-report')
-    @include('landing.news-events') <!-- ใช้ $news ที่ส่งมาจาก Controller -->
+    @include('landing.news-events')     <!-- ใช้ $news -->
 @endsection

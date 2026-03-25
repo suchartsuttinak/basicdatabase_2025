@@ -1,4 +1,4 @@
-@extends('layouts.landing')
+@extends('layouts.landing_pages')
 
 @section('content')
     @include('landing.hero')
