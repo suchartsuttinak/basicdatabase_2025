@@ -93,29 +93,39 @@ class AdminClientController extends Controller
     ));
 }
 
-    public function ClientReport($id)
+   public function ClientReport($id)
     {
         $client = Client::with([
-            'problems',
-            'province',
-            'district',
-            'sub_district',
-            'national',
-            'religion',
-            'marital',
-            'occupation',
-            'income',
-            'education',
-            'contact',
-            'project',
-            'status',
-            'house',
-            'target',
-            'title'
-        ])->findOrFail($id);
+    'problems',
+    'province',
+    'district',
+    'sub_district',
+    'national',
+    'religion',
+    'marital',
+    'occupation',
+    'income',
+    'education',
+    'contact',
+    'project',
+    'status',
+    'house',
+    'target',
+    'title',
+    // ใช้ชื่อ relation ตาม Model
+    'originProvince',
+    'originDistrict',
+    'originSubDistrict',
+    'members.education',
+    'members.occupation',
+    'members.income',
+])->findOrFail($id);
+
+
 
         $problems = Problem::all();
 
         return view('admin_client.index.client_report', compact('client', 'problems'));
     }
 }
+
