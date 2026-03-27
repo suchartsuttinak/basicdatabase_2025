@@ -1,186 +1,318 @@
+@php
+    $clientId = $client->id ?? null;
+
+    $isProfileOpen =
+        Request::routeIs('client.show') ||
+        Request::routeIs('client.report') ||
+        Request::routeIs('issues.index');
+
+    $isProcessOpen =
+        Request::routeIs('factfinding.*') ||
+        Request::routeIs('family.*') ||
+        Request::routeIs('visitFamily.*') ||
+        Request::routeIs('member.*') ||
+        Request::routeIs('estimate.*') ||
+        Request::routeIs('client_files.*');
+
+    $isEducationOpen =
+        Request::routeIs('education_record_*') ||
+        Request::routeIs('school_followup_*') ||
+        Request::routeIs('absent.*');
+
+    $isHealthOpen =
+        Request::routeIs('accident.*') ||
+        Request::routeIs('check_body.*') ||
+        Request::routeIs('medical.*') ||
+        Request::routeIs('vaccine.*') ||
+        Request::routeIs('psychiatric.*') ||
+        Request::routeIs('addictive.*');
+
+    $isBehaviorOpen =
+        Request::routeIs('observe.*') ||
+        Request::routeIs('escape.*');
+
+    $isSocialOpen =
+        Request::routeIs('case_outside.*') ||
+        Request::routeIs('refers.*') ||
+        Request::routeIs('job_agencies.*') ||
+        Request::routeIs('help_sessions.*');
+@endphp
+
 <div class="app-sidebar-menu">
     <div class="h-100" data-simplebar>
-
-        <!--- Sidemenu -->
         <div id="sidebar-menu">
 
-            <div class="logo-box">
-                <a href="index.html" class="logo logo-light">
+            <div class="logo-box text-center py-3 border-bottom">
+                <a href="{{ route('dashboard') }}" class="logo logo-dark text-decoration-none d-inline-flex align-items-center gap-2">
                     <span class="logo-sm">
-                        <img src="assets/images/logo-sm.png" alt="" height="22">
+                        <img src="{{ asset('backend/assets/images/logo-sm.png') }}" alt="logo-sm" height="22">
                     </span>
-                    <span class="logo-lg">
-                        <img src="assets/images/logo-light.png" alt="" height="24">
-                    </span>
-                </a>
-                <a href="index.html" class="logo logo-dark">
-                    <span class="logo-sm">
-                        <img src="assets/images/logo-sm.png" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="assets/images/logo-dark.png" alt="" height="24">
+                    <span class="logo-lg fw-semibold text-dark">
+                        ข้อมูลผู้รับบริการ
                     </span>
                 </a>
             </div>
 
-            <ul id="side-menu">
-                <h1 class="text-danger text-center">{{ $client->id }}</h1>
+            <div class="client-mini-card px-3 py-3 border-bottom">
+                <div class="client-id text-center text-danger fw-semibold fs-2 mb-1">
+                    {{ $clientId }}
+                </div>
+                <div class="client-id-label text-center text-muted small">
+                    ทะเบียนประวัติ
+                </div>
+            </div>
+
+            <ul id="side-menu" class="metismenu list-unstyled pt-2">
 
                 <li class="menu-title">ทะเบียนประวัติ</li>
 
                 <li>
-                    <a href="#sidebarDashboards" data-bs-toggle="collapse">
-                        <i data-feather="home"></i
+                    <a href="#sidebarProfile"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isProfileOpen ? 'true' : 'false' }}"
+                       class="{{ $isProfileOpen ? 'active' : '' }}">
+                        <i data-feather="home"></i>
                         <span> บันทึกข้อมูลแรกเข้า </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarDashboards">
+                    <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('client.show') }}" class="tp-link">ทะเบียนผู้รับ</a>
-                            </li>
-    
-                            <li>
-                                 <a href="{{ route('client.report', $client->id) }}" class="tp-link">
-                                    รายงานการช่วยเหลือ 
+                                <a href="{{ route('client.show') }}"
+                                   class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
+                                    ทะเบียนผู้รับ
                                 </a>
                             </li>
-                           
                             <li>
-                                 <li>
-                                    <a href="{{ route('issues.index') }}" class="tp-link">ขอความช่วยเหลือ</a>
-                                </li>
+                                <a href="{{ route('client.report', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">
+                                    รายงานการช่วยเหลือ
+                                </a>
                             </li>
-                           
+                            <li>
+                                <a href="{{ route('issues.index') }}"
+                                   class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
+                                    ขอความช่วยเหลือ
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
-                 
 
                 <li class="menu-title">กระบวนการ</li>
 
-               <li>
-                        <a href="#sidebarAuth" data-bs-toggle="collapse"
-                        class="{{ Request::is('institution*') || Request::is('factfinding*') || Request::is('family*') ? 'active' : '' }}">
-                            <i data-feather="users"></i>
-                            <span> ข้อมูลผู้ใช้ </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse {{ Request::is('institution*') || Request::is('factfinding*') || Request::is('family*') ? 'show' : '' }}" id="sidebarAuth">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('factfinding.add', $client->id) }}" class="tp-link">สอบข้อเท็จจริง</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('family.add', $client->id) }}" class="tp-link">บันทึกครอบครัว</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('visitFamily.create', $client->id) }}" class="tp-link">เยี่ยมครอบครัว</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('member.create', $client->id) }}" class="tp-link">บันทึกสมาชิกครอบครัว</a>
-                                </li>
-                                <li>
-                                 <a href="{{ route('estimate.show', $client->id) }}" class="tp-link">ประเมินครอบครัว</a>
-                                </li>
-                                  <li>
-                                <a href="{{ route('client_files.index', $client->id) }}" class="tp-link">รายการไฟล์เอกสาร</a>
-                            </li>
-                            </ul>
-                        </div>
-                    </li>
-               <li>
-                    <a href="#sidebareducationRecord" data-bs-toggle="collapse"
-                    class="{{ Request::is('education_record*') || Request::is('school_followup*') || Request::is('absent*') ? 'active' : '' }}">
-                         <i class="fas fa-graduation-cap"></i>
-                        <span> ข้อมูลการศึกษา </span>
+                <li>
+                    <a href="#sidebarProcess"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isProcessOpen ? 'true' : 'false' }}"
+                       class="{{ $isProcessOpen ? 'active' : '' }}">
+                        <i data-feather="users"></i>
+                        <span> ข้อมูลผู้ใช้ </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse {{ Request::is('education_record*') || Request::is('school_followup*') || Request::is('absent*') ? 'show' : '' }}" id="sidebareducationRecord">
+                    <div class="collapse {{ $isProcessOpen ? 'show' : '' }}" id="sidebarProcess">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('education_record_add', ['client_id' => $client->id]) }}" class="tp-link">บันทึกผลการเรียน</a>
+                                <a href="{{ route('factfinding.add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('factfinding.*') ? 'active' : '' }}">
+                                    สอบข้อเท็จจริง
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('education_record_show', $client->id) }}" class="tp-link">แสดงผลการเรียน</a>
+                                <a href="{{ route('family.add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('family.*') ? 'active' : '' }}">
+                                    บันทึกครอบครัว
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('school_followup_add', $client->id) }}" class="tp-link">ติดตามการศึกษา</a>
+                                <a href="{{ route('visitFamily.create', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('visitFamily.*') ? 'active' : '' }}">
+                                    เยี่ยมครอบครัว
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('absent.add', $client->id) }}" class="tp-link">บันทึกการขาดเรียน</a>
+                                <a href="{{ route('member.create', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('member.*') ? 'active' : '' }}">
+                                    บันทึกสมาชิกครอบครัว
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('estimate.show', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('estimate.*') ? 'active' : '' }}">
+                                    ประเมินครอบครัว
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('client_files.index', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('client_files.*') ? 'active' : '' }}">
+                                    รายการไฟล์เอกสาร
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
                 <li>
-                    <a href="#sidebaraccident" data-bs-toggle="collapse"
-                    class="{{ Request::is('accident*') || Request::is('check_body*') || Request::is('medical*') || Request::is('vaccine*') || Request::is('psychiatric*') || Request::is('addictive*') ? 'active' : '' }}">
-                        <i class="fas fa-heartbeat"></i>
-                        <span> ข้อมูลสุขภาพ </span>
+                    <a href="#sidebarEducation"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isEducationOpen ? 'true' : 'false' }}"
+                       class="{{ $isEducationOpen ? 'active' : '' }}">
+                        <i class="fas fa-graduation-cap sidebar-fa-icon"></i>
+                        <span> ข้อมูลการศึกษา </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse {{ Request::is('accident*') || Request::is('check_body*') || Request::is('medical*') || Request::is('vaccine*') || Request::is('psychiatric*') || Request::is('addictive*') ? 'show' : '' }}" id="sidebaraccident">
+                    <div class="collapse {{ $isEducationOpen ? 'show' : '' }}" id="sidebarEducation">
                         <ul class="nav-second-level">
-                            <li><a href="{{ route('accident.add', $client->id) }}" class="tp-link">บันทึกการบาดเจ็บ</a></li>
-                            <li><a href="{{ route('check_body.add', $client->id) }}" class="tp-link">ตรวจสุขภาพเบื้องต้น</a></li>
-                            <li><a href="{{ route('medical.add', $client->id) }}" class="tp-link">การรักษาพยาบาล</a></li>
-                            <li><a href="{{ route('vaccine.index', $client->id) }}" class="tp-link">ประวัติการรับวัคซีน</a></li>
-                            <li><a href="{{ route('psychiatric.create', $client->id) }}" class="tp-link">การวินิจฉัยทางจิตเวช</a></li>
-                            <li><a href="{{ route('addictive.create', $client->id) }}" class="tp-link">การตรวจสารเสพติด</a></li>
+                            <li>
+                                <a href="{{ route('education_record_add', ['client_id' => $clientId]) }}"
+                                   class="tp-link {{ Request::routeIs('education_record_add') ? 'active' : '' }}">
+                                    บันทึกผลการเรียน
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('education_record_show', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('education_record_show') ? 'active' : '' }}">
+                                    แสดงผลการเรียน
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('school_followup_add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('school_followup_*') ? 'active' : '' }}">
+                                    ติดตามการศึกษา
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('absent.add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('absent.*') ? 'active' : '' }}">
+                                    บันทึกการขาดเรียน
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
 
+                <li>
+                    <a href="#sidebarHealth"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isHealthOpen ? 'true' : 'false' }}"
+                       class="{{ $isHealthOpen ? 'active' : '' }}">
+                        <i class="fas fa-heartbeat sidebar-fa-icon"></i>
+                        <span> ข้อมูลสุขภาพ </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse {{ $isHealthOpen ? 'show' : '' }}" id="sidebarHealth">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a href="{{ route('accident.add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('accident.*') ? 'active' : '' }}">
+                                    บันทึกการบาดเจ็บ
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('check_body.add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('check_body.*') ? 'active' : '' }}">
+                                    ตรวจสุขภาพเบื้องต้น
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('medical.add', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('medical.*') ? 'active' : '' }}">
+                                    การรักษาพยาบาล
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('vaccine.index', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('vaccine.*') ? 'active' : '' }}">
+                                    ประวัติการรับวัคซีน
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('psychiatric.create', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('psychiatric.*') ? 'active' : '' }}">
+                                    การวินิจฉัยทางจิตเวช
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('addictive.create', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('addictive.*') ? 'active' : '' }}">
+                                    การตรวจสารเสพติด
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
                 <li class="menu-title mt-2">ข้อมูลด้านพฤติกรรม</li>
 
                 <li>
-                    <a href="#sidebarBaseui" data-bs-toggle="collapse">
+                    <a href="#sidebarBehavior"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isBehaviorOpen ? 'true' : 'false' }}"
+                       class="{{ $isBehaviorOpen ? 'active' : '' }}">
                         <i data-feather="package"></i>
                         <span> ข้อมูลด้านพฤติกรรม </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarBaseui">
+                    <div class="collapse {{ $isBehaviorOpen ? 'show' : '' }}" id="sidebarBehavior">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('observe.create', $client->id) }}" class="tp-link">บันทึกพฤติกรรม</a>
+                                <a href="{{ route('observe.create', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('observe.*') ? 'active' : '' }}">
+                                    บันทึกพฤติกรรม
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('escape.index', $client->id) }}" class="tp-link">หนีออกจากบ้าน</a>
-                            </li>                          
+                                <a href="{{ route('escape.index', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('escape.*') ? 'active' : '' }}">
+                                    หนีออกจากบ้าน
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
 
-                 <li class="menu-title mt-2">ข้อมูลด้านสังคม</li>
-                 <li>
-                    <a href="#sidebarMaps" data-bs-toggle="collapse">
-                         <i class="fas fa-users"></i>
+                <li class="menu-title mt-2">ข้อมูลด้านสังคม</li>
+
+                <li>
+                    <a href="#sidebarSocial"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isSocialOpen ? 'true' : 'false' }}"
+                       class="{{ $isSocialOpen ? 'active' : '' }}">
+                        <i class="fas fa-users sidebar-fa-icon"></i>
                         <span> สังคมสงเคราะห์ </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarMaps">
+                    <div class="collapse {{ $isSocialOpen ? 'show' : '' }}" id="sidebarSocial">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('case_outside.show', $client->id) }}" class="tp-link">ติดตามเด็กที่อยู่ภายนอก</a>
+                                <a href="{{ route('case_outside.show', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('case_outside.*') ? 'active' : '' }}">
+                                    ติดตามเด็กที่อยู่ภายนอก
+                                </a>
                             </li>
-                             <li>
-                                <a href="{{ route('refers.index', $client->id) }}" class="tp-link">รายการการจำหน่าย</a>
+                            <li>
+                                <a href="{{ route('refers.index', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('refers.*') ? 'active' : '' }}">
+                                    รายการการจำหน่าย
+                                </a>
                             </li>
-                             <li>
-                                <a href="{{ route('job_agencies.show', $client->id) }}" class="tp-link">หางานให้ผู้รับบริการ</a>
+                            <li>
+                                <a href="{{ route('job_agencies.show', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('job_agencies.*') ? 'active' : '' }}">
+                                    หางานให้ผู้รับบริการ
+                                </a>
                             </li>
-                             <li>
-                                <a href="{{ route('help_sessions.show', $client->id) }}" class="tp-link">รายการการช่วยเหลือ</a>
-                            </li>   
-                          
+                            <li>
+                                <a href="{{ route('help_sessions.show', $clientId) }}"
+                                   class="tp-link {{ Request::routeIs('help_sessions.*') ? 'active' : '' }}">
+                                    รายการการช่วยเหลือ
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
+
             </ul>
         </div>
-        <!-- End Sidebar -->
     </div>
 </div>

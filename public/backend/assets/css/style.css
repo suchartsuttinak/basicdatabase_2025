@@ -1,53 +1,405 @@
   /* ปรับ input และ select */
 
   /* client */
-  .form-control, .form-select {
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    color: #000000;
-  }
 
-  .form-control:focus, .form-select:focus {
-    background-color: #f1f3f4;
-    border-color: #bbb;
-    color: #000000;
-    box-shadow: none;
-  }
+    .registry-page {
+        background: #f4f6f9;
+        padding: 12px;
+    }
 
-  /* placeholder */
-  ::placeholder {
-    color: #6c757d;
-    opacity: 1;
-  }
+    .registry-wrapper {
+        background: #fff;
+        border: 1px solid #c6ccd4;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+        overflow: hidden;
+    }
 
-  /* document */
-  .small-text {
-    font-size: 0.9rem;
-  }
+    .registry-header {
+        background: #234f87;
+        color: #fff;
+        text-align: center;
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1.1;
+        padding: 12px 15px;
+        font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif;
+    }
 
-  /* checkbox */
-  .small-check .form-check-input {
-    width: 16px;
-    height: 16px;
-  }
+    .registry-subtabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    background: #eef1f4;
+    border-bottom: 1px solid #d5dbe3;
+    padding: 0 8px;
+    -webkit-overflow-scrolling: touch;
+}
 
-  .small-check .form-check-label {
-    font-size: 0.85rem;
-  }
+.subtab-link {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    border-top: 3px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    transition: all .15s ease-in-out;
+}
 
-  /* เส้นแบ่ง */
-  .row-divider {
-    border-bottom: 2px solid #ddd;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-  }
+.subtab-link:hover {
+    background: #e7edf3;
+    color: #234f87;
+}
 
-  /* เปลี่ยนสีเมนู tab */
-  .nav-tabs .nav-link.active {
-      background-color: #0d6efd !important; /* สีฟ้า (ค่า default) */
-      color: #fff !important;
-      border-color: #0d6efd #0d6efd #fff !important;
-  }
+.subtab-link.active {
+    background: #fff;
+    color: #234f87;
+    font-weight: 600;
+    border-top-color: #234f87;
+    border-left-color: #d5dbe3;
+    border-right-color: #d5dbe3;
+    border-bottom-color: #fff;
+    margin-bottom: -1px;
+}
+
+@media (max-width: 768px) {
+    .registry-subtabs {
+        padding: 0 4px;
+    }
+
+    .subtab-link {
+        min-height: 40px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+    .workflow-tabs {
+        background: #234f87;
+        border-bottom: 1px solid #d5dbe3;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .workflow-tabs .tab-link {
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 16px;
+        font-size: 14px;
+        border-right: 1px solid rgba(255,255,255,.15);
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .workflow-tabs .tab-link:hover,
+    .workflow-tabs .tab-link.active {
+        background: rgba(255,255,255,.12);
+    }
+
+    .workflow-tabs .tab-link.back-link {
+        margin-left: auto;
+        background: rgba(255,255,255,.08);
+    }
+
+    .workflow-tabs .tab-link.back-link:hover {
+        background: rgba(255,255,255,.18);
+    }
+
+    .registry-subtabs {
+        background: #eef1f4;
+        border-bottom: 1px solid #d5dbe3;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        padding: 0 8px;
+    }
+
+    .registry-subtabs .subtab-link {
+        text-decoration: none;
+        color: #333;
+        padding: 8px 12px;
+        font-size: 14px;
+        border-top: 2px solid transparent;
+        transition: all .2s ease;
+    }
+
+    .registry-subtabs .subtab-link:hover,
+    .registry-subtabs .subtab-link.active {
+        background: #fff;
+        border: 1px solid #d5dbe3;
+        border-bottom-color: #fff;
+        border-top: 2px solid #234f87;
+        margin-bottom: -1px;
+    }
+
+    .registry-body {
+        padding: 12px;
+    }
+
+    .panel-box {
+        border: 1px solid #c9ced6;
+        background: #fff;
+        margin-bottom: 12px;
+        padding: 12px;
+    }
+
+    .panel-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #486b97;
+        margin-bottom: 10px;
+        font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif;
+        line-height: 1;
+    }
+
+    .compact-row {
+        --bs-gutter-x: 10px;
+        --bs-gutter-y: 8px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 3px;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 34px;
+        height: 34px;
+        padding: 4px 8px;
+        font-size: 14px;
+        border-radius: 0;
+        border-color: #bfc5cc;
+        box-shadow: none !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #234f87;
+    }
+
+    textarea.form-control {
+        min-height: 90px;
+        height: auto;
+    }
+
+    .required-star {
+        color: #dc3545;
+        font-weight: 700;
+    }
+
+    .inline-radio-group {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-height: 34px;
+        border: 1px solid #bfc5cc;
+        padding: 0 10px;
+        background: #fff;
+        flex-wrap: wrap;
+    }
+
+    .inline-radio-group .form-check {
+        margin: 0;
+    }
+
+    .inline-radio-group .form-check-label {
+        font-size: 14px;
+        margin-left: 2px;
+    }
+
+    .client-main-row {
+        align-items: flex-start;
+    }
+
+    .photo-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+        height: 100%;
+    }
+
+    .photo-preview {
+        width: 120px;
+        height: 145px;
+        object-fit: cover;
+        border: 1px solid #8e99a7;
+        background: #fff;
+        padding: 2px;
+        display: block;
+    }
+
+    .photo-btn {
+        border-radius: 0;
+        font-size: 13px;
+        padding: 4px 12px;
+        margin-top: 8px;
+        white-space: nowrap;
+    }
+
+    .problem-box {
+        border: 1px solid #c9ced6;
+        background: #fcfcfc;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .problem-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 10px 14px;
+        width: 100%;
+    }
+
+    .problem-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 1px solid #e1e5ea;
+        background: #fff;
+        cursor: pointer;
+        min-height: 48px;
+        margin: 0;
+        transition: all .2s ease;
+    }
+
+    .problem-item:hover {
+        border-color: #9fb3c8;
+        background: #f8fbff;
+    }
+
+    .problem-item input[type="checkbox"] {
+        margin-top: 3px;
+        flex: 0 0 auto;
+    }
+
+    .problem-item span {
+        font-size: 14px;
+        line-height: 1.45;
+        color: #222;
+        word-break: break-word;
+    }
+
+    .address-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .copy-check {
+        margin-bottom: 8px;
+    }
+
+    .copy-check label {
+        font-size: 14px;
+        color: #234f87;
+        font-weight: 600;
+    }
+
+    .action-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .btn-registry {
+        min-width: 140px;
+        border-radius: 0;
+        font-size: 14px;
+    }
+
+    .error-message,
+    .invalid-feedback,
+    .text-danger {
+        font-size: 13px;
+    }
+
+    @media (max-width: 991.98px) {
+        .client-main-row {
+            flex-direction: column;
+        }
+
+        .photo-box {
+            border-top: 1px dashed #c9ced6;
+            padding-top: 12px;
+        }
+
+        .problem-grid {
+            grid-template-columns: repeat(2, minmax(160px, 1fr));
+        }
+
+        .address-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .registry-page {
+            padding: 6px;
+        }
+
+        .registry-header {
+            font-size: 22px;
+            padding: 10px;
+        }
+
+        .registry-body {
+            padding: 8px;
+        }
+
+        .workflow-tabs .tab-link,
+        .registry-subtabs .subtab-link {
+            width: 100%;
+            justify-content: flex-start;
+            border-right: 0;
+        }
+
+        .workflow-tabs .tab-link.back-link {
+            margin-left: 0;
+        }
+
+        .panel-box {
+            padding: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-control,
+        .form-select {
+            font-size: 13px;
+            min-height: 36px;
+            height: 36px;
+        }
+
+        .inline-radio-group {
+            min-height: 36px;
+            gap: 10px;
+        }
+
+        .problem-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
   /* end client */
 
   /* family/add */

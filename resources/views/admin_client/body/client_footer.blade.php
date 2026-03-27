@@ -1,12 +1,13 @@
-<footer class="footer">
+<footer class="footer app-footer">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col fs-13 text-muted text-center">
-                &copy;
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> - พัฒนา <span class="mdi mdi-heart text-danger"></span> โดย <a href="#!"
-                    class="text-reset fw-semibold">นายสุชาติ สุทธินาค</a>
+        <div class="row align-items-center">
+            <div class="col-12 text-center">
+                <div class="footer-text">
+                    &copy; <span id="footer-year"></span>
+                    <span class="mx-1">|</span>
+                    พัฒนา <span class="mdi mdi-heart text-danger"></span> โดย
+                    <span class="fw-semibold">นายสุชาติ สุทธินาค</span>
+                </div>
             </div>
         </div>
     </div>
