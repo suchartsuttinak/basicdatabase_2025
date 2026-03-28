@@ -33,6 +33,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+       {{-- 🔥 เพิ่มตรงนี้ --}}
+    @stack('styles')
+
     <style>
         :root{
             --topbar-height: 70px;
@@ -913,6 +916,7 @@
                 margin-bottom: .75rem;
             }
         }
+ 
     </style>
 </head>
 
@@ -933,7 +937,7 @@
             <div class="sidebar-overlay"></div>
 
             {{-- CONTENT --}}
-            <main class="content-page">
+            <main class="content-page main-content">
                 <div class="content-shell">
                     <div class="content-scroll-x">
                         @yield('content')
