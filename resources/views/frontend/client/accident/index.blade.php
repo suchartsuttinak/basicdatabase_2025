@@ -7,264 +7,337 @@
 @endphp
 
 <style>
-    .accident-page {
-        --primary-soft: #eef4ff;
-        --border-soft: #e7ecf3;
-        --text-muted-soft: #6c757d;
-        --success-soft: #edf9f1;
-        --danger-soft: #fff1f2;
-        --card-radius: 18px;
+   .accident-page {
+    --acc-primary: #2563eb;
+    --acc-primary-soft: #eef4ff;
+    --acc-border-soft: #e7ecf3;
+    --acc-text-muted: #6c757d;
+    --acc-success-soft: #edf9f1;
+    --acc-danger-soft: #fff1f2;
+    --acc-card-radius: 18px;
+    --acc-shadow: 0 10px 30px rgba(26, 54, 93, .06);
+    --acc-shadow-sm: 0 4px 12px rgba(15, 23, 42, .05);
+}
+
+.accident-page .page-header-card,
+.accident-page .form-card,
+.accident-page .table-card,
+.accident-page .summary-card {
+    border: 0;
+    border-radius: var(--acc-card-radius);
+    box-shadow: var(--acc-shadow);
+    overflow: hidden;
+    background: #fff;
+}
+
+.accident-page .page-header-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+}
+
+.accident-page .accident-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: #1f2d3d;
+    line-height: 1.35;
+}
+
+.accident-page .accident-section-subtitle {
+    color: var(--acc-text-muted);
+    font-size: .875rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+.accident-page .info-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .8rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--acc-border-soft);
+    font-size: .82rem;
+    color: #334155;
+    white-space: nowrap;
+    box-shadow: var(--acc-shadow-sm);
+}
+
+.accident-page .summary-card {
+    background: #fff;
+    height: 100%;
+}
+
+.accident-page .accident-summary-label {
+    font-size: .78rem;
+    color: var(--acc-text-muted);
+    margin-bottom: .2rem;
+    line-height: 1.2;
+}
+
+.accident-page .accident-summary-value {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: .95rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.accident-page .form-card .card-header,
+.accident-page .table-card .card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--acc-border-soft);
+    padding: 1rem 1.25rem;
+}
+
+.accident-page .form-card .card-body,
+.accident-page .table-card .card-body {
+    padding: 1.25rem;
+}
+
+.accident-page .accident-label {
+    font-size: .86rem;
+    font-weight: 600;
+    margin-bottom: .45rem;
+    color: #334155;
+    line-height: 1.35;
+}
+
+.accident-page .accident-label .required {
+    color: #dc3545;
+}
+
+.accident-page .form-control,
+.accident-page .form-select {
+    border-radius: 12px;
+    border: 1px solid #dbe3ee;
+    padding: .65rem .85rem;
+    font-size: .92rem;
+    min-height: 44px;
+    box-shadow: none;
+    background: #fff;
+}
+
+.accident-page textarea.form-control {
+    min-height: 100px;
+}
+
+.accident-page .form-control:focus,
+.accident-page .form-select:focus {
+    border-color: #7aa7ff;
+    box-shadow: 0 0 0 .18rem rgba(13, 110, 253, .10);
+}
+
+.accident-page .radio-card-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.accident-page .radio-card {
+    position: relative;
+}
+
+.accident-page .radio-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.accident-page .radio-card label {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    border: 1px solid #dbe3ee;
+    border-radius: 14px;
+    padding: .95rem 1rem;
+    background: #fff;
+    cursor: pointer;
+    transition: all .2s ease;
+    min-height: 58px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0;
+}
+
+.accident-page .radio-card label .icon-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--acc-primary-soft);
+    color: var(--acc-primary);
+    flex-shrink: 0;
+}
+
+.accident-page .radio-card input[type="radio"]:checked + label {
+    border-color: #86b7fe;
+    background: #f8fbff;
+    box-shadow: 0 0 0 .18rem rgba(13, 110, 253, .08);
+}
+
+.accident-page .medical-box {
+    border: 1px dashed #cdd8e6;
+    background: #fafcff;
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.accident-page .btn-modern {
+    border-radius: 12px;
+    font-size: .9rem;
+    font-weight: 600;
+    padding: .62rem .95rem;
+}
+
+.accident-page .btn-icon {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accident-page .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.accident-page .table {
+    margin-bottom: 0;
+}
+
+.accident-page .table thead th {
+    font-size: .82rem;
+    font-weight: 700;
+    color: #334155;
+    background: #f8fafc;
+    border-bottom-width: 1px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.accident-page .table tbody td {
+    font-size: .88rem;
+    vertical-align: middle;
+}
+
+.accident-page .badge-soft-success {
+    background: #edf9f1;
+    color: #198754;
+    border: 1px solid #cdebd8;
+    font-weight: 700;
+}
+
+.accident-page .badge-soft-secondary {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    font-weight: 700;
+}
+
+.accident-page .empty-state {
+    border: 1px dashed #d9e2ef;
+    border-radius: 18px;
+    padding: 2rem 1rem;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.accident-page .empty-state .empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--acc-primary-soft);
+    color: var(--acc-primary);
+    font-size: 1.6rem;
+}
+
+.accident-page .sticky-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    justify-content: flex-end;
+}
+
+.accident-page .modal-content {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 0;
+}
+
+.accident-page .modal-header {
+    border-bottom: 1px solid var(--acc-border-soft);
+}
+
+.accident-page .modal-footer {
+    border-top: 1px solid var(--acc-border-soft);
+}
+
+@media (max-width: 991.98px) {
+    .accident-page .sticky-tools {
+        justify-content: flex-start;
     }
 
+    .accident-page .info-pill {
+        white-space: normal;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .accident-page .radio-card-group {
+        grid-template-columns: 1fr;
+    }
+
+    .accident-page .form-card .card-body,
+    .accident-page .table-card .card-body,
+    .accident-page .form-card .card-header,
+    .accident-page .table-card .card-header {
+        padding: 1rem;
+    }
+
+    .accident-page .sticky-tools {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .accident-page .sticky-tools .btn,
+    .accident-page .sticky-tools .btn-modern {
+        width: 100%;
+    }
+
+    .accident-page .table thead th,
+    .accident-page .table tbody td {
+        font-size: .84rem;
+    }
+}
+
+@media (max-width: 575.98px) {
     .accident-page .page-header-card,
     .accident-page .form-card,
     .accident-page .table-card,
     .accident-page .summary-card {
-        border: 0;
-        border-radius: var(--card-radius);
-        box-shadow: 0 10px 30px rgba(26, 54, 93, .06);
-        overflow: hidden;
-    }
-
-    .accident-page .page-header-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
-    }
-
-    .accident-page .section-title {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-bottom: 0;
-        color: #1f2d3d;
-    }
-
-    .accident-page .section-subtitle {
-        color: var(--text-muted-soft);
-        font-size: .875rem;
-        margin-bottom: 0;
-    }
-
-    .accident-page .info-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        padding: .45rem .8rem;
-        border-radius: 999px;
-        background: #fff;
-        border: 1px solid var(--border-soft);
-        font-size: .82rem;
-        color: #334155;
-        white-space: nowrap;
-    }
-
-    .accident-page .summary-card {
-        background: #fff;
-        height: 100%;
-    }
-
-    .accident-page .summary-label {
-        font-size: .78rem;
-        color: var(--text-muted-soft);
-        margin-bottom: .2rem;
-    }
-
-    .accident-page .summary-value {
-        font-weight: 700;
-        color: #1f2937;
-        font-size: .95rem;
-        word-break: break-word;
-    }
-
-    .accident-page .form-card .card-header,
-    .accident-page .table-card .card-header {
-        background: #fff;
-        border-bottom: 1px solid var(--border-soft);
-        padding: 1rem 1.25rem;
-    }
-
-    .accident-page .form-card .card-body,
-    .accident-page .table-card .card-body {
-        padding: 1.25rem;
-    }
-
-    .accident-page .modern-label {
-        font-size: .86rem;
-        font-weight: 600;
-        margin-bottom: .45rem;
-        color: #334155;
-    }
-
-    .accident-page .modern-label .required {
-        color: #dc3545;
-    }
-
-    .accident-page .form-control,
-    .accident-page .form-select {
-        border-radius: 12px;
-        border: 1px solid #dbe3ee;
-        padding: .65rem .85rem;
-        font-size: .92rem;
-        min-height: 44px;
-        box-shadow: none;
-    }
-
-    .accident-page textarea.form-control {
-        min-height: 100px;
-    }
-
-    .accident-page .form-control:focus,
-    .accident-page .form-select:focus {
-        border-color: #7aa7ff;
-        box-shadow: 0 0 0 .18rem rgba(13, 110, 253, .10);
-    }
-
-    .accident-page .radio-card-group {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: .75rem;
-    }
-
-    .accident-page .radio-card {
-        position: relative;
-    }
-
-    .accident-page .radio-card input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .accident-page .radio-card label {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        border: 1px solid #dbe3ee;
         border-radius: 14px;
-        padding: .95rem 1rem;
-        background: #fff;
-        cursor: pointer;
-        transition: all .2s ease;
-        min-height: 58px;
-        font-weight: 600;
-        color: #334155;
-    }
-
-    .accident-page .radio-card label .icon-wrap {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--primary-soft);
-        color: #0d6efd;
-        flex-shrink: 0;
-    }
-
-    .accident-page .radio-card input[type="radio"]:checked + label {
-        border-color: #86b7fe;
-        background: #f8fbff;
-        box-shadow: 0 0 0 .18rem rgba(13, 110, 253, .08);
-    }
-
-    .accident-page .medical-box {
-        border: 1px dashed #cdd8e6;
-        background: #fafcff;
-        border-radius: 16px;
-        padding: 1rem;
-    }
-
-    .accident-page .btn-modern {
-        border-radius: 12px;
-        font-size: .9rem;
-        font-weight: 600;
-        padding: .62rem .95rem;
-    }
-
-    .accident-page .btn-icon {
-        width: 34px;
-        height: 34px;
-        padding: 0;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .accident-page .table thead th {
-        font-size: .82rem;
-        font-weight: 700;
-        color: #334155;
-        background: #f8fafc;
-        border-bottom-width: 1px;
-        vertical-align: middle;
-        white-space: nowrap;
-    }
-
-    .accident-page .table tbody td {
-        font-size: .88rem;
-        vertical-align: middle;
-    }
-
-    .accident-page .badge-soft-success {
-        background: #edf9f1;
-        color: #198754;
-        border: 1px solid #cdebd8;
-        font-weight: 700;
-    }
-
-    .accident-page .badge-soft-secondary {
-        background: #f3f4f6;
-        color: #6b7280;
-        border: 1px solid #e5e7eb;
-        font-weight: 700;
     }
 
     .accident-page .empty-state {
-        border: 1px dashed #d9e2ef;
-        border-radius: 18px;
-        padding: 2rem 1rem;
-        text-align: center;
-        background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+        padding: 1.5rem .9rem;
     }
 
     .accident-page .empty-state .empty-icon {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 1rem;
-        border-radius: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--primary-soft);
-        color: #0d6efd;
-        font-size: 1.6rem;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
     }
-
-    .accident-page .sticky-tools {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .6rem;
-        justify-content: flex-end;
-    }
-
-    @media (max-width: 991.98px) {
-        .accident-page .sticky-tools {
-            justify-content: flex-start;
-        }
-    }
-
-    @media (max-width: 767.98px) {
-        .accident-page .radio-card-group {
-            grid-template-columns: 1fr;
-        }
-
-        .accident-page .form-card .card-body,
-        .accident-page .table-card .card-body,
-        .accident-page .form-card .card-header,
-        .accident-page .table-card .card-header {
-            padding: 1rem;
-        }
-    }
+}
 </style>
 
 <div class="container-fluid px-2 px-lg-3 accident-page">

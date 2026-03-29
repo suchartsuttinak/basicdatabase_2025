@@ -1,0 +1,308 @@
+.vaccine-page {
+    --vaccine-primary: #2563eb;
+    --vaccine-border: #e5e7eb;
+    --vaccine-text-soft: #6b7280;
+    --vaccine-bg-soft: #f8fafc;
+}
+
+.vaccine-hero {
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+}
+
+.vaccine-hero__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: #dbeafe;
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.vaccine-summary-card,
+.vaccine-table-card,
+.vaccine-modal-content {
+    border-radius: 18px;
+}
+
+/* Client info */
+.vaccine-client-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: stretch;
+}
+
+.vaccine-client-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 220px;
+    flex: 0 1 auto;
+}
+
+.vaccine-client-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex: 0 0 42px;
+}
+
+.vaccine-client-icon--primary {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.vaccine-client-icon--success {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.vaccine-client-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vaccine-client-label {
+    font-size: .78rem;
+    color: var(--vaccine-text-soft);
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.vaccine-client-value {
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.vaccine-note-box {
+    background: var(--vaccine-bg-soft);
+    border: 1px dashed #cbd5e1;
+    color: #475569;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: .875rem;
+}
+
+/* Table */
+.vaccine-table thead th {
+    background: #f8fafc;
+    color: #334155;
+    font-size: .85rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--vaccine-border);
+    white-space: nowrap;
+    padding: .9rem .85rem;
+}
+
+.vaccine-table tbody td {
+    vertical-align: middle;
+    font-size: .92rem;
+    padding: .9rem .85rem;
+    border-color: #eef2f7;
+}
+
+.vaccine-table tbody tr:hover {
+    background: #fafcff;
+}
+
+.vaccine-action-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .45rem;
+}
+
+.vaccine-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    border-radius: 10px;
+    padding: .42rem .7rem;
+    font-size: .82rem;
+    white-space: nowrap;
+}
+
+/* Empty state */
+.vaccine-empty-state-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+    border-radius: 18px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+/* Modal / form */
+.vaccine-modal-header {
+    border-bottom: 0;
+    padding: 1rem 1.25rem;
+}
+
+.vaccine-form-section {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.vaccine-section-title {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.vaccine-section-title::before {
+    content: "";
+    width: 6px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--vaccine-primary);
+    display: inline-block;
+}
+
+.vaccine-page .form-label {
+    font-size: .85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: .4rem;
+}
+
+.vaccine-page .form-label.required::after {
+    content: " *";
+    color: #dc2626;
+}
+
+.vaccine-page .form-control,
+.vaccine-page .form-select {
+    border-radius: 12px;
+    border-color: #dbe2ea;
+    padding-top: .55rem;
+    padding-bottom: .55rem;
+}
+
+.vaccine-page .form-control:focus,
+.vaccine-page .form-select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .12);
+}
+
+/* Modal scroll */
+.vaccine-modal-content {
+    border: 0;
+    overflow: hidden;
+}
+
+.vaccine-modal-content > form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.vaccine-modal-content .modal-header {
+    flex: 0 0 auto;
+}
+
+.vaccine-modal-content .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.vaccine-modal-content .modal-footer {
+    flex: 0 0 auto;
+    background: #fff;
+}
+
+.modal-dialog.modal-dialog-scrollable .vaccine-modal-content {
+    max-height: calc(100vh - 2rem);
+}
+
+@media (max-width: 767.98px) {
+    .vaccine-page .card {
+        border-radius: 14px;
+    }
+
+    .vaccine-table thead th,
+    .vaccine-table tbody td {
+        font-size: .85rem;
+        padding: .75rem .7rem;
+    }
+
+    .vaccine-client-grid {
+        flex-direction: column;
+        gap: .85rem;
+    }
+
+    .vaccine-client-item {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .vaccine-action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .vaccine-action-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .vaccine-modal-content .modal-footer {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: .5rem;
+    }
+
+    .vaccine-modal-content .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .modal.modal-fullscreen-sm-down .modal-content {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .modal.modal-fullscreen-sm-down .vaccine-modal-content > form {
+        height: 100vh;
+    }
+
+    .modal.modal-fullscreen-sm-down .modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+
+    .modal.modal-fullscreen-sm-down .modal-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        border-top: 1px solid #dee2e6;
+        background: #fff;
+        padding: .75rem;
+    }
+}

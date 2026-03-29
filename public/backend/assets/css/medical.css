@@ -1,0 +1,338 @@
+.medical-page {
+    --medical-primary: #2563eb;
+    --medical-border: #e5e7eb;
+    --medical-text-soft: #6b7280;
+    --medical-bg-soft: #f8fafc;
+}
+
+.medical-hero {
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+}
+
+.medical-hero__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: #dbeafe;
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.medical-client-summary-card,
+.medical-table-card,
+.medical-modal-content {
+    border-radius: 18px;
+}
+
+/* Client summary */
+.medical-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.medical-summary-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.medical-summary-label {
+    font-size: .78rem;
+    color: var(--medical-text-soft);
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.medical-summary-value {
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.medical-note-box {
+    background: var(--medical-bg-soft);
+    border: 1px dashed #cbd5e1;
+    color: #475569;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: .875rem;
+}
+
+/* Table */
+.medical-table thead th {
+    background: #f8fafc;
+    color: #334155;
+    font-size: .85rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--medical-border);
+    white-space: nowrap;
+    padding: .9rem .85rem;
+}
+
+.medical-table tbody td {
+    vertical-align: middle;
+    font-size: .92rem;
+    padding: .9rem .85rem;
+    border-color: #eef2f7;
+}
+
+.medical-table tbody tr:hover {
+    background: #fafcff;
+}
+
+.medical-action-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .45rem;
+}
+
+.medical-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    border-radius: 10px;
+    padding: .42rem .7rem;
+    font-size: .82rem;
+    white-space: nowrap;
+}
+
+/* Empty state */
+.medical-empty-state-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+    border-radius: 18px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+/* Modal / form */
+.medical-modal-header {
+    border-bottom: 0;
+    padding: 1rem 1.25rem;
+}
+
+.medical-form-section {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.medical-section-title {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.medical-section-title::before {
+    content: "";
+    width: 6px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--medical-primary);
+    display: inline-block;
+}
+
+.medical-page .form-label {
+    font-size: .85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: .4rem;
+}
+
+.medical-page .form-label.required::after {
+    content: " *";
+    color: #dc2626;
+}
+
+.medical-page .form-control,
+.medical-page .form-select {
+    border-radius: 12px;
+    border-color: #dbe2ea;
+    padding-top: .55rem;
+    padding-bottom: .55rem;
+}
+
+.medical-page .form-control:focus,
+.medical-page .form-select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .12);
+}
+
+/* Radio group */
+.medical-radio-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.medical-radio-card {
+    display: block;
+    margin: 0;
+    cursor: pointer;
+}
+
+.medical-radio-card input[type="radio"] {
+    display: none;
+}
+
+.medical-radio-content {
+    display: flex;
+    align-items: flex-start;
+    gap: .85rem;
+    border: 1px solid #dbe2ea;
+    border-radius: 14px;
+    padding: .95rem 1rem;
+    background: #fff;
+    transition: all .2s ease;
+    min-height: 100%;
+}
+
+.medical-radio-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.medical-radio-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+}
+
+.medical-radio-text small {
+    color: #64748b;
+    margin-top: .2rem;
+}
+
+.medical-radio-card input[type="radio"]:checked + .medical-radio-content {
+    border-color: #60a5fa;
+    background: #eff6ff;
+    box-shadow: 0 0 0 .15rem rgba(37, 99, 235, .08);
+}
+
+.medical-conditional-box {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+/* Modal scroll */
+.medical-modal-content {
+    border: 0;
+    overflow: hidden;
+}
+
+.medical-modal-content > form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.medical-modal-content .modal-header {
+    flex: 0 0 auto;
+}
+
+.medical-modal-content .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.medical-modal-content .modal-footer {
+    flex: 0 0 auto;
+    background: #fff;
+}
+
+.modal-dialog.modal-dialog-scrollable .medical-modal-content {
+    max-height: calc(100vh - 2rem);
+}
+
+@media (max-width: 991.98px) {
+    .medical-radio-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .medical-page .card {
+        border-radius: 14px;
+    }
+
+    .medical-table thead th,
+    .medical-table tbody td {
+        font-size: .85rem;
+        padding: .75rem .7rem;
+    }
+
+    .medical-action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .medical-action-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .medical-modal-content .modal-footer {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: .5rem;
+    }
+
+    .medical-modal-content .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .modal.modal-fullscreen-sm-down .modal-content {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .modal.modal-fullscreen-sm-down .medical-modal-content > form {
+        height: 100vh;
+    }
+
+    .modal.modal-fullscreen-sm-down .modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+
+    .modal.modal-fullscreen-sm-down .modal-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        border-top: 1px solid #dee2e6;
+        background: #fff;
+        padding: .75rem;
+    }
+}
