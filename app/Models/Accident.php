@@ -30,6 +30,13 @@ class Accident extends Model
         'client_id',
     ];
 
+        // กำหนดการแปลงข้อมูลวันที่เป็น Carbon instance
+     protected $casts = [
+        'incident_date' => 'date',
+        'appointment'   => 'date',
+        'record_date'   => 'date',
+    ];
+
     /**
      * ความสัมพันธ์: Accident → Client
      * อุบัติเหตุแต่ละรายการจะเชื่อมโยงกับ Client หนึ่งคน

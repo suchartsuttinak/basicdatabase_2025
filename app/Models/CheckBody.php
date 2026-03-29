@@ -18,6 +18,13 @@ class CheckBody extends Model
         'contagious','other','drug_allergy','recorder','remark','client_id'
     ];
 
+    // ✅ กำหนดการแปลงข้อมูล
+     protected $casts = [
+        'assessor_date' => 'date',
+        'weight' => 'decimal:2',
+        'height' => 'decimal:2',
+    ];
+
     public function client()
     {
         return $this->belongsTo(Client::class);
