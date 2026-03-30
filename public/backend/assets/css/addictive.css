@@ -1,0 +1,195 @@
+.addictive-page {
+    --add-border: #e9edf3;
+    --add-soft: #f8fafc;
+    --add-head: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+    --add-radius: 14px;
+}
+
+.addictive-card,
+.addictive-client-card,
+.addictive-table-card,
+.addictive-modal .modal-content {
+    border-radius: var(--add-radius);
+    overflow: hidden;
+}
+
+.addictive-card-header {
+    background: var(--add-head);
+    border-bottom: 1px solid var(--add-border);
+    padding: 0.9rem 1rem;
+}
+
+.addictive-btn-primary,
+.addictive-btn-save,
+.addictive-btn-cancel,
+.addictive-btn-action {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.addictive-client-card {
+    background: #fff;
+    border: 1px solid var(--add-border);
+}
+
+.addictive-client-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.addictive-client-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+}
+
+.addictive-client-item .label {
+    font-weight: 700;
+    color: #334155;
+}
+
+.addictive-client-item .value {
+    color: #0f172a;
+}
+
+.addictive-table-card {
+    border: 1px solid var(--add-border);
+}
+
+.addictive-table {
+    min-width: 980px;
+}
+
+.addictive-table thead th {
+    background: #eaf3ff;
+    color: #1e3a5f;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    border-bottom: 1px solid #d6e4f5;
+}
+
+.addictive-table tbody td {
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+.addictive-action-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.addictive-btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.addictive-modal .modal-content {
+    border: 0;
+    box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.16);
+}
+
+.addictive-modal .modal-header {
+    padding: 0.85rem 1rem;
+}
+
+.addictive-modal .modal-body {
+    padding: 1rem;
+    background: #fcfdff;
+}
+
+.addictive-modal-footer {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--add-border);
+}
+
+.radio-card-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.radio-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid #dbe4f0;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    min-height: 42px;
+    transition: all 0.2s ease;
+}
+
+.radio-card:hover {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.08);
+}
+
+.radio-card input[type="radio"] {
+    margin-top: 0;
+}
+
+.form-label {
+    margin-bottom: 0.4rem;
+}
+
+@media (max-width: 991.98px) {
+    .addictive-card-header {
+        padding: 0.85rem 0.85rem;
+    }
+
+    .addictive-modal .modal-body {
+        padding: 0.9rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .addictive-client-item {
+        font-size: 0.9rem;
+    }
+
+    .addictive-btn-primary,
+    .addictive-btn-save,
+    .addictive-btn-cancel,
+    .addictive-btn-action {
+        font-size: 0.85rem;
+    }
+
+    .radio-card {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .addictive-card-header h6 {
+        font-size: 0.95rem;
+    }
+
+    .addictive-table tbody td,
+    .addictive-table thead th {
+        font-size: 0.82rem;
+    }
+
+    .addictive-action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .addictive-btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+}
