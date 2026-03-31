@@ -3,24 +3,12 @@
     @section('content')
     <div class="container-fluid mt-2 psychiatric-page">
         <div class="card shadow-sm border-0 psychiatric-card">
-            <div class="card-header psychiatric-header">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <h6 class="mb-0 fw-bold d-flex align-items-center">
-                        <i class="bi bi-clipboard-check me-2"></i>
-                        ข้อมูลการตรวจวินิจฉัยทางจิตวิทยา
-                    </h6>
 
-                    <button type="button"
-                            class="btn btn-primary btn-sm psychiatric-btn-primary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#createPsychiatricModal"
-                            id="btn-create-psychiatric">
-                        <i class="bi bi-plus-circle me-1"></i> เพิ่มข้อมูล
-                    </button>
-                </div>
-            </div>
+          <!-- header -->`
+                @include('frontend.client.psychiatric.partials.header')
 
-            <div class="card-body p-2 p-md-3">
+          
+                <div class="card-body p-2 p-md-3">
                 @include('frontend.client.psychiatric.partials._client_info')
                 @include('frontend.client.psychiatric.partials._table')
             </div>

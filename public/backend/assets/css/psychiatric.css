@@ -1,195 +1,275 @@
-.psychiatric-page {
-    --psy-border: #e9edf3;
-    --psy-soft: #f8fafc;
-    --psy-head: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
-    --psy-radius: 14px;
+/* =========================================
+   Psychiatric Modal - Final Stable Fix
+   ========================================= */
+
+/* scope only */
+.psychiatric-page.psy-modal .modal-dialog,
+.psychiatric-page .psy-modal .modal-dialog {
+    margin: 1rem auto;
 }
 
-.psychiatric-card,
-.psychiatric-client-card,
-.psychiatric-table-card,
-.psychiatric-modal .modal-content {
-    border-radius: var(--psy-radius);
+.psychiatric-page.psy-modal .modal-content,
+.psychiatric-page .psy-modal .modal-content {
+    border: 0;
+    border-radius: 18px;
     overflow: hidden;
-}
-
-.psychiatric-header {
-    background: var(--psy-head);
-    border-bottom: 1px solid var(--psy-border);
-    padding: 0.9rem 1rem;
-}
-
-.psychiatric-btn-primary,
-.psychiatric-btn-save,
-.psychiatric-btn-cancel,
-.psychiatric-btn-action {
-    border-radius: 10px;
-    font-weight: 500;
-}
-
-.psychiatric-client-card {
     background: #fff;
-    border: 1px solid var(--psy-border);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.16);
+    height: auto;
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
 }
 
-.psychiatric-client-info {
+.psychiatric-page.psy-modal .psy-modal-form,
+.psychiatric-page .psy-modal .psy-modal-form {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+.psychiatric-page.psy-modal .modal-header,
+.psychiatric-page .psy-modal .modal-header {
+    flex: 0 0 auto;
+    padding: 1rem 1.1rem;
+}
+
+.psychiatric-page.psy-modal .modal-body,
+.psychiatric-page .psy-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    background: #fcfdff;
+    padding: 1rem 1.1rem 1.25rem;
+}
+
+.psychiatric-page.psy-modal .modal-footer,
+.psychiatric-page .psy-modal .modal-footer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0.9rem 1.1rem;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+/* section */
+.psychiatric-page .psy-modal-section {
+    padding: 1rem;
+    border: 1px solid #edf2f7;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.psychiatric-page .psy-modal-section + .psy-modal-section {
+    margin-top: 1rem;
+}
+
+/* form grid */
+.psychiatric-page .psy-form-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 1rem;
 }
 
-.psychiatric-client-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    font-size: 0.95rem;
+.psychiatric-page .psy-col-12 { grid-column: span 12; }
+.psychiatric-page .psy-col-6  { grid-column: span 6; }
+.psychiatric-page .psy-col-5  { grid-column: span 5; }
+.psychiatric-page .psy-col-4  { grid-column: span 4; }
+.psychiatric-page .psy-col-3  { grid-column: span 3; }
+
+.psychiatric-page .psy-field {
+    min-width: 0;
 }
 
-.psychiatric-client-item .label {
+.psychiatric-page .psy-label {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: #334155;
+    line-height: 1.4;
 }
 
-.psychiatric-client-item .value {
-    color: #0f172a;
+.psychiatric-page .psy-required {
+    color: #dc2626;
 }
 
-.psychiatric-table-card {
-    border: 1px solid var(--psy-border);
+.psychiatric-page .form-control,
+.psychiatric-page .form-select {
+    min-height: 44px;
+    border-radius: 12px;
+    border-color: #dbe3ee;
+    font-size: 0.92rem;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+    box-shadow: none;
 }
 
-.psychiatric-table {
-    min-width: 980px;
+.psychiatric-page textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
 }
 
-.psychiatric-table thead th {
-    background: #eaf3ff;
-    color: #1e3a5f;
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-    border-bottom: 1px solid #d6e4f5;
-}
-
-.psychiatric-table tbody td {
-    vertical-align: middle;
-    font-size: 0.875rem;
-}
-
-.psychiatric-action-group {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-}
-
-.psychiatric-btn-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    white-space: nowrap;
-}
-
-.psychiatric-modal .modal-content {
-    border: 0;
-    box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.16);
-}
-
-.psychiatric-modal .modal-header {
-    padding: 0.85rem 1rem;
-}
-
-.psychiatric-modal .modal-body {
-    padding: 1rem;
-    background: #fcfdff;
-}
-
-.psychiatric-modal-footer {
-    padding: 0.85rem 1rem;
-    border-top: 1px solid var(--psy-border);
-}
-
-.radio-card-group {
-    display: flex;
-    flex-wrap: wrap;
+/* option card */
+.psychiatric-page .psy-option-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
 }
 
-.radio-card {
-    display: inline-flex;
+.psychiatric-page .psy-option-card {
+    display: flex;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.6rem 0.9rem;
+    gap: 0.65rem;
+    min-height: 54px;
+    min-width: 0;
+    padding: 0.85rem 0.95rem;
     border: 1px solid #dbe4f0;
-    border-radius: 12px;
+    border-radius: 14px;
     background: #fff;
     cursor: pointer;
-    min-height: 42px;
     transition: all 0.2s ease;
+    overflow: hidden;
 }
 
-.radio-card:hover {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.08);
+.psychiatric-page .psy-option-card input[type="radio"],
+.psychiatric-page .psy-option-card input[type="checkbox"] {
+    flex: 0 0 auto;
+    margin: 0;
 }
 
-.radio-card input[type="radio"] {
-    margin-top: 0;
+.psychiatric-page .psy-option-card span {
+    display: block;
+    min-width: 0;
+    line-height: 1.35;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #1e293b;
+    word-break: break-word;
 }
 
-.form-label {
-    margin-bottom: 0.4rem;
+.psychiatric-page .psy-option-card:has(input:checked) {
+    border-color: #60a5fa;
+    background: #eff6ff;
+    box-shadow: 0 0 0 0.18rem rgba(59, 130, 246, 0.12);
 }
 
+.psychiatric-page .psy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0.55rem 0.95rem;
+    border-radius: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* tablet */
 @media (max-width: 991.98px) {
-    .psychiatric-header {
-        padding: 0.85rem 0.85rem;
+    .psychiatric-page .psy-col-5,
+    .psychiatric-page .psy-col-4,
+    .psychiatric-page .psy-col-3 {
+        grid-column: span 6;
+    }
+}
+
+/* mobile */
+@media (max-width: 767.98px) {
+    .psychiatric-page .psy-col-6,
+    .psychiatric-page .psy-col-5,
+    .psychiatric-page .psy-col-4,
+    .psychiatric-page .psy-col-3 {
+        grid-column: span 12;
     }
 
-    .psychiatric-modal .modal-body {
+    .psychiatric-page .psy-option-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* phone - real fullscreen behavior */
+@media (max-width: 575.98px) {
+    .psychiatric-page.psy-modal,
+    .psychiatric-page .psy-modal {
+        padding: 0 !important;
+    }
+
+    .psychiatric-page.psy-modal .modal-dialog,
+    .psychiatric-page .psy-modal .modal-dialog {
+        margin: 0 !important;
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+    }
+
+    .psychiatric-page.psy-modal .modal-content,
+    .psychiatric-page .psy-modal .modal-content {
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+    }
+
+    .psychiatric-page.psy-modal .psy-modal-form,
+    .psychiatric-page .psy-modal .psy-modal-form {
+        height: 100%;
+    }
+
+    .psychiatric-page.psy-modal .modal-header,
+    .psychiatric-page .psy-modal .modal-header {
         padding: 0.9rem;
     }
-}
 
-@media (max-width: 767.98px) {
-    .psychiatric-client-item {
-        font-size: 0.9rem;
+    .psychiatric-page.psy-modal .modal-title,
+    .psychiatric-page .psy-modal .modal-title {
+        font-size: 0.96rem;
     }
 
-    .psychiatric-btn-primary,
-    .psychiatric-btn-save,
-    .psychiatric-btn-cancel,
-    .psychiatric-btn-action {
-        font-size: 0.85rem;
+    /* สำคัญมาก: footer sticky, body เผื่อพื้นที่ */
+    .psychiatric-page.psy-modal .modal-body,
+    .psychiatric-page .psy-modal .modal-body {
+        padding: 0.9rem 0.9rem 7rem !important;
+        overscroll-behavior: contain;
     }
 
-    .radio-card {
-        width: 100%;
-        justify-content: flex-start;
-    }
-}
-
-@media (max-width: 575.98px) {
-    .psychiatric-header h6 {
-        font-size: 0.95rem;
-    }
-
-    .psychiatric-table tbody td,
-    .psychiatric-table thead th {
-        font-size: 0.82rem;
+    .psychiatric-page.psy-modal .modal-footer,
+    .psychiatric-page .psy-modal .modal-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        padding: 0.8rem 0.9rem calc(0.8rem + env(safe-area-inset-bottom));
+        background: #fff;
+        box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.08);
+        flex-wrap: nowrap;
     }
 
-    .psychiatric-action-group {
-        flex-direction: column;
-        align-items: stretch;
+    .psychiatric-page.psy-modal .modal-footer .btn,
+    .psychiatric-page .psy-modal .modal-footer .btn,
+    .psychiatric-page.psy-modal .modal-footer .psy-btn,
+    .psychiatric-page .psy-modal .modal-footer .psy-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 42px;
     }
 
-    .psychiatric-btn-action {
-        width: 100%;
-        justify-content: center;
+    .psychiatric-page .psy-modal-section {
+        padding: 0.9rem;
+        border-radius: 14px;
     }
+
+    .psychiatric-page textarea.form-control {
+        min-height: 100px;
+    }
+    
 }

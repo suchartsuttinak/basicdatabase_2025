@@ -188,3 +188,27 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     };
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modalIds = ['createPsychiatricModal', 'editPsychiatricModal'];
+
+    modalIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        el.addEventListener('shown.bs.modal', function () {
+            document.body.classList.add('modal-open');
+
+            const body = el.querySelector('.modal-body');
+            if (body) {
+                body.scrollTop = 0;
+            }
+
+            window.dispatchEvent(new Event('resize'));
+        });
+
+        el.addEventListener('hidden.bs.modal', function () {
+            document.body.classList.remove('modal-open');
+        });
+    });
+});
