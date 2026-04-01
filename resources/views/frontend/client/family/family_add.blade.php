@@ -1,1062 +1,1019 @@
 @extends('admin_client.admin_client')
 @section('content')
 
+@php
+    $tabConfigs = [
+        'father' => [
+            'tab_id' => 'father-tab',
+            'pane_id' => 'father-pane',
+            'tab_label' => 'บิดา',
+            'personal_title' => 'ข้อมูลส่วนตัวบิดา',
+            'contact_title' => 'ข้อมูลการติดต่อบิดา',
+            'name_label' => 'ชื่อบิดา',
+            'name_placeholder' => 'กรอกคำนำหน้าชื่อ เช่น นายสุชาติ',
+            'model' => $father ?? null,
+        ],
+        'mother' => [
+            'tab_id' => 'mother-tab',
+            'pane_id' => 'mother-pane',
+            'tab_label' => 'มารดา',
+            'personal_title' => 'ข้อมูลส่วนตัวมารดา',
+            'contact_title' => 'ข้อมูลการติดต่อมารดา',
+            'name_label' => 'ชื่อมารดา',
+            'name_placeholder' => 'กรอกคำนำหน้าชื่อ เช่น นางสาวสมหญิง',
+            'model' => $mother ?? null,
+        ],
+        'spouse' => [
+            'tab_id' => 'spouse-tab',
+            'pane_id' => 'spouse-pane',
+            'tab_label' => 'สามี/ภรรยา',
+            'personal_title' => 'ข้อมูลส่วนตัวสามี/ภรรยา',
+            'contact_title' => 'ข้อมูลการติดต่อสามี/ภรรยา',
+            'name_label' => 'ชื่อสามี/ภรรยา',
+            'name_placeholder' => 'กรอกคำนำหน้าชื่อ เช่น นายสมชาย',
+            'model' => $spouse ?? null,
+        ],
+        'relative' => [
+            'tab_id' => 'relative-tab',
+            'pane_id' => 'relative-pane',
+            'tab_label' => 'ญาติ',
+            'personal_title' => 'ข้อมูลส่วนตัวญาติ',
+            'contact_title' => 'ข้อมูลการติดต่อญาติ',
+            'name_label' => 'ชื่อญาติ',
+            'name_placeholder' => 'กรอกคำนำหน้าชื่อ เช่น นางสาวสมหญิง',
+            'model' => $relative ?? null,
+        ],
+    ];
+
+    $savedActiveTab = session('active_tab', 'father-tab');
+    $hasExistingData = isset($father) || isset($mother) || isset($spouse) || isset($relative);
+@endphp
+
 <style>
-    /* ปรับสีพื้นหลังของแท็บ Family */
-.nav-tabs.custom-tabs .nav-link {
-    background-color: #f0f0f0 !important;   /* สีพื้นหลังปกติ */
-    color: #333 !important;                 /* สีตัวอักษร */
-    border: 1px solid #ccc !important;      /* เส้นขอบ */
-}
+    .family-page {
+        --fp-primary: #0f766e;
+        --fp-primary-2: #14b8a6;
+        --fp-primary-soft: rgba(15, 118, 110, 0.10);
+        --fp-primary-soft-2: rgba(15, 118, 110, 0.16);
+        --fp-text: #1f2937;
+        --fp-muted: #6b7280;
+        --fp-border: #dbe7e7;
+        --fp-border-strong: #cfe0e2;
+        --fp-bg: #f6fbfb;
+        --fp-card: #ffffff;
+        --fp-card-soft: #fbfefe;
+        --fp-danger: #dc2626;
+        --fp-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        --fp-shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.08);
+        --fp-radius-xl: 22px;
+        --fp-radius-lg: 18px;
+        --fp-radius-md: 14px;
+        --fp-radius-sm: 12px;
+    }
 
-/* เมื่อแท็บถูกเลือก (active) ให้เป็นสีเขียว */
-.nav-tabs.custom-tabs .nav-link.active {
-    background-color: #28a745 !important;   /* สีเขียว Bootstrap */
-    color: #fff !important;                 /* สีตัวอักษร */
-    border-color: #28a745 !important;
-}
+    .family-page {
+        color: var(--fp-text);
+    }
 
-/* เมื่อ hover */
-.nav-tabs.custom-tabs .nav-link:hover {
-    background-color: #d4edda !important;   /* เขียวอ่อน */
-    color: #000 !important;
-}
+    .family-page .family-shell {
+        background: linear-gradient(180deg, #fcfefe 0%, #f7fbfb 100%);
+        border: 1px solid var(--fp-border);
+        border-radius: var(--fp-radius-xl);
+        padding: 1rem;
+        box-shadow: var(--fp-shadow);
+    }
+
+    .family-page .family-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: .2rem .1rem 0;
+    }
+
+    .family-page .family-title-wrap {
+        min-width: 0;
+    }
+
+    .family-page .family-title {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 800;
+        line-height: 1.2;
+        color: var(--fp-text);
+    }
+
+    .family-page .family-subtitle {
+        margin: .3rem 0 0;
+        color: var(--fp-muted);
+        font-size: .92rem;
+        line-height: 1.4;
+    }
+
+    .family-page .family-status-badge {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .6rem .85rem;
+        border-radius: 999px;
+        border: 1px solid var(--fp-border);
+        background: #fff;
+        font-weight: 700;
+        font-size: .88rem;
+        color: var(--fp-primary);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+        white-space: nowrap;
+    }
+
+    .family-page .family-status-badge i {
+        font-size: .95rem;
+    }
+
+    .family-page .family-tabs-wrap {
+        margin-bottom: 1rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .family-page .family-tabs-wrap::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .family-page .family-tabs-wrap::-webkit-scrollbar-thumb {
+        background: rgba(15, 118, 110, 0.18);
+        border-radius: 999px;
+    }
+
+    .family-page .family-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: .55rem;
+        min-width: max-content;
+        border-bottom: 0;
+        padding-bottom: .1rem;
+    }
+
+    .family-page .family-tabs .nav-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        min-height: 48px;
+        padding: .82rem 1rem;
+        border-radius: var(--fp-radius-md);
+        border: 1px solid var(--fp-border);
+        background: #fff;
+        color: var(--fp-text);
+        font-weight: 700;
+        white-space: nowrap;
+        transition: all .2s ease;
+        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.02);
+    }
+
+    .family-page .family-tabs .nav-link:hover {
+        background: #f9fcfc;
+        border-color: rgba(15, 118, 110, 0.20);
+        color: var(--fp-primary);
+        transform: translateY(-1px);
+    }
+
+    .family-page .family-tabs .nav-link.active {
+        background: linear-gradient(180deg, rgba(15, 118, 110, 0.14), rgba(20, 184, 166, 0.10));
+        color: #0b5f59;
+        border-color: rgba(15, 118, 110, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 8px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .family-page .family-tabs .nav-link.active::after {
+        content: "";
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 6px;
+        height: 3px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--fp-primary), var(--fp-primary-2));
+    }
+
+    .family-page .family-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .family-page .family-card {
+        border: 1px solid var(--fp-border);
+        border-radius: var(--fp-radius-lg);
+        background: var(--fp-card);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .family-page .family-card-header {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        padding: 1rem 1rem .95rem;
+        background: linear-gradient(180deg, #ffffff, #f8fbfb);
+        border-bottom: 1px solid var(--fp-border);
+    }
+
+    .family-page .family-card-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(20, 184, 166, 0.10));
+        color: var(--fp-primary);
+        border: 1px solid rgba(15, 118, 110, 0.10);
+    }
+
+    .family-page .family-card-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.25;
+        color: var(--fp-text);
+    }
+
+    .family-page .family-card-subtitle {
+        margin: .2rem 0 0;
+        color: var(--fp-muted);
+        font-size: .86rem;
+    }
+
+    .family-page .family-card-body {
+        padding: 1rem;
+    }
+
+    .family-page .family-form-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: .95rem .9rem;
+    }
+
+    .family-page .span-12 { grid-column: span 12; }
+    .family-page .span-8  { grid-column: span 8; }
+    .family-page .span-6  { grid-column: span 6; }
+    .family-page .span-4  { grid-column: span 4; }
+
+    .family-page .field-group {
+        min-width: 0;
+    }
+
+    .family-page .form-label {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        margin-bottom: .45rem;
+        font-weight: 700;
+        color: #334155;
+        line-height: 1.3;
+    }
+
+    .family-page .label-required {
+        color: var(--fp-danger);
+        font-weight: 800;
+    }
+
+    .family-page .form-control,
+    .family-page .form-select,
+    .family-page .input-group-text {
+        min-height: 46px;
+        border-radius: var(--fp-radius-sm);
+        border-color: #d7e3e5;
+        font-size: .95rem;
+    }
+
+    .family-page .form-control,
+    .family-page .form-select {
+        background: #fff;
+    }
+
+    .family-page .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .family-page .form-control:focus,
+    .family-page .form-select:focus {
+        border-color: rgba(15, 118, 110, 0.34);
+        box-shadow: 0 0 0 .22rem rgba(15, 118, 110, 0.10);
+    }
+
+    .family-page .input-group-text {
+        background: #f8fbfb;
+        color: #475569;
+        font-weight: 700;
+    }
+
+    .family-page .form-control.is-invalid,
+    .family-page .form-select.is-invalid {
+        border-color: rgba(220, 38, 38, 0.45);
+        background-image: none;
+    }
+
+    .family-page .field-error {
+        margin-top: .38rem;
+        display: block;
+        font-size: .82rem;
+        color: var(--fp-danger);
+        line-height: 1.35;
+    }
+
+    .family-page .family-actionbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: .75rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--fp-border);
+    }
+
+    .family-page .family-note {
+        margin-right: auto;
+        color: var(--fp-muted);
+        font-size: .88rem;
+    }
+
+    .family-page .btn-family-submit {
+        min-height: 48px;
+        padding: .8rem 1.2rem;
+        border-radius: var(--fp-radius-md);
+        border: 0;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--fp-primary), var(--fp-primary-2));
+        box-shadow: 0 10px 22px rgba(15, 118, 110, 0.18);
+    }
+
+    .family-page .btn-family-submit:hover {
+        filter: brightness(.98);
+        transform: translateY(-1px);
+    }
+
+    .family-page .btn-family-submit:disabled {
+        opacity: .8;
+        transform: none;
+    }
+
+    .family-page .tab-pane {
+        animation: familyFade .18s ease;
+    }
+
+    @keyframes familyFade {
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1199.98px) {
+        .family-page .family-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .family-page .family-shell {
+            padding: .9rem;
+            border-radius: 18px;
+        }
+
+        .family-page .family-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .family-page .family-status-badge {
+            white-space: normal;
+        }
+
+        .family-page .family-card-body {
+            padding: .95rem;
+        }
+
+        .family-page .family-tabs .nav-link {
+            padding: .74rem .95rem;
+            min-height: 46px;
+            border-radius: 12px;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .family-page .family-shell {
+            padding: .78rem;
+            border-radius: 16px;
+        }
+
+        .family-page .family-title {
+            font-size: 1.04rem;
+        }
+
+        .family-page .family-subtitle {
+            font-size: .88rem;
+        }
+
+        .family-page .family-card {
+            border-radius: 16px;
+        }
+
+        .family-page .family-card-header {
+            padding: .92rem .92rem .88rem;
+        }
+
+        .family-page .family-card-body {
+            padding: .9rem;
+        }
+
+        .family-page .family-form-grid {
+            grid-template-columns: 1fr;
+            gap: .88rem;
+        }
+
+        .family-page .span-12,
+        .family-page .span-8,
+        .family-page .span-6,
+        .family-page .span-4 {
+            grid-column: span 1;
+        }
+
+        .family-page .family-actionbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .family-page .family-note {
+            margin-right: 0;
+        }
+
+        .family-page .family-actionbar .btn {
+            width: 100%;
+        }
+    }
 </style>
 
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 
- <!-- ปุ่มจัดการ + TAB -->
-       @include('admin_client.include.tabs')
+@include('admin_client.include.tabs')
 
-    <form id="familyForm" action="{{ route('family.store') }}" method="POST" enctype="multipart/form-data">
-    @csrf
-    <input type="hidden" name="client_id" value="{{ $client->id }}">
-    <input type="hidden" name="active_tab" id="active_tab" value="">
+<div class="family-page">
+    <div class="family-shell">
+        <div class="family-topbar">
+            <div class="family-title-wrap">
+                <h2 class="family-title">ข้อมูลครอบครัวและผู้เกี่ยวข้อง</h2>
+                <p class="family-subtitle">
+                    บันทึกข้อมูลบิดา มารดา สามี/ภรรยา และญาติ โดยออกแบบให้รองรับทุกหน้าจอ ใช้งานง่าย และลดความผิดพลาดจากโค้ดซ้ำ
+                </p>
+            </div>
 
+            <div class="family-status-badge">
+                <i class="bi bi-shield-check"></i>
+                <span>{{ $hasExistingData ? 'โหมดแก้ไขข้อมูล' : 'โหมดบันทึกข้อมูลใหม่' }}</span>
+            </div>
+        </div>
 
+        <form id="familyForm" action="{{ route('family.store') }}" method="POST" novalidate>
+            @csrf
+            <input type="hidden" name="client_id" value="{{ $client->id }}">
+            <input type="hidden" name="active_tab" id="active_tab" value="{{ $savedActiveTab }}">
 
-        <!-- Tabs ด้านบน -->
-        <ul class="nav nav-tabs custom-tabs mb-3" id="familyTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="father-tab" data-bs-toggle="tab" data-bs-target="#father" type="button" role="tab">บิดา</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="mother-tab" data-bs-toggle="tab" data-bs-target="#mother" type="button" role="tab">มารดา</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="spouse-tab" data-bs-toggle="tab" data-bs-target="#spouse" type="button" role="tab">สามี/ภรรยา</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="relative-tab" data-bs-toggle="tab" data-bs-target="#relative" type="button" role="tab">ญาติ</button>
-            </li>
-        </ul>
+            <div class="family-tabs-wrap">
+                <ul class="nav family-tabs" id="familyTabs" role="tablist" aria-label="แท็บข้อมูลครอบครัว">
+                    @foreach ($tabConfigs as $prefix => $config)
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link {{ $savedActiveTab === $config['tab_id'] ? 'active' : ($loop->first && !$savedActiveTab ? 'active' : '') }}"
+                                id="{{ $config['tab_id'] }}"
+                                data-bs-toggle="tab"
+                                data-bs-target="#{{ $config['pane_id'] }}"
+                                type="button"
+                                role="tab"
+                                aria-controls="{{ $config['pane_id'] }}"
+                                aria-selected="{{ $savedActiveTab === $config['tab_id'] ? 'true' : 'false' }}"
+                            >
+                                <i class="bi bi-person-vcard"></i>
+                                <span>{{ $config['tab_label'] }}</span>
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
 
-        <!-- เนื้อหาแต่ละ Tab -->
-        <div class="tab-content" id="familyTabsContent">
+            <div class="tab-content" id="familyTabsContent">
+                @foreach ($tabConfigs as $prefix => $config)
+                    @php
+                        $person = $config['model'];
+                        $isActivePane = $savedActiveTab === $config['tab_id'] || ($loop->first && !$savedActiveTab);
+                    @endphp
 
-            
-            <!-- บิดา -->
-            <div class="tab-pane fade show active" id="father" role="tabpanel">
-                <div class="row">
-                    <!-- Card ซ้าย -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card border shadow-sm">
-                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวบิดา</h5></div>
-                            <div class="card-body">
-
-                        <!-- ชื่อบิดา -->
-                 <div class="col-md-12 mb-3">
-                        <label for="father_fname" class="form-label">ชื่อบิดา</label>
-                        <div class="input-group">
-                            <input type="text" 
-                                name="father[fname]" 
-                                id="father_fname"
-                                class="form-control @error('father.fname') is-invalid @enderror"
-                                value="{{ old('father.fname', $father->fname ?? '') }}"
-                                placeholder="กรอกคำนำหน้าชื่อ เช่น นายสุชาติ">
+                    <div
+                        class="tab-pane fade {{ $isActivePane ? 'show active' : '' }}"
+                        id="{{ $config['pane_id'] }}"
+                        role="tabpanel"
+                        aria-labelledby="{{ $config['tab_id'] }}"
+                        tabindex="0"
+                    >
+                        <div class="family-grid">
+                            <section class="family-card">
+                                <div class="family-card-header">
+                                    <div class="family-card-icon">
+                                        <i class="bi bi-person-badge"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="family-card-title">{{ $config['personal_title'] }}</h5>
+                                        <p class="family-card-subtitle">ข้อมูลประจำตัวและข้อมูลพื้นฐาน</p>
+                                    </div>
                                 </div>
-                                @error('father.fname')
-                                    <small class="text-danger error-message">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        <!-- นามสกุล -->
-                        <div class="col-md-12 mb-3">
-                                <label for="lname" class="form-label">นามสกุล</label>
-                                <input type="text" name="father[lname]" id="lname"
-                                    class="form-control @error('lname') is-invalid @enderror"
-                                    value="{{ old('father.lname', $father->lname ?? '') }}">
-                                @error('lname')
-                                    <small class="text-danger error-message" id="error-lname">{{ $message }}</small>
-                                @enderror
-                        </div>
-                                <!-- เลขประจําตัว -->
-                       <div class="col-md-12 mb-3">
-                            <label for="father_idcard" class="form-label">เลขประจำตัวประชาชน</label>
-                            <input type="text" 
-                                name="father[idcard]" 
-                                id="father_idcard"
-                                class="form-control @error('father.idcard') is-invalid @enderror"
-                                value="{{ old('father.idcard', $father->idcard ?? '') }}">
-                            @error('father.idcard')
-                                <div class="invalid-feedback" id="error-father-idcard">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อายุ -->
-                         <div class="col-md-4 mb-3">
-                    <label for="age" class="form-label">อายุ</label>
-                    <div class="input-group">
-                        <input type="number" name="father[age]" id="age"
-                            class="form-control @error('age') is-invalid @enderror"
-                            value="{{ old('father.age', $father->age ?? '') }}" min="0">
-                        <span class="input-group-text">ปี</span>
-                            </div>
-                            @error('age')
-                                <div class="text-danger small mt-1" id="error-age">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อาชีพ -->
-                <div class="col-md-12 mb-3">
-                    <label for="occupation" class="form-label">อาชีพ</label>
-                    <input type="text" name="father[occupation]" id="occupation"
-                        class="form-control @error('occupation') is-invalid @enderror"
-                        value="{{ old('father.occupation', $father->occupation ?? '') }}">
-                    @error('occupation')
-                        <small class="text-danger error-message" id="error-occupation">{{ $message }}</small>
-                    @enderror
-                </div>
-                    <!-- รายได้ -->
-                 <div class="col-md-12 mb-3">
-                    <label for="income" class="form-label">รายได้</label>
-                    <input type="text" name="father[income]" id="income"
-                        class="form-control @error('income') is-invalid @enderror"
-                        value="{{ old('father.income', $father->income ?? '') }}">
-                    @error('income')
-                        <small class="text-danger error-message" id="error-income">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Card ขวา -->
-    <div class="col-lg-6 mb-4">
-        <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อบิดา</h5></div>
+                                <div class="family-card-body">
+                                    <div class="family-form-grid">
+                                        @php
+                                            $nameField = "{$prefix}.fname";
+                                            $lnameField = "{$prefix}.lname";
+                                            $idcardField = "{$prefix}.idcard";
+                                            $ageField = "{$prefix}.age";
+                                            $occupationField = "{$prefix}.occupation";
+                                            $incomeField = "{$prefix}.income";
+                                        @endphp
 
-            <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="address" class="form-label">ที่อยู่เลขที่</label>
-                    <input type="text" name="father[address_no]" id="address_no"
-                        class="form-control" value="{{ old('father.address_no', $father->address_no ?? '') }}">
-                    @error('address_no')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
+                                        <div class="field-group span-12">
+                                            <label for="{{ $prefix }}_fname" class="form-label">
+                                                {{ $config['name_label'] }}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[fname]"
+                                                id="{{ $prefix }}_fname"
+                                                class="form-control {{ $errors->has($nameField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($nameField, $person->fname ?? '') }}"
+                                                placeholder="{{ $config['name_placeholder'] }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($nameField))
+                                                <span class="field-error">{{ $errors->first($nameField) }}</span>
+                                            @endif
+                                        </div>
 
-                <div class="col-md-6 mb-3">
-                    <label for="moo" class="form-label">หมู่ที่</label>
-                    <input type="text" name="father[moo]" id="moo"
-                        class="form-control" value="{{ old('father.moo', $father->moo ?? '') }}">
-                    @error('moo')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
+                                        <div class="field-group span-12">
+                                            <label for="{{ $prefix }}_lname" class="form-label">นามสกุล</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[lname]"
+                                                id="{{ $prefix }}_lname"
+                                                class="form-control {{ $errors->has($lnameField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($lnameField, $person->lname ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($lnameField))
+                                                <span class="field-error">{{ $errors->first($lnameField) }}</span>
+                                            @endif
+                                        </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="soi" class="form-label">ตรอก/ซอย</label>
-                    <input type="text" name="father[soi]" id="soi"
-                        class="form-control" value="{{ old('father.soi', $father->soi ?? '') }}">
-                    @error('soi')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
+                                        <div class="field-group span-12">
+                                            <label for="{{ $prefix }}_idcard" class="form-label">เลขประจำตัวประชาชน</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[idcard]"
+                                                id="{{ $prefix }}_idcard"
+                                                class="form-control {{ $errors->has($idcardField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($idcardField, $person->idcard ?? '') }}"
+                                                inputmode="numeric"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($idcardField))
+                                                <span class="field-error">{{ $errors->first($idcardField) }}</span>
+                                            @endif
+                                        </div>
 
-                <div class="col-md-6 mb-3">
-                    <label for="road" class="form-label">ถนน</label>
-                    <input type="text" name="father[road]" id="road"
-                        class="form-control" value="{{ old('father.road', $father->road ?? '') }}">
-                    @error('road')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
+                                        <div class="field-group span-4">
+                                            <label for="{{ $prefix }}_age" class="form-label">อายุ</label>
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="{{ $prefix }}[age]"
+                                                    id="{{ $prefix }}_age"
+                                                    class="form-control {{ $errors->has($ageField) ? 'is-invalid' : '' }}"
+                                                    value="{{ old($ageField, $person->age ?? '') }}"
+                                                    min="0"
+                                                >
+                                                <span class="input-group-text">ปี</span>
+                                            </div>
+                                            @if ($errors->has($ageField))
+                                                <span class="field-error">{{ $errors->first($ageField) }}</span>
+                                            @endif
+                                        </div>
 
-            <div class="mb-3">
-                <label for="village" class="form-label">หมู่บ้าน</label>
-                <input type="text" name="father[village]" id="village"
-                    class="form-control" value="{{ old('father.village', $father->village ?? '') }}">
-                @error('village')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
+                                        <div class="field-group span-8">
+                                            <label for="{{ $prefix }}_occupation" class="form-label">อาชีพ</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[occupation]"
+                                                id="{{ $prefix }}_occupation"
+                                                class="form-control {{ $errors->has($occupationField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($occupationField, $person->occupation ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($occupationField))
+                                                <span class="field-error">{{ $errors->first($occupationField) }}</span>
+                                            @endif
+                                        </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="father_province" class="form-label">จังหวัด</label>
-                            <select name="father[province_id]" id="father_province" class="form-select"
-                                    data-selected="{{ old('father.province_id', $father->province_id ?? '') }}">
-                                <option value="">--เลือกจังหวัด--</option>
-                                @foreach($provinces as $province)
-                                    <option value="{{ $province->id }}"
-                                        {{ old('father.province_id', $father->province_id ?? '') == $province->id ? 'selected' : '' }}>
-                                        {{ $province->prov_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                                        <div class="field-group span-12">
+                                            <label for="{{ $prefix }}_income" class="form-label">รายได้</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[income]"
+                                                id="{{ $prefix }}_income"
+                                                class="form-control {{ $errors->has($incomeField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($incomeField, $person->income ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($incomeField))
+                                                <span class="field-error">{{ $errors->first($incomeField) }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="father_district" class="form-label">เขต/อำเภอ</label>
-                            <select name="father[district_id]" id="father_district" class="form-select"
-                                    data-selected="{{ old('father.district_id', $father->district_id ?? '') }}">
-                                <option value="">--เลือกอำเภอ--</option>
-                                @foreach($districts as $district)
-                                    <option value="{{ $district->id }}"
-                                        {{ old('father.district_id', $father->district_id ?? '') == $district->id ? 'selected' : '' }}>
-                                        {{ $district->dist_name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <section class="family-card">
+                                <div class="family-card-header">
+                                    <div class="family-card-icon">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="family-card-title">{{ $config['contact_title'] }}</h5>
+                                        <p class="family-card-subtitle">ที่อยู่และช่องทางการติดต่อ</p>
+                                    </div>
+                                </div>
+
+                                <div class="family-card-body">
+                                    <div class="family-form-grid">
+                                        @php
+                                            $addressNoField = "{$prefix}.address_no";
+                                            $mooField = "{$prefix}.moo";
+                                            $soiField = "{$prefix}.soi";
+                                            $roadField = "{$prefix}.road";
+                                            $villageField = "{$prefix}.village";
+                                            $provinceField = "{$prefix}.province_id";
+                                            $districtField = "{$prefix}.district_id";
+                                            $subDistrictField = "{$prefix}.sub_district_id";
+                                            $zipcodeField = "{$prefix}.zipcode";
+                                            $phoneField = "{$prefix}.phone";
+                                        @endphp
+
+                                        <div class="field-group span-6">
+                                            <label for="{{ $prefix }}_address_no" class="form-label">ที่อยู่เลขที่</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[address_no]"
+                                                id="{{ $prefix }}_address_no"
+                                                class="form-control {{ $errors->has($addressNoField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($addressNoField, $person->address_no ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($addressNoField))
+                                                <span class="field-error">{{ $errors->first($addressNoField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-6">
+                                            <label for="{{ $prefix }}_moo" class="form-label">หมู่ที่</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[moo]"
+                                                id="{{ $prefix }}_moo"
+                                                class="form-control {{ $errors->has($mooField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($mooField, $person->moo ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($mooField))
+                                                <span class="field-error">{{ $errors->first($mooField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-6">
+                                            <label for="{{ $prefix }}_soi" class="form-label">ตรอก/ซอย</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[soi]"
+                                                id="{{ $prefix }}_soi"
+                                                class="form-control {{ $errors->has($soiField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($soiField, $person->soi ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($soiField))
+                                                <span class="field-error">{{ $errors->first($soiField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-6">
+                                            <label for="{{ $prefix }}_road" class="form-label">ถนน</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[road]"
+                                                id="{{ $prefix }}_road"
+                                                class="form-control {{ $errors->has($roadField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($roadField, $person->road ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($roadField))
+                                                <span class="field-error">{{ $errors->first($roadField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-12">
+                                            <label for="{{ $prefix }}_village" class="form-label">หมู่บ้าน</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[village]"
+                                                id="{{ $prefix }}_village"
+                                                class="form-control {{ $errors->has($villageField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($villageField, $person->village ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($villageField))
+                                                <span class="field-error">{{ $errors->first($villageField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-6">
+                                            <label for="{{ $prefix }}_province" class="form-label">จังหวัด</label>
+                                            <select
+                                                name="{{ $prefix }}[province_id]"
+                                                id="{{ $prefix }}_province"
+                                                class="form-select {{ $errors->has($provinceField) ? 'is-invalid' : '' }}"
+                                                data-selected="{{ old($provinceField, $person->province_id ?? '') }}"
+                                            >
+                                                <option value="">--เลือกจังหวัด--</option>
+                                                @foreach ($provinces as $province)
+                                                    <option
+                                                        value="{{ $province->id }}"
+                                                        {{ old($provinceField, $person->province_id ?? '') == $province->id ? 'selected' : '' }}
+                                                    >
+                                                        {{ $province->prov_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has($provinceField))
+                                                <span class="field-error">{{ $errors->first($provinceField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-6">
+                                            <label for="{{ $prefix }}_district" class="form-label">เขต/อำเภอ</label>
+                                            <select
+                                                name="{{ $prefix }}[district_id]"
+                                                id="{{ $prefix }}_district"
+                                                class="form-select {{ $errors->has($districtField) ? 'is-invalid' : '' }}"
+                                                data-selected="{{ old($districtField, $person->district_id ?? '') }}"
+                                            >
+                                                <option value="">--เลือกอำเภอ--</option>
+                                                @foreach ($districts as $district)
+                                                    <option
+                                                        value="{{ $district->id }}"
+                                                        {{ old($districtField, $person->district_id ?? '') == $district->id ? 'selected' : '' }}
+                                                    >
+                                                        {{ $district->dist_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has($districtField))
+                                                <span class="field-error">{{ $errors->first($districtField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-12">
+                                            <label for="{{ $prefix }}_subdistrict" class="form-label">แขวง/ตำบล</label>
+                                            <select
+                                                name="{{ $prefix }}[sub_district_id]"
+                                                id="{{ $prefix }}_subdistrict"
+                                                class="form-select {{ $errors->has($subDistrictField) ? 'is-invalid' : '' }}"
+                                                data-selected="{{ old($subDistrictField, $person->sub_district_id ?? '') }}"
+                                            >
+                                                <option value="">--เลือกตำบล--</option>
+                                                @foreach ($sub_districts as $subdistrict)
+                                                    <option
+                                                        value="{{ $subdistrict->id }}"
+                                                        {{ old($subDistrictField, $person->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}
+                                                    >
+                                                        {{ $subdistrict->subd_name ?? $subdistrict->subdist_name ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has($subDistrictField))
+                                                <span class="field-error">{{ $errors->first($subDistrictField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-4">
+                                            <label for="{{ $prefix }}_zipcode" class="form-label">รหัสไปรษณีย์</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[zipcode]"
+                                                id="{{ $prefix }}_zipcode"
+                                                class="form-control {{ $errors->has($zipcodeField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($zipcodeField, $person->zipcode ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($zipcodeField))
+                                                <span class="field-error">{{ $errors->first($zipcodeField) }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="field-group span-8">
+                                            <label for="{{ $prefix }}_phone" class="form-label">โทรศัพท์</label>
+                                            <input
+                                                type="text"
+                                                name="{{ $prefix }}[phone]"
+                                                id="{{ $prefix }}_phone"
+                                                class="form-control {{ $errors->has($phoneField) ? 'is-invalid' : '' }}"
+                                                value="{{ old($phoneField, $person->phone ?? '') }}"
+                                                autocomplete="off"
+                                            >
+                                            @if ($errors->has($phoneField))
+                                                <span class="field-error">{{ $errors->first($phoneField) }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
-
-                     <div class="mb-3">
-                            <label for="subdistrict" class="form-label">แขวง/ตำบล</label>
-                            <select name="father[sub_district_id]" id="father_subdistrict" class="form-select"
-                                    data-selected="{{ old('father.sub_district_id', $father->sub_district_id ?? '') }}">
-                                <option value="">-- เลือกตำบล --</option>
-                                @foreach($sub_districts as $subdistrict)
-                                    <option value="{{ $subdistrict->id }}"
-                                        {{ old('father.sub_district_id', $father->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                                        {{ $subdistrict->subd_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('father.sub_district_id')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="father_zipcode" class="form-label">รหัสไปรษณีย์</label>
-                            <input type="text" name="father[zipcode]" id="father_zipcode"
-                                class="form-control" value="{{ old('father.zipcode', $father->zipcode ?? '') }}">
-                            @error('zipcode')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-8 mb-3">
-                            <label for="phone" class="form-label">โทรศัพท์</label>
-                            <input type="text" name="father[phone]" id="phone"
-                                class="form-control" value="{{ old('father.phone', $father->phone ?? '') }}">
-                            @error('phone')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
-        </div>
+
+            <div class="family-actionbar">
+                <div class="family-note">
+                    ระบบจะบันทึกแท็บล่าสุดไว้ เพื่อให้กลับมาที่ส่วนเดิมหลังตรวจสอบหรือบันทึกข้อมูล
+                </div>
+
+                <button type="submit" id="familySubmitBtn" class="btn btn-primary btn-family-submit">
+                    <i class="bi bi-check-circle me-1"></i>
+                    {{ $hasExistingData ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูล' }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
-
-<!-- มารดา -->
-
-            <div class="tab-pane fade" id="mother" role="tabpanel">
-                <div class="row">
-                    <!-- Card ซ้าย -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card border shadow-sm">
-                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวมารดา</h5></div>
-                            <div class="card-body">
-                               <!-- ชื่อบิดา -->
-                     <div class="col-md-12 mb-3">
-                            <label for="fname" class="form-label">ชื่อมารดา</label>
-                            <div class="input-group">
-                                <input type="text" 
-                                    name="mother[fname]" 
-                                    id="fname"
-                                    class="form-control @error('mother.fname') is-invalid @enderror"
-                                    value="{{ old('mother.fname', $mother->fname ?? '') }}"
-                                    placeholder="กรอกคำนำหน้าชื่อ เช่น นางสาวสมหญิง">
-                            </div>
-                            @error('mother.fname')
-                                <small class="text-danger error-message" id="error-fname">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <!-- นามสกุล -->
-                        <div class="col-md-12 mb-3">
-                                <label for="lname" class="form-label">นามสกุล</label>
-                                <input type="text" name="mother[lname]" id="lname"
-                                    class="form-control @error('lname') is-invalid @enderror"
-                                    value="{{ old('mother.lname', $mother->lname ?? '') }}">
-                                @error('lname')
-                                    <small class="text-danger error-message" id="error-lname">{{ $message }}</small>
-                                @enderror
-                        </div>
-                                <!-- เลขประจําตัว -->
-                        <div class="col-md-12 mb-3">
-                            <label for="idcard" class="form-label">เลขประจำตัวประชาชน</label>
-                            <input type="text" name="mother[idcard]" id="idcard"
-                                class="form-control @error('idcard') is-invalid @enderror"
-                                value="{{ old('mother.idcard', $mother->idcard ?? '') }}">
-                            @error('idcard')
-                                <div class="invalid-feedback" id="error-idcard">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อายุ -->
-                         <div class="col-md-4 mb-3">
-                    <label for="age" class="form-label">อายุ</label>
-                    <div class="input-group">
-                        <input type="number" name="mother[age]" id="age"
-                            class="form-control @error('age') is-invalid @enderror"
-                            value="{{ old('mother.age', $mother->age ?? '') }}" min="0">
-                        <span class="input-group-text">ปี</span>
-                            </div>
-                            @error('age')
-                                <div class="text-danger small mt-1" id="error-age">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อาชีพ -->
-                <div class="col-md-12 mb-3">
-                    <label for="occupation" class="form-label">อาชีพ</label>
-                    <input type="text" name="mother[occupation]" id="occupation"
-                        class="form-control @error('occupation') is-invalid @enderror"
-                        value="{{ old('mother.occupation', $mother->occupation ?? '') }}">
-                    @error('occupation')
-                        <small class="text-danger error-message" id="error-occupation">{{ $message }}</small>
-                    @enderror
-                </div>
-                    <!-- รายได้ -->
-                 <div class="col-md-12 mb-3">
-                    <label for="income" class="form-label">รายได้</label>
-                    <input type="text" name="mother[income]" id="income"
-                        class="form-control @error('income') is-invalid @enderror"
-                        value="{{ old('mother.income', $mother->income ?? '') }}">
-                    @error('income')
-                        <small class="text-danger error-message" id="error-income">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card ขวา -->
-    <div class="col-lg-6 mb-4">
-        <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อมารดา</h5></div>
-
-            <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="address" class="form-label">ที่อยู่เลขที่</label>
-                    <input type="text" name="mother[address_no]" id="address_no"
-                        class="form-control" value="{{ old('mother.address_no', $mother->address_no ?? '') }}">
-                    @error('address_no')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="moo" class="form-label">หมู่ที่</label>
-                    <input type="text" name="mother[moo]" id="moo"
-                        class="form-control" value="{{ old('mother.moo', $mother->moo ?? '') }}">
-                    @error('moo')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="soi" class="form-label">ตรอก/ซอย</label>
-                    <input type="text" name="mother[soi]" id="soi"
-                        class="form-control" value="{{ old('mother.soi', $mother->soi ?? '') }}">
-                    @error('soi')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="road" class="form-label">ถนน</label>
-                    <input type="text" name="mother[road]" id="road"
-                        class="form-control" value="{{ old('mother.road', $mother->road ?? '') }}">
-                    @error('road')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="village" class="form-label">หมู่บ้าน</label>
-                <input type="text" name="mother[village]" id="village"
-                    class="form-control" value="{{ old('mother.village', $mother->village ?? '') }}">
-                @error('village')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                            <label for="mother_province" class="form-label">จังหวัด</label>
-                            <select name="mother[province_id]" id="mother_province" class="form-select"
-                                    data-selected="{{ old('mother.province_id', $mother->province_id ?? '') }}">
-                                <option value="">--เลือกจังหวัด--</option>
-                                @foreach($provinces as $province)
-                                    <option value="{{ $province->id }}"
-                                        {{ old('mother.province_id', $mother->province_id ?? '') == $province->id ? 'selected' : '' }}>
-                                        {{ $province->prov_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="mother_district" class="form-label">เขต/อำเภอ</label>
-                        <select name="mother[district_id]" id="mother_district" class="form-select"
-                                data-selected="{{ old('mother.district_id', $mother->district_id ?? '') }}">
-                            <option value="">--เลือกอำเภอ--</option>
-                            @foreach($districts as $district)
-                                <option value="{{ $district->id }}"
-                                    {{ old('mother.district_id', $mother->district_id ?? '') == $district->id ? 'selected' : '' }}>
-                                    {{ $district->dist_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="subdistrict" class="form-label">แขวง/ตำบล</label>
-               <select name="mother[sub_district_id]" id="mother_subdistrict" class="form-select"
-                        data-selected="{{ old('mother.sub_district_id', $mother->sub_district_id ?? '') }}">
-                    <option value="">-- เลือกตำบล --</option>
-                    @foreach($sub_districts as $subdistrict)
-                        <option value="{{ $subdistrict->id }}"
-                            {{ old('mother.sub_district_id', $mother->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                            {{ $subdistrict->subd_name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('mother.sub_district_id')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-                            <input type="text" name="mother[zipcode]" id="mother_zipcode"
-                                class="form-control" value="{{ old('mother.zipcode', $mother->zipcode ?? '') }}">
-                            @error('zipcode')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-8 mb-3">
-                            <label for="phone" class="form-label">โทรศัพท์</label>
-                            <input type="text" name="mother[phone]" id="phone"
-                                class="form-control" value="{{ old('mother.phone', $mother->phone ?? '') }}">
-                            @error('phone')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-            <!-- สามี/ภรรยา -->
-            <div class="tab-pane fade" id="spouse" role="tabpanel">
-               <div class="row">
-                    <!-- Card ซ้าย -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card border shadow-sm">
-                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวสามี/ภรรยา</h5></div>
-                            <div class="card-body">
-                               <!-- ชื่อบิดา -->
-                        <div class="col-md-12 mb-3">
-                            <label for="fname" class="form-label">ชื่อสามี/ภรรยา</label>
-                            <input type="text" name="spouse[fname]" id="fname"
-                                class="form-control @error('fname') is-invalid @enderror"
-                                value="{{ old('spouse.fname', $spouse->fname ?? '') }}"
-                                 placeholder="กรอกคำนำหน้าชื่อ เช่น นายสมชาย">
-                            @error('fname')
-                                <small class="text-danger error-message" id="error-fname">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <!-- นามสกุล -->
-                        <div class="col-md-12 mb-3">
-                                <label for="lname" class="form-label">นามสกุล</label>
-                                <input type="text" name="spouse[lname]" id="lname"
-                                    class="form-control @error('lname') is-invalid @enderror"
-                                    value="{{ old('spouse.lname', $spouse->lname ?? '') }}">
-                                @error('lname')
-                                    <small class="text-danger error-message" id="error-lname">{{ $message }}</small>
-                                @enderror
-                        </div>
-                                <!-- เลขประจําตัว -->
-                        <div class="col-md-12 mb-3">
-                            <label for="idcard" class="form-label">เลขประจำตัวประชาชน</label>
-                            <input type="text" name="spouse[idcard]" id="idcard"
-                                class="form-control @error('idcard') is-invalid @enderror"
-                                value="{{ old('spouse.idcard', $spouse->idcard ?? '') }}">
-                            @error('idcard')
-                                <div class="invalid-feedback" id="error-idcard">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อายุ -->
-                         <div class="col-md-4 mb-3">
-                    <label for="age" class="form-label">อายุ</label>
-                    <div class="input-group">
-                        <input type="number" name="spouse[age]" id="age"
-                            class="form-control @error('age') is-invalid @enderror"
-                            value="{{ old('spouse.age', $spouse->age ?? '') }}" min="0">
-                        <span class="input-group-text">ปี</span>
-                            </div>
-                            @error('age')
-                                <div class="text-danger small mt-1" id="error-age">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อาชีพ -->
-                <div class="col-md-12 mb-3">
-                    <label for="occupation" class="form-label">อาชีพ</label>
-                    <input type="text" name="spouse[occupation]" id="occupation"
-                        class="form-control @error('occupation') is-invalid @enderror"
-                        value="{{ old('spouse.occupation', $spouse->occupation ?? '') }}">
-                    @error('occupation')
-                        <small class="text-danger error-message" id="error-occupation">{{ $message }}</small>
-                    @enderror
-                </div>
-                    <!-- รายได้ -->
-                 <div class="col-md-12 mb-3">
-                    <label for="income" class="form-label">รายได้</label>
-                    <input type="text" name="spouse[income]" id="income"
-                        class="form-control @error('income') is-invalid @enderror"
-                        value="{{ old('spouse.income', $spouse->income ?? '') }}">
-                    @error('income')
-                        <small class="text-danger error-message" id="error-income">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card ขวา -->
-    <div class="col-lg-6 mb-4">
-        <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อสามี/ภรรยา</h5></div>
-
-            <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="address" class="form-label">ที่อยู่เลขที่</label>
-                    <input type="text" name="spouse[address_no]" id="address_no"
-                        class="form-control" value="{{ old('spouse.address_no', $spouse->address_no ?? '') }}">
-                    @error('address_no')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="moo" class="form-label">หมู่ที่</label>
-                    <input type="text" name="spouse[moo]" id="moo"
-                        class="form-control" value="{{ old('spouse.moo', $spouse->moo ?? '') }}">
-                    @error('moo')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="soi" class="form-label">ตรอก/ซอย</label>
-                    <input type="text" name="spouse[soi]" id="soi"
-                        class="form-control" value="{{ old('spouse.soi', $spouse->soi ?? '') }}">
-                    @error('soi')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="road" class="form-label">ถนน</label>
-                    <input type="text" name="spouse[road]" id="road"
-                        class="form-control" value="{{ old('spouse.road', $spouse->road ?? '') }}">
-                    @error('road')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="village" class="form-label">หมู่บ้าน</label>
-                <input type="text" name="spouse[village]" id="village"
-                    class="form-control" value="{{ old('spouse.village', $spouse->village ?? '') }}">
-                @error('village')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="province" class="form-label">จังหวัด</label>
-                    <select name="spouse[province_id]" id="spouse_province" class="form-select"
-                            data-selected="{{ old('spouse.province_id', $spouse->province_id ?? '') }}">
-                        <option value="">--เลือกจังหวัด--</option>
-                        @foreach($provinces as $province)
-                            <option value="{{ $province->id }}"
-                                {{ old('spouse.province_id', $spouse->province_id ?? '') == $province->id ? 'selected' : '' }}>
-                                {{ $province->prov_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="district" class="form-label">เขต/อำเภอ</label>
-                    <select name="spouse[district_id]" id="spouse_district" class="form-select"
-                            data-selected="{{ old('spouse.district_id', $spouse->district_id ?? '') }}">
-                        <option value="">--เลือกอำเภอ--</option>
-                        @foreach($districts as $district)
-                            <option value="{{ $district->id }}"
-                                {{ old('spouse.district_id', $spouse->district_id ?? '') == $district->id ? 'selected' : '' }}>
-                                {{ $district->dist_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="subdistrict" class="form-label">แขวง/ตำบล</label>
-                <select name="spouse[sub_district_id]" id="spouse_subdistrict" class="form-select"
-                        data-selected="{{ old('spouse.sub_district_id', $spouse->sub_district_id ?? '') }}">
-                    <option value="">-- เลือกตำบล --</option>
-                    @foreach($sub_districts as $subdistrict)
-                        <option value="{{ $subdistrict->id }}"
-                            {{ old('spouse.sub_district_id', $recipient->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                            {{ $subdistrict->subdist_name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('sub_district_id')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-                            <input type="text" name="spouse[zipcode]" id="spouse_zipcode"
-                                class="form-control" value="{{ old('spouse.zipcode', $spouse->zipcode ?? '') }}">
-                            @error('zipcode')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-8 mb-3">
-                            <label for="phone" class="form-label">โทรศัพท์</label>
-                            <input type="text" name="spouse[phone]" id="phone"
-                                class="form-control" value="{{ old('spouse.phone', $spouse->phone ?? '') }}">
-                            @error('phone')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-            <!-- ญาติ -->
-            <div class="tab-pane fade" id="relative" role="tabpanel">
-               <div class="row">
-                    <!-- Card ซ้าย -->
-                    <div class="col-lg-6 mb-4">
-                        <div class="card border shadow-sm">
-                            <div class="card-header"><h5 class="mb-0">ข้อมูลส่วนตัวญาติ</h5></div>
-                            <div class="card-body">
-                               <!-- ชื่อบิดา -->
-                        <div class="col-md-12 mb-3">
-                            <label for="fname" class="form-label">ชื่อญาติ</label>
-                            <input type="text" name="relative[fname]" id="fname"
-                                class="form-control @error('fname') is-invalid @enderror"
-                                value="{{ old('relative.fname', $relative->fname ?? '') }}"
-                                placeholder="กรอกคำนำหน้าชื่อ เช่น นางสาวสมหญิง">
-                            @error('fname')
-                                <small class="text-danger error-message" id="error-fname">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <!-- นามสกุล -->
-                        <div class="col-md-12 mb-3">
-                                <label for="lname" class="form-label">นามสกุล</label>
-                                <input type="text" name="relative[lname]" id="lname"
-                                    class="form-control @error('lname') is-invalid @enderror"
-                                    value="{{ old('relative.lname', $relative->lname ?? '') }}">
-                                @error('lname')
-                                    <small class="text-danger error-message" id="error-lname">{{ $message }}</small>
-                                @enderror
-                        </div>
-                                <!-- เลขประจําตัว -->
-                        <div class="col-md-12 mb-3">
-                            <label for="idcard" class="form-label">เลขประจำตัวประชาชน</label>
-                            <input type="text" name="relative[idcard]" id="idcard"
-                                class="form-control @error('idcard') is-invalid @enderror"
-                                value="{{ old('relative.idcard', $relative->idcard ?? '') }}">
-                            @error('idcard')
-                                <div class="invalid-feedback" id="error-idcard">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อายุ -->
-                         <div class="col-md-4 mb-3">
-                    <label for="age" class="form-label">อายุ</label>
-                    <div class="input-group">
-                        <input type="number" name="relative[age]" id="age"
-                            class="form-control @error('age') is-invalid @enderror"
-                            value="{{ old('relative.age', $relative->age ?? '') }}" min="0">
-                        <span class="input-group-text">ปี</span>
-                            </div>
-                            @error('age')
-                                <div class="text-danger small mt-1" id="error-age">{{ $message }}</div>
-                            @enderror
-                        </div>
-                             <!-- อาชีพ -->
-                <div class="col-md-12 mb-3">
-                    <label for="occupation" class="form-label">อาชีพ</label>
-                    <input type="text" name="relative[occupation]" id="occupation"
-                        class="form-control @error('occupation') is-invalid @enderror"
-                        value="{{ old('relative.occupation', $relative->occupation ?? '') }}">
-                    @error('occupation')
-                        <small class="text-danger error-message" id="error-occupation">{{ $message }}</small>
-                    @enderror
-                </div>
-                    <!-- รายได้ -->
-                 <div class="col-md-12 mb-3">
-                    <label for="income" class="form-label">รายได้</label>
-                    <input type="text" name="relative[income]" id="income"
-                        class="form-control @error('income') is-invalid @enderror"
-                        value="{{ old('relative.income', $relative->income ?? '') }}">
-                    @error('income')
-                        <small class="text-danger error-message" id="error-income">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card ขวา -->
-    <div class="col-lg-6 mb-4">
-        <div class="card border shadow-sm">
-            <div class="card-header"><h5 class="mb-0">ข้อมูลการติดต่อญาติ</h5></div>
-
-            <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="address" class="form-label">ที่อยู่เลขที่</label>
-                    <input type="text" name="relative[address_no]" id="address_no"
-                        class="form-control" value="{{ old('relative.address_no', $relative->address_no ?? '') }}">
-                    @error('address_no')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="moo" class="form-label">หมู่ที่</label>
-                    <input type="text" name="relative[moo]" id="moo"
-                        class="form-control" value="{{ old('relative.moo', $relative->moo ?? '') }}">
-                    @error('moo')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="soi" class="form-label">ตรอก/ซอย</label>
-                    <input type="text" name="relative[soi]" id="soi"
-                        class="form-control" value="{{ old('relative.soi', $relative->soi ?? '') }}">
-                    @error('soi')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="road" class="form-label">ถนน</label>
-                    <input type="text" name="relative[road]" id="road"
-                        class="form-control" value="{{ old('relative.road', $relative->road ?? '') }}">
-                    @error('road')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="village" class="form-label">หมู่บ้าน</label>
-                <input type="text" name="relative[village]" id="village"
-                    class="form-control" value="{{ old('relative.village', $relative->village ?? '') }}">
-                @error('village')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="province" class="form-label">จังหวัด</label>
-                    <select name="relative[province_id]" id="relative_province" class="form-select"
-                            data-selected="{{ old('relative.province_id', $relative->province_id ?? '') }}">
-                        <option value="">--เลือกจังหวัด--</option>
-                        @foreach($provinces as $province)
-                            <option value="{{ $province->id }}"
-                                {{ old('relative.province_id', $relative->province_id ?? '') == $province->id ? 'selected' : '' }}>
-                                {{ $province->prov_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            <div class="col-md-6 mb-3">
-                    <label for="district" class="form-label">เขต/อำเภอ</label>
-                    <select name="relative[district_id]" id="relative_district" class="form-select"
-                            data-selected="{{ old('relative.district_id', $relative->district_id ?? '') }}">
-                        <option value="">--เลือกอำเภอ--</option>
-                        @foreach($districts as $district)
-                            <option value="{{ $district->id }}"
-                                {{ old('relative.district_id', $relative->district_id ?? '') == $district->id ? 'selected' : '' }}>
-                                {{ $district->dist_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="subdistrict" class="form-label">แขวง/ตำบล</label>
-                <select name="relative[sub_district_id]" id="relative_subdistrict" class="form-select"
-                    data-selected="{{ old('relative.sub_district_id', $relative->sub_district_id ?? '') }}">
-                    <option value="">-- เลือกตำบล --</option>
-                    @foreach($sub_districts as $subdistrict)
-                        <option value="{{ $subdistrict->id }}"
-                            {{ old('relative.sub_district_id', $relative->sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                            {{ $subdistrict->subdist_name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('sub_district_id')
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="zipcode" class="form-label">รหัสไปรษณีย์</label>
-                            <input type="text" name="relative[zipcode]" id="relative_zipcode"
-                                class="form-control" value="{{ old('relative.zipcode', $relative->zipcode ?? '') }}">
-                            @error('zipcode')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-8 mb-3">
-                            <label for="phone" class="form-label">โทรศัพท์</label>
-                            <input type="text" name="relative[phone]" id="phone"
-                                class="form-control" value="{{ old('relative.phone', $relative->phone ?? '') }}">
-                            @error('phone')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-     
-       <!-- ปุ่มบันทึก/แก้ไข -->
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">
-                @if(isset($father) || isset($mother) || isset($spouse) || isset($relative))
-                    แก้ไขข้อมูล
-                @else
-                    บันทึกข้อมูล
-                @endif
-            </button>
-        </div>
-            </form>
-        </div>
-    
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
 
 <script>
-$(function () {
+document.addEventListener('DOMContentLoaded', function () {
+    const familyForm = document.getElementById('familyForm');
+    const familySubmitBtn = document.getElementById('familySubmitBtn');
+    const activeTabInput = document.getElementById('active_tab');
 
-    function bindLocationDropdowns(prefix) {
-        const province    = $('#' + prefix + '_province');
-        const district    = $('#' + prefix + '_district');
-        const subdistrict = $('#' + prefix + '_subdistrict');
-        const zipcode     = $('#' + prefix + '_zipcode');
-
-        // Province change
-        province.on('change', function (e) {
-            e.preventDefault();
-            const province_id = $(this).val();
-            district.html('<option value="">--เลือกอำเภอ--</option>');
-            subdistrict.html('<option value="">--เลือกตำบล--</option>');
-            zipcode.val('');
-
-            if (province_id) {
-                $.get('/get-districts/' + province_id).done(function (data) {
-                    $.each(data, function (i, value) {
-                        district.append('<option value="' + value.id + '">' + value.dist_name + '</option>');
-                    });
-                });
+    const fetchJSON = async (url) => {
+        const response = await fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         });
 
-        // District change
-        district.on('change', function (e) {
-            e.preventDefault();
-            const district_id = $(this).val();
-            subdistrict.html('<option value="">--เลือกตำบล--</option>');
-            zipcode.val('');
+        if (!response.ok) {
+            throw new Error(`Request failed: ${response.status}`);
+        }
 
-            if (district_id) {
-                $.get('/get-subdistricts/' + district_id).done(function (data) {
-                    $.each(data, function (i, value) {
-                        subdistrict.append('<option value="' + value.id + '">' + value.subd_name + '</option>');
-                    });
-                });
+        return await response.json();
+    };
+
+    const setOptions = (selectEl, items, placeholder, textKey, selectedValue = '') => {
+        if (!selectEl) return;
+
+        let html = `<option value="">${placeholder}</option>`;
+        items.forEach(item => {
+            const selected = String(item.id) === String(selectedValue) ? 'selected' : '';
+            const text = item[textKey] ?? '';
+            html += `<option value="${item.id}" ${selected}>${text}</option>`;
+        });
+        selectEl.innerHTML = html;
+    };
+
+    const bindLocationGroup = (prefix) => {
+        const province = document.getElementById(`${prefix}_province`);
+        const district = document.getElementById(`${prefix}_district`);
+        const subdistrict = document.getElementById(`${prefix}_subdistrict`);
+        const zipcode = document.getElementById(`${prefix}_zipcode`);
+
+        if (!province || !district || !subdistrict || !zipcode) return;
+
+        const selectedProvince = province.dataset.selected || '';
+        const selectedDistrict = district.dataset.selected || '';
+        const selectedSubdistrict = subdistrict.dataset.selected || '';
+
+        province.addEventListener('change', async function () {
+            const provinceId = this.value;
+
+            setOptions(district, [], '--เลือกอำเภอ--', 'dist_name');
+            setOptions(subdistrict, [], '--เลือกตำบล--', 'subd_name');
+            zipcode.value = '';
+
+            if (!provinceId) return;
+
+            try {
+                const districts = await fetchJSON(`/get-districts/${provinceId}`);
+                setOptions(district, districts, '--เลือกอำเภอ--', 'dist_name');
+            } catch (error) {
+                console.error('Load districts failed:', error);
             }
         });
 
-        // Subdistrict change
-        subdistrict.on('change', function (e) {
-            e.preventDefault();
-            const subdistrict_id = $(this).val();
-            zipcode.val('');
-            if (subdistrict_id) {
-                $.get('/get-zipcode/' + subdistrict_id).done(function (data) {
-                    zipcode.val(data.zipcode || '');
-                });
+        district.addEventListener('change', async function () {
+            const districtId = this.value;
+
+            setOptions(subdistrict, [], '--เลือกตำบล--', 'subd_name');
+            zipcode.value = '';
+
+            if (!districtId) return;
+
+            try {
+                const subdistricts = await fetchJSON(`/get-subdistricts/${districtId}`);
+                setOptions(subdistrict, subdistricts, '--เลือกตำบล--', 'subd_name');
+            } catch (error) {
+                console.error('Load subdistricts failed:', error);
             }
         });
 
-        // ✅ Preload selections
-        const selectedProvince    = province.data('selected') || '';
-        const selectedDistrict    = district.data('selected') || '';
-        const selectedSubdistrict = subdistrict.data('selected') || '';
+        subdistrict.addEventListener('change', async function () {
+            const subdistrictId = this.value;
+            zipcode.value = '';
 
-        if (selectedProvince) {
-            province.val(selectedProvince);
-            $.get('/get-districts/' + selectedProvince).done(function (data) {
-                district.html('<option value="">--เลือกอำเภอ--</option>');
-                $.each(data, function (i, value) {
-                    const selected = (String(value.id) === String(selectedDistrict)) ? ' selected' : '';
-                    district.append('<option value="' + value.id + '"' + selected + '>' + value.dist_name + '</option>');
-                });
+            if (!subdistrictId) return;
+
+            try {
+                const zip = await fetchJSON(`/get-zipcode/${subdistrictId}`);
+                zipcode.value = zip.zipcode || '';
+            } catch (error) {
+                console.error('Load zipcode failed:', error);
+            }
+        });
+
+        const preload = async () => {
+            try {
+                if (selectedProvince) {
+                    province.value = selectedProvince;
+
+                    const districts = await fetchJSON(`/get-districts/${selectedProvince}`);
+                    setOptions(district, districts, '--เลือกอำเภอ--', 'dist_name', selectedDistrict);
+                }
 
                 if (selectedDistrict) {
-                    $.get('/get-subdistricts/' + selectedDistrict).done(function (data2) {
-                        subdistrict.html('<option value="">--เลือกตำบล--</option>');
-                        $.each(data2, function (i, value) {
-                            const selected = (String(value.id) === String(selectedSubdistrict)) ? ' selected' : '';
-                            subdistrict.append('<option value="' + value.id + '"' + selected + '>' + value.subd_name + '</option>');
-                        });
-
-                        if (selectedSubdistrict) {
-                            $.get('/get-zipcode/' + selectedSubdistrict).done(function (data3) {
-                                zipcode.val(data3.zipcode || '');
-                            });
-                        }
-                    });
+                    const subdistricts = await fetchJSON(`/get-subdistricts/${selectedDistrict}`);
+                    setOptions(subdistrict, subdistricts, '--เลือกตำบล--', 'subd_name', selectedSubdistrict);
                 }
-            });
-        }
-    }
 
-    bindLocationDropdowns('father');
-    bindLocationDropdowns('mother');
-    bindLocationDropdowns('spouse');
-    bindLocationDropdowns('relative');
+                if (selectedSubdistrict) {
+                    const zip = await fetchJSON(`/get-zipcode/${selectedSubdistrict}`);
+                    zipcode.value = zip.zipcode || '';
+                }
+            } catch (error) {
+                console.error(`Preload failed for ${prefix}:`, error);
+            }
+        };
 
-   // เก็บค่า tab ก่อน submit
-    $('form').on('submit', function() {
-        let activeTab = $('.nav-tabs .nav-link.active').attr('id'); 
-        $('#active_tab').val(activeTab);
-    });
+        preload();
+    };
 
-    // เปิด tab เดิมหลัง redirect
-    let activeTab = "{{ session('active_tab') }}";
-    if (activeTab) {
-        let tabTriggerEl = document.getElementById(activeTab);
-        if (tabTriggerEl) {
-            let tab = new bootstrap.Tab(tabTriggerEl);
+    ['father', 'mother', 'spouse', 'relative'].forEach(bindLocationGroup);
+
+    const savedTab = activeTabInput?.value || '';
+    if (savedTab) {
+        const trigger = document.getElementById(savedTab);
+        if (trigger && window.bootstrap) {
+            const tab = new bootstrap.Tab(trigger);
             tab.show();
         }
     }
-});
 
-</script>
-
-<script>
-$(function () {
-    $('#familyForm').on('submit', function(e) {
-        e.preventDefault(); // ❌ ป้องกันการ reload หน้า
-
-        // เก็บค่า tab ปัจจุบัน
-        let activeTab = $('#familyTabs .nav-link.active').attr('id'); 
-        $('#active_tab').val(activeTab);
-
-        // ส่งข้อมูลด้วย AJAX
-        $.ajax({
-            url: $(this).attr('action'),
-            method: $(this).attr('method'),
-            data: $(this).serialize(),
-            success: function(response) {
-              Swal.fire({
-                icon: 'success',
-                title: 'บันทึกข้อมูลเรียบร้อย',
-                showConfirmButton: true,   // ✅ แสดงปุ่ม OK
-                confirmButtonText: 'OK',   // ✅ ข้อความบนปุ่ม
-                timer: 3000,               // ✅ ปิดเองใน 3 วินาที
-                timerProgressBar: true     // ✅ แสดงแถบเวลา
-            });
-            },
-            error: function(xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: xhr.responseJSON?.message || 'ไม่สามารถบันทึกได้',
-                });
+    document.querySelectorAll('#familyTabs .nav-link').forEach(tabBtn => {
+        tabBtn.addEventListener('shown.bs.tab', function () {
+            if (activeTabInput) {
+                activeTabInput.value = this.id;
             }
         });
     });
+
+    if (familyForm) {
+        familyForm.addEventListener('submit', function () {
+            const activeTab = document.querySelector('#familyTabs .nav-link.active');
+            if (activeTabInput && activeTab) {
+                activeTabInput.value = activeTab.id;
+            }
+
+            if (familySubmitBtn) {
+                familySubmitBtn.disabled = true;
+                familySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังบันทึกข้อมูล...';
+            }
+        });
+    }
 });
 </script>
 
-
-
 @endsection
-
-        
-
-
-
-
-
-
-
-

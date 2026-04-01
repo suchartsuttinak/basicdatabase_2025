@@ -14,31 +14,8 @@
             ทะเบียนประวัติผู้รับฯ
         </div>
 
-        <div class="workflow-tabs">
-            <a class="tab-link {{ request()->routeIs('client.edit') ? 'active' : '' }}"
-               href="{{ route('client.edit', $client->id) }}">
-                <i class="bi bi-person-plus-fill"></i> เพิ่มข้อมูลผู้รับบริการ
-            </a>
-
-            <a class="tab-link {{ request()->routeIs('factfinding.add','factfinding.edit') ? 'active' : '' }}"
-               href="{{ route('factfinding.add', $client->id) }}">
-                <i class="bi bi-search-heart"></i> สอบข้อเท็จจริงเบื้องต้น
-            </a>
-
-            <a class="tab-link {{ request()->routeIs('family.add','family.edit') ? 'active' : '' }}"
-               href="{{ route('family.add', $client->id) }}">
-                <i class="bi bi-people-fill"></i> บันทึกบิดาและมารดา
-            </a>
-
-            <a class="tab-link {{ request()->routeIs('member.create','member.show','member.edit') ? 'active' : '' }}"
-               href="{{ route('member.create', $client->id) }}">
-                <i class="bi bi-house-heart-fill"></i> บันทึกสมาชิกครอบครัว
-            </a>
-
-            <a class="tab-link back-link" href="{{ route('client.show') }}">
-                <i class="bi bi-arrow-left-circle"></i> กลับหน้าหลัก
-            </a>
-        </div>
+          <!-- ปุ่มจัดการ + TAB -->
+       {{-- @include('admin_client.include.tabs') --}}
 
     <div class="registry-subtabs">
     <a href="{{ route('client.edit', $client->id) }}"

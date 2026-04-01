@@ -25,7 +25,7 @@
 
                 <a href="{{ route('dashboard') }}" class="topbar-brand d-none d-md-flex">
                     <span class="topbar-brand-badge">
-                        <i class="fas fa-shield-heart"></i>
+                       <i class="fas fa-people-group"></i>
                     </span>
                     <span class="topbar-brand-text">
                         ระบบข้อมูลผู้รับบริการ
