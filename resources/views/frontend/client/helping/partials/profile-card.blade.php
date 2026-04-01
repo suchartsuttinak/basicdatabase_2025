@@ -1,0 +1,63 @@
+@php
+    $clientInitial = mb_substr(trim($client->fullname ?? 'U'), 0, 1);
+
+    $clientImageUrl = asset('upload/no_image.jpg');
+
+    if (!empty($client->image)) {
+        $imagePath = public_path('upload/client_images/' . $client->image);
+
+        if (file_exists($imagePath)) {
+            $clientImageUrl = asset('upload/client_images/' . $client->image);
+        }
+    }
+@endphp
+
+<div class="hp-top-grid">
+    <div class="hp-profile-card">
+        <div class="hp-profile-inner hp-profile-inner--enhanced">
+            <div class="hp-profile-photo-col">
+                <div class="summary-avatar">
+                    <img
+                        src="{{ $clientImageUrl }}"
+                        alt="client-image"
+                        onerror="this.style.display='none'; this.closest('.summary-avatar').nextElementSibling.style.display='inline-flex';"
+                    >
+                </div>
+
+                <div class="hp-avatar-fallback hp-avatar-fallback--large" style="display:none;">
+                    {{ $clientInitial }}
+                </div>
+            </div>
+
+            <div class="hp-profile-content">
+                <div class="hp-profile-label">
+                    <i class="bi bi-person-badge"></i>
+                    <span>ข้อมูลผู้รับบริการ</span>
+                </div>
+
+                <div class="hp-profile-name">{{ $client->fullname ?? '-' }}</div>
+
+                <div class="hp-profile-meta">
+                    <span class="hp-meta-chip">
+                        <i class="bi bi-calendar-heart"></i>
+                        อายุ {{ $client->age ?? '-' }} ปี
+                    </span>
+                    <span class="hp-meta-chip">
+                        <i class="bi bi-clipboard2-heart"></i>
+                        จำนวน {{ $sessions->count() }} ครั้ง
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hp-summary-card">
+        <div class="hp-summary-label">ยอดรวมการช่วยเหลือทั้งหมด</div>
+        <div class="hp-summary-value">
+            {{ number_format($grandTotal ?? 0, 2) }} บาท
+        </div>
+        <div class="hp-summary-sub">
+            สรุปจากข้อมูลการช่วยเหลือทั้งหมดของผู้รับรายนี้
+        </div>
+    </div>
+</div>

@@ -1,0 +1,656 @@
+ .jobagency-page {
+        --ja-primary: #4f6edb;
+        --ja-primary-dark: #3553ba;
+        --ja-primary-soft: #eef3ff;
+        --ja-success-soft: #ecfdf3;
+        --ja-warning-soft: #fff7ed;
+        --ja-danger-soft: #fff1f2;
+        --ja-border: #dbe3ef;
+        --ja-border-strong: #c8d4e5;
+        --ja-bg: #f6f8fc;
+        --ja-card: #ffffff;
+        --ja-text: #0f172a;
+        --ja-text-soft: #64748b;
+        --ja-muted: #94a3b8;
+        --ja-radius-xl: 20px;
+        --ja-radius-lg: 16px;
+        --ja-radius-md: 12px;
+        --ja-shadow-sm: 0 10px 28px rgba(15, 23, 42, 0.06);
+        --ja-shadow-md: 0 18px 50px rgba(15, 23, 42, 0.12);
+    }
+
+    .jobagency-page {
+        color: var(--ja-text);
+    }
+
+    .jobagency-page .ja-main-card,
+    .jobagency-page .ja-info-card,
+    .jobagency-page .ja-table-card {
+        background: var(--ja-card);
+        border: 1px solid var(--ja-border);
+        border-radius: var(--ja-radius-xl);
+        box-shadow: var(--ja-shadow-sm);
+        overflow: hidden;
+    }
+
+    .jobagency-page .ja-main-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(180deg, #fbfcff 0%, #f4f7fc 100%);
+        border-bottom: 1px solid var(--ja-border);
+    }
+
+    .jobagency-page .ja-header-title {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        min-width: 0;
+    }
+
+    .jobagency-page .ja-header-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--ja-primary-soft);
+        color: var(--ja-primary);
+        font-size: 1.2rem;
+        flex: 0 0 auto;
+    }
+
+    .jobagency-page .ja-header-text {
+        min-width: 0;
+    }
+
+    .jobagency-page .ja-header-text h5,
+    .jobagency-page .ja-header-text h6 {
+        margin: 0;
+        font-weight: 800;
+        color: var(--ja-text);
+    }
+
+    .jobagency-page .ja-header-text p {
+        margin: .18rem 0 0 0;
+        font-size: .9rem;
+        color: var(--ja-text-soft);
+    }
+
+    .jobagency-page .ja-btn {
+        min-height: 42px;
+        padding: .625rem 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+        white-space: nowrap;
+        box-shadow: none !important;
+    }
+
+    .jobagency-page .ja-btn-sm {
+        min-height: 38px;
+        padding: .48rem .85rem;
+        border-radius: 11px;
+        font-size: .875rem;
+    }
+
+    .jobagency-page .ja-body {
+        padding: 1rem;
+        background: var(--ja-bg);
+    }
+
+    .jobagency-page .ja-info-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .jobagency-page .ja-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .jobagency-page .ja-info-item {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+        padding: .95rem 1rem;
+        border: 1px solid var(--ja-border);
+        border-radius: 16px;
+        background: #fff;
+        min-width: 0;
+    }
+
+    .jobagency-page .ja-info-item-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--ja-primary-soft);
+        color: var(--ja-primary);
+        flex: 0 0 auto;
+    }
+
+    .jobagency-page .ja-info-label {
+        display: block;
+        font-size: .8rem;
+        font-weight: 800;
+        color: var(--ja-text-soft);
+        margin-bottom: .2rem;
+    }
+
+    .jobagency-page .ja-info-value {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--ja-text);
+        word-break: break-word;
+    }
+
+    .jobagency-page .ja-table-card {
+        overflow: hidden;
+    }
+
+    .jobagency-page .ja-table-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--ja-border);
+        background: #fff;
+    }
+
+    .jobagency-page .ja-table-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        font-weight: 800;
+        color: var(--ja-text);
+    }
+
+    .jobagency-page .ja-table-title i {
+        color: var(--ja-primary);
+    }
+
+    .jobagency-page .ja-table-meta {
+        font-size: .9rem;
+        font-weight: 700;
+        color: var(--ja-text-soft);
+    }
+
+    .jobagency-page .ja-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        background: #fff;
+    }
+
+    .jobagency-page .ja-table-wrap::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    .jobagency-page .ja-table-wrap::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+
+    .jobagency-page table.ja-table {
+        width: 100% !important;
+        min-width: 1180px;
+        margin: 0 !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        vertical-align: middle;
+    }
+
+    .jobagency-page table.ja-table thead th {
+        background: #f8fbff;
+        color: #334155;
+        font-size: .86rem;
+        font-weight: 800;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        padding: .95rem .75rem;
+        border-bottom: 1px solid var(--ja-border) !important;
+    }
+
+    .jobagency-page table.ja-table tbody td {
+        padding: .9rem .75rem;
+        font-size: .92rem;
+        color: #334155;
+        vertical-align: middle;
+        background: #fff;
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .jobagency-page table.ja-table tbody tr:hover td {
+        background: #fbfdff;
+    }
+
+    .jobagency-page .ja-cell {
+        min-width: 120px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .jobagency-page .ja-cell-sm {
+        min-width: 90px;
+    }
+
+    .jobagency-page .ja-cell-lg {
+        min-width: 180px;
+        max-width: 260px;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .jobagency-page .ja-income-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: .35rem .7rem;
+        border-radius: 999px;
+        background: var(--ja-success-soft);
+        color: #15803d;
+        font-weight: 800;
+        font-size: .86rem;
+        white-space: nowrap;
+    }
+
+    .jobagency-page .ja-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        min-width: max-content;
+        flex-wrap: nowrap;
+    }
+
+    .jobagency-page .ja-actions form {
+        margin: 0;
+        display: inline;
+    }
+
+    .jobagency-page .ja-actions .btn {
+        min-width: 96px;
+    }
+
+    .jobagency-page .ja-empty {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--ja-text-soft);
+        background: #fff;
+    }
+
+    .jobagency-page .ja-empty i {
+        display: inline-block;
+        font-size: 1.7rem;
+        margin-bottom: .5rem;
+        color: var(--ja-muted);
+    }
+
+    /* =========================
+       DataTables Skin
+    ========================= */
+    .jobagency-page #datatable-jobagency_wrapper {
+        padding: 0;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .row > div {
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_length,
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_filter {
+        padding-top: .85rem;
+        padding-bottom: .65rem;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_length {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-wrap: wrap;
+        color: #475569;
+        font-size: .9rem;
+        font-weight: 600;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_length label {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: 0;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_length select {
+        min-width: 68px;
+        height: 38px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: .35rem 2rem .35rem .75rem;
+        background-color: #fff;
+        box-shadow: none;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_filter {
+        text-align: right;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_filter label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .5rem;
+        margin-bottom: 0;
+        width: 100%;
+        color: #475569;
+        font-size: .9rem;
+        font-weight: 600;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_filter input {
+        width: 220px;
+        max-width: 100%;
+        height: 38px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: .45rem .75rem;
+        margin-left: 0 !important;
+        box-shadow: none;
+        background: #fff;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_info,
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_paginate {
+        padding-top: .85rem;
+        padding-bottom: .95rem;
+        color: #64748b;
+        font-size: .9rem;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .dataTables_paginate {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .pagination {
+        margin-bottom: 0;
+        gap: .2rem;
+        flex-wrap: wrap;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .paginate_button .page-link {
+        border-radius: 10px !important;
+        min-width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--ja-border);
+        color: #475569;
+        padding: .45rem .75rem;
+        box-shadow: none !important;
+    }
+
+    .jobagency-page #datatable-jobagency_wrapper .paginate_button.active .page-link {
+        background: var(--ja-primary);
+        border-color: var(--ja-primary);
+        color: #fff;
+    }
+
+    .jobagency-page table.dataTable thead > tr > th.sorting,
+    .jobagency-page table.dataTable thead > tr > th.sorting_asc,
+    .jobagency-page table.dataTable thead > tr > th.sorting_desc {
+        padding-right: 2rem !important;
+    }
+
+    /* =========================
+       Modal
+    ========================= */
+    .jobagency-page .ja-modal .modal-dialog {
+        margin: 1rem auto;
+    }
+
+    .jobagency-page .ja-modal .modal-content {
+        border: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: var(--ja-shadow-md);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .jobagency-page .ja-modal .modal-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--ja-border);
+        background: linear-gradient(180deg, #eef4ff 0%, #ffffff 100%);
+    }
+
+    .jobagency-page .ja-modal.ja-modal-edit .modal-header {
+        background: linear-gradient(180deg, #fff8ee 0%, #ffffff 100%);
+    }
+
+    .jobagency-page .ja-modal-title {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-weight: 800;
+        color: var(--ja-text);
+    }
+
+    .jobagency-page .ja-modal-title i {
+        color: var(--ja-primary);
+    }
+
+    .jobagency-page .ja-modal-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .jobagency-page .ja-modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 1.1rem 1.25rem 1rem;
+        background: #fff;
+    }
+
+    .jobagency-page .ja-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: .75rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem 1.1rem;
+        border-top: 1px solid var(--ja-border);
+        background: #fff;
+        flex: 0 0 auto;
+    }
+
+    .jobagency-page .ja-section {
+        border: 1px solid var(--ja-border);
+        border-radius: 16px;
+        padding: 1rem;
+        background: #fff;
+        margin-bottom: 1rem;
+    }
+
+    .jobagency-page .ja-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .jobagency-page .ja-section-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        margin-bottom: .95rem;
+        font-size: .95rem;
+        font-weight: 800;
+        color: var(--ja-text);
+    }
+
+    .jobagency-page .ja-section-title i {
+        color: var(--ja-primary);
+    }
+
+    .jobagency-page .ja-label {
+        font-size: .87rem;
+        font-weight: 800;
+        color: #334155;
+        margin-bottom: .45rem;
+    }
+
+    .jobagency-page .ja-label .text-danger {
+        font-weight: 900;
+    }
+
+    .jobagency-page .ja-control,
+    .jobagency-page .ja-select,
+    .jobagency-page .ja-textarea {
+        min-height: 44px;
+        border: 1px solid var(--ja-border-strong);
+        border-radius: 12px;
+        padding: .65rem .85rem;
+        font-size: .95rem;
+        color: var(--ja-text);
+        background: #fff;
+        transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+    }
+
+    .jobagency-page .ja-textarea {
+        min-height: 92px;
+        resize: vertical;
+    }
+
+    .jobagency-page .ja-control:focus,
+    .jobagency-page .ja-select:focus,
+    .jobagency-page .ja-textarea:focus {
+        border-color: rgba(79, 110, 219, .55);
+        box-shadow: 0 0 0 4px rgba(79, 110, 219, .10);
+    }
+
+    /* =========================
+       Validation
+    ========================= */
+    .jobagency-page .is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.12) !important;
+    }
+
+    .jobagency-page .ja-invalid-text {
+        display: block;
+        width: 100%;
+        margin-top: .4rem;
+        font-size: .82rem;
+        font-weight: 600;
+        color: #dc3545;
+    }
+
+    /* =========================
+       Responsive
+    ========================= */
+    @media (max-width: 767.98px) {
+        .jobagency-page .ja-body {
+            padding: .75rem;
+        }
+
+        .jobagency-page .ja-main-header {
+            padding: 1rem;
+        }
+
+        .jobagency-page .ja-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .jobagency-page .ja-main-header .ja-btn {
+            width: 100%;
+        }
+
+        .jobagency-page .ja-modal .modal-dialog {
+            margin: .5rem;
+        }
+
+        .jobagency-page .ja-modal .modal-content {
+            min-height: calc(100dvh - 1rem);
+            max-height: calc(100dvh - 1rem);
+        }
+
+        .jobagency-page .ja-modal-body {
+            padding: 1rem;
+        }
+
+        .jobagency-page .ja-modal-footer {
+            padding: .9rem 1rem 1rem;
+        }
+
+        .jobagency-page .ja-modal-footer .btn {
+            flex: 1 1 calc(50% - .5rem);
+            min-width: 0;
+        }
+
+        .jobagency-page #datatable-jobagency_wrapper .dataTables_filter,
+        .jobagency-page #datatable-jobagency_wrapper .dataTables_info,
+        .jobagency-page #datatable-jobagency_wrapper .dataTables_paginate {
+            text-align: left !important;
+        }
+
+        .jobagency-page #datatable-jobagency_wrapper .dataTables_filter label {
+            justify-content: flex-start;
+        }
+
+        .jobagency-page #datatable-jobagency_wrapper .dataTables_filter input {
+            width: 100%;
+        }
+
+        .jobagency-page #datatable-jobagency_wrapper .dataTables_paginate {
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .jobagency-page .ja-modal .modal-dialog {
+            margin: 0;
+        }
+
+        .jobagency-page .ja-modal .modal-content {
+            min-height: 100dvh;
+            max-height: 100dvh;
+            border-radius: 0;
+        }
+
+        .jobagency-page .ja-modal-footer .btn {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+
+        .jobagency-page .ja-actions {
+            gap: .4rem;
+        }
+
+        .jobagency-page .ja-actions .btn {
+            min-width: 88px;
+        }
+    }
