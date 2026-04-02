@@ -29,7 +29,7 @@
     $todayText = ($day ?? '-') . ' ' . ($month ?? '-') . ' ' . ($year ?? '-');
 @endphp
 
-<div class="container-fluid client-page py-4 py-lg-5">
+<div class="container-fluid client-page">
 
     {{-- Top Navigation / Back --}}
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
@@ -89,9 +89,21 @@
                         @endif
                     </div>
 
-                    <div class="profile-quick-tags mt-3">
-                        <span class="quick-tag"><i class="bi bi-person-badge me-1"></i>ข้อมูลรายบุคคล</span>
-                        <span class="quick-tag"><i class="bi bi-shield-check me-1"></i>พร้อมใช้งาน</span>
+                  <div class="profile-quick-tags mt-3">
+
+                        {{-- 🔥 เลขทะเบียน --}}
+                        <span class="quick-tag">
+                            <i class="bi bi-person-badge me-1"></i>
+                            เลขทะเบียน: {{ $client->register_number ?? '-' }}
+                        </span>
+
+                        {{-- 🔥 ระยะเวลาอยู่อาศัย --}}
+                    <span class="quick-tag">
+                        <i class="bi bi-calendar-check me-1"></i>ระยะเวลาอยู่อาศัย:
+
+                        {{ $client->residence_duration ?? 'ไม่มีข้อมูลวันที่เข้าระบบ' }}
+                    </span>
+
                     </div>
                 </div>
 

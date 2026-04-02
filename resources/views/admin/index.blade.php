@@ -9,6 +9,9 @@
         padding: 1.25rem 0 1.5rem;
     }
 
+    /* =========================
+       HERO
+    ========================= */
     .dashboard-hero {
         position: relative;
         overflow: hidden;
@@ -65,9 +68,11 @@
     .dashboard-hero-title {
         margin: 0;
         font-size: 2rem;
-        font-weight: 700;
+        font-weight: 800;
         line-height: 1.2;
-        letter-spacing: -.02em;
+        letter-spacing: -0.02em;
+        color: #ffffff !important;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.15);
     }
 
     .dashboard-hero-subtitle {
@@ -94,8 +99,12 @@
         padding: .8rem 1.15rem;
         font-weight: 600;
         box-shadow: 0 10px 20px rgba(0,0,0,.12);
+        white-space: nowrap;
     }
 
+    /* =========================
+       CARD / SECTION
+    ========================= */
     .dashboard-card {
         border: 1px solid #e9eef5;
         border-radius: 20px;
@@ -147,6 +156,9 @@
         font-weight: 600;
     }
 
+    /* =========================
+       TABLE
+    ========================= */
     .appointment-table {
         margin-bottom: 0;
     }
@@ -168,6 +180,157 @@
         font-weight: 700;
     }
 
+    .table-card .table {
+        margin-bottom: 0;
+    }
+
+    .table-card .table thead th {
+        background: #f8fafc;
+        color: #334155;
+        font-weight: 700;
+        border-bottom-color: #e5e7eb;
+        white-space: nowrap;
+    }
+
+    .table-card .table tbody td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .table-student-name {
+        font-weight: 600;
+        color: #111827;
+        min-width: 180px;
+    }
+
+    .table-muted {
+        color: #6b7280;
+    }
+
+    .dashboard-empty {
+        padding: 1rem;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    /* wrapper สำหรับเลื่อนตารางแนวนอน */
+    .dashboard-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 14px;
+        position: relative;
+    }
+
+    .dashboard-table-scroll table {
+        min-width: 860px;
+    }
+
+    /* DataTable wrapper ให้เลื่อนได้จริง */
+    .dashboard-table-scroll .dataTables_wrapper {
+        width: 100%;
+    }
+
+    .dashboard-table-scroll .dataTables_scroll {
+        width: 100%;
+    }
+
+    .dashboard-table-scroll .dataTables_scrollHead {
+        overflow: hidden !important;
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+    }
+
+    .dashboard-table-scroll .dataTables_scrollBody {
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-bottom-left-radius: 14px;
+        border-bottom-right-radius: 14px;
+    }
+
+    .dashboard-table-scroll .dataTables_scrollBody table {
+        min-width: 860px !important;
+        width: 100% !important;
+    }
+
+    .dashboard-table-scroll::-webkit-scrollbar,
+    .dashboard-table-scroll .dataTables_scrollBody::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    .dashboard-table-scroll::-webkit-scrollbar-thumb,
+    .dashboard-table-scroll .dataTables_scrollBody::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, .75);
+        border-radius: 999px;
+    }
+
+    .dashboard-table-scroll::-webkit-scrollbar-track,
+    .dashboard-table-scroll .dataTables_scrollBody::-webkit-scrollbar-track {
+        background: rgba(241, 245, 249, .95);
+        border-radius: 999px;
+    }
+
+    /* เงาบอกว่ามีการเลื่อน */
+    .dashboard-table-fade {
+        position: relative;
+    }
+
+    .dashboard-table-fade::before,
+    .dashboard-table-fade::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 24px;
+        height: 100%;
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .dashboard-table-fade::before {
+        left: 0;
+        background: linear-gradient(to right, rgba(255,255,255,.95), rgba(255,255,255,0));
+    }
+
+    .dashboard-table-fade::after {
+        right: 0;
+        background: linear-gradient(to left, rgba(255,255,255,.95), rgba(255,255,255,0));
+    }
+
+    /* จัด style DataTable controls */
+    #clientsTable_wrapper .dataTables_length,
+    #clientsTable_wrapper .dataTables_filter {
+        margin-bottom: .85rem;
+    }
+
+    #clientsTable_wrapper .dataTables_length select,
+    #clientsTable_wrapper .dataTables_filter input {
+        border-radius: 10px;
+        border: 1px solid #dbe3ec;
+        min-height: 38px;
+        padding: .35rem .65rem;
+        box-shadow: none !important;
+        background: #fff;
+    }
+
+    #clientsTable_wrapper .dataTables_info,
+    #clientsTable_wrapper .dataTables_paginate,
+    #clientsTable_wrapper .dataTables_filter,
+    #clientsTable_wrapper .dataTables_length {
+        font-size: .88rem;
+        color: #475569;
+        margin-top: .55rem;
+    }
+
+    #clientsTable_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 10px !important;
+    }
+
+    /* =========================
+       MINI STAT
+    ========================= */
     .mini-stat-card {
         height: 100%;
         border: 1px solid #e8edf3;
@@ -248,6 +411,9 @@
         font-weight: 500;
     }
 
+    /* =========================
+       FILTER
+    ========================= */
     .filter-card {
         border: 1px solid #e8edf3;
         border-radius: 22px;
@@ -341,6 +507,9 @@
         font-weight: 700;
     }
 
+    /* =========================
+       METRIC / CHART
+    ========================= */
     .metric-card {
         position: relative;
         overflow: hidden;
@@ -432,55 +601,9 @@
         min-height: 360px;
     }
 
-    .table-card .table {
-        margin-bottom: 0;
-    }
-
-    .table-card .table thead th {
-        background: #f8fafc;
-        color: #334155;
-        font-weight: 700;
-        border-bottom-color: #e5e7eb;
-        white-space: nowrap;
-    }
-
-    .table-card .table tbody td {
-        vertical-align: middle;
-    }
-
-    .table-student-name {
-        font-weight: 600;
-        color: #111827;
-    }
-
-    .table-muted {
-        color: #6b7280;
-    }
-
-    .dashboard-empty {
-        padding: 1rem;
-        text-align: center;
-        color: #6b7280;
-    }
-
-    #clientsTable_wrapper .dataTables_length select,
-    #clientsTable_wrapper .dataTables_filter input {
-        border-radius: 10px;
-        border: 1px solid #dbe3ec;
-        min-height: 38px;
-        padding: .35rem .65rem;
-        box-shadow: none !important;
-    }
-
-    #clientsTable_wrapper .dataTables_info,
-    #clientsTable_wrapper .dataTables_paginate,
-    #clientsTable_wrapper .dataTables_filter,
-    #clientsTable_wrapper .dataTables_length {
-        font-size: .88rem;
-        color: #475569;
-        margin-top: .55rem;
-    }
-
+    /* =========================
+       RESPONSIVE
+    ========================= */
     @media (max-width: 991.98px) {
         .dashboard-hero {
             padding: 1.25rem;
@@ -537,6 +660,28 @@
         .chart-panel {
             min-height: 300px;
         }
+
+        /* จอเล็กให้ table เลื่อนได้สบาย */
+        .dashboard-table-scroll {
+            margin: 0 -2px;
+            padding-bottom: .15rem;
+        }
+
+        .dashboard-table-scroll table,
+        .dashboard-table-scroll .dataTables_scrollBody table {
+            min-width: 820px !important;
+        }
+
+        #clientsTable_wrapper .dataTables_length,
+        #clientsTable_wrapper .dataTables_filter {
+            width: 100%;
+            text-align: left;
+        }
+
+        #clientsTable_wrapper .dataTables_filter input {
+            width: 100%;
+            margin-left: 0 !important;
+        }
     }
 </style>
 
@@ -570,8 +715,7 @@
 
                 <div class="col-lg-4">
                     <div class="dashboard-hero-actions">
-                        <a href="{{ route('client.show') }}"
-                           class="btn btn-light dashboard-btn-pill">
+                        <a href="{{ route('client.show') }}" class="btn btn-light dashboard-btn-pill">
                             <i data-feather="arrow-right-circle"></i>
                             <span>แสดงรายชื่อผู้รับบริการ</span>
                         </a>
@@ -596,7 +740,7 @@
 
             <div class="card-body">
                 @if($appointmentCount > 0)
-                    <div class="table-responsive">
+                    <div class="dashboard-table-scroll dashboard-table-fade">
                         <table class="table appointment-table align-middle">
                             <thead>
                                 <tr>
@@ -958,8 +1102,8 @@
                     </div>
 
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="clientsTable" class="table table-hover align-middle">
+                        <div class="dashboard-table-scroll dashboard-table-fade">
+                            <table id="clientsTable" class="table table-hover align-middle w-100">
                                 <thead>
                                     <tr>
                                         <th style="width:18%">ชื่อ</th>
@@ -1073,27 +1217,39 @@ document.addEventListener("DOMContentLoaded", function () {
         new ApexCharts(document.querySelector("#chartEducation"), optionsEducation).render();
     }
 
-    $('#clientsTable').DataTable({
-        destroy: true,
-        responsive: true,
-        autoWidth: false,
-        pageLength: 10,
-        order: [[0, 'asc']],
-        language: {
-            search: "ค้นหา:",
-            lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
-            info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-            infoEmpty: "ไม่มีข้อมูลให้แสดง",
-            infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
-            zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
-            paginate: {
-                first: "หน้าแรก",
-                last: "หน้าสุดท้าย",
-                next: "ถัดไป",
-                previous: "ก่อนหน้า"
+    if ($.fn.DataTable && $('#clientsTable').length) {
+        $('#clientsTable').DataTable({
+            destroy: true,
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: false,
+            pageLength: 10,
+            order: [[0, 'asc']],
+            language: {
+                search: "ค้นหา:",
+                lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+                info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                infoEmpty: "ไม่มีข้อมูลให้แสดง",
+                infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+                zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
+                paginate: {
+                    first: "หน้าแรก",
+                    last: "หน้าสุดท้าย",
+                    next: "ถัดไป",
+                    previous: "ก่อนหน้า"
+                }
+            },
+            columnDefs: [
+                { targets: 0, width: "18%" }
+            ],
+            initComplete: function () {
+                if (window.feather) {
+                    feather.replace();
+                }
             }
-        }
-    });
+        });
+    }
 
     if ($.fn.datepicker && $('.datepicker-th').length) {
         $('.datepicker-th').datepicker({

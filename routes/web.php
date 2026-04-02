@@ -42,9 +42,10 @@ Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
 
 
 
-// หน้า about (ฟอร์มกรอกข้อมูล)
+// หน้า about (ฟอร์มกรอกข้อมูล history, objective, mission, contact)
 Route::get('/about', [AboutController::class, 'index'])->name('landing.about.index');
 Route::post('/about', [AboutController::class, 'store'])->name('landing.about.store');
+Route::delete('/about/{id}', [AboutController::class, 'destroy'])->name('landing.about.delete');
 
 
 

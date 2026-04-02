@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="{{ asset('backend/assets/css/escape.css') }}">
 
-<div class="container-fluid mt-3 escape-page">
+<div class="container-fluid escape-page">
 
     <div class="escape-shell">
         {{-- Header --}}

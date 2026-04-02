@@ -35,8 +35,16 @@ class AboutController extends Controller
     ]);
 
     // หลังบันทึกเสร็จ กลับไปหน้า Landing
-    return redirect()->route('landing.index')->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+    return redirect()->route('landing.about.index')->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
 
 
     }
+
+    public function destroy($id)
+{
+    $data = AboutData::findOrFail($id);
+    $data->delete();
+
+    return redirect()->back()->with('success', 'ลบข้อมูลเรียบร้อยแล้ว');
+}
 }

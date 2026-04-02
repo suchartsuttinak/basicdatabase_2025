@@ -2,38 +2,30 @@
 <html lang="th">
 <head>
     <meta charset="utf-8" />
-    <title>Dashboard | Admin Dashboard Template</title>
+    <title>@yield('title', 'ระบบข้อมูลผู้รับบริการ')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc." />
+    <meta name="description" content="ระบบฐานข้อมูลผู้รับบริการ" />
     <meta name="author" content="Zoyothemes" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <link rel="shortcut icon" href="{{ asset('backend/assets/images/favicon.ico') }}">
 
-    <!-- Core CSS -->
     <link href="{{ asset('backend/assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style" />
     <link href="{{ asset('backend/assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
-    <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
 
-    <!-- Datatables CSS -->
     <link href="{{ asset('backend/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-keytable-bs5/css/keyTable.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('backend/assets/libs/datatables.net-select-bs5/css/select.bootstrap5.min.css') }}" rel="stylesheet" />
 
-    <!-- Datepicker CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     @stack('styles')
@@ -43,20 +35,25 @@
             --topbar-height: 72px;
             --sidebar-width: 260px;
 
-            --topbar-bg: rgba(255,255,255,.88);
+            --topbar-offset: 12px; /* ยิ่งมาก content ยิ่งถูกดันขึ้น */
+            --content-top-padding: .12rem;
+            --content-top-padding-lg: .18rem;
+            --content-top-padding-sm: .08rem;
+
+            --topbar-bg: rgba(255,255,255,.92);
             --topbar-border: #e6edf5;
             --topbar-text: #1f3b64;
             --topbar-muted: #6b7280;
             --topbar-hover: #eef5ff;
             --topbar-active-bg: #e8f1ff;
             --topbar-active-text: #2563eb;
-            --topbar-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+            --topbar-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
 
             --content-bg: #f8fafc;
             --card-border: #e9ecef;
-            --shadow-soft: 0 2px 10px rgba(15, 23, 42, .03);
-            --radius-lg: 14px;
-            --radius-md: 10px;
+            --shadow-soft: 0 6px 18px rgba(15, 23, 42, .04);
+            --radius-lg: 16px;
+            --radius-md: 12px;
         }
 
         html, body {
@@ -71,6 +68,7 @@
             color: #212529;
             background: var(--content-bg);
             overflow-x: hidden;
+            padding-top: calc(var(--topbar-height) - var(--topbar-offset));
         }
 
         h1, h2, h3, h4, h5, .card-header, .navbar-brand {
@@ -83,13 +81,15 @@
         }
 
         .btn {
-            font-weight: 400;
-            letter-spacing: .2px;
+            font-weight: 500;
+            letter-spacing: .15px;
         }
 
         .form-control,
         .form-select {
             color: #495057;
+            border-radius: 12px;
+            min-height: 42px;
         }
 
         .form-control::placeholder {
@@ -97,7 +97,6 @@
             opacity: 1;
         }
 
-        /* DataTable */
         table.dataTable td,
         table.dataTable th {
             font-size: 12px;
@@ -114,7 +113,6 @@
             margin-left: .4rem;
         }
 
-        /* App Layout */
         #app-layout {
             min-height: 100vh;
             display: flex;
@@ -123,7 +121,7 @@
 
         .app-body {
             display: flex;
-            min-height: calc(100vh - var(--topbar-height));
+            min-height: calc(100vh - var(--topbar-height) + var(--topbar-offset));
         }
 
         .app-sidebar-menu {
@@ -131,7 +129,7 @@
             flex: 0 0 var(--sidebar-width);
             background: #f8f9fa;
             border-right: 1px solid #dee2e6;
-            min-height: calc(100vh - var(--topbar-height));
+            min-height: calc(100vh - var(--topbar-height) + var(--topbar-offset));
         }
 
         .content-page {
@@ -139,9 +137,9 @@
             min-width: 0;
             position: relative;
             background-color: var(--content-bg);
-            min-height: calc(100vh - var(--topbar-height));
+            min-height: calc(100vh - var(--topbar-height) + var(--topbar-offset));
             overflow-x: hidden;
-            padding: .75rem 1.25rem 1.5rem 1.25rem;
+            padding: var(--content-top-padding) 1.25rem 1.5rem 1.25rem !important;
         }
 
         .content-page > .content,
@@ -151,7 +149,12 @@
             max-width: 100%;
         }
 
-        /* Utility */
+        .content-shell,
+        .content-scroll-x {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
         .content-scroll-x {
             width: 100%;
             overflow-x: auto;
@@ -159,9 +162,41 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .content-page > :first-child,
+        .content-page > .content-shell:first-child,
+        .content-page > .content-shell > .content-scroll-x:first-child,
+        .content-page > .content-shell > .content-scroll-x > :first-child,
+        .content-page .container:first-child,
+        .content-page .container-fluid:first-child,
+        .content-page .row:first-child,
+        .content-page .card:first-child,
+        .content-page section:first-child,
+        .content-page article:first-child,
+        .content-page form:first-child,
+        .content-page .page-header-compact:first-child {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        .content-page .container-fluid.mt-1,
+        .content-page .container-fluid.mt-2,
+        .content-page .container-fluid.mt-3,
+        .content-page .container.mt-1,
+        .content-page .container.mt-2,
+        .content-page .container.mt-3,
+        .content-page .row.mt-1,
+        .content-page .row.mt-2,
+        .content-page .row.mt-3,
+        .content-page .card.mt-1,
+        .content-page .card.mt-2,
+        .content-page .card.mt-3 {
+            margin-top: 0 !important;
+        }
+
         .table-wrap {
             width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .table-wrap table {
@@ -174,7 +209,6 @@
             padding-bottom: .5rem;
         }
 
-        /* Card */
         .card {
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
@@ -186,11 +220,12 @@
             border-bottom: 1px solid #eef1f4;
         }
 
-        /* Topbar */
         .app-topbar {
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 1040;
+            left: 0;
+            right: 0;
+            z-index: 1100;
             min-height: var(--topbar-height);
             background: var(--topbar-bg);
             backdrop-filter: blur(10px);
@@ -365,6 +400,7 @@
             border: 1px solid #e8edf3;
             border-radius: 14px;
             box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+            z-index: 1200;
         }
 
         .topbar-dropdown .dropdown-header {
@@ -394,7 +430,6 @@
             margin: .4rem 0;
         }
 
-        /* Common buttons/profile */
         .button-toggle-menu {
             cursor: pointer;
             outline: none;
@@ -421,7 +456,6 @@
             object-fit: cover;
         }
 
-        /* Sidebar */
         .app-sidebar-menu .logo-box {
             background: #fff;
         }
@@ -533,7 +567,6 @@
             font-weight: 500;
         }
 
-        /* Page header compact */
         .page-header-compact {
             margin-top: 0 !important;
             padding-top: 0 !important;
@@ -567,20 +600,6 @@
             margin: .5rem auto 0;
         }
 
-        .content-page > .content-scroll-x > :first-child,
-        .content-page > :first-child {
-            margin-top: 0 !important;
-        }
-
-        .content-page .card:first-child,
-        .content-page .page-header-compact + .card,
-        .content-page .page-header-compact + .row,
-        .content-page .page-header-compact + .container,
-        .content-page .page-header-compact + .container-fluid {
-            margin-top: 0 !important;
-        }
-
-        /* Report / print-like pages */
         .report-wrap,
         .print-page,
         .report-container {
@@ -594,7 +613,6 @@
             height: auto;
         }
 
-        /* Footer */
         .app-footer {
             margin-top: 1.25rem;
             padding: .9rem 0 0 0;
@@ -612,7 +630,6 @@
             color: #374151;
         }
 
-        /* Desktop hover dropdown */
         @media (min-width: 1200px) {
             .topbar-menu .dropdown:hover > .topbar-dropdown {
                 display: block;
@@ -637,127 +654,137 @@
                 display: flex !important;
                 align-items: center;
             }
+
+            .content-page {
+                padding-top: var(--content-top-padding-lg) !important;
+            }
         }
 
         @media (max-width: 1199.98px) {
-    .app-body {
-        flex-direction: row !important;
-    }
+            :root{
+                --topbar-offset: 10px;
+            }
 
-    .app-sidebar-menu {
-        position: fixed;
-        top: var(--topbar-height);
-        left: 0;
-        width: 260px;
-        height: calc(100vh - var(--topbar-height));
-        background: #fff;
-        z-index: 1050;
-        transform: translateX(-100%);
-        transition: transform .25s ease, visibility .25s ease;
-        box-shadow: 2px 0 12px rgba(0,0,0,.08);
-        border-right: 1px solid #dee2e6;
-        border-bottom: 0;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        visibility: hidden;
-        pointer-events: none;
-    }
+            .app-body {
+                flex-direction: row !important;
+            }
 
-    body.sidebar-open .app-sidebar-menu {
-        transform: translateX(0);
-        visibility: visible;
-        pointer-events: auto;
-    }
+            .app-sidebar-menu {
+                position: fixed;
+                top: calc(var(--topbar-height) - var(--topbar-offset));
+                left: 0;
+                width: 260px;
+                height: calc(100vh - var(--topbar-height) + var(--topbar-offset));
+                background: #fff;
+                z-index: 1090;
+                transform: translateX(-100%);
+                transition: transform .25s ease, visibility .25s ease;
+                box-shadow: 2px 0 12px rgba(0,0,0,.08);
+                border-right: 1px solid #dee2e6;
+                border-bottom: 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                visibility: hidden;
+                pointer-events: none;
+            }
 
-    .sidebar-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.35);
-        z-index: 1045;
-        opacity: 0;
-        visibility: hidden;
-        transition: .25s ease;
-    }
+            body.sidebar-open .app-sidebar-menu {
+                transform: translateX(0);
+                visibility: visible;
+                pointer-events: auto;
+            }
 
-    body.sidebar-open .sidebar-overlay {
-        opacity: 1;
-        visibility: visible;
-    }
+            .sidebar-overlay {
+                position: fixed;
+                top: calc(var(--topbar-height) - var(--topbar-offset));
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,.35);
+                z-index: 1085;
+                opacity: 0;
+                visibility: hidden;
+                transition: .25s ease;
+            }
 
-    .content-page {
-        width: 100%;
-        margin-left: 0 !important;
-        padding: .75rem 1rem 1.25rem 1rem;
-    }
+            body.sidebar-open .sidebar-overlay {
+                opacity: 1;
+                visibility: visible;
+            }
 
-    #side-menu > li > a {
-        margin-left: 8px;
-        margin-right: 8px;
-    }
+            .content-page {
+                width: 100%;
+                margin-left: 0 !important;
+                padding: .1rem 1rem 1.25rem 1rem !important;
+            }
 
-    #side-menu .nav-second-level li a {
-        padding-left: 46px;
-        margin-left: 8px;
-        margin-right: 8px;
-    }
+            #side-menu > li > a {
+                margin-left: 8px;
+                margin-right: 8px;
+            }
 
-    .topbar-navbar {
-        min-height: auto;
-    }
+            #side-menu .nav-second-level li a {
+                padding-left: 46px;
+                margin-left: 8px;
+                margin-right: 8px;
+            }
 
-    .topbar-collapse {
-        padding-top: .85rem;
-    }
+            .topbar-navbar {
+                min-height: auto;
+            }
 
-    .topbar-menu {
-        gap: .15rem;
-    }
+            .topbar-collapse {
+                padding-top: .85rem;
+                max-height: calc(100vh - var(--topbar-height) - 12px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
 
-    .topbar-menu,
-    .topbar-profile-nav {
-        width: 100%;
-    }
+            .topbar-menu,
+            .topbar-profile-nav {
+                width: 100%;
+            }
 
-    .topbar-menu .nav-item,
-    .topbar-profile-nav .nav-item {
-        width: 100%;
-    }
+            .topbar-menu .nav-item,
+            .topbar-profile-nav .nav-item {
+                width: 100%;
+            }
 
-    .topbar-link,
-    .topbar-user {
-        width: 100%;
-        justify-content: flex-start;
-    }
+            .topbar-link,
+            .topbar-user {
+                width: 100%;
+                justify-content: flex-start;
+            }
 
-    .topbar-dropdown {
-        position: static !important;
-        transform: none !important;
-        width: 100%;
-        min-width: 100%;
-        margin-top: .3rem;
-        border-radius: 12px;
-        box-shadow: none;
-    }
+            .topbar-dropdown {
+                position: static !important;
+                transform: none !important;
+                width: 100%;
+                min-width: 100%;
+                margin-top: .3rem;
+                border-radius: 12px;
+                box-shadow: none;
+            }
 
-    .topbar-profile-nav {
-        margin-top: .7rem;
-        padding-top: .7rem;
-        border-top: 1px solid #e9edf3;
-    }
+            .topbar-profile-nav {
+                margin-top: .7rem;
+                padding-top: .7rem;
+                border-top: 1px solid #e9edf3;
+            }
 
-    .topbar-user {
-        padding-left: .2rem !important;
-    }
+            .topbar-user {
+                padding-left: .2rem !important;
+            }
 
-    .topbar-brand {
-        margin-left: .15rem;
-    }
-}
+            .topbar-brand {
+                margin-left: .15rem;
+            }
+        }
 
-        /* Mobile */
         @media (max-width: 767.98px) {
             :root{
                 --topbar-height: 64px;
+                --topbar-offset: 8px;
             }
 
             body {
@@ -790,7 +817,7 @@
             }
 
             .content-page {
-                padding: .65rem .75rem 1rem .75rem;
+                padding: var(--content-top-padding-sm) .75rem 1rem .75rem !important;
             }
 
             .card {
@@ -814,6 +841,7 @@
                 font-size: 12px;
             }
         }
+        
     </style>
 </head>
 
@@ -821,19 +849,14 @@
 
     <div id="app-layout">
 
-        {{-- HEADER --}}
         @include('admin_client.body.client_header')
 
-        {{-- BODY --}}
         <div class="app-body">
 
-            {{-- SIDEBAR --}}
             @include('admin_client.body.client_sidebar')
 
-            {{-- OVERLAY --}}
             <div class="sidebar-overlay"></div>
 
-            {{-- CONTENT --}}
             <main class="content-page main-content">
                 <div class="content-shell">
                     <div class="content-scroll-x">
@@ -841,14 +864,12 @@
                     </div>
                 </div>
 
-                {{-- FOOTER --}}
                 @include('admin_client.body.client_footer')
             </main>
 
         </div>
     </div>
 
-    <!-- Vendor JS -->
     <script src="{{ asset('backend/assets/libs/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/simplebar/simplebar.min.js') }}"></script>
@@ -857,29 +878,24 @@
     <script src="{{ asset('backend/assets/libs/jquery.counterup/jquery.counterup.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/feather-icons/feather.min.js') }}"></script>
 
-    <!-- Apexcharts -->
     <script src="{{ asset('backend/assets/libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="https://apexcharts.com/samples/assets/stock-prices.js"></script>
 
-    <!-- Dashboard Init -->
     <script src="{{ asset('backend/assets/js/pages/analytics-dashboard.init.js') }}"></script>
-
-    <!-- App JS -->
     <script src="{{ asset('backend/assets/js/app.js') }}"></script>
 
-    <!-- Datatables JS -->
     <script src="{{ asset('backend/assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
     <script src="{{ asset('backend/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('backend/assets/js/pages/datatable.init.js') }}"></script>
 
-    <!-- DataTables ภาษาไทย -->
     <script>
         $(function() {
             $.extend(true, $.fn.dataTable.defaults, {
-                responsive: true,
+                responsive: false,
                 destroy: true,
                 autoWidth: false,
+                scrollX: true,
                 language: {
                     search: "ค้นหา:",
                     lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
@@ -896,9 +912,9 @@
                 }
             });
 
-            $('table[id^="datatable"]').each(function() {
+            $('table[id^="datatable"], table.data-table-auto').each(function() {
                 const $table = $(this);
-                if ($.fn.dataTable.isDataTable($table)) {
+                if ($.fn.dataTable.isDataTable(this)) {
                     $table.DataTable().destroy();
                 }
                 $table.DataTable();
@@ -906,18 +922,13 @@
         });
     </script>
 
-    <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="{{ asset('backend/assets/js/code.js') }}"></script>
-
-    <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    <!-- Datepicker JS + Thai locale -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.th.min.js"></script>
 
-    <!-- Init Datepicker Thai -->
     <script>
         $(function() {
             $('.datepicker-th').datepicker({
@@ -950,7 +961,6 @@
         });
     </script>
 
-    <!-- Confirm Delete -->
     <script>
         window.confirmDelete = function(formId, message = 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่') {
             Swal.fire({
@@ -970,7 +980,6 @@
         };
     </script>
 
-    <!-- Toastr Alert -->
     <script>
         @if(Session::has('message'))
             var type = "{{ Session::get('alert-type','info') }}";
@@ -983,7 +992,6 @@
         @endif
     </script>
 
-    <!-- Feather Icon Refresh -->
     <script>
         $(function () {
             if (window.feather) {
@@ -992,7 +1000,6 @@
         });
     </script>
 
-    <!-- Footer Year -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const footerYear = document.getElementById('footer-year');
@@ -1004,14 +1011,33 @@
 
     @stack('scripts')
 
-    <!-- Sidebar Toggle -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const toggleBtn = document.querySelector('.button-toggle-menu');
+            const toggleBtns = document.querySelectorAll('.button-toggle-menu');
             const overlay = document.querySelector('.sidebar-overlay');
+            const topbar = document.getElementById('appTopbar') || document.querySelector('.app-topbar');
+            const navbarCollapse = document.getElementById('navbarSupportedContent');
 
-            toggleBtn?.addEventListener('click', function () {
-                document.body.classList.toggle('sidebar-open');
+            function syncTopbarHeight() {
+                if (!topbar) return;
+
+                const height = topbar.offsetHeight || 72;
+                const rootStyle = getComputedStyle(document.documentElement);
+                const offset = parseInt(rootStyle.getPropertyValue('--topbar-offset')) || 0;
+                const safePadding = Math.max(height - offset, 52);
+
+                document.documentElement.style.setProperty('--topbar-height', height + 'px');
+                document.body.style.paddingTop = safePadding + 'px';
+            }
+
+            syncTopbarHeight();
+
+            toggleBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    if (window.innerWidth < 1200) {
+                        document.body.classList.toggle('sidebar-open');
+                    }
+                });
             });
 
             overlay?.addEventListener('click', function () {
@@ -1019,10 +1045,16 @@
             });
 
             window.addEventListener('resize', function () {
+                syncTopbarHeight();
                 if (window.innerWidth >= 1200) {
                     document.body.classList.remove('sidebar-open');
                 }
             });
+
+            if (navbarCollapse) {
+                navbarCollapse.addEventListener('shown.bs.collapse', syncTopbarHeight);
+                navbarCollapse.addEventListener('hidden.bs.collapse', syncTopbarHeight);
+            }
         });
     </script>
 </body>

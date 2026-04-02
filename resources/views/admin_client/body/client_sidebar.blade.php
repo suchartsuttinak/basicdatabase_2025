@@ -42,26 +42,6 @@
     <div class="h-100" data-simplebar>
         <div id="sidebar-menu">
 
-            <div class="logo-box text-center py-3 border-bottom">
-                <a href="{{ route('dashboard') }}" class="logo logo-dark text-decoration-none d-inline-flex align-items-center gap-2">
-                    <span class="logo-sm">
-                        <img src="{{ asset('backend/assets/images/logo-sm.png') }}" alt="logo-sm" height="22">
-                    </span>
-                    <span class="logo-lg fw-semibold text-dark">
-                        ข้อมูลผู้รับบริการ
-                    </span>
-                </a>
-            </div>
-
-            <div class="client-mini-card px-3 py-3 border-bottom">
-                <div class="client-id text-center text-danger fw-semibold fs-2 mb-1">
-                    {{ $clientId }}
-                </div>
-                <div class="client-id-label text-center text-muted small">
-                    ทะเบียนประวัติ
-                </div>
-            </div>
-
             <ul id="side-menu" class="metismenu list-unstyled pt-2">
 
                 <li class="menu-title">ทะเบียนประวัติ</li>
@@ -86,15 +66,10 @@
                             <li>
                                 <a href="{{ route('client.report', $clientId) }}"
                                    class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">
-                                    รายงานการช่วยเหลือ
+                                    รายงานผู้รับบริการ
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{ route('issues.index') }}"
-                                   class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
-                                    ขอความช่วยเหลือ
-                                </a>
-                            </li>
+                         
                         </ul>
                     </div>
                 </li>

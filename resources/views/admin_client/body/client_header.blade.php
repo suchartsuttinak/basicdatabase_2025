@@ -3,7 +3,68 @@
     $profileData = App\Models\User::find($id);
 @endphp
 
-<div class="topbar-custom app-topbar">
+<style>
+    /* =========================================================
+       Scoped style เฉพาะ topbar นี้เท่านั้น
+       ปรับเฉพาะข้อความเมนูหลักให้เหมือน "ระบบข้อมูลผู้รับบริการ"
+       ========================================================= */
+    #appTopbar .topbar-menu > .nav-item > .topbar-link > span,
+    #appTopbar .topbar-menu > .nav-item > .topbar-link.dropdown-toggle > span {
+        font-family: 'Kanit', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        letter-spacing: .01em !important;
+        color: #1e3a5f !important;
+        display: inline-block !important;
+        vertical-align: middle !important;
+        text-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* คงรูปแบบเดิมตอน active / hover โดยไม่ไปยุ่งส่วนอื่น */
+    #appTopbar .topbar-menu > .nav-item > .topbar-link.active > span,
+    #appTopbar .topbar-menu > .nav-item > .topbar-link:hover > span,
+    #appTopbar .topbar-menu > .nav-item > .topbar-link:focus > span,
+    #appTopbar .topbar-menu > .nav-item > .topbar-link.dropdown-toggle.active > span,
+    #appTopbar .topbar-menu > .nav-item > .topbar-link.dropdown-toggle:hover > span,
+    #appTopbar .topbar-menu > .nav-item > .topbar-link.dropdown-toggle:focus > span {
+        font-family: 'Kanit', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        letter-spacing: .01em !important;
+    }
+
+    /* จัดไอคอนกับข้อความให้บาลานซ์ขึ้น แต่ไม่กระทบเมนูย่อย */
+    #appTopbar .topbar-menu > .nav-item > .topbar-link {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: .55rem !important;
+    }
+
+    #appTopbar .topbar-menu > .nav-item > .topbar-link > i {
+        flex: 0 0 auto;
+    }
+
+    @media (max-width: 767.98px) {
+        #appTopbar .topbar-menu > .nav-item > .topbar-link > span,
+        #appTopbar .topbar-menu > .nav-item > .topbar-link.dropdown-toggle > span,
+        #appTopbar .topbar-menu > .nav-item > .topbar-link.active > span,
+        #appTopbar .topbar-menu > .nav-item > .topbar-link:hover > span,
+        #appTopbar .topbar-menu > .nav-item > .topbar-link:focus > span {
+            font-family: 'Kanit', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            line-height: 1.2 !important;
+            letter-spacing: .01em !important;
+            color: #1e3a5f !important;
+        }
+    }
+</style>
+
+<div class="topbar-custom app-topbar" id="appTopbar">
     <div class="container-fluid px-2 px-lg-3">
         <nav class="navbar navbar-expand-xl navbar-light topbar-navbar">
 
@@ -25,7 +86,7 @@
 
                 <a href="{{ route('dashboard') }}" class="topbar-brand d-none d-md-flex">
                     <span class="topbar-brand-badge">
-                       <i class="fas fa-people-group"></i>
+                        <i class="fas fa-people-group"></i>
                     </span>
                     <span class="topbar-brand-text">
                         ระบบข้อมูลผู้รับบริการ

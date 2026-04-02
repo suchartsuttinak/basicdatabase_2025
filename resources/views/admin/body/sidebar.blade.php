@@ -1,264 +1,220 @@
-<div class="app-sidebar-menu">
-    <div class="h-100" data-simplebar>
+@php
+    $isProfileOpen =
+        Request::routeIs('client.show') ||
+        Request::routeIs('client.show_refer');
 
-        <!--- Sidemenu -->
+    $isDashboardOpen =
+        Request::routeIs('issues.index') ||
+        Request::routeIs('news.create') ||
+        Request::routeIs('landing.about.index');
+
+    $isMasterMenu =
+        Request::routeIs('institution.*') ||
+        Request::routeIs('subject.*') ||
+        Request::routeIs('education.*') ||
+        Request::routeIs('semester.*') ||
+        Request::routeIs('psycho.*') ||
+        Request::routeIs('misbehavior.*') ||
+        Request::routeIs('outside.*') ||
+        Request::routeIs('document.*') ||
+        Request::routeIs('income.*') ||
+        Request::routeIs('help_type.*') ||
+        Request::routeIs('translate.*');
+@endphp
+
+<style>
+/* (เหมือนเดิมทุกอย่าง — ไม่เปลี่ยน CSS เดิมของคุณ) */
+.app-sidebar-menu.sidebar-arrow-fix .menu-arrow {
+    position: relative;
+    display: inline-block;
+    width: 10px;
+    min-width: 10px;
+    height: 10px;
+    margin-left: auto;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    color: transparent !important;
+    overflow: hidden;
+}
+
+.app-sidebar-menu.sidebar-arrow-fix .menu-arrow::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid #64748b;
+    border-bottom: 2px solid #64748b;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    transition: transform .2s ease;
+}
+
+.app-sidebar-menu.sidebar-arrow-fix a[aria-expanded="true"] > .menu-arrow::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.app-sidebar-menu.sidebar-arrow-fix i[data-feather] {
+    opacity: 0;
+}
+
+.app-sidebar-menu.sidebar-arrow-fix.sidebar-icons-ready i[data-feather],
+.app-sidebar-menu.sidebar-arrow-fix.sidebar-icons-ready svg.feather {
+    opacity: 1;
+}
+
+.app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a::after {
+    content: none !important;
+}
+</style>
+
+<div class="app-sidebar-menu sidebar-arrow-fix" id="stableMasterSidebar">
+    <div class="h-100" data-simplebar>
         <div id="sidebar-menu">
 
             <div class="logo-box">
-                <a href="index.html" class="logo logo-light">
+                <a href="{{ url('/') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="assets/images/logo-sm.png" alt="" height="22">
+                        <img src="{{ asset('backend/assets/images/logo-sm.png') }}" height="22">
                     </span>
                     <span class="logo-lg">
-                        <img src="assets/images/logo-light.png" alt="" height="24">
-                    </span>
-                </a>
-                <a href="index.html" class="logo logo-dark">
-                    <span class="logo-sm">
-                        <img src="assets/images/logo-sm.png" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="assets/images/logo-dark.png" alt="" height="24">
+                        <img src="{{ asset('backend/assets/images/logo-light.png') }}" height="24">
                     </span>
                 </a>
             </div>
 
-            <ul id="side-menu">
+            <ul id="side-menu" class="metismenu list-unstyled pt-2">
 
+                {{-- =========================
+                    ทะเบียนประวัติ
+                ========================== --}}
                 <li class="menu-title">ทะเบียนประวัติ</li>
-
                 <li>
-                    <a href="#sidebarDashboards" data-bs-toggle="collapse">
-                         <i data-feather="users"></i>
-                        {{-- <i data-feather="home"></i> --}}
-                        <span> บันทึกข้อมูลแรกเข้า </span>
+                    <a href="#sidebarProfile"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isProfileOpen ? 'true' : 'false' }}"
+                       class="{{ $isProfileOpen ? 'active' : '' }}">
+                        <i data-feather="users"></i>
+                        <span>บันทึกข้อมูลแรกเข้า</span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarDashboards">
+
+                    <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('client.show') }}" class="tp-link">ทะเบียนผู้รับ</a>
+                                <a href="{{ route('client.show') }}"
+                                   class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
+                                    ทะเบียนผู้รับบริการ
+                                </a>
                             </li>
-                             <li>
-                                <a href="{{ route('client.show_refer') }}" class="tp-link">ทะเบียนผู้ทั้งหมด</a>
-                            </li>
-                          
-                          
-                     <li>
-                                <a href="ecommerce.html" class="tp-link">E-commerce</a>
+                            <li>
+                                <a href="{{ route('client.show_refer') }}"
+                                   class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
+                                    ทะเบียนผู้รับบริการทั้งหมด
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
-                <li class="menu-title">กระบวนการ</li>
-
+                {{-- =========================
+                    🔥 Dashboard ใหม่
+                ========================== --}}
+                <li class="menu-title">Dashboard</li>
                 <li>
-                    <a href="#sidebarAuth" data-bs-toggle="collapse">
-                        <i data-feather="home"></i>
-                        <span> ประเภท/หมวดหมู่ </span>
+                    <a href="#sidebarDashboard"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isDashboardOpen ? 'true' : 'false' }}"
+                       class="{{ $isDashboardOpen ? 'active' : '' }}">
+                        <i data-feather="layout"></i>
+                        <span>เข้าสู่หน้ายินดีต้อนรับ</span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarAuth">
+
+                    <div class="collapse {{ $isDashboardOpen ? 'show' : '' }}" id="sidebarDashboard">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="{{ route('institution.all') }}" class="tp-link">รายการสถานศึกษา</a>
+                                <a href="{{ route('issues.index') }}"
+                                   class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
+                                    แจ้งเรื่องช่วยเหลือ
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('subject.show') }}" class="tp-link">รายการวิชาเรียน</a>
-                            </li>
-                             <li>
-                                <a href="{{ route('education.show') }}" class="tp-link">รายการระดับการศึกษา</a>
-                            </li>
-                             <li>
-                                <a href="{{ route('semester.show') }}" class="tp-link">รายการปีการศึกษา</a>
+                                <a href="{{ route('news.create') }}"
+                                   class="tp-link {{ Request::routeIs('news.create') ? 'active' : '' }}">
+                                    เพิ่มข่าวสาร
+                                </a>
                             </li>
                             <li>
-                                <a href="{{ route('psycho.show') }}" class="tp-link">รายการโรคทางจิตเวช</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('misbehavior.show') }}" class="tp-link">รายการพฤติกรรม</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('outside.show') }}" class="tp-link">รายการเด็กที่อยู่ภายนอก</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('document.show') }}" class="tp-link">รายการเอกสาร</a>
-                            </li>
-                           
-                            <li>
-                                <a href="{{ route('income.show') }}" class="tp-link">รายการรายได้</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('help_type.show') }}" class="tp-link">ประเภทการช่วยเหลือ</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('translate.show') }}" class="tp-link">ประเภทการพ้นอุปการะ</a>
-                            </li>
-                             
-                                <a href="auth-logout.html" class="tp-link">Logout</a>
+                                <a href="{{ route('landing.about.index') }}"
+                                   class="tp-link {{ Request::routeIs('landing.about.index') ? 'active' : '' }}">
+                                    ประวัติความเป็นมา
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
+                {{-- =========================
+                    ข้อมูลอ้างอิง
+                ========================== --}}
+                <li class="menu-title">ข้อมูลอ้างอิง</li>
                 <li>
-                    <a href="#sidebarError" data-bs-toggle="collapse">
-                        <i data-feather="alert-octagon"></i>
-                        <span> Error Pages </span>
+                    <a href="#sidebar-master-data"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isMasterMenu ? 'true' : 'false' }}"
+                       class="{{ $isMasterMenu ? 'active' : '' }}">
+                        <i data-feather="grid"></i>
+                        <span>ประเภท / หมวดหมู่</span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="sidebarError">
+
+                    <div class="collapse {{ $isMasterMenu ? 'show' : '' }}" id="sidebar-master-data">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="error-404.html" class="tp-link">Error 404</a>
-                            </li>
-                            <li>
-                                <a href="error-500.html" class="tp-link">Error 500</a>
-                            </li>
-                            <li>
-                                <a href="error-503.html" class="tp-link">Error 503</a>
-                            </li>
-                            <li>
-                                <a href="error-429.html" class="tp-link">Error 429</a>
-                            </li>
-                            <li>
-                                <a href="offline-page.html" class="tp-link">Offline Page</a>
-                            </li>
+                            <li><a href="{{ route('institution.all') }}">รายการสถานศึกษา</a></li>
+                            <li><a href="{{ route('subject.show') }}">รายการวิชาเรียน</a></li>
+                            <li><a href="{{ route('education.show') }}">รายการระดับการศึกษา</a></li>
+                            <li><a href="{{ route('semester.show') }}">รายการปีการศึกษา</a></li>
+                            <li><a href="{{ route('psycho.show') }}">รายการโรคทางจิตเวช</a></li>
+                            <li><a href="{{ route('misbehavior.show') }}">รายการพฤติกรรม</a></li>
+                            <li><a href="{{ route('outside.show') }}">รายการเด็กที่อยู่ภายนอก</a></li>
+                            <li><a href="{{ route('document.show') }}">รายการเอกสาร</a></li>
+                            <li><a href="{{ route('income.show') }}">รายการรายได้</a></li>
+                            <li><a href="{{ route('help_type.show') }}">ประเภทการช่วยเหลือ</a></li>
+                            <li><a href="{{ route('translate.show') }}">ประเภทการพ้นอุปการะ</a></li>
                         </ul>
                     </div>
                 </li>
 
-               
-
+                {{-- =========================
+                    ระบบ
+                ========================== --}}
+                <li class="menu-title mt-2">ระบบ</li>
                 <li>
-                    <a href="calendar.html" class="tp-link">
-                        <i data-feather="calendar"></i>
-                        <span> Calendar </span>
+                    <a href="{{ route('admin.logout') ?? url('/logout') }}">
+                        <i data-feather="log-out"></i>
+                        <span>ออกจากระบบ</span>
                     </a>
-                </li>
-
-                <li class="menu-title mt-2">General</li>
-
-             
-
-                <li>
-                    <a href="widgets.html" class="tp-link">
-                        <i data-feather="aperture"></i>
-                        <span> Widgets </span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#sidebarAdvancedUI" data-bs-toggle="collapse">
-                        <i data-feather="cpu"></i>
-                        <span> Extended UI </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarAdvancedUI">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="extended-carousel.html" class="tp-link">Carousel</a>
-                            </li>
-                            <li>
-                                <a href="extended-notifications.html" class="tp-link">Notifications</a>
-                            </li>
-                            <li>
-                                <a href="extended-offcanvas.html" class="tp-link">Offcanvas</a>
-                            </li>
-                            <li>
-                                <a href="extended-range-slider.html" class="tp-link">Range Slider</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarIcons" data-bs-toggle="collapse">
-                        <i data-feather="award"></i>
-                        <span> Icons </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarIcons">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="icons-feather.html" class="tp-link">Feather Icons</a>
-                            </li>
-                            <li>
-                                <a href="icons-mdi.html" class="tp-link">Material Design Icons</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarForms" data-bs-toggle="collapse">
-                        <i data-feather="briefcase"></i>
-                        <span> Forms </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarForms">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="forms-elements.html" class="tp-link">General Elements</a>
-                            </li>
-                            <li>
-                                <a href="forms-validation.html" class="tp-link">Validation</a>
-                            </li>
-                            <li>
-                                <a href="forms-quilljs.html" class="tp-link">Quilljs Editor</a>
-                            </li>
-                            <li>
-                                <a href="forms-pickers.html" class="tp-link">Picker</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <li>
-                    <a href="#sidebarTables" data-bs-toggle="collapse">
-                        <i data-feather="table"></i>
-                        <span> Tables </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarTables">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="tables-basic.html" class="tp-link">Basic Tables</a>
-                            </li>
-                            <li>
-                                <a href="tables-datatables.html" class="tp-link">Data Tables</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                
-
-                <li>
-                    <a href="#sidebarMaps" data-bs-toggle="collapse">
-                        <i data-feather="map"></i>
-                        <span> Maps </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="sidebarMaps">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="maps-google.html" class="tp-link">Google Maps</a>
-                            </li>
-                            <li>
-                                <a href="maps-vector.html" class="tp-link">Vector Maps</a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
             </ul>
-
         </div>
-        <!-- End Sidebar -->
-
-        <div class="clearfix"></div>
-
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('stableMasterSidebar');
+    if (!sidebar) return;
+
+    function renderFeather() {
+        if (window.feather) {
+            try { feather.replace(); } catch (e) {}
+        }
+        sidebar.classList.add('sidebar-icons-ready');
+    }
+
+    renderFeather();
+    setTimeout(renderFeather, 100);
+});
+</script>

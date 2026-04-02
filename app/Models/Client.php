@@ -65,7 +65,27 @@ class Client extends Model
         }
 
         return $title;
+
     }
+            // Accessor: ปีที่อยู่อาศัย (คำนวณจากวันที่เข้ารับบริการ)
+        public function getResidenceDurationAttribute()
+        {
+            if (!$this->arrival_date) {
+                return null;
+            }
+
+            try {
+                $start = Carbon::parse($this->arrival_date);
+                $now = now();
+
+                $diff = $start->diff($now);
+
+                return "{$diff->y} ปี {$diff->m} เดือน";
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
 
     // Full name พร้อมคำนำหน้าที่ปรับแล้ว
     public function getFullNameAttribute()
