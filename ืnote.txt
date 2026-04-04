@@ -296,7 +296,7 @@ Route::middleware(['auth', 'role:admin,manager'])->group(function () {
 
 ใช้แบบนี้ร่วมด้วย
 
-@if(auth()->check() && !auth()->user()->hasRole(['general_user', 'executive']))
+
 ----------------------------------
 ถ้าเป็น “route / หน้า”
 

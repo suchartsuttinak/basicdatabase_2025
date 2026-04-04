@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\backend\OperationController;
 use App\Http\Controllers\backend\PublicizeController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Landing\AboutController;
@@ -112,7 +113,22 @@ require __DIR__.'/auth.php';
     Route::post('/toggle-status/{id}', [UserManagementController::class, 'toggleStatus'])->name('users.toggleStatus');
 });
 
-  
+
+
+    // Operation Route All
+        Route::middleware(['auth'])->prefix('operations')->group(function () {
+        Route::get('/', [OperationController::class, 'index'])->name('operations.index');
+        Route::get('/create', [OperationController::class, 'create'])->name('operations.create');
+        Route::post('/store', [OperationController::class, 'store'])->name('operations.store');
+        Route::get('/edit/{id}', [OperationController::class, 'edit'])->name('operations.edit');
+        Route::put('/update/{id}', [OperationController::class, 'update'])->name('operations.update');
+        Route::delete('/delete/{id}', [OperationController::class, 'destroy'])->name('operations.delete');
+
+        // รายงานรายวัน
+        Route::get('/report/daily', [OperationController::class, 'dailyReport'])->name('operations.report.daily');
+    });
+
+
     //Backend Route All
 
     //บันทึกประวัติผู้รับบริการ

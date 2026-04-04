@@ -211,7 +211,7 @@
                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="bi bi-file-earmark-pdf me-1"></i> เปิดไฟล์
                                             </a>
-
+                                                 @if(auth()->check() && auth()->user()->role === 'admin')
                                             <a href="{{ route('publicizes.edit', $item->id) }}"
                                                class="btn btn-outline-warning btn-sm">
                                                 <i class="bi bi-pencil-square me-1"></i> แก้ไข
@@ -228,6 +228,7 @@
                                                     <i class="bi bi-trash me-1"></i> ลบ
                                                 </button>
                                             </form>
+                                                @endif
                                         </div>
                                     </div>
                                 </div>

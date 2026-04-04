@@ -217,6 +217,24 @@
                     </li>
                     @endif
 
+                    {{-- รายงานการปฏิบัติงาน --}}  
+                    <li class="nav-item">
+                        <a href="{{ route('operations.index') }}"
+                        class="nav-link {{ request()->routeIs('operations.*') ? 'active' : '' }}">
+                            <i class="bi bi-journal-text me-2"></i>
+                            <span>บันทึกการปฏิบัติงาน</span>
+                        </a>
+                    </li>
+
+
+                    <li class="nav-item">
+                        <a href="{{ route('operations.report.daily') }}"
+                        class="nav-link {{ request()->routeIs('operations.report.daily') ? 'active' : '' }}">
+                            <i class="bi bi-file-earmark-text me-2"></i>
+                            <span>รายงานการปฏิบัติงาน</span>
+                        </a>
+                    </li>
+
 
                 {{-- =========================
                     ระบบ

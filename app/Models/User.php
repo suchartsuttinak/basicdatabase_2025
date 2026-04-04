@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Operation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,7 +21,7 @@ class User extends Authenticatable
     protected $guarded = [];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * The attributes that should be hidden for serialization.ย
      *
      * @var list<string>
      */
@@ -142,4 +143,12 @@ class User extends Authenticatable
         return $this->role === $roles;
     }
     
+
+    /**
+ * รายงานการปฏิบัติงานประจำวัน
+ */
+public function operations(): HasMany
+{
+    return $this->hasMany(Operation::class);
+}
 }
