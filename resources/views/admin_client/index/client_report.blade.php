@@ -1,47 +1,60 @@
 @extends('admin_client.admin_client')
 @section('content')
 
-<style>
+
+   <style>
+    @page {
+        size: A4 portrait;
+        margin: 12mm 10mm 12mm 14mm;
+    }
+
     body {
         margin: 0;
-        padding: 20px;
-        background: #f2f2f2;
+        padding: 24px;
+        background: #eef1f5;
         font-family: "TH Sarabun New", "Sarabun", "Tahoma", sans-serif;
-        color: #222;
-        font-size: 18px;
-        line-height: 1.25;
+        color: #1f2937;
+        font-size: 19px;
+        line-height: 1.4;
+        letter-spacing: 0.1px;
     }
 
     .report-wrap {
-        width: 1120px;
+        width: 1080px;
         margin: 0 auto;
-        background: #fff;
-        border: 1px solid #cfcfcf;
-        padding: 18px 24px 20px 24px;
+        background: #ffffff;
+        border: 1px solid #d8dee8;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        padding: 26px 34px 30px 46px;
         box-sizing: border-box;
     }
 
     .report-header {
         position: relative;
-        min-height: 118px;
-        margin-bottom: 8px;
+        min-height: 126px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e7eb;
     }
 
     .report-title {
         text-align: center;
-        font-size: 25px;
-        font-weight: bold;
-        color: #6f72d9;
-        margin: 2px 0 0 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #4f46e5;
+        margin: 2px 110px 4px 0;
+        line-height: 1.2;
+        letter-spacing: .2px;
     }
 
     .photo-box {
         position: absolute;
         top: 0;
-        right: 10px;
-        width: 84px;
-        height: 98px;
-        border: 1px solid #8f8f8f;
+        right: 0;
+        width: 92px;
+        height: 108px;
+        border: 1px solid #bfc7d4;
+        border-radius: 4px;
         overflow: hidden;
         background: #fff;
     }
@@ -56,16 +69,17 @@
     .form-row {
         display: flex;
         align-items: flex-start;
-        margin-bottom: 4px;
+        margin-bottom: 12px;
     }
 
     .row-no {
-        width: 34px;
-        flex: 0 0 34px;
-        font-weight: bold;
-        font-size: 19px;
-        line-height: 1.2;
-        padding-top: 1px;
+        width: 42px;
+        flex: 0 0 42px;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 1.5;
+        padding-top: 2px;
+        color: #111827;
     }
 
     .row-body {
@@ -77,37 +91,39 @@
         display: flex;
         flex-wrap: wrap;
         align-items: flex-end;
-        gap: 3px 12px;
+        gap: 8px 18px;
     }
 
     .sub-line {
-        margin-top: 2px;
+        margin-top: 8px;
     }
 
-    /* ให้บรรทัดย่อยเริ่มในแนวเดียวกับข้อความหลัก */
-    .sub-line.same-start {
-        padding-left: 0;
+    .sub-line + .sub-line {
+        margin-top: 6px;
     }
 
     .field {
         display: inline-flex;
         align-items: flex-end;
         white-space: nowrap;
+        min-height: 30px;
     }
 
     .label {
-        font-weight: bold;
-        margin-right: 3px;
+        font-weight: 700;
+        margin-right: 4px;
+        color: #111827;
     }
 
     .value {
         display: inline-block;
-        border-bottom: 1px solid #9d9d9d;
-        min-height: 20px;
-        line-height: 1.05;
-        padding: 0 3px 1px 3px;
+        border-bottom: 1px solid #98a2b3;
+        min-height: 26px;
+        line-height: 1.2;
+        padding: 0 5px 2px 5px;
         vertical-align: bottom;
         text-align: center;
+        color: #111827;
     }
 
     .value.left {
@@ -134,210 +150,447 @@
     .w-180 { min-width: 180px; }
     .w-200 { min-width: 200px; }
     .w-220 { min-width: 220px; }
+    .w-240 { min-width: 240px; }
     .w-260 { min-width: 260px; }
+    .w-320 { min-width: 320px; }
+    .w-420 { min-width: 420px; }
+    .w-520 { min-width: 520px; }
+    .w-full { width: 100%; min-height: 30px; }
 
-    .problem-title {
-        font-weight: bold;
-        font-size: 19px;
-        margin: 10px 0 3px 0;
+    .report-block-title,
+    .problem-title,
+    .member-table-title,
+    .factfinding-subtitle {
+        font-weight: 700;
+        color: #374151;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #d9dee7;
+    }
+
+    .report-block-title,
+    .problem-title,
+    .member-table-title {
+        font-size: 22px;
+        margin: 22px 0 10px;
     }
 
     .problem-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 2px 16px;
+        gap: 8px 24px;
+        padding-top: 2px;
     }
 
     .problem-item {
-        min-width: 250px;
-        font-size: 17px;
+        min-width: 260px;
+        font-size: 18px;
+        line-height: 1.5;
     }
 
     .checkbox {
-        font-weight: bold;
-        margin-right: 3px;
+        font-weight: 700;
+        margin-right: 4px;
     }
 
     .member-table-wrap {
-        margin-top: 14px;
-    }
-
-    .member-table-title {
-        font-weight: bold;
-        font-size: 19px;
-        margin-bottom: 5px;
+        margin-top: 22px;
     }
 
     .member-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
+        margin-top: 8px;
     }
 
     .member-table th,
     .member-table td {
-        border: 2px solid #333;
-        padding: 5px 6px;
-        font-size: 16px;
-        line-height: 1.2;
+        border: 1px solid #4b5563;
+        padding: 8px 10px;
+        font-size: 17px;
+        line-height: 1.4;
         vertical-align: top;
         word-break: break-word;
     }
 
     .member-table th {
         text-align: center;
-        font-weight: bold;
-        background: #fafafa;
+        font-weight: 700;
+        background: #f8fafc;
+        color: #1f2937;
     }
 
     .center {
         text-align: center;
     }
 
+    .factfinding-section {
+        margin-top: 28px;
+        padding-top: 16px;
+        border-top: 2px solid #c7cfdb;
+    }
+
+    .factfinding-subtitle {
+        font-size: 21px;
+        margin: 18px 0 10px 0;
+    }
+
+    .factfinding-box {
+        border: 1px solid #d6dde8;
+        background: #fbfcff;
+        padding: 12px 14px;
+        margin-top: 10px;
+        border-radius: 4px;
+    }
+
+    .factfinding-box + .factfinding-box {
+        margin-top: 12px;
+    }
+
+    .factfinding-text {
+        border: 1px solid #d3d9e3;
+        background: #ffffff;
+        min-height: 58px;
+        padding: 10px 12px;
+        line-height: 1.55;
+        white-space: pre-line;
+        margin-top: 6px;
+        border-radius: 3px;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .doc-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin-top: 4px;
+    }
+
+    .doc-item {
+        min-width: 240px;
+        font-size: 18px;
+    }
+
+    .muted {
+        color: #6b7280;
+    }
+
+    /* ---------- ช่องข้อความยาวแบบอยู่แถวเดิม แต่ขึ้นบรรทัดใหม่ได้ ---------- */
+    .field.wrap {
+        white-space: normal;
+        align-items: flex-start;
+        min-width: 0;
+    }
+
+    .field.wrap .label {
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .field.wrap .value {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        line-height: 1.5;
+        min-width: 0;
+    }
+
+    /* ---------- แถวคู่ที่ข้อความยาวและตัดบรรทัดได้ ---------- */
+    .paired-wrap-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+    }
+
+    .paired-wrap-row .field.wrap {
+        width: 100%;
+    }
+
+    .paired-wrap-row .field.wrap .value {
+        flex: 1 1 auto;
+        width: auto;
+    }
+
+    /* ---------- หัวข้อย่อย 14.1 - 14.4 ---------- */
+    .subitem-group {
+        padding-left: 42px;
+        margin-top: 6px;
+    }
+
+    .subitem-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .subitem-no {
+        width: 60px;
+        flex: 0 0 60px;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.55;
+        padding-top: 1px;
+    }
+
+    .subitem-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .subitem-line {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .subitem-label {
+        flex: 0 0 250px;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.55;
+        white-space: nowrap;
+        padding-top: 1px;
+    }
+
+    .subitem-value {
+        flex: 1 1 auto;
+        min-width: 0;
+        border-bottom: 1px dashed #9aa3af;
+        color: #111827;
+        line-height: 1.55;
+        padding: 0 5px 2px 5px;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        text-align: left;
+    }
+
     @media (max-width: 1200px) {
+        body {
+            padding: 14px;
+        }
+
         .report-wrap {
+            width: 100%;
+            padding: 22px 22px 26px 26px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 8px;
+            font-size: 18px;
+        }
+
+        .report-wrap {
+            padding: 18px 16px 22px 18px;
+        }
+
+        .photo-box {
+            position: static;
+            margin: 12px auto 0;
+        }
+
+        .report-header {
+            padding-bottom: 14px;
+        }
+
+        .form-row {
+            gap: 6px;
+        }
+
+        .row-no {
+            width: 34px;
+            flex-basis: 34px;
+        }
+
+        .paired-wrap-row {
+            grid-template-columns: 1fr;
+        }
+
+        .subitem-group {
+            padding-left: 0;
+        }
+
+        .subitem-row {
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .subitem-no {
+            width: 100%;
+            flex: 0 0 auto;
+        }
+
+        .subitem-line {
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .subitem-label {
+            flex: 0 0 auto;
+            width: 100%;
+            white-space: normal;
+        }
+
+        .subitem-value {
             width: 100%;
         }
     }
 
-    .form-row {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 14px;   /* เพิ่มจาก 10 → 14 */
-}
+    @media print {
+        body {
+            background: #fff;
+            padding: 0;
+            font-size: 18px;
+            line-height: 1.32;
+            color: #000;
+        }
 
-.row-no {
-    width: 34px;
-    flex: 0 0 34px;
-    font-weight: bold;
-    font-size: 19px;
-    line-height: 1.5;     /* เพิ่มความโปร่ง */
-    padding-top: 2px;
-}
+        .report-wrap {
+            width: 100%;
+            margin: 0;
+            border: 0;
+            box-shadow: none;
+            padding: 0;
+        }
 
-.line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 8px 18px;        /* เพิ่ม spacing แนวนอน + แนวตั้ง */
-}
+        .report-header {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #cfcfcf;
+        }
 
-.sub-line {
-    margin-top: 8px;      /* จาก 6 → 8 */
-}
-
-/* เพิ่มช่องว่างระหว่างบล็อกย่อย */
-.sub-line + .sub-line {
-    margin-top: 6px;
-}
-
-.value {
-    display: inline-block;
-    border-bottom: 1px solid #9d9d9d;
-    min-height: 24px;     /* จาก 22 → 24 */
-    line-height: 1.2;
-    padding: 0 4px 2px 4px;
-}
-
-/* ข้อ 7–10 ให้โปร่งขึ้นอีกนิด */
-.form-row.family-row {
-    margin-bottom: 16px;
-}
-
-/* สภาพปัญหา */
-.problem-title {
-    font-weight: bold;
-    font-size: 19px;
-    margin: 20px 0 8px 0;   /* เพิ่มระยะบน */
-}
-
-.problem-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 24px;
-}
-
-.problem-item {
-    min-width: 260px;
-    font-size: 17px;
-    line-height: 1.5;
-}
-
-/* ตาราง */
-.member-table-wrap {
-    margin-top: 22px;
-}
-
-.member-table-title {
-    font-weight: bold;
-    font-size: 19px;
-    margin-bottom: 10px;
-}
-
-.member-table th,
-.member-table td {
-    border: 2px solid #333;
-    padding: 9px 10px;   /* เพิ่มอีก */
-    font-size: 16px;
-    line-height: 1.4;
-}
-
-.report-wrap {
-    width: 1120px;
-    margin: 0 auto;
-    padding-left: 100px;   /* เพิ่ม */
-    padding-right: 24px;
-}
-
+        .factfinding-section,
+        .member-table-wrap,
+        .factfinding-box,
+        .subitem-row,
+        .form-row {
+            page-break-inside: avoid;
+        }
+    }
 </style>
 
+
 @php
-    $birthDate   = $client->birth_date ? date('m/d/Y', strtotime($client->birth_date)) : '-';
-    $arrivalDate = $client->arrival_date ? date('m/d/Y', strtotime($client->arrival_date)) : '-';
+    $factFinding = $factFinding ?? null;
+
+    $birthDate   = $client->birth_date ? date('d/m/Y', strtotime($client->birth_date)) : '-';
+    $arrivalDate = $client->arrival_date ? date('d/m/Y', strtotime($client->arrival_date)) : '-';
+
+    $factDate = !empty($factFinding?->date) ? date('d/m/Y', strtotime($factFinding->date)) : '-';
+    $receiveDate = !empty($factFinding?->receive_date) ? date('d/m/Y', strtotime($factFinding->receive_date)) : '-';
+
+    $showText = function ($value, $default = '-') {
+        return filled($value) ? $value : $default;
+    };
+
+    $extractPlaceName = function ($value, array $possibleKeys = [], $default = '-') {
+        if (blank($value)) {
+            return $default;
+        }
+
+        if (is_string($value) || is_numeric($value)) {
+            return $value;
+        }
+
+        if (is_object($value)) {
+            foreach ($possibleKeys as $key) {
+                if (isset($value->$key) && filled($value->$key)) {
+                    return $value->$key;
+                }
+            }
+
+            if ($value instanceof \JsonSerializable) {
+                $value = $value->jsonSerialize();
+            } else {
+                $value = (array) $value;
+            }
+        }
+
+        if (is_array($value)) {
+            foreach ($possibleKeys as $key) {
+                if (array_key_exists($key, $value) && filled($value[$key])) {
+                    return $value[$key];
+                }
+            }
+        }
+
+        return $default;
+    };
+
+    $personSubDistrict = function ($person) use ($extractPlaceName) {
+        if (!$person) return '-';
+
+        return $extractPlaceName(
+            $person->sub_district ?? $person->subDistrict ?? null,
+            ['subd_name', 'name', 'subdistrict_name', 'sub_district_name']
+        );
+    };
+
+    $personDistrict = function ($person) use ($extractPlaceName) {
+        if (!$person) return '-';
+
+        return $extractPlaceName(
+            $person->district ?? null,
+            ['dist_name', 'name', 'district_name']
+        );
+    };
+
+    $personProvince = function ($person) use ($extractPlaceName) {
+        if (!$person) return '-';
+
+        return $extractPlaceName(
+            $person->province ?? null,
+            ['prov_name', 'name', 'province_name']
+        );
+    };
 @endphp
 
 <div class="report-wrap">
     <div class="report-header">
         <div class="report-title">ทะเบียนประวัติผู้รับการสงเคราะห์</div>
-
+      
         <div class="photo-box">
             <img src="{{ !empty($client->image) ? asset('upload/client_images/'.$client->image) : asset('upload/no_image.jpg') }}" alt="รูปถ่าย">
         </div>
     </div>
 
-    {{-- เลขทะเบียน / ชื่อเล่น --}}
     <div class="form-row">
         <div class="row-no"></div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">เลขทะเบียน</span>
-                    <span class="value left w-70">{{ $client->register_number ?? '-' }}</span>
+                    <span class="value left w-90">{{ $client->register_number ?? '-' }}</span>
                 </div>
 
-                <div class="field" style="margin-left:55px;">
+                <div class="field" style="margin-left:36px;">
                     <span class="label">ชื่อเล่น</span>
-                    <span class="value left w-70">{{ $client->nick_name ?? '-' }}</span>
+                    <span class="value left w-90">{{ $client->nick_name ?? '-' }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 1 --}}
     <div class="form-row">
         <div class="row-no">1.</div>
         <div class="row-body">
             <div class="line">
-               
-
                 <div class="field">
                     <span class="label">ชื่อ-สกุล</span>
-                    <span class="value left w-220">{{ $client->full_name ?? '-' }}</span>
+                    <span class="value left w-260">{{ $client->full_name ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">อายุ</span>
-                    <span class="value w-35">{{ $client->age ?? '-' }}</span>
+                    <span class="value w-40">{{ $client->age ?? '-' }}</span>
                 </div>
 
                 <div class="field">
@@ -347,221 +600,217 @@
         </div>
     </div>
 
-    {{-- 2 --}}
     <div class="form-row">
         <div class="row-no">2.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">วัน เดือน ปี เกิด</span>
-                    <span class="value w-90">{{ $birthDate }}</span>
+                    <span class="value w-100">{{ $birthDate }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">เชื้อชาติ</span>
-                    <span class="value left w-55">{{ optional($client->national)->national_name ?? '-' }}</span>
+                    <span class="value left w-80">{{ optional($client->national)->national_name ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">สัญชาติ</span>
-                    <span class="value left w-55">{{ optional($client->national)->national_name ?? '-' }}</span>
+                    <span class="value left w-80">{{ optional($client->national)->national_name ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">ศาสนา</span>
-                    <span class="value left w-55">{{ optional($client->religion)->religion_name ?? '-' }}</span>
+                    <span class="value left w-80">{{ optional($client->religion)->religion_name ?? '-' }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 3 --}}
     <div class="form-row">
         <div class="row-no">3.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">บัตรประจำตัวประชาชนเลขที่</span>
-                    <span class="value left w-160">{{ $client->id_card ?? '-' }}</span>
+                    <span class="value left w-180">{{ $client->id_card ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">วันที่รับเข้า</span>
-                    <span class="value w-90">{{ $arrivalDate }}</span>
+                    <span class="value w-100">{{ $arrivalDate }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">กลุ่มเป้าหมาย</span>
-                    <span class="value left w-110">{{ optional($client->target)->target_name ?? '-' }}</span>
+                    <span class="value left w-130">{{ optional($client->target)->target_name ?? '-' }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 4 --}}
     <div class="form-row">
         <div class="row-no">4.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">ภูมิลำเนาเดิมเลขที่</span>
-                    <span class="value left w-45">{{ $client->origin_address ?? '-' }}</span>
+                    <span class="value left w-50">{{ $client->origin_address ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">ตรอก/ซอย</span>
-                    <span class="value left w-80">{{ $client->origin_soi ?? '-' }}</span>
+                    <span class="value left w-90">{{ $client->origin_soi ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">ถนน</span>
-                    <span class="value left w-80">{{ $client->origin_road ?? '-' }}</span>
+                    <span class="value left w-90">{{ $client->origin_road ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">หมู่ที่</span>
-                    <span class="value w-35">{{ $client->origin_moo ?? '-' }}</span>
+                    <span class="value w-40">{{ $client->origin_moo ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ตำบล/แขวง</span>
-                        <span class="value left w-100">{{ optional($client->originSubDistrict)->subd_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ optional($client->originSubDistrict)->subd_name ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-100">{{ optional($client->originDistrict)->dist_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ optional($client->originDistrict)->dist_name ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional($client->originProvince)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ optional($client->originProvince)->prov_name ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">โทร.</span>
-                        <span class="value left w-80">{{ $client->origin_phone ?? '-' }}</span>
+                        <span class="value left w-100">{{ $client->origin_phone ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 5 --}}
     <div class="form-row">
         <div class="row-no">5.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">ที่อยู่ปัจจุบัน เลขที่</span>
-                    <span class="value left w-45">{{ $client->address ?? '-' }}</span>
+                    <span class="value left w-50">{{ $client->address ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">ตรอก/ซอย</span>
-                    <span class="value left w-80">{{ $client->soi ?? '-' }}</span>
+                    <span class="value left w-90">{{ $client->soi ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">ถนน</span>
-                    <span class="value left w-80">{{ $client->road ?? '-' }}</span>
+                    <span class="value left w-90">{{ $client->road ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">หมู่ที่</span>
-                    <span class="value w-35">{{ $client->moo ?? '-' }}</span>
+                    <span class="value w-40">{{ $client->moo ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ตำบล/แขวง</span>
-                        <span class="value left w-100">{{ optional($client->sub_district)->subd_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ optional($client->sub_district)->subd_name ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-100">{{ optional($client->district)->dist_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ optional($client->district)->dist_name ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional($client->province)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ optional($client->province)->prov_name ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">โทร.</span>
-                        <span class="value left w-80">{{ $client->phone ?? '-' }}</span>
+                        <span class="value left w-100">{{ $client->phone ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 6 --}}
     <div class="form-row">
         <div class="row-no">6.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">ระดับการศึกษา</span>
-                    <span class="value left w-100">{{ optional($client->education)->education_name ?? '-' }}</span>
+                    <span class="value left w-120">{{ optional($client->education)->education_name ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">สถานศึกษา</span>
-                    <span class="value left w-160">{{ $client->scholl ?? '-' }}</span>
+                    <span class="value left w-220">{{ $client->scholl ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">รายได้รายเดือน</span>
-                    <span class="value left w-100">{{ optional($client->income)->income_name ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->income)->income_name ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ปีการศึกษา</span>
-                        <span class="value left w-55">{{ $client->study_year ?? '-' }}</span>
+                        <span class="value left w-70">{{ $client->study_year ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional($client->schoolProvince)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ $client->school_province ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-90">{{ optional($client->schoolDistrict)->dist_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ $client->school_district ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 7 บิดา --}}
+    <div class="report-block-title">ข้อมูลครอบครัว</div>
+
     <div class="form-row">
         <div class="row-no">7.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">บิดาชื่อ</span>
-                    <span class="value left w-100">{{ optional($client->father)->fname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->father)->fname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">นามสกุล</span>
-                    <span class="value left w-100">{{ optional($client->father)->lname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->father)->lname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">อายุ</span>
-                    <span class="value w-35">{{ optional($client->father)->age ?? '-' }}</span>
+                    <span class="value w-40">{{ optional($client->father)->age ?? '-' }}</span>
                 </div>
 
                 <div class="field">
@@ -570,78 +819,77 @@
 
                 <div class="field">
                     <span class="label">อาชีพ</span>
-                    <span class="value left w-80">{{ optional($client->father)->occupation ?? '-' }}</span>
+                    <span class="value left w-100">{{ optional($client->father)->occupation ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ที่อยู่ปัจจุบัน เลขที่</span>
-                        <span class="value left w-45">{{ optional($client->father)->address_no ?? '-' }}</span>
+                        <span class="value left w-50">{{ optional($client->father)->address_no ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ตรอก/ซอย</span>
-                        <span class="value left w-80">{{ optional($client->father)->soi ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->father)->soi ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ถนน</span>
-                        <span class="value left w-80">{{ optional($client->father)->road ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->father)->road ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">หมู่ที่</span>
-                        <span class="value w-35">{{ optional($client->father)->moo ?? '-' }}</span>
+                        <span class="value w-40">{{ optional($client->father)->moo ?? '-' }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ตำบล/แขวง</span>
-                        <span class="value left w-100">{{ optional(optional($client->father)->sub_district)->subd_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personSubDistrict($client->father) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-100">{{ optional(optional($client->father)->district)->dist_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personDistrict($client->father) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional(optional($client->father)->province)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ $personProvince($client->father) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">โทร.</span>
-                        <span class="value left w-80">{{ optional($client->father)->phone ?? '-' }}</span>
+                        <span class="value left w-100">{{ optional($client->father)->phone ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 8 มารดา --}}
     <div class="form-row">
         <div class="row-no">8.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">มารดาชื่อ</span>
-                    <span class="value left w-100">{{ optional($client->mother)->fname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->mother)->fname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">นามสกุล</span>
-                    <span class="value left w-100">{{ optional($client->mother)->lname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->mother)->lname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">อายุ</span>
-                    <span class="value w-35">{{ optional($client->mother)->age ?? '-' }}</span>
+                    <span class="value w-40">{{ optional($client->mother)->age ?? '-' }}</span>
                 </div>
 
                 <div class="field">
@@ -650,78 +898,77 @@
 
                 <div class="field">
                     <span class="label">อาชีพ</span>
-                    <span class="value left w-80">{{ optional($client->mother)->occupation ?? '-' }}</span>
+                    <span class="value left w-100">{{ optional($client->mother)->occupation ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ที่อยู่ปัจจุบัน เลขที่</span>
-                        <span class="value left w-45">{{ optional($client->mother)->address_no ?? '-' }}</span>
+                        <span class="value left w-50">{{ optional($client->mother)->address_no ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ตรอก/ซอย</span>
-                        <span class="value left w-80">{{ optional($client->mother)->soi ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->mother)->soi ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ถนน</span>
-                        <span class="value left w-80">{{ optional($client->mother)->road ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->mother)->road ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">หมู่ที่</span>
-                        <span class="value w-35">{{ optional($client->mother)->moo ?? '-' }}</span>
+                        <span class="value w-40">{{ optional($client->mother)->moo ?? '-' }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ตำบล/แขวง</span>
-                        <span class="value left w-100">{{ optional(optional($client->mother)->sub_district)->subd_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personSubDistrict($client->mother) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-100">{{ optional(optional($client->mother)->district)->dist_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personDistrict($client->mother) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional(optional($client->mother)->province)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ $personProvince($client->mother) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">โทร.</span>
-                        <span class="value left w-80">{{ optional($client->mother)->phone ?? '-' }}</span>
+                        <span class="value left w-100">{{ optional($client->mother)->phone ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 9 ผู้ปกครอง --}}
     <div class="form-row">
         <div class="row-no">9.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">ผู้ปกครองชื่อ</span>
-                    <span class="value left w-100">{{ optional($client->relative)->fname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->relative)->fname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">นามสกุล</span>
-                    <span class="value left w-100">{{ optional($client->relative)->lname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->relative)->lname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">อายุ</span>
-                    <span class="value w-35">{{ optional($client->relative)->age ?? '-' }}</span>
+                    <span class="value w-40">{{ optional($client->relative)->age ?? '-' }}</span>
                 </div>
 
                 <div class="field">
@@ -730,78 +977,77 @@
 
                 <div class="field">
                     <span class="label">เกี่ยวข้องเป็น</span>
-                    <span class="value left w-80">{{ optional($client->relative)->relation ?? '-' }}</span>
+                    <span class="value left w-100">{{ optional($client->relative)->relation ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ที่อยู่ปัจจุบัน เลขที่</span>
-                        <span class="value left w-45">{{ optional($client->relative)->address_no ?? '-' }}</span>
+                        <span class="value left w-50">{{ optional($client->relative)->address_no ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ตรอก/ซอย</span>
-                        <span class="value left w-80">{{ optional($client->relative)->soi ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->relative)->soi ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ถนน</span>
-                        <span class="value left w-80">{{ optional($client->relative)->road ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->relative)->road ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">หมู่ที่</span>
-                        <span class="value w-35">{{ optional($client->relative)->moo ?? '-' }}</span>
+                        <span class="value w-40">{{ optional($client->relative)->moo ?? '-' }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ตำบล/แขวง</span>
-                        <span class="value left w-100">{{ optional(optional($client->relative)->sub_district)->subd_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personSubDistrict($client->relative) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-100">{{ optional(optional($client->relative)->district)->dist_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personDistrict($client->relative) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional(optional($client->relative)->province)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ $personProvince($client->relative) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">โทร.</span>
-                        <span class="value left w-80">{{ optional($client->relative)->phone ?? '-' }}</span>
+                        <span class="value left w-100">{{ optional($client->relative)->phone ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 10 ญาติผู้ที่อุปการะ --}}
     <div class="form-row">
         <div class="row-no">10.</div>
         <div class="row-body">
             <div class="line">
                 <div class="field">
                     <span class="label">ญาติผู้ที่อุปการะชื่อ</span>
-                    <span class="value left w-100">{{ optional($client->spouse)->fname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->spouse)->fname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">นามสกุล</span>
-                    <span class="value left w-100">{{ optional($client->spouse)->lname ?? '-' }}</span>
+                    <span class="value left w-110">{{ optional($client->spouse)->lname ?? '-' }}</span>
                 </div>
 
                 <div class="field">
                     <span class="label">อายุ</span>
-                    <span class="value w-35">{{ optional($client->spouse)->age ?? '-' }}</span>
+                    <span class="value w-40">{{ optional($client->spouse)->age ?? '-' }}</span>
                 </div>
 
                 <div class="field">
@@ -810,61 +1056,60 @@
 
                 <div class="field">
                     <span class="label">เกี่ยวข้องเป็น</span>
-                    <span class="value left w-80">{{ optional($client->spouse)->relation ?? '-' }}</span>
+                    <span class="value left w-100">{{ optional($client->spouse)->relation ?? '-' }}</span>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ที่อยู่ปัจจุบัน เลขที่</span>
-                        <span class="value left w-45">{{ optional($client->spouse)->address_no ?? '-' }}</span>
+                        <span class="value left w-50">{{ optional($client->spouse)->address_no ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ตรอก/ซอย</span>
-                        <span class="value left w-80">{{ optional($client->spouse)->soi ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->spouse)->soi ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">ถนน</span>
-                        <span class="value left w-80">{{ optional($client->spouse)->road ?? '-' }}</span>
+                        <span class="value left w-90">{{ optional($client->spouse)->road ?? '-' }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">หมู่ที่</span>
-                        <span class="value w-35">{{ optional($client->spouse)->moo ?? '-' }}</span>
+                        <span class="value w-40">{{ optional($client->spouse)->moo ?? '-' }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="sub-line same-start">
+            <div class="sub-line">
                 <div class="line">
                     <div class="field">
                         <span class="label">ตำบล/แขวง</span>
-                        <span class="value left w-100">{{ optional(optional($client->spouse)->sub_district)->subd_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personSubDistrict($client->spouse) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">อำเภอ/เขต</span>
-                        <span class="value left w-100">{{ optional(optional($client->spouse)->district)->dist_name ?? '-' }}</span>
+                        <span class="value left w-120">{{ $personDistrict($client->spouse) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">จังหวัด</span>
-                        <span class="value left w-90">{{ optional(optional($client->spouse)->province)->prov_name ?? '-' }}</span>
+                        <span class="value left w-110">{{ $personProvince($client->spouse) }}</span>
                     </div>
 
                     <div class="field">
                         <span class="label">โทร.</span>
-                        <span class="value left w-80">{{ optional($client->spouse)->phone ?? '-' }}</span>
+                        <span class="value left w-100">{{ optional($client->spouse)->phone ?? '-' }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- สภาพปัญหา --}}
     <div class="problem-title">สภาพปัญหา</div>
     <div class="problem-list">
         @if($client->problems->count() > 0)
@@ -878,7 +1123,6 @@
         @endif
     </div>
 
-    {{-- สมาชิกครอบครัว --}}
     <div class="member-table-wrap">
         <div class="member-table-title">รายละเอียดสมาชิกครอบครัว</div>
 
@@ -890,8 +1134,8 @@
                     <th style="width:7%;">อายุ</th>
                     <th style="width:10%;">เกี่ยวข้อง</th>
                     <th style="width:20%;">อาชีพ/การศึกษา</th>
-                    <th style="width:12%;">รายได้/เดือน</th>
-                    <th style="width:19%;">หมายเหตุ</th>
+                    <th style="width:17%;">รายได้/เดือน</th>
+                    <th style="width:15%;">หมายเหตุ</th>
                 </tr>
             </thead>
             <tbody>
@@ -918,6 +1162,253 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="factfinding-section">
+       
+
+        <div class="form-row">
+            <div class="row-no">11.</div>
+            <div class="row-body">
+                <div class="line">
+                    <div class="field">
+                        <span class="label">วันที่นำส่ง</span>
+                        <span class="value w-100">{{ $factDate }}</span>
+                    </div>
+
+                    <div class="field">
+                        <span class="label">วันที่บันทึกข้อมูล</span>
+                        <span class="value w-100">{{ $receiveDate }}</span>
+                    </div>
+
+                    <div class="field">
+                        <span class="label">ผู้นำส่ง</span>
+                        <span class="value left w-260">{{ $showText($factFinding?->fact_name) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="factfinding-subtitle">12. ข้อมูลด้านร่างกายและสุขภาพ</div>
+
+        <div class="form-row">
+            <div class="row-no"></div>
+            <div class="row-body">
+                <div class="line">
+                    <div class="field">
+                        <span class="label">รูปพรรณสัณฐาน</span>
+                        <span class="value left w-150">{{ $showText($factFinding?->appearance) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="label">สีผิว</span>
+                        <span class="value left w-120">{{ $showText($factFinding?->skin) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="label">ตำหนิ/แผลเป็น</span>
+                        <span class="value left w-120">{{ $showText($factFinding?->scar) }}</span>
+                    </div>
+                    <div class="field">
+                        <span class="label">ลักษณะความพิการ</span>
+                        <span class="value left w-140">{{ $showText($factFinding?->disability) }}</span>
+                    </div>
+                </div>
+
+                <div class="sub-line">
+                    <div class="line">
+                        <div class="field">
+                            <span class="label">น้ำหนัก</span>
+                            <span class="value w-55">{{ $showText($factFinding?->weight) }}</span>
+                        </div>
+                        <div class="field"><span class="label">กก.</span></div>
+
+                        <div class="field">
+                            <span class="label">ส่วนสูง</span>
+                            <span class="value w-55">{{ $showText($factFinding?->height) }}</span>
+                        </div>
+                        <div class="field"><span class="label">ซม.</span></div>
+
+                        <div class="field">
+                            <span class="label">กรุ๊ปเลือด</span>
+                            <span class="value left w-70">{{ $showText($factFinding?->blood_group) }}</span>
+                        </div>
+
+                        <div class="field">
+                            <span class="label">สุขอนามัย</span>
+                            <span class="value left w-120">{{ $showText($factFinding?->hygiene) }}</span>
+                        </div>
+
+                        <div class="field">
+                            <span class="label">สุขภาพช่องปาก</span>
+                            <span class="value left w-120">{{ $showText($factFinding?->oral_health) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-line">
+                    <div class="line">
+                        <div class="field">
+                            <span class="label">บาดแผล/การบาดเจ็บ</span>
+                            <span class="value left w-260">{{ $showText($factFinding?->injury) }}</span>
+                        </div>
+                       <div class="field wrap">
+    <span class="label">หลักฐานที่พบ</span>
+    <span class="value left w-260">{{ $showText($factFinding?->evidence) }}</span>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="row-no">13.</div>
+            <div class="row-body">
+                <div class="line">
+                    <div class="field">
+                        <span class="label">การเจ็บป่วย</span>
+                        <span class="value left w-70">{{ ($factFinding?->sick ?? 0) == 1 ? 'มี' : 'ไม่มี' }}</span>
+                    </div>
+
+                    <div class="field">
+                        <span class="label">รายละเอียดการเจ็บป่วย</span>
+                        <span class="value left w-320">{{ $showText($factFinding?->sick_detail) }}</span>
+                    </div>
+                </div>
+
+                <div class="sub-line">
+                    <div class="line">
+                        <div class="field">
+                            <span class="label">การรักษา</span>
+                            <span class="value left w-220">{{ $showText($factFinding?->treatment) }}</span>
+                        </div>
+
+                        <div class="field">
+                            <span class="label">โรงพยาบาล</span>
+                            <span class="value left w-260">{{ $showText($factFinding?->hospital) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="factfinding-subtitle">14. ข้อมูลด้านครอบครัวและความสัมพันธ์</div>
+
+        <div class="subitem-group">
+            <div class="subitem-row">
+                <div class="subitem-no">14.1</div>
+                <div class="subitem-body">
+                    <div class="full-row-field">
+                        <span class="label">สถานภาพสมรส</span>
+                        <span class="value left">{{ optional($factFinding?->marital)->marital_name ?? '-' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subitem-row">
+                <div class="subitem-no">14.2</div>
+                <div class="subitem-body">
+                    <div class="full-row-field">
+                        <span class="label">ความสัมพันธ์ระหว่างบิดามารดา</span>
+                        <span class="value left">{{ $showText($factFinding?->relation_parent) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subitem-row">
+                <div class="subitem-no">14.3</div>
+                <div class="subitem-body">
+                    <div class="full-row-field">
+                        <span class="label">ความสัมพันธ์ระหว่างบุคคลในครอบครัว</span>
+                        <span class="value left">{{ $showText($factFinding?->relation_family) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subitem-row">
+                <div class="subitem-no">14.4</div>
+                <div class="subitem-body">
+                    <div class="full-row-field">
+                        <span class="label">ความสัมพันธ์กับบุตร/บุคคลในครอบครัว</span>
+                        <span class="value left">{{ $showText($factFinding?->relation_child) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="factfinding-subtitle">15. สภาพแวดล้อม</div>
+
+        <div class="factfinding-box">
+            <div class="label">สภาพที่อยู่อาศัยภายนอก</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->ex_conditions) }}</div>
+        </div>
+
+        <div class="factfinding-box">
+            <div class="label">สภาพที่อยู่อาศัยภายใน</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->in_conditions) }}</div>
+        </div>
+
+        <div class="factfinding-box">
+            <div class="label">สภาพแวดล้อม</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->environment) }}</div>
+        </div>
+
+        <div class="factfinding-subtitle">16. การวิเคราะห์ปัญหาและความต้องการ</div>
+
+        <div class="factfinding-box">
+            <div class="label">สาเหตุที่เข้ารับการสงเคราะห์</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->cause_problem) }}</div>
+        </div>
+
+        <div class="factfinding-box">
+            <div class="label">ความต้องการความช่วยเหลือ</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->need) }}</div>
+        </div>
+
+        <div class="factfinding-box">
+            <div class="label">ประวัติความเป็นมา</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->case_history) }}</div>
+        </div>
+
+        <div class="factfinding-box">
+            <div class="label">ข้อมูลเท็จจริงอื่น ๆ</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->information) }}</div>
+        </div>
+
+        <div class="factfinding-box">
+            <div class="label">การวินิจฉัยปัญหา</div>
+            <div class="factfinding-text">{{ $showText($factFinding?->diagnosis) }}</div>
+        </div>
+
+        <div class="factfinding-subtitle">17. เอกสารประกอบและผู้บันทึก</div>
+
+        <div class="form-row">
+            <div class="row-no"></div>
+            <div class="row-body">
+                <div class="line">
+                    <div class="field">
+                        <span class="label">ผู้บันทึก</span>
+                        <span class="value left w-220">{{ $showText($factFinding?->recorder) }}</span>
+                    </div>
+
+                    <div class="field">
+                        <span class="label">สถานะข้อมูล</span>
+                        <span class="value left w-100">{{ ($factFinding?->active ?? 0) ? 'ใช้งาน' : 'ไม่ใช้งาน' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="problem-title" style="margin-top: 12px;">เอกสารประกอบการสอบข้อเท็จจริง</div>
+        <div class="doc-list">
+            @if(!empty($factFinding) && $factFinding->documents && $factFinding->documents->count() > 0)
+                @foreach($factFinding->documents as $doc)
+                    <div class="doc-item">
+                        <span class="checkbox">☑</span>{{ $doc->document_name ?? '-' }}
+                    </div>
+                @endforeach
+            @else
+                <div class="doc-item muted">- ไม่มีข้อมูลเอกสารประกอบ -</div>
+            @endif
+        </div>
     </div>
 </div>
 

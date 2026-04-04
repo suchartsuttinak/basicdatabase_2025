@@ -215,3 +215,94 @@ Requirement:
 
 บอกผมได้เลยครับ ผมจะพาคุณไปถึงจุดนั้น 🔥
 ------------------------------------------------------------------------
+
+ช่วยปรับโค้ดหน้านี้ใหม่ทั้งหมด
+- ให้สวยงามระดับมาตรฐาน
+- รองรับทุกหน้าจอ
+- css ใส่ไว้ในหน้านี้และอย่าให้ชนส่วนอื่น
+- จัด spacing / alignment / typography ให้เรียบร้อย
+- ถ้าเป็นรายงาน ให้เหมาะกับ A4 และพิมพ์ออกมาสวย
+- ถ้ามีหัวข้อย่อย ให้จัดแนวตรงกับหัวข้อหลัก
+- ปรับโค้ดมาให้ทั้งไฟล์ พร้อมนำไปวางแทนได้เลย
+-------------------------------------------------------------------------------
+
+
+เวอร์ชันที่ผมแนะนำ (ใช้งานจริง)
+แยก “ดูได้” กับ “แก้ได้”
+
+use App\Http\Controllers\ClientController;
+
+// 🔹 ทุก role เข้าดูได้
+Route::middleware(['auth'])->group(function () {
+    Route::get('/client', [ClientController::class, 'index'])->name('client.index');
+    Route::get('/client/show/{id}', [ClientController::class, 'show'])->name('client.show');
+});
+
+// 🔹 เฉพาะคนที่แก้ไขได้
+Route::middleware(['auth', 'role:admin,manager,social_worker'])->group(function () {
+    Route::get('/client/create', [ClientController::class, 'create'])->name('client.create');
+    Route::post('/client/store', [ClientController::class, 'store'])->name('client.store');
+    Route::get('/client/edit/{id}', [ClientController::class, 'edit'])->name('client.edit');
+    Route::put('/client/update/{id}', [ClientController::class, 'update'])->name('client.update');
+});
+
+// 🔹 เฉพาะ admin ลบได้
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::delete('/client/delete/{id}', [ClientController::class, 'destroy'])->name('client.delete');
+});
+
+-------------------------------------------------------------------------------------
+
+กันทั้ง route (ระดับสูงขึ้น)
+Route::middleware(['auth', 'role:admin,manager'])->group(function () {
+    Route::post('/store', ...);
+    Route::put('/update/{id}', ...);
+    Route::delete('/delete/{id}', ...);
+});
+---------------------------------------------------------------
+
+   <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a href="{{ route('client.show') }}"
+                                    class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
+                                    ทะเบียนผู้รับบริการ
+                                </a>
+                            </li>
+                              @if(auth()->check() && auth()->user()->role === 'admin')
+                            <li>
+                                <a href="{{ route('client.show_refer') }}"
+                                    class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
+                                    ทะเบียนผู้รับบริการทั้งหมด
+                                </a>
+                            </li>
+                             @endif
+
+                             {{-- @if(auth()->check() && auth()->user()->hasRole(['admin','executive','manager']))
+                                <li>
+                                    <a href="{{ route('client.show_refer') }}"
+                                        class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
+                                        ทะเบียนผู้รับบริการทั้งหมด
+                                    </a>
+                                </li>
+                             @endif --}}
+                        </ul>
+                    </div>
+
+-------------------------------------------------------------------------------------
+
+แบบที่ผมแนะนำสำหรับคุณ
+ถ้าเป็น “เมนู”
+
+ใช้แบบนี้ร่วมด้วย
+
+@if(auth()->check() && !auth()->user()->hasRole(['general_user', 'executive']))
+----------------------------------
+ถ้าเป็น “route / หน้า”
+
+ใช้แบบนี้ดีที่สุด
+
+Route::middleware(['auth', 'exclude.role:general_user,executive'])->group(function () {
+    Route::get('/client/show-refer', [ClientController::class, 'ShowRefer'])->name('client.show_refer');
+});
+----------------------------------------------------------------------------------

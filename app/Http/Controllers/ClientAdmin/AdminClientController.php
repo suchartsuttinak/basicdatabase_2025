@@ -94,38 +94,47 @@ class AdminClientController extends Controller
 }
 
    public function ClientReport($id)
-    {
-        $client = Client::with([
-    'problems',
-    'province',
-    'district',
-    'sub_district',
-    'national',
-    'religion',
-    'marital',
-    'occupation',
-    'income',
-    'education',
-    'contact',
-    'project',
-    'status',
-    'house',
-    'target',
-    'title',
-    // ใช้ชื่อ relation ตาม Model
-    'originProvince',
-    'originDistrict',
-    'originSubDistrict',
-    'members.education',
-    'members.occupation',
-    'members.income',
-])->findOrFail($id);
+{
+    $client = Client::with([
+        'problems',
+        'province',
+        'district',
+        'sub_district',
+        'national',
+        'religion',
+        'marital',
+        'occupation',
+        'income',
+        'education',
+        'contact',
+        'project',
+        'status',
+        'house',
+        'target',
+        'title',
+        'originProvince',
+        'originDistrict',
+        'originSubDistrict',
+        'members.education',
+        'members.occupation',
+        'members.income',
+        'father',
+        'mother',
+        'relative',
+        'spouse',
+    ])->findOrFail($id);
 
+    $factFinding = \App\Models\Factfinding::with([
+        'marital',
+        'documents',
+    ])->where('client_id', $id)->first();
 
+    $problems = Problem::all();
 
-        $problems = Problem::all();
-
-        return view('admin_client.index.client_report', compact('client', 'problems'));
-    }
+    return view('admin_client.index.client_report', compact(
+        'client',
+        'problems',
+        'factFinding'
+    ));
 }
-
+}

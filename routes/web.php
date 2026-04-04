@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\backend\PublicizeController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
 use App\Http\Controllers\Landing\AboutController;
 use App\Http\Controllers\Landing\IssueController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Landing\LandingController;
 use App\Http\Controllers\Landing\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -49,13 +51,17 @@ Route::delete('/about/{id}', [AboutController::class, 'destroy'])->name('landing
 
 
 
+// หน้า publicizes (ฟอร์มกรอกข้อมูลข่าวสาร/กิจกรรม)
+   Route::prefix('publicizes')->group(function () {
+    Route::get('/', [PublicizeController::class, 'index'])->name('publicizes.index');
+    Route::get('/create', [PublicizeController::class, 'create'])->name('publicizes.create');
+    Route::post('/store', [PublicizeController::class, 'store'])->name('publicizes.store');
+    Route::get('/edit/{publicize}', [PublicizeController::class, 'edit'])->name('publicizes.edit');
+    Route::put('/update/{publicize}', [PublicizeController::class, 'update'])->name('publicizes.update');
+    Route::delete('/delete/{publicize}', [PublicizeController::class, 'destroy'])->name('publicizes.destroy');
+});
 
-
-
-
-
-
-
+   
 
 //     Route::get('/', function () {
 //     return view('welcome');
@@ -94,7 +100,17 @@ require __DIR__.'/auth.php';
     Route::get('/client/report/{id}', [AdminClientController::class, 'ClientReport'])->name('client.report');
 });
 
-  
+
+    // User Management (Admin Only จัดการผู้ใช้งาน)
+    Route::middleware(['auth', 'role:admin'])->prefix('users')->group(function () {
+    Route::get('/', [UserManagementController::class, 'index'])->name('users.index');
+    Route::get('/create', [UserManagementController::class, 'create'])->name('users.create');
+    Route::post('/store', [UserManagementController::class, 'store'])->name('users.store');
+    Route::get('/edit/{id}', [UserManagementController::class, 'edit'])->name('users.edit');
+    Route::put('/update/{id}', [UserManagementController::class, 'update'])->name('users.update');
+    Route::delete('/delete/{id}', [UserManagementController::class, 'destroy'])->name('users.delete');
+    Route::post('/toggle-status/{id}', [UserManagementController::class, 'toggleStatus'])->name('users.toggleStatus');
+});
 
   
     //Backend Route All

@@ -1,0 +1,502 @@
+ .edurec-edit-page {
+        --edurec-primary: #0d6efd;
+        --edurec-primary-dark: #0b5ed7;
+        --edurec-success: #198754;
+        --edurec-danger: #dc3545;
+        --edurec-warning: #f59e0b;
+        --edurec-text: #0f172a;
+        --edurec-muted: #64748b;
+        --edurec-border: #e2e8f0;
+        --edurec-soft: #f8fafc;
+        --edurec-soft-2: #f1f5f9;
+        --edurec-white: #ffffff;
+        --edurec-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        --edurec-shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.12);
+        --edurec-radius-xl: 24px;
+        --edurec-radius-lg: 18px;
+        --edurec-radius-md: 14px;
+        --edurec-radius-sm: 10px;
+    }
+
+    .edurec-edit-page {
+        padding: 1rem 0 2rem;
+    }
+
+    .edurec-edit-page .edurec-wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    .edurec-edit-page .alert {
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        font-weight: 500;
+    }
+
+    .edurec-edit-page .edurec-card {
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        border-radius: var(--edurec-radius-xl);
+        overflow: hidden;
+        background: var(--edurec-white);
+        box-shadow: var(--edurec-shadow);
+    }
+
+    .edurec-edit-page .edurec-header {
+        position: relative;
+        padding: 1.35rem 1.5rem;
+        background:
+            radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 32%),
+            linear-gradient(135deg, #0d6efd 0%, #0b5ed7 45%, #084298 100%);
+        color: #fff;
+    }
+
+    .edurec-edit-page .edurec-header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .edurec-edit-page .edurec-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .edurec-edit-page .edurec-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255,255,255,0.18);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        flex-shrink: 0;
+    }
+
+    .edurec-edit-page .edurec-title-group {
+        min-width: 0;
+    }
+
+    .edurec-edit-page .edurec-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .35rem .75rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.16);
+        font-size: .78rem;
+        font-weight: 700;
+        letter-spacing: .02em;
+        margin-bottom: .55rem;
+        border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .edurec-edit-page .edurec-title {
+        margin: 0;
+        font-size: clamp(1.15rem, 2vw, 1.65rem);
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .edurec-edit-page .edurec-subtitle {
+        margin: .3rem 0 0;
+        color: rgba(255,255,255,0.88);
+        font-size: .95rem;
+    }
+
+    .edurec-edit-page .edurec-close-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.14);
+        color: #fff;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all .25s ease;
+        flex-shrink: 0;
+    }
+
+    .edurec-edit-page .edurec-close-btn:hover {
+        background: rgba(255,255,255,0.22);
+        transform: translateY(-1px);
+        color: #fff;
+    }
+
+    .edurec-edit-page .edurec-body {
+        padding: 1.5rem;
+        background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    }
+
+    .edurec-edit-page .edurec-section {
+        background: var(--edurec-white);
+        border: 1px solid var(--edurec-border);
+        border-radius: var(--edurec-radius-lg);
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+
+    .edurec-edit-page .edurec-section-title {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        margin: 0 0 1rem;
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--edurec-text);
+    }
+
+    .edurec-edit-page .edurec-section-title i {
+        color: var(--edurec-primary);
+    }
+
+    .edurec-edit-page .edurec-info-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1rem;
+    }
+
+    .edurec-edit-page .edurec-col-12 { grid-column: span 12; }
+    .edurec-edit-page .edurec-col-8  { grid-column: span 8; }
+    .edurec-edit-page .edurec-col-6  { grid-column: span 6; }
+    .edurec-edit-page .edurec-col-4  { grid-column: span 4; }
+    .edurec-edit-page .edurec-col-3  { grid-column: span 3; }
+    .edurec-edit-page .edurec-col-2  { grid-column: span 2; }
+
+    .edurec-edit-page .edurec-field {
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+        min-width: 0;
+    }
+
+    .edurec-edit-page .edurec-label {
+        font-size: .92rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .edurec-edit-page .form-control,
+    .edurec-edit-page .form-select {
+        min-height: 48px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        font-size: .96rem;
+        color: var(--edurec-text);
+        background-color: #fff;
+        padding: .72rem .95rem;
+        transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+        box-shadow: none;
+    }
+
+    .edurec-edit-page .form-control:focus,
+    .edurec-edit-page .form-select:focus {
+        border-color: rgba(13, 110, 253, .65);
+        box-shadow: 0 0 0 .24rem rgba(13, 110, 253, .12);
+    }
+
+    .edurec-edit-page .form-control[readonly] {
+        background: #f8fafc;
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .edurec-edit-page .invalid-feedback {
+        font-size: .82rem;
+        font-weight: 500;
+    }
+
+    .edurec-edit-page .edurec-subject-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .edurec-edit-page .edurec-subject-note {
+        color: var(--edurec-muted);
+        font-size: .9rem;
+        margin: 0;
+    }
+
+    .edurec-edit-page .edurec-subject-list {
+        display: flex;
+        flex-direction: column;
+        gap: .9rem;
+    }
+
+    .edurec-edit-page .edurec-subject-item {
+        position: relative;
+        border: 1px solid #dbe5f0;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        padding: 1rem;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+        transition: all .25s ease;
+    }
+
+    .edurec-edit-page .edurec-subject-item:hover {
+        border-color: #c9ddff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .edurec-edit-page .edurec-subject-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        margin-bottom: .85rem;
+        flex-wrap: wrap;
+    }
+
+    .edurec-edit-page .edurec-subject-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: .45rem .8rem;
+        border-radius: 999px;
+        background: #eaf2ff;
+        color: #0b5ed7;
+        font-weight: 700;
+        font-size: .86rem;
+    }
+
+    .edurec-edit-page .edurec-subject-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .edurec-edit-page .edurec-helper {
+        font-size: .82rem;
+        color: var(--edurec-muted);
+        margin-top: .2rem;
+    }
+
+    .edurec-edit-page .edurec-summary-box {
+        border: 1px dashed #cbd5e1;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #fcfdff 0%, #f8fafc 100%);
+        padding: 1rem;
+    }
+
+    .edurec-edit-page .edurec-summary-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .edurec-edit-page .edurec-summary-meta {
+        color: var(--edurec-muted);
+        font-size: .92rem;
+    }
+
+    .edurec-edit-page .edurec-summary-meta strong {
+        color: var(--edurec-text);
+    }
+
+    .edurec-edit-page .edurec-gpa-wrap {
+        min-width: 180px;
+    }
+
+    .edurec-edit-page .edurec-gpa-wrap .form-control {
+        text-align: right;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .edurec-edit-page .edurec-footer-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5edf6;
+    }
+
+    .edurec-edit-page .edurec-footer-actions-left,
+    .edurec-edit-page .edurec-footer-actions-right {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .edurec-edit-page .btn {
+        min-height: 46px;
+        border-radius: 12px;
+        font-weight: 700;
+        padding: .7rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+        transition: all .2s ease;
+    }
+
+    .edurec-edit-page .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .edurec-edit-page .btn-edurec-add {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        color: #0f172a;
+    }
+
+    .edurec-edit-page .btn-edurec-add:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    .edurec-edit-page .btn-edurec-home {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+    }
+
+    .edurec-edit-page .btn-edurec-home:hover {
+        background: #dbeafe;
+        color: #1e40af;
+        border-color: #93c5fd;
+    }
+
+    .edurec-edit-page .btn-edurec-save {
+        background: linear-gradient(135deg, #198754 0%, #157347 100%);
+        border: 1px solid #157347;
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(25, 135, 84, 0.18);
+    }
+
+    .edurec-edit-page .btn-edurec-save:hover {
+        color: #fff;
+        box-shadow: 0 16px 28px rgba(25, 135, 84, 0.24);
+    }
+
+    .edurec-edit-page .btn-edurec-remove {
+        min-height: 48px;
+        min-width: 48px;
+        padding: .7rem .9rem;
+        border-radius: 12px;
+        border: 1px solid #fecaca;
+        background: #fff5f5;
+        color: #dc2626;
+    }
+
+    .edurec-edit-page .btn-edurec-remove:hover {
+        background: #fef2f2;
+        color: #b91c1c;
+        border-color: #fca5a5;
+    }
+
+    .edurec-edit-page .edurec-empty-state {
+        border: 1px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 1.3rem;
+        text-align: center;
+        color: var(--edurec-muted);
+        background: #fbfdff;
+        display: none;
+    }
+
+    .edurec-edit-page .edurec-empty-state i {
+        font-size: 1.5rem;
+        color: #94a3b8;
+        margin-bottom: .45rem;
+        display: inline-block;
+    }
+
+    @media (max-width: 991.98px) {
+        .edurec-edit-page .edurec-col-8,
+        .edurec-edit-page .edurec-col-6,
+        .edurec-edit-page .edurec-col-4,
+        .edurec-edit-page .edurec-col-3,
+        .edurec-edit-page .edurec-col-2 {
+            grid-column: span 12;
+        }
+
+        .edurec-edit-page .edurec-subject-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .edurec-edit-page .edurec-summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .edurec-edit-page .edurec-gpa-wrap {
+            min-width: 100%;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .edurec-edit-page {
+            padding: .5rem 0 1.5rem;
+        }
+
+        .edurec-edit-page .edurec-body,
+        .edurec-edit-page .edurec-header {
+            padding: 1rem;
+        }
+
+        .edurec-edit-page .edurec-section {
+            padding: 1rem;
+            border-radius: 16px;
+        }
+
+        .edurec-edit-page .edurec-title-wrap {
+            align-items: flex-start;
+        }
+
+        .edurec-edit-page .edurec-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+        }
+
+        .edurec-edit-page .edurec-subject-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .edurec-edit-page .edurec-footer-actions,
+        .edurec-edit-page .edurec-footer-actions-left,
+        .edurec-edit-page .edurec-footer-actions-right {
+            width: 100%;
+        }
+
+        .edurec-edit-page .edurec-footer-actions-left,
+        .edurec-edit-page .edurec-footer-actions-right {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .edurec-edit-page .btn {
+            width: 100%;
+        }
+
+        .edurec-edit-page .btn-edurec-remove {
+            width: 100%;
+        }
+
+        .edurec-edit-page .edurec-close-btn {
+            width: 40px;
+            height: 40px;
+        }
+    }
