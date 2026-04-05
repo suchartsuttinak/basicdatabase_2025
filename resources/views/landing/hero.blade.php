@@ -6,9 +6,9 @@
             <a href="{{ route('login') }}" class="px-6 py-3 bg-white text-primary font-semibold rounded-lg shadow hover:bg-gray-100">
                 เข้าสู่ระบบ
             </a>
-            <a href="{{ route('register') }}" class="px-6 py-3 bg-secondary text-white font-semibold rounded-lg shadow hover:bg-gray-700">
+            {{-- <a href="{{ route('register') }}" class="px-6 py-3 bg-secondary text-white font-semibold rounded-lg shadow hover:bg-gray-700">
                 สมัครสมาชิก
-            </a>
+            </a> --}}
         </div>
     </div>
 </section>

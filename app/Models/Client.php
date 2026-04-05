@@ -147,10 +147,18 @@ class Client extends Model
     {
         return $this->hasMany(ClientFile::class, 'client_id');
     }
+   
+// Scope สำหรับกรองตามบ้านของผู้ใช้
+    
 
+    public function scopeForUser($query, $user)
+{
+    // 👉 ถ้าเป็น admin เห็นทั้งหมด
+    if ($user->role === 'admin') {
+        return $query;
+    }
 
-
-
-
-     
+    return $query->whereIn('house_id', $user->houses->pluck('id'));
+}
+ 
 }

@@ -624,11 +624,13 @@
                                 </form>
 
                                 <div class="sw-divider">สำหรับผู้ที่ยังไม่มีบัญชี</div>
+                                    @if (Route::has('register'))
+                                    <div class="sw-divider">การเข้าใช้งานระบบ</div>
 
-                                <p class="sw-register-text">
-                                    ยังไม่มีบัญชีใช่หรือไม่?
-                                    <a class="sw-register-link ms-1" href="{{ route('register') }}">สมัครสมาชิก</a>
-                                </p>
+                                    <p class="sw-register-text mb-0">
+                                        หากยังไม่มีบัญชีผู้ใช้งาน กรุณาติดต่อผู้ดูแลระบบเพื่อสร้างบัญชีให้
+                                    </p>
+                                    @endif
                             </div>
                         </div>
                     </div>

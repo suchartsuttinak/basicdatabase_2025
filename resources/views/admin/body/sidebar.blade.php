@@ -2,7 +2,9 @@
     $isProfileOpen = Request::routeIs('client.show') || Request::routeIs('client.show_refer');
 
     $isDashboardOpen =
-        Request::routeIs('issues.index') || Request::routeIs('news.create') || Request::routeIs('landing.about.index');
+        Request::routeIs('issues.index') ||
+        Request::routeIs('news.create') ||
+        Request::routeIs('landing.about.index');
 
     $isMasterMenu =
         Request::routeIs('institution.*') ||
@@ -16,10 +18,14 @@
         Request::routeIs('income.*') ||
         Request::routeIs('help_type.*') ||
         Request::routeIs('translate.*');
+
+    $isUserMenu =
+        Request::routeIs('users.index') ||
+        Request::routeIs('users.create') ||
+        Request::routeIs('users.edit');
 @endphp
 
 <style>
-    /* (เหมือนเดิมทุกอย่าง — ไม่เปลี่ยน CSS เดิมของคุณ) */
     .app-sidebar-menu.sidebar-arrow-fix .menu-arrow {
         position: relative;
         display: inline-block;
@@ -46,7 +52,7 @@
         transition: transform .2s ease;
     }
 
-    .app-sidebar-menu.sidebar-arrow-fix a[aria-expanded="true"]>.menu-arrow::before {
+    .app-sidebar-menu.sidebar-arrow-fix a[aria-expanded="true"] > .menu-arrow::before {
         transform: translate(-50%, -50%) rotate(45deg);
     }
 
@@ -59,8 +65,53 @@
         opacity: 1;
     }
 
-    .app-sidebar-menu.sidebar-arrow-fix #side-menu>li>a::after {
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a::after {
         content: none !important;
+    }
+
+    .sidebar-user-link-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        margin-right: 8px;
+        font-size: 15px;
+        opacity: .92;
+    }
+
+    .nav-second-level .tp-link.with-icon {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all .2s ease;
+    }
+
+    .nav-second-level .tp-link.with-icon:hover {
+        transform: translateX(2px);
+    }
+
+    .sidebar-badge-soft {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.4;
+        background: rgba(59, 130, 246, .12);
+        color: #2563eb;
+        vertical-align: middle;
+    }
+
+    .menu-title-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .menu-title-with-icon i {
+        font-size: 14px;
+        opacity: .85;
     }
 </style>
 
@@ -71,10 +122,10 @@
             <div class="logo-box">
                 <a href="{{ url('/') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ asset('backend/assets/images/logo-sm.png') }}" height="22">
+                        <img src="{{ asset('backend/assets/images/logo-sm.png') }}" height="22" alt="logo-sm">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ asset('backend/assets/images/logo-light.png') }}" height="24">
+                        <img src="{{ asset('backend/assets/images/logo-light.png') }}" height="24" alt="logo-lg">
                     </span>
                 </a>
             </div>
@@ -86,9 +137,10 @@
                 ========================== --}}
                 <li class="menu-title">ทะเบียนประวัติ</li>
                 <li>
-                    <a href="#sidebarProfile" data-bs-toggle="collapse"
-                        aria-expanded="{{ $isProfileOpen ? 'true' : 'false' }}"
-                        class="{{ $isProfileOpen ? 'active' : '' }}">
+                    <a href="#sidebarProfile"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isProfileOpen ? 'true' : 'false' }}"
+                       class="{{ $isProfileOpen ? 'active' : '' }}">
                         <i data-feather="users"></i>
                         <span>บันทึกข้อมูลแรกเข้า</span>
                         <span class="menu-arrow"></span>
@@ -98,39 +150,32 @@
                         <ul class="nav-second-level">
                             <li>
                                 <a href="{{ route('client.show') }}"
-                                    class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
+                                   class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
                                     ทะเบียนผู้รับบริการ
                                 </a>
                             </li>
-                              @if(auth()->check() && auth()->user()->role === 'admin')
-                            <li>
-                                <a href="{{ route('client.show_refer') }}"
-                                    class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
-                                    ทะเบียนผู้รับบริการทั้งหมด
-                                </a>
-                            </li>
-                             @endif
 
-                             {{-- @if(auth()->check() && auth()->user()->hasRole(['admin','executive','manager']))
+                            @if(auth()->check() && auth()->user()->role === 'admin')
                                 <li>
                                     <a href="{{ route('client.show_refer') }}"
-                                        class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
+                                       class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
                                         ทะเบียนผู้รับบริการทั้งหมด
                                     </a>
                                 </li>
-                             @endif --}}
+                            @endif
                         </ul>
                     </div>
                 </li>
 
                 {{-- =========================
-                    🔥 Dashboard ใหม่
+                    Dashboard
                 ========================== --}}
                 <li class="menu-title">Dashboard</li>
                 <li>
-                    <a href="#sidebarDashboard" data-bs-toggle="collapse"
-                        aria-expanded="{{ $isDashboardOpen ? 'true' : 'false' }}"
-                        class="{{ $isDashboardOpen ? 'active' : '' }}">
+                    <a href="#sidebarDashboard"
+                       data-bs-toggle="collapse"
+                       aria-expanded="{{ $isDashboardOpen ? 'true' : 'false' }}"
+                       class="{{ $isDashboardOpen ? 'active' : '' }}">
                         <i data-feather="layout"></i>
                         <span>เข้าสู่หน้ายินดีต้อนรับ</span>
                         <span class="menu-arrow"></span>
@@ -140,24 +185,22 @@
                         <ul class="nav-second-level">
                             <li>
                                 <a href="{{ route('issues.index') }}"
-                                    class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
+                                   class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
                                     แจ้งเรื่องช่วยเหลือ
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('news.create') }}"
-                                    class="tp-link {{ Request::routeIs('news.create') ? 'active' : '' }}">
+                                   class="tp-link {{ Request::routeIs('news.create') ? 'active' : '' }}">
                                     เพิ่มข่าวสาร
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('landing.about.index') }}"
-                                    class="tp-link {{ Request::routeIs('landing.about.index') ? 'active' : '' }}">
+                                   class="tp-link {{ Request::routeIs('landing.about.index') ? 'active' : '' }}">
                                     ประวัติความเป็นมา
                                 </a>
                             </li>
-
-                     
                         </ul>
                     </div>
                 </li>
@@ -165,83 +208,121 @@
                 {{-- =========================
                     ข้อมูลอ้างอิง
                 ========================== --}}
-                   @if(auth()->check() && auth()->user()->role === 'admin')
-                <li class="menu-title">ข้อมูลอ้างอิง</li>
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <li class="menu-title">ข้อมูลอ้างอิง</li>
                     <li>
-                    <a href="#sidebar-master-data" data-bs-toggle="collapse"
-                        aria-expanded="{{ $isMasterMenu ? 'true' : 'false' }}"
-                        class="{{ $isMasterMenu ? 'active' : '' }}">
-                        <i data-feather="grid"></i>
-                        <span>ประเภท / หมวดหมู่</span>
-                        <span class="menu-arrow"></span>
-                    </a>
+                        <a href="#sidebar-master-data"
+                           data-bs-toggle="collapse"
+                           aria-expanded="{{ $isMasterMenu ? 'true' : 'false' }}"
+                           class="{{ $isMasterMenu ? 'active' : '' }}">
+                            <i data-feather="grid"></i>
+                            <span>ประเภท / หมวดหมู่</span>
+                            <span class="menu-arrow"></span>
+                        </a>
 
-                    <div class="collapse {{ $isMasterMenu ? 'show' : '' }}" id="sidebar-master-data">
-                        <ul class="nav-second-level">
-                            <li><a href="{{ route('institution.all') }}">รายการสถานศึกษา</a></li>
-                            <li><a href="{{ route('subject.show') }}">รายการวิชาเรียน</a></li>
-                            <li><a href="{{ route('education.show') }}">รายการระดับการศึกษา</a></li>
-                            <li><a href="{{ route('semester.show') }}">รายการปีการศึกษา</a></li>
-                            <li><a href="{{ route('psycho.show') }}">รายการโรคทางจิตเวช</a></li>
-                            <li><a href="{{ route('misbehavior.show') }}">รายการพฤติกรรม</a></li>
-                            <li><a href="{{ route('outside.show') }}">รายการเด็กที่อยู่ภายนอก</a></li>
-                            <li><a href="{{ route('document.show') }}">รายการเอกสาร</a></li>
-                            <li><a href="{{ route('income.show') }}">รายการรายได้</a></li>
-                            <li><a href="{{ route('help_type.show') }}">ประเภทการช่วยเหลือ</a></li>
-                            <li><a href="{{ route('translate.show') }}">ประเภทการพ้นอุปการะ</a></li>
-                        </ul>
-                    </div>
-                </li>
-            @endif
-
-                   {{-- =========================
-                    🔥  ประชาสัมพันธ์
-                ========================== --}}
-              
-                    <li class="menu-title mt-2">ประชาสัมพันธ์</li>
-                    <li>
-                       <a href="{{ route('publicizes.index') }}"
-                            class="tp-link {{ Request::routeIs('publicizes.index') ? 'active' : '' }}">
-                            <i class="bi bi-megaphone me-1"></i> ข่าวสาร/กิจกรรม
-                            </a>
+                        <div class="collapse {{ $isMasterMenu ? 'show' : '' }}" id="sidebar-master-data">
+                            <ul class="nav-second-level">
+                                <li><a href="{{ route('institution.all') }}" class="tp-link {{ Request::routeIs('institution.*') ? 'active' : '' }}">รายการสถานศึกษา</a></li>
+                                <li><a href="{{ route('subject.show') }}" class="tp-link {{ Request::routeIs('subject.*') ? 'active' : '' }}">รายการวิชาเรียน</a></li>
+                                <li><a href="{{ route('education.show') }}" class="tp-link {{ Request::routeIs('education.*') ? 'active' : '' }}">รายการระดับการศึกษา</a></li>
+                                <li><a href="{{ route('semester.show') }}" class="tp-link {{ Request::routeIs('semester.*') ? 'active' : '' }}">รายการปีการศึกษา</a></li>
+                                <li><a href="{{ route('psycho.show') }}" class="tp-link {{ Request::routeIs('psycho.*') ? 'active' : '' }}">รายการโรคทางจิตเวช</a></li>
+                                <li><a href="{{ route('misbehavior.show') }}" class="tp-link {{ Request::routeIs('misbehavior.*') ? 'active' : '' }}">รายการพฤติกรรม</a></li>
+                                <li><a href="{{ route('outside.show') }}" class="tp-link {{ Request::routeIs('outside.*') ? 'active' : '' }}">รายการเด็กที่อยู่ภายนอก</a></li>
+                                <li><a href="{{ route('document.show') }}" class="tp-link {{ Request::routeIs('document.*') ? 'active' : '' }}">รายการเอกสาร</a></li>
+                                <li><a href="{{ route('income.show') }}" class="tp-link {{ Request::routeIs('income.*') ? 'active' : '' }}">รายการรายได้</a></li>
+                                <li><a href="{{ route('help_type.show') }}" class="tp-link {{ Request::routeIs('help_type.*') ? 'active' : '' }}">ประเภทการช่วยเหลือ</a></li>
+                                <li><a href="{{ route('translate.show') }}" class="tp-link {{ Request::routeIs('translate.*') ? 'active' : '' }}">ประเภทการพ้นอุปการะ</a></li>
+                            </ul>
+                        </div>
                     </li>
-            
-              {{-- จัดการผู้ใช้งาน (เฉพาะ admin-เท่านั้น) --}}  
-               
-                  @if(auth()->check() && auth()->user()->role === 'admin')
+                @endif
+
+                {{-- =========================
+                    ประชาสัมพันธ์
+                ========================== --}}
+                <li class="menu-title mt-2">ประชาสัมพันธ์</li>
+                <li>
+                    <a href="{{ route('publicizes.index') }}"
+                       class="tp-link {{ Request::routeIs('publicizes.index') ? 'active' : '' }}">
+                        <i class="bi bi-megaphone me-1"></i>
+                        ข่าวสาร/กิจกรรม
+                    </a>
+                </li>
+
+                {{-- =========================
+                    บันทึก/รายงานการปฏิบัติงาน
+                ========================== --}}
+                <li class="nav-item">
+                    <a href="{{ route('operations.index') }}"
+                       class="nav-link {{ request()->routeIs('operations.*') ? 'active' : '' }}">
+                        <i class="bi bi-journal-text me-2"></i>
+                        <span>บันทึกการปฏิบัติงาน</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('operations.report.daily') }}"
+                       class="nav-link {{ request()->routeIs('operations.report.daily') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        <span>รายงานการปฏิบัติงาน</span>
+                    </a>
+                </li>
+
+                {{-- =========================
+                    จัดการผู้ใช้งาน
+                ========================== --}}
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <li class="menu-title mt-2">
+                        <span class="menu-title-with-icon">
+                            <i class="bi bi-person-gear"></i>
+                            การจัดการระบบ
+                        </span>
+                    </li>
+
                     <li>
-                        <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <a href="#sidebarUsers"
+                           data-bs-toggle="collapse"
+                           aria-expanded="{{ $isUserMenu ? 'true' : 'false' }}"
+                           class="{{ $isUserMenu ? 'active' : '' }}">
                             <i class="bi bi-people-fill"></i>
                             <span>จัดการผู้ใช้งาน</span>
+                            <span class="sidebar-badge-soft">Admin</span>
+                            <span class="menu-arrow"></span>
                         </a>
+
+                        <div class="collapse {{ $isUserMenu ? 'show' : '' }}" id="sidebarUsers">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('users.index') }}"
+                                       class="tp-link with-icon {{ Request::routeIs('users.index') || Request::routeIs('users.edit') ? 'active' : '' }}">
+                                        <span class="sidebar-user-link-icon">
+                                            <i class="bi bi-list-ul"></i>
+                                        </span>
+                                        รายชื่อผู้ใช้งาน
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('users.create') }}"
+                                       class="tp-link with-icon {{ Request::routeIs('users.create') ? 'active' : '' }}">
+                                        <span class="sidebar-user-link-icon">
+                                            <i class="bi bi-person-plus-fill"></i>
+                                        </span>
+                                        เพิ่มผู้ใช้งาน
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
-                    @endif
-
-                    {{-- รายงานการปฏิบัติงาน --}}  
-                    <li class="nav-item">
-                        <a href="{{ route('operations.index') }}"
-                        class="nav-link {{ request()->routeIs('operations.*') ? 'active' : '' }}">
-                            <i class="bi bi-journal-text me-2"></i>
-                            <span>บันทึกการปฏิบัติงาน</span>
-                        </a>
-                    </li>
-
-
-                    <li class="nav-item">
-                        <a href="{{ route('operations.report.daily') }}"
-                        class="nav-link {{ request()->routeIs('operations.report.daily') ? 'active' : '' }}">
-                            <i class="bi bi-file-earmark-text me-2"></i>
-                            <span>รายงานการปฏิบัติงาน</span>
-                        </a>
-                    </li>
-
+                @endif
 
                 {{-- =========================
                     ระบบ
                 ========================== --}}
                 <li class="menu-title mt-2">ระบบ</li>
                 <li>
-                    <a href="{{ route('admin.logout') ?? url('/logout') }}">
+                    <a href="{{ route('admin.logout') }}">
                         <i data-feather="log-out"></i>
                         <span>ออกจากระบบ</span>
                     </a>
@@ -253,7 +334,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const sidebar = document.getElementById('stableMasterSidebar');
         if (!sidebar) return;
 

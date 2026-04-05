@@ -34,7 +34,7 @@
             <ul class="space-y-1 text-gray-300 text-sm">
                 <li><a href="{{ url('/') }}" class="hover:text-yellow-400 transition-colors">หน้าแรก</a></li>
                 <li><a href="{{ route('login') }}" class="hover:text-yellow-400 transition-colors">เข้าสู่ระบบ</a></li>
-                <li><a href="{{ route('register') }}" class="hover:text-yellow-400 transition-colors">สมัครสมาชิก</a></li>
+                {{-- <li><a href="{{ route('register') }}" class="hover:text-yellow-400 transition-colors">สมัครสมาชิก</a></li> --}}
             </ul>
         </div>
 

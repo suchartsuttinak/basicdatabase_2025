@@ -10,8 +10,12 @@ use App\Http\Controllers\Landing\LandingController;
 use App\Http\Controllers\Landing\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
+
+
+
 
 
 // ประมวลผล/สถิติ หน้า dashboard
@@ -102,8 +106,8 @@ require __DIR__.'/auth.php';
 });
 
 
-    // User Management (Admin Only จัดการผู้ใช้งาน)
-    Route::middleware(['auth', 'role:admin'])->prefix('users')->group(function () {
+// User Management (Admin Only)
+    Route::prefix('admin/users')->middleware(['auth', 'role:admin', 'prevent-back'])->group(function () {
     Route::get('/', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/create', [UserManagementController::class, 'create'])->name('users.create');
     Route::post('/store', [UserManagementController::class, 'store'])->name('users.store');
@@ -127,6 +131,20 @@ require __DIR__.'/auth.php';
         // รายงานรายวัน
         Route::get('/report/daily', [OperationController::class, 'dailyReport'])->name('operations.report.daily');
     });
+
+    // User Route All
+   
+
+    Route::middleware(['auth', 'role:admin'])->prefix('admin/users')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::get('/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/store', [UserController::class, 'store'])->name('users.store');
+    Route::get('/edit/{id}', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/update/{id}', [UserController::class, 'update'])->name('users.update');
+
+    Route::patch('/toggle-status/{id}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+});
 
 
     //Backend Route All

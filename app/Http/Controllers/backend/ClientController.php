@@ -27,15 +27,14 @@ class ClientController extends Controller
 {
    
     public function ClientShow()
-    {
-    // ✅ ดึงเฉพาะ clients ที่ยัง active (release_status = 'show')
-            $clients = Client::with('problems')
+{
+    $clients = Client::with('problems')
         ->where('release_status', 'show')
+        ->forUser(auth()->user())
         ->get();
 
-    // ✅ ส่งข้อมูลไปยัง view
     return view('backend.client.client_show', compact('clients'));
-    }
+}
    
     public function ClientAdd()
     {
@@ -520,15 +519,14 @@ public function ClientDelete($id)
 }
     
  public function ClientShowRefer()
-    {
-    // ✅ ดึงเฉพาะ clients ที่ยัง active (release_status = 'show' หรือ 'refer')
-            $clients = Client::with('problems')
-            ->whereIn('release_status', ['show', 'refer'])
-                ->get();
+{
+    $clients = Client::with('problems')
+        ->whereIn('release_status', ['show', 'refer'])
+        ->forUser(auth()->user())
+        ->get();
 
-    // ✅ ส่งข้อมูลไปยัง view
     return view('backend.client.client_show_refer', compact('clients'));
-    }
+}
     
    public function changeStatus($id)
 {

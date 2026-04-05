@@ -11,7 +11,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!auth()->check()) {
-            abort(403, 'กรุณาเข้าสู่ระบบก่อน');
+            return redirect()->route('login');
         }
 
         if (!in_array(auth()->user()->role, $roles)) {
