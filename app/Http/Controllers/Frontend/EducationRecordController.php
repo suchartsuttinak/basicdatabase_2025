@@ -15,7 +15,7 @@ class EducationRecordController extends Controller
 {
     public function EducationRecordAdd($client_id)
 {
-    $client = Client::findOrFail($client_id);
+    $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
     $subjects = Subject::all();
 
     // ✅ เรียง semester_name ตามปีและเทอมจริง ๆ  
@@ -56,6 +56,10 @@ class EducationRecordController extends Controller
         'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่',
     ]);
 
+        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+            ->where('id', $validated['client_id'])
+            ->firstOrFail();
+
         // ✅ กันบันทึกซ้ำ
         $existingRecord = EducationRecord::where('client_id', $validated['client_id'])
             ->where('education_id', $validated['education_id'])
@@ -79,7 +83,7 @@ class EducationRecordController extends Controller
         }
 
         $record = EducationRecord::create([
-            'client_id'     => $validated['client_id'],
+            'client_id'     => $client->id, // ✅ [แก้ไข]
             'education_id'  => $validated['education_id'],
             'semester_id'   => $validated['semester_id'], // ✅ เก็บ FK
             'school_name'   => $validated['school_name'],
@@ -99,13 +103,18 @@ class EducationRecordController extends Controller
             }
         }
 
-        return redirect()->route('education_record_show', ['client_id' => $validated['client_id']])
+        return redirect()->route('education_record_show', ['client_id' => $record->client_id]) // ✅ [แก้ไข]
             ->with('success','บันทึกผลการเรียนเรียบร้อยแล้ว');
     }
 
    public function EducationRecordEdit($id)
 {
-    $record = EducationRecord::with('subjects')->findOrFail($id);
+    $record = EducationRecord::with('subjects')
+        ->whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id); // ✅ [แก้ไข]
+
     $client = $record->client;
     $subjects = Subject::all();
     $educations = Education::all();
@@ -147,7 +156,15 @@ class EducationRecordController extends Controller
             'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่',
         ]);
 
-        $record = EducationRecord::findOrFail($id);
+        $record = EducationRecord::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
+        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+            ->where('id', $validated['client_id'])
+            ->firstOrFail();
 
         if (!empty($validated['subjects'])) {
             $subjectIds = array_column($validated['subjects'], 'subject_id');
@@ -157,7 +174,7 @@ class EducationRecordController extends Controller
         }
 
         $record->update([
-            'client_id'    => $validated['client_id'],
+            'client_id'    => $client->id, // ✅ [แก้ไข]
             'education_id' => $validated['education_id'],
             'semester_id'  => $validated['semester_id'], // ✅ เก็บ FK
             'school_name'  => $validated['school_name'],
@@ -181,13 +198,13 @@ class EducationRecordController extends Controller
 
         $record->subjects()->sync($syncData);
 
-        return redirect()->route('education_record_show', ['client_id' => $validated['client_id']])
+        return redirect()->route('education_record_show', ['client_id' => $record->client_id]) // ✅ [แก้ไข]
                          ->with('success','แก้ไขผลการเรียนเรียบร้อยแล้ว');
     }
 
     public function EducationRecordShow($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
 
         $educationRecords = EducationRecord::with('subjects','education','semester') // ✅ ดึง semester FK
             ->where('client_id', $client_id)
@@ -206,7 +223,12 @@ class EducationRecordController extends Controller
      // 📌 ลบผลการเรียน
     public function EducationRecordDelete($id)
     {
-        $record = EducationRecord::findOrFail($id);
+        $record = EducationRecord::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         $client_id = $record->client_id;
 
         // ลบความสัมพันธ์กับ subjects ก่อน

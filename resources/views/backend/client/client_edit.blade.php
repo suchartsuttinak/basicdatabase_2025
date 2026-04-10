@@ -1,12 +1,28 @@
 @extends('admin.admin_master')
 @section('admin')
 
+@php
+    use Illuminate\Support\Carbon;
+
+    $districts = $districts ?? collect();
+    $sub_districts = $sub_districts ?? collect();
+    $origin_districts = $origin_districts ?? collect();
+    $origin_sub_districts = $origin_sub_districts ?? collect();
+
+    $birthDateValue = old(
+        'birth_date',
+        !empty($client?->birth_date) ? Carbon::parse($client->birth_date)->format('Y-m-d') : ''
+    );
+
+    $arrivalDateValue = old(
+        'arrival_date',
+        !empty($client?->arrival_date) ? Carbon::parse($client->arrival_date)->format('Y-m-d') : ''
+    );
+@endphp
 
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
 
 <div class="container-fluid registry-page">
     <div class="registry-wrapper">
@@ -14,36 +30,35 @@
             ทะเบียนประวัติผู้รับฯ
         </div>
 
-          <!-- ปุ่มจัดการ + TAB -->
-       {{-- @include('admin_client.include.tabs') --}}
+        {{-- @include('admin_client.include.tabs') --}}
 
-    <div class="registry-subtabs">
-    <a href="{{ route('client.edit', $client->id) }}"
-       class="subtab-link {{ request()->routeIs('client.edit') ? 'active' : '' }}">
-        รายละเอียดผู้รับ
-    </a>
+        <div class="registry-subtabs">
+            <a href="{{ route('client.edit', $client->id) }}"
+               class="subtab-link {{ request()->routeIs('client.edit') ? 'active' : '' }}">
+                รายละเอียดผู้รับ
+            </a>
 
-    <a href="{{ route('family.add', $client->id) }}"
-       class="subtab-link {{ request()->routeIs('family.add', 'family.edit') ? 'active' : '' }}">
-        รายละเอียดบิดา มารดา
-    </a>
+            <a href="{{ route('family.add', $client->id) }}"
+               class="subtab-link {{ request()->routeIs('family.add', 'family.edit') ? 'active' : '' }}">
+                รายละเอียดบิดา มารดา
+            </a>
 
-    @if(Route::has('guardian.add'))
-        <a href="{{ route('guardian.add', $client->id) }}"
-           class="subtab-link {{ request()->routeIs('guardian.add', 'guardian.edit') ? 'active' : '' }}">
-            รายละเอียดผู้ปกครอง/ญาติ
-        </a>
-    @else
-        <a href="{{ route('family.add', $client->id) }}" class="subtab-link">
-            รายละเอียดผู้ปกครอง/ญาติ
-        </a>
-    @endif
+            @if(Route::has('guardian.add'))
+                <a href="{{ route('guardian.add', $client->id) }}"
+                   class="subtab-link {{ request()->routeIs('guardian.add', 'guardian.edit') ? 'active' : '' }}">
+                    รายละเอียดผู้ปกครอง/ญาติ
+                </a>
+            @else
+                <a href="{{ route('family.add', $client->id) }}" class="subtab-link">
+                    รายละเอียดผู้ปกครอง/ญาติ
+                </a>
+            @endif
 
-    <a href="{{ route('member.create', $client->id) }}"
-       class="subtab-link {{ request()->routeIs('member.create', 'member.show', 'member.edit') ? 'active' : '' }}">
-        รายละเอียดครอบครัว
-    </a>
-</div>
+            <a href="{{ route('member.create', $client->id) }}"
+               class="subtab-link {{ request()->routeIs('member.create', 'member.show', 'member.edit') ? 'active' : '' }}">
+                รายละเอียดครอบครัว
+            </a>
+        </div>
 
         <div class="registry-body">
             <form action="{{ route('client.update') }}" method="POST" enctype="multipart/form-data">
@@ -141,7 +156,7 @@
                                     <label for="birth_date" class="form-label">วันเกิด <span class="required-star">*</span></label>
                                     <input type="date" name="birth_date" id="birth_date"
                                         class="form-control @error('birth_date') is-invalid @enderror"
-                                        value="{{ old('birth_date', $client?->birth_date) }}">
+                                        value="{{ $birthDateValue }}">
                                     @error('birth_date')
                                         <small class="text-danger error-message" id="error-birth_date">{{ $message }}</small>
                                     @enderror
@@ -347,7 +362,7 @@
                                     <label for="arrival_date" class="form-label">วันที่รับเข้า <span class="required-star">*</span></label>
                                     <input type="date" name="arrival_date" id="arrival_date"
                                         class="form-control @error('arrival_date') is-invalid @enderror"
-                                        value="{{ old('arrival_date', $client->arrival_date ?? '') }}">
+                                        value="{{ $arrivalDateValue }}">
                                     @error('arrival_date')
                                         <small class="text-danger error-message" id="error-arrival_date">{{ $message }}</small>
                                     @enderror
@@ -752,7 +767,7 @@ $(function () {
         let subdistrict_id = $(this).val();
         if (subdistrict_id) {
             $.get('/get-origin-zipcode/' + subdistrict_id, function (data) {
-                $('#origin_zipcode').val(data.origin_zipcode);
+                $('#origin_zipcode').val(data.origin_zipcode ?? data.zipcode ?? '');
             });
         } else {
             $('#origin_zipcode').val('');

@@ -13,21 +13,28 @@ class HelpSessionController extends Controller
 {
     public function show(Client $client)
     {
+        // =========================
+        // PATCH: กันเดา URL (Route Model Binding)
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
        $sessions = HelpSession::where('client_id', $client->id)
         ->with('items')
         ->orderBy('help_date', 'desc')
         ->get();
 
-    // รวมยอดทั้งหมดของ client รายนี้
     $grandTotal = $sessions->sum('total_amount');
 
     return view('frontend.client.helping.help_sessions_show', compact('client', 'sessions', 'grandTotal'));
-
-
     }
 
     public function store(Request $request, Client $client)
     {
+        // =========================
+        // PATCH: กันเดา URL (Route Model Binding)
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
       $validated = $request->validate([
         'help_date' => [
             'required',
@@ -42,15 +49,12 @@ class HelpSessionController extends Controller
         'help_date.required' => 'กรุณากรอกวันที่',
         'help_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
         'help_date.unique'   => 'วันที่นี้มีการบันทึกช่วยเหลือแล้ว ห้ามซ้ำ',
-        // … ข้อความ error อื่น ๆ …
     ]);
-
-
 
     DB::transaction(function () use ($validated, $client) {
         $session = HelpSession::create([
             'client_id'    => $client->id,
-            'help_date'    => $validated['help_date'], // ✅ ใช้วันที่จากฟอร์ม
+            'help_date'    => $validated['help_date'],
             'total_amount' => 0,
         ]);
 
@@ -69,45 +73,71 @@ class HelpSessionController extends Controller
         $session->update(['total_amount' => $total]);
     });
 
-    $notification = [
-            'message' => 'บันทึกข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
     return redirect()->route('help_sessions.show', $client->id)
-                     ->with($notification);
+                     ->with([
+                        'message' => 'บันทึกข้อมูลเรียบร้อย',
+                        'alert-type' => 'success'
+                     ]);
 }
-
-
 
     public function destroy(Client $client, HelpSession $session)
     {
+        // =========================
+        // PATCH: กันลบของ client คนอื่น
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
+        // =========================
+        // PATCH: ตรวจว่า session เป็นของ client นี้จริง
+        // =========================
+        if ($session->client_id !== $client->id) {
+            abort(403);
+        }
+
         $session->delete();
 
-        $notification = [
-            'message' => 'ลบข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
         return redirect()->route('help_sessions.show', $client->id)
-                         ->with($notification);
+                         ->with([
+                            'message' => 'ลบข้อมูลเรียบร้อย',
+                            'alert-type' => 'success'
+                         ]);
     }
 
     public function create(Client $client)
     {
+        // =========================
+        // PATCH: กันเดา URL
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
         return view('frontend.client.helping.help_sessions_create', compact('client'));
     }
 
-
 public function edit(Client $client, HelpSession $session)
 {
+    // =========================
+    // PATCH: กันเข้าดูของ client คนอื่น
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
+    if ($session->client_id !== $client->id) {
+        abort(403);
+    }
+
     return view('frontend.client.helping.edit', compact('client', 'session'));
-
-
 }
 
 public function update(Request $request, Client $client, HelpSession $session)
 {
+    // =========================
+    // PATCH: กัน update ของ client คนอื่น
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
+    if ($session->client_id !== $client->id) {
+        abort(403);
+    }
+
     $validated = $request->validate([
         'help_date' => [
             'required',
@@ -123,9 +153,6 @@ public function update(Request $request, Client $client, HelpSession $session)
         'help_date.required' => 'กรุณากรอกวันที่',
         'help_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
         'help_date.unique'   => 'วันที่นี้มีการบันทึกช่วยเหลือแล้ว ห้ามซ้ำ',
-        'items.*.item_name.required' => 'กรุณากรอกรายการ',
-        'items.*.quantity.required'  => 'กรุณากรอกจำนวน',
-        'items.*.unit_price.required'=> 'กรุณากรอกราคา',
     ]);
 
     DB::transaction(function () use ($validated, $session) {
@@ -147,14 +174,10 @@ public function update(Request $request, Client $client, HelpSession $session)
         $session->update(['total_amount' => $total]);
     });
 
-     $notification = [
-            'message' => 'แก้ไขข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
     return redirect()->route('help_sessions.show', $client->id)
-                     ->with($notification);
+                     ->with([
+                        'message' => 'แก้ไขข้อมูลเรียบร้อย',
+                        'alert-type' => 'success'
+                     ]);
 }
-
-
 }

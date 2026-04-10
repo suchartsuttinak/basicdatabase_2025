@@ -16,7 +16,11 @@ class CaseOutsideController extends Controller
     public function ShowCaseOutside($client_id)
     {
         $outside = Outside::all();
-        $client  = Client::findOrFail($client_id);
+
+        // =========================
+        // PATCH: กันเดา URL เข้า client
+        // =========================
+        $client  = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $caseoutsides = CaseOutside::where('client_id', $client->id)
             ->orderBy('count', 'desc')
@@ -60,6 +64,11 @@ class CaseOutsideController extends Controller
             'client_id.exists'    => 'ผู้รับบริการไม่ถูกต้อง',
         ]);
 
+        // =========================
+        // PATCH: กันยิง request เปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
         DB::transaction(function () use ($validated) {
             $case = CaseOutside::create($validated);
             $this->reindexCounts($case->client_id);
@@ -72,6 +81,11 @@ class CaseOutsideController extends Controller
     public function UpdateCaseOutside(Request $request, $id)
     {
         $case = CaseOutside::findOrFail($id);
+
+        // =========================
+        // PATCH: กัน update record คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($case->client_id);
 
         $validator = Validator::make($request->all(), [
             'date' => [
@@ -112,8 +126,15 @@ class CaseOutsideController extends Controller
                 ->withInput($request->all() + ['case_id' => $id]);
         }
 
-        DB::transaction(function () use ($case, $validator) {
-            $case->update($validator->validated());
+        $data = $validator->validated();
+
+        // =========================
+        // PATCH: กันเปลี่ยน client_id ไป client อื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
+        DB::transaction(function () use ($case, $data) {
+            $case->update($data);
             $this->reindexCounts($case->client_id);
         });
 
@@ -125,13 +146,18 @@ class CaseOutsideController extends Controller
      public function DeleteCaseOutside($id)
     {
         $case = CaseOutside::findOrFail($id);
+
+        // =========================
+        // PATCH: กันลบ record คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($case->client_id);
+
         $client_id = $case->client_id;
 
         DB::transaction(function () use ($case) {
             $client_id = $case->client_id;
             $case->delete();
 
-            // ✅ ลบแล้ว reindex ใหม่ทั้งหมดตามวัน (asc)
             $this->reindexCounts($client_id);
         });
 
@@ -150,7 +176,6 @@ class CaseOutsideController extends Controller
 
         $counter = 1;
         foreach ($items as $item) {
-            // อัปเดตเฉพาะ count เพื่อความเร็ว
             $item->update(['count' => $counter]);
             $counter++;
         }

@@ -15,13 +15,17 @@ class ObserveController extends Controller
     // หน้าเพิ่มใหม่
     public function AddObserve($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้า client
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
         $misbehaviors = Misbehavior::all();
         $observes = Observe::with('followups')
             ->where('client_id', $client_id)
             ->orderBy('date', 'desc')
             ->get();
-        $observe = null; // สำหรับเพิ่มใหม่
+        $observe = null;
 
         return view('frontend.client.observe.observe_create', compact('client','client_id','misbehaviors','observes','observe'));
     }
@@ -51,48 +55,37 @@ class ObserveController extends Controller
         'date.required'        => 'กรุณาระบุวันที่',
         'date.date'            => 'วันที่ไม่ถูกต้อง',
         'date.unique'          => 'วันที่นี้ถูกบันทึกแล้วสำหรับนักเรียนรายนี้',
-
         'behavior.required'    => 'กรุณาระบุพฤติกรรม',
-        'behavior.string'      => 'พฤติกรรมต้องเป็นข้อความ',
-
         'cause.required'       => 'กรุณาระบุสาเหตุ',
-        'cause.string'         => 'สาเหตุต้องเป็นข้อความ',
-
         'solution.required'    => 'กรุณาระบุแนวทางแก้ไข',
-        'solution.string'      => 'แนวทางแก้ไขต้องเป็นข้อความ',
-
         'action.required'      => 'กรุณาระบุการดำเนินการ',
-        'action.string'        => 'การดำเนินการต้องเป็นข้อความ',
-
-        'obstacles.string'     => 'อุปสรรคต้องเป็นข้อความ',
-
         'result.required'      => 'กรุณาระบุผลการดำเนินการ',
-        'result.string'        => 'ผลการดำเนินการต้องเป็นข้อความ',
-
         'record_date.required' => 'กรุณาระบุวันที่บันทึก',
-        'record_date.date'     => 'วันที่บันทึกไม่ถูกต้อง',
-
-        'recorder.string'      => 'ผู้บันทึกต้องเป็นข้อความ',
-        'recorder.max'         => 'ชื่อผู้บันทึกต้องไม่เกิน 100 ตัวอักษร',
-
         'misbehavior_id.required' => 'กรุณาเลือกประเภทพฤติกรรมไม่เหมาะสม',
-        'misbehavior_id.integer'  => 'รหัสพฤติกรรมต้องเป็นตัวเลข',
-
         'client_id.required'   => 'กรุณาเลือกนักเรียน',
-        'client_id.integer'    => 'รหัสนักเรียนต้องเป็นตัวเลข',
     ]);
 
+        // =========================
+        // PATCH: กันเปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
         Observe::create($data);
-         // ส่งข้อความ success ไปที่ session โดยตรง
-            return redirect()->route('observe.create', $data['client_id'])
+
+        return redirect()->route('observe.create', $data['client_id'])
             ->with('success', 'บันทึกข้อมูลเรียบร้อย');
-            }           
+    }
 
     // หน้าแก้ไข
     public function EditObserve($id)
     {
         $observe = Observe::with('followups')->findOrFail($id);
-        $client = $observe->client;
+
+        // =========================
+        // PATCH: กันเข้าดู record คนอื่น
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
         $misbehaviors = Misbehavior::all();
         $observes = Observe::with('followups')
             ->where('client_id', $client->id)
@@ -107,6 +100,11 @@ class ObserveController extends Controller
     {
         $observe = Observe::findOrFail($id);
 
+        // =========================
+        // PATCH: กัน update record คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
         $data = $request->validate([
             'date'          => [
                 'required',
@@ -119,50 +117,20 @@ class ObserveController extends Controller
             'cause'         => 'required|string',
             'solution'      => 'required|string',
             'action'        => 'required|string',
-            'obstacles'     => 'nullable|string',
             'result'        => 'required|string',
             'record_date'   => 'required|date',
-            'recorder'      => 'nullable|string|max:100',
             'misbehavior_id'=> 'required|integer',
             'client_id'     => 'required|integer',
-        ], [
-            'date.required'        => 'กรุณาระบุวันที่',
-            'date.date'            => 'วันที่ไม่ถูกต้อง',
-            'date.unique'          => 'วันที่นี้ถูกบันทึกแล้วสำหรับนักเรียนรายนี้',
-
-            'behavior.required'    => 'กรุณาระบุพฤติกรรม',
-            'behavior.string'      => 'พฤติกรรมต้องเป็นข้อความ',
-
-            'cause.required'       => 'กรุณาระบุสาเหตุ',
-            'cause.string'         => 'สาเหตุต้องเป็นข้อความ',
-
-            'solution.required'    => 'กรุณาระบุแนวทางแก้ไข',
-            'solution.string'      => 'แนวทางแก้ไขต้องเป็นข้อความ',
-
-            'action.required'      => 'กรุณาระบุการดำเนินการ',
-            'action.string'        => 'การดำเนินการต้องเป็นข้อความ',
-
-            'obstacles.string'     => 'อุปสรรคต้องเป็นข้อความ',
-
-            'result.required'      => 'กรุณาระบุผลการดำเนินการ',
-            'result.string'        => 'ผลการดำเนินการต้องเป็นข้อความ',
-
-            'record_date.required' => 'กรุณาระบุวันที่บันทึก',
-            'record_date.date'     => 'วันที่บันทึกไม่ถูกต้อง',
-
-            'recorder.string'      => 'ผู้บันทึกต้องเป็นข้อความ',
-            'recorder.max'         => 'ชื่อผู้บันทึกต้องไม่เกิน 100 ตัวอักษร',
-
-            'misbehavior_id.required' => 'กรุณาเลือกประเภทพฤติกรรมไม่เหมาะสม',
-            'misbehavior_id.integer'  => 'รหัสพฤติกรรมต้องเป็นตัวเลข',
-
-            'client_id.required'   => 'กรุณาเลือกนักเรียน',
-            'client_id.integer'    => 'รหัสนักเรียนต้องเป็นตัวเลข',
         ]);
 
+        // =========================
+        // PATCH: กันเปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
         $observe->update($data);
-       // ส่งข้อความ success ไปที่ session โดยตรง
-    return redirect()->route('observe.create', $data['client_id'])
+
+        return redirect()->route('observe.create', $data['client_id'])
                      ->with('success', 'อัปเดตข้อมูลเรียบร้อย');
     }
 
@@ -170,16 +138,17 @@ class ObserveController extends Controller
     public function DeleteObserve($id)
     {
         $observe = Observe::findOrFail($id);
+
+        // =========================
+        // PATCH: กันลบ record คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
         $client_id = $observe->client_id;
         $observe->delete();
 
-        $notification = [
-            'message' => 'ลบข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
         return redirect()->route('observe.create', $client_id)
-                         ->with($notification);
+                         ->with(['message' => 'ลบข้อมูลเรียบร้อย','alert-type'=>'success']);
     }
 
     // บันทึกการติดตามผล
@@ -188,52 +157,58 @@ class ObserveController extends Controller
             $data = $request->validate([
                 'observe_id'      => 'required|integer|exists:observes,id',
                 'followup_date'   => 'required|date',
-                'followup_action' => 'nullable|string',
-                'followup_result' => 'nullable|string',
             ]);
 
             $observe = Observe::findOrFail($data['observe_id']);
+
+            // =========================
+            // PATCH: กันเพิ่ม followup ของ client คนอื่น
+            // =========================
+            Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
             $data['followup_count'] = $observe->followups()->count() + 1;
 
             ObserveFollowup::create($data);
 
-             $notification = [
-            'message' => 'บันทึกข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
             return redirect()
                 ->route('observe.edit', $data['observe_id'])
-                ->with($notification);
+                ->with(['message'=>'บันทึกข้อมูลเรียบร้อย','alert-type'=>'success']);
         }
 
     // ลบการติดตามผล
     public function DeleteFollowup($id)
     {
         $followup = ObserveFollowup::findOrFail($id);
+
+        $observe = Observe::findOrFail($followup->observe_id);
+
+        // =========================
+        // PATCH: กันลบ followup ของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
         $observe_id = $followup->observe_id;
         $followup->delete();
 
-        $notification = [
-            'message' => 'ลบข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
         return redirect()->route('observe.edit', $observe_id)
-                         ->with($notification);
+                         ->with(['message'=>'ลบข้อมูลเรียบร้อย','alert-type'=>'success']);
     }
 
     // แก้ไขการติดตามผล
     public function EditFollowup($id)
 {
     $followup = ObserveFollowup::findOrFail($id);
-    $observe = $followup->observeRelation; // ใช้ชื่อ relation ที่ไม่ชนกับ Laravel
+    $observe = $followup->observeRelation;
 
     if (!$observe) {
         return redirect()->back()->with('error', 'ไม่พบข้อมูลพฤติกรรมที่สัมพันธ์กับการติดตามผลนี้');
     }
 
-    $client = $observe->client;
+    // =========================
+    // PATCH: กันเข้าดู followup คนอื่น
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
     $misbehaviors = Misbehavior::all();
     $observes = Observe::with('followups')
         ->where('client_id', $client->id)
@@ -245,27 +220,26 @@ class ObserveController extends Controller
     ));
 }
 
-
     // อัปเดตการติดตามผล
     public function UpdateFollowup(Request $request, $id)
     {
         $followup = ObserveFollowup::findOrFail($id);
 
+        $observe = Observe::findOrFail($followup->observe_id);
+
+        // =========================
+        // PATCH: กัน update followup คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($observe->client_id);
+
         $data = $request->validate([
             'followup_date' => 'required|date',
             'followup_count' => 'required|integer|min:1',
-            'followup_action' => 'nullable|string',
-            'followup_result' => 'nullable|string',
         ]);
 
         $followup->update($data);
 
-          $notification = [
-            'message' => 'อัปเดตข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
         return redirect()->route('observe.edit', $followup->observe_id)
-                         ->with($notification);
+                         ->with(['message'=>'อัปเดตข้อมูลเรียบร้อย','alert-type'=>'success']);
     }
 }

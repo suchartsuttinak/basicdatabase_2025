@@ -70,11 +70,13 @@
 
     .client-table-wrap {
         overflow-x: auto;
+        width: 100%;
     }
 
     .client-table {
         margin-bottom: 0;
         min-width: 980px;
+        width: 100% !important;
         vertical-align: middle;
     }
 
@@ -85,6 +87,7 @@
         font-size: 13px;
         border-bottom: 1px solid #dbe6f5 !important;
         white-space: nowrap;
+        vertical-align: middle;
     }
 
     .client-table tbody td {
@@ -126,12 +129,24 @@
         border-radius: 999px;
         font-size: 12px;
         font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .action-cell {
+        width: 190px;
+        min-width: 190px;
+        white-space: nowrap;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .action-group {
-        display: flex;
-        flex-wrap: wrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
         gap: .35rem;
+        white-space: nowrap;
     }
 
     .action-btn {
@@ -142,6 +157,12 @@
         justify-content: center;
         border-radius: 10px;
         padding: 0;
+        flex: 0 0 34px;
+    }
+
+    .action-btn span {
+        line-height: 1;
+        font-size: 18px;
     }
 
     .dataTables_wrapper .dataTables_filter input {
@@ -185,6 +206,26 @@
         .client-list-card .card-body {
             padding: .85rem;
         }
+
+        .client-table {
+            min-width: 960px;
+        }
+
+        .action-cell {
+            width: 170px;
+            min-width: 170px;
+        }
+
+        .action-group {
+            gap: .3rem;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            border-radius: 9px;
+        }
     }
 </style>
 
@@ -205,12 +246,14 @@
                 </div>
             </div>
 
+            @if(auth()->check() && auth()->user()->hasRole(['admin','manager']))
             <div class="client-toolbar-right">
                 <a href="{{ route('client.add') }}" class="btn btn-success client-btn">
                     <i data-feather="plus-circle"></i>
                     <span>เพิ่มรายการ</span>
                 </a>
             </div>
+            @endif
         </div>
 
         <div class="card client-list-card">
@@ -232,7 +275,7 @@
                                     <th>อายุ</th>
                                     <th>ปัญหา</th>
                                     <th>สถานะ</th>
-                                    <th>การจัดการ</th>
+                                    <th class="action-cell">การจัดการ</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -285,7 +328,7 @@
                                             @endif
                                         </td>
 
-                                        <td>
+                                        <td class="action-cell">
                                             <div class="action-group">
                                                 <a title="ดูข้อมูล"
                                                    href="{{ route('admin.index', $client->id) }}"
@@ -299,12 +342,14 @@
                                                     <span class="mdi mdi-book-edit-outline mdi-18px"></span>
                                                 </a>
 
-                                                <a title="ลบ"
-                                                   href="{{ route('client.delete', $client->id) }}"
-                                                   class="btn btn-danger btn-sm action-btn"
-                                                   id="delete">
-                                                    <span class="mdi mdi-trash-can-outline mdi-18px"></span>
-                                                </a>
+                                                @if(in_array(auth()->user()->role, ['admin', 'social_worker']))
+                                                    <a title="ลบ"
+                                                       href="{{ route('client.delete', $client->id) }}"
+                                                       class="btn btn-danger btn-sm action-btn"
+                                                       onclick="return confirm('ยืนยันการลบข้อมูล?')">
+                                                        <span class="mdi mdi-trash-can-outline mdi-18px"></span>
+                                                    </a>
+                                                @endif
 
                                                 <a title="จำหน่าย"
                                                    href="{{ route('refers.index', $client->id) }}"
@@ -335,8 +380,9 @@
 <script>
     $(document).ready(function() {
         $('#datatable').DataTable({
-            responsive: true,
+            responsive: false,
             autoWidth: false,
+            scrollX: true,
             pageLength: 10,
             order: [[0, 'asc']],
             language: {

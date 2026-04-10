@@ -99,10 +99,16 @@ require __DIR__.'/auth.php';
     Route::post('/admin/password/update', [AdminController::class, 'PasswordUpdate'])->name('admin.password.update');  
 });
 
-// AdminClient Route All
+
+    // AdminClient Route All
     Route::middleware('auth')->group(function () {
-    Route::get('/admin/client/{id}', [AdminClientController::class, 'Index'])->name('admin.index');
-    Route::get('/client/report/{id}', [AdminClientController::class, 'ClientReport'])->name('client.report');
+    Route::get('/admin/client/{id}', [AdminClientController::class, 'Index'])
+        ->whereNumber('id')
+        ->name('admin.index');
+
+    Route::get('/client/report/{id}', [AdminClientController::class, 'ClientReport'])
+        ->whereNumber('id')
+        ->name('client.report');
 });
 
 

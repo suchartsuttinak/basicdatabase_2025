@@ -14,7 +14,7 @@ class SchoolFollowupController extends Controller
 {
     public function SchoolFollowupAdd($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
         $educationRecord = $this->getLatestEducationRecord($client_id);
 
         if (!$educationRecord) {
@@ -44,10 +44,16 @@ class SchoolFollowupController extends Controller
     {
         $validated = $request->validated();
 
+        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+            ->where('id', $validated['client_id'])
+            ->firstOrFail();
+
         if (empty($validated['education_record_id'])) {
             $educationRecord = $this->getLatestEducationRecord($validated['client_id']);
             $validated['education_record_id'] = $educationRecord?->id;
         }
+
+        $validated['client_id'] = $client->id; // ✅ [แก้ไข]
 
         SchoolFollowup::create($validated);
 
@@ -66,7 +72,10 @@ class SchoolFollowupController extends Controller
                     'educationRecord.education',
                     'educationRecord.semester'
                 ])
-                ->findOrFail($id);
+                ->whereHas('client', function ($q) {
+                    $q->forUser(auth()->user());
+                })
+                ->findOrFail($id); // ✅ [แก้ไข]
 
             $educationRecord = $followup->educationRecord;
 
@@ -103,7 +112,12 @@ class SchoolFollowupController extends Controller
 
     public function SchoolFollowupUpdate(UpdateSchoolFollowupRequest $request, $id)
     {
-        $followup = SchoolFollowup::findOrFail($id);
+        $followup = SchoolFollowup::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         $validated = $request->validated();
 
         // คง education_record_id เดิมไว้เสมอ
@@ -152,7 +166,12 @@ class SchoolFollowupController extends Controller
 
     public function SchoolFollowupDelete($id)
     {
-        $followup = SchoolFollowup::findOrFail($id);
+        $followup = SchoolFollowup::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         $clientId = $followup->client_id;
 
         $followup->delete();
@@ -171,9 +190,12 @@ class SchoolFollowupController extends Controller
                 'educationRecord.education',
                 'educationRecord.semester'
             ])
-            ->findOrFail($followup_id);
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($followup_id); // ✅ [แก้ไข]
 
-        $client = Client::findOrFail($followup->client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($followup->client_id); // ✅ [แก้ไข]
         $educationRecord = $followup->educationRecord;
 
         $age = $client->birth_date

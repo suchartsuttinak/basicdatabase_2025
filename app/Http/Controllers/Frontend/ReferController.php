@@ -15,7 +15,11 @@ class ReferController extends Controller
      */
     public function index($client_id)
     {
-        $client     = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // =========================
+        $client     = Client::forUser(auth()->user())->findOrFail($client_id);
+
         $translates = Translate::all();
         $refers     = Refer::with(['client','translate'])
                            ->where('client_id', $client_id)
@@ -54,11 +58,15 @@ class ReferController extends Controller
         'client_id.exists'      => 'ข้อมูลผู้รับบริการไม่ถูกต้อง',
     ]);
 
+        // =========================
+        // PATCH: กันยิง request เปลี่ยน client_id
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
         // ✅ บันทึก refer
         $refer = Refer::create($validated);
 
         // ✅ อัพเดทสถานะ client → refer
-        $client = Client::findOrFail($validated['client_id']);
         $client->update(['release_status' => 'refer']);
 
         // ✅ redirect กลับไปหน้า index ของ refer
@@ -79,6 +87,11 @@ class ReferController extends Controller
         if (!$refer->client) {
             return $this->errorResponse('ไม่พบข้อมูล client ที่เกี่ยวข้อง', 404);
         }
+
+        // =========================
+        // PATCH: กันเดา URL มา restore สถานะของ client ที่ไม่มีสิทธิ์
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($refer->client_id);
 
         // ✅ ถ้า client มีสถานะ show อยู่แล้ว
         if ($refer->client->release_status === 'show') {

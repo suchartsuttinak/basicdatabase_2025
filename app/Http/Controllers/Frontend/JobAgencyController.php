@@ -21,7 +21,10 @@ class JobAgencyController extends Controller
      */
     public function showJobAgency($client_id)
 {
-    $client = Client::findOrFail($client_id);
+    // =========================
+    // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
     $jobAgencies = JobAgency::where('client_id', $client->id)
         ->orderBy('income', 'desc')
@@ -81,6 +84,11 @@ public function storeJobAgency(Request $request)
         'client_id.exists'      => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
     ]);
 
+    // =========================
+    // PATCH: กันยิง request เปลี่ยน client_id
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
     $jobAgency = DB::transaction(fn() => JobAgency::create($validated));
 
     // ✅ ใช้ client_id เพราะ route รับ client_id
@@ -93,6 +101,11 @@ public function storeJobAgency(Request $request)
     public function updateJobAgency(Request $request, $id)
 {
     $jobAgency = JobAgency::findOrFail($id);
+
+    // =========================
+    // PATCH: กันเดา URL มา update record ของ client ที่ไม่มีสิทธิ์
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($jobAgency->client_id);
 
     $validator = Validator::make($request->all(), [
         'job_date' => [
@@ -108,6 +121,7 @@ public function storeJobAgency(Request $request)
         'company'       => 'required|string',
         'coordinator'   => 'required|string',
         'remark'        => 'nullable|string',
+        'client_id'     => 'required|exists:clients,id',
     ], [
         // … ข้อความ error ภาษาไทย …
     ]);
@@ -116,11 +130,18 @@ public function storeJobAgency(Request $request)
         return redirect()
             ->back()
             ->withErrors($validator)
-            ->withInput($request->all() + ['job_id' => $id]); // ✅ ส่ง job_id กลับไป
+            ->withInput($request->all() + ['job_id' => $id]);
     }
 
-    DB::transaction(function () use ($jobAgency, $validator) {
-        $jobAgency->update($validator->validated());
+    $data = $validator->validated();
+
+    // =========================
+    // PATCH: กันเปลี่ยน client_id ไป client อื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
+    DB::transaction(function () use ($jobAgency, $data) {
+        $jobAgency->update($data);
     });
 
     return redirect()
@@ -134,6 +155,12 @@ public function storeJobAgency(Request $request)
    public function deleteJobAgency($id)
 {
     $jobAgency = JobAgency::findOrFail($id);
+
+    // =========================
+    // PATCH: กันเดา URL มาลบ record ของ client ที่ไม่มีสิทธิ์
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($jobAgency->client_id);
+
     $client_id = $jobAgency->client_id;
 
     DB::transaction(function () use ($jobAgency) {
@@ -145,4 +172,3 @@ public function storeJobAgency(Request $request)
 }
  
 }
-

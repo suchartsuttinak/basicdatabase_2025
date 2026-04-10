@@ -7,6 +7,10 @@
 @php
     use Carbon\Carbon;
 
+    if (!$client) {
+        abort(404);
+    }
+
     $profileImage = asset('upload/no_image.jpg');
     $imagePath = !empty($client->image) ? public_path('upload/client_images/' . $client->image) : null;
 
@@ -17,9 +21,17 @@
     $birthDate = !empty($client->birth_date) ? Carbon::parse($client->birth_date) : null;
     $arrivalDate = !empty($client->arrival_date) ? Carbon::parse($client->arrival_date) : null;
 
-    $educationRecord = $client->educationRecords->first();
-    $educationName = $educationRecord->education->education_name ?? 'ไม่ระบุ';
-    $institutionName = $educationRecord->institution->institution_name ?? 'ไม่ระบุ';
+    $educationRecords = $client->educationRecords ?? collect();
+    $educationRecord = $educationRecords->first();
+
+    $educationName = optional(optional($educationRecord)->education)->education_name ?? 'ไม่ระบุ';
+    $institutionName = optional(optional($educationRecord)->institution)->institution_name ?? 'ไม่ระบุ';
+
+    $appointments = collect($appointments ?? []);
+    $appointmentCount = $appointmentCount ?? $appointments->count();
+
+    $accidents = collect($accidents ?? []);
+    $accidentCount = $accidentCount ?? $accidents->count();
 
     $observeLatestCount = !empty($observeLatest) ? 1 : 0;
     $observeDateText = !empty($observeDate)
@@ -27,13 +39,14 @@
         : 'ไม่ระบุ';
 
     $todayText = ($day ?? '-') . ' ' . ($month ?? '-') . ' ' . ($year ?? '-');
+
+    $clientFullName = $client->full_name ?? $client->fullname ?? trim(($client->first_name ?? '') . ' ' . ($client->last_name ?? ''));
 @endphp
 
 <div class="container-fluid client-page">
 
-    {{-- Top Navigation / Back --}}
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <div>
+    <div class="client-topbar d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div class="topbar-left">
             <a href="{{ route('client.show') }}" class="btn btn-primary btn-back shadow-sm">
                 <span class="btn-back-icon">
                     <i class="bi bi-arrow-left-short"></i>
@@ -42,14 +55,13 @@
             </a>
         </div>
 
-        <div class="text-md-end">
+        <div class="topbar-right text-md-end">
             <div class="page-badge">
                 <i class="bi bi-person-vcard me-2"></i>ข้อมูลผู้รับบริการ
             </div>
         </div>
     </div>
 
-    {{-- Page Header --}}
     <div class="page-header-card mb-4">
         <div class="row align-items-center g-4">
             <div class="col-lg-8">
@@ -68,7 +80,6 @@
         </div>
     </div>
 
-    {{-- Profile Card --}}
     <div class="card profile-card border-0 shadow-sm mb-4 overflow-hidden">
         <div class="card-body p-0">
             <div class="row g-0">
@@ -79,7 +90,7 @@
                              class="profile-avatar">
                     </div>
 
-                    <h3 class="profile-name mb-2">{{ $client->fullname ?? 'ไม่ระบุชื่อ' }}</h3>
+                    <h3 class="profile-name mb-2">{{ $clientFullName ?: 'ไม่ระบุชื่อ' }}</h3>
 
                     <div class="profile-meta">
                         @if($birthDate)
@@ -89,27 +100,22 @@
                         @endif
                     </div>
 
-                  <div class="profile-quick-tags mt-3">
-
-                        {{-- 🔥 เลขทะเบียน --}}
+                    <div class="profile-quick-tags mt-3">
                         <span class="quick-tag">
                             <i class="bi bi-person-badge me-1"></i>
                             เลขทะเบียน: {{ $client->register_number ?? '-' }}
                         </span>
 
-                        {{-- 🔥 ระยะเวลาอยู่อาศัย --}}
-                    <span class="quick-tag">
-                        <i class="bi bi-calendar-check me-1"></i>ระยะเวลาอยู่อาศัย:
-
-                        {{ $client->residence_duration ?? 'ไม่มีข้อมูลวันที่เข้าระบบ' }}
-                    </span>
-
+                        <span class="quick-tag">
+                            <i class="bi bi-calendar-check me-1"></i>ระยะเวลาอยู่อาศัย:
+                            {{ $client->residence_duration ?? 'ไม่มีข้อมูลวันที่เข้าระบบ' }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="col-xl-8">
-                    <div class="p-4 p-lg-5">
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+                    <div class="profile-right-panel p-4 p-lg-5">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 detail-head">
                             <h5 class="detail-title mb-0">รายละเอียดข้อมูลพื้นฐาน</h5>
                             <span class="detail-status">
                                 <i class="bi bi-check-circle-fill me-1"></i> อัปเดตข้อมูลแล้ว
@@ -120,7 +126,7 @@
                             <div class="col-md-6">
                                 <div class="info-item">
                                     <div class="info-label">ชื่อ - สกุล</div>
-                                    <div class="info-value">{{ $client->fullname ?? 'ไม่ระบุ' }}</div>
+                                    <div class="info-value">{{ $clientFullName ?: 'ไม่ระบุ' }}</div>
                                 </div>
                             </div>
 
@@ -188,7 +194,6 @@
         </div>
     </div>
 
-    {{-- Daily Stats --}}
     <div class="section-head mb-3">
         <div>
             <h4 class="section-title mb-1">สรุปข้อมูลล่าสุด</h4>
@@ -197,7 +202,6 @@
     </div>
 
     <div class="row g-4 mb-5">
-        {{-- Appointment --}}
         <div class="col-lg-4">
             <div class="card stat-card stat-card-success border-0 shadow-sm h-100">
                 <div class="card-body p-4">
@@ -206,19 +210,26 @@
                     </div>
 
                     <div class="stat-label">การพบแพทย์</div>
-                    <div class="stat-number">{{ $appointmentCount ?? 0 }}</div>
+                    <div class="stat-number">{{ $appointmentCount }}</div>
                     <div class="stat-desc">จำนวนรายการนัดหมายที่เกี่ยวข้อง</div>
 
                     <div class="stat-list mt-4">
-                        @if(!empty($appointmentCount) && $appointmentCount > 0)
+                        @if($appointmentCount > 0)
                             <ul class="list-unstyled mb-0">
                                 @foreach($appointments as $record)
                                     <li>
                                         <i class="bi bi-dot"></i>
-                                        {{ $record['type'] ?? 'นัดหมาย' }}
+                                        {{ is_array($record) ? ($record['type'] ?? 'นัดหมาย') : ($record->type ?? 'นัดหมาย') }}
                                         วันที่
-                                        {{ Carbon::parse($record['date'])->locale('th')->translatedFormat('d F') }}
-                                        {{ Carbon::parse($record['date'])->year + 543 }}
+                                        @php
+                                            $recordDate = is_array($record) ? ($record['date'] ?? null) : ($record->date ?? null);
+                                        @endphp
+                                        @if($recordDate)
+                                            {{ Carbon::parse($recordDate)->locale('th')->translatedFormat('d F') }}
+                                            {{ Carbon::parse($recordDate)->year + 543 }}
+                                        @else
+                                            ไม่ระบุ
+                                        @endif
                                     </li>
                                 @endforeach
                             </ul>
@@ -230,7 +241,6 @@
             </div>
         </div>
 
-        {{-- Behavior --}}
         <div class="col-lg-4">
             <div class="card stat-card stat-card-warning border-0 shadow-sm h-100">
                 <div class="card-body p-4">
@@ -251,7 +261,6 @@
             </div>
         </div>
 
-        {{-- Accident --}}
         <div class="col-lg-4">
             <div class="card stat-card stat-card-danger border-0 shadow-sm h-100">
                 <div class="card-body p-4">
@@ -260,7 +269,7 @@
                     </div>
 
                     <div class="stat-label">การบาดเจ็บ</div>
-                    <div class="stat-number">{{ $accidentCount ?? 0 }}</div>
+                    <div class="stat-number">{{ $accidentCount }}</div>
                     <div class="stat-desc">ข้อมูลการบาดเจ็บที่บันทึกในระบบ</div>
 
                     <div class="stat-list mt-4">
@@ -268,14 +277,21 @@
                             <strong>อ้างอิงวันที่:</strong> {{ $todayText }}
                         </div>
 
-                        @if(!empty($accidentCount) && $accidentCount > 0)
+                        @if($accidentCount > 0)
                             <ul class="list-unstyled mb-0">
                                 @foreach($accidents as $accident)
+                                    @php
+                                        $incidentDate = is_array($accident) ? ($accident['incident_date'] ?? null) : ($accident->incident_date ?? null);
+                                    @endphp
                                     <li>
                                         <i class="bi bi-dot"></i>
                                         บันทึกการบาดเจ็บวันที่
-                                        {{ Carbon::parse($accident->incident_date)->locale('th')->translatedFormat('d F') }}
-                                        {{ Carbon::parse($accident->incident_date)->year + 543 }}
+                                        @if($incidentDate)
+                                            {{ Carbon::parse($incidentDate)->locale('th')->translatedFormat('d F') }}
+                                            {{ Carbon::parse($incidentDate)->year + 543 }}
+                                        @else
+                                            ไม่ระบุ
+                                        @endif
                                     </li>
                                 @endforeach
                             </ul>
@@ -288,7 +304,6 @@
         </div>
     </div>
 
-    {{-- Services --}}
     <div class="section-head mb-3">
         <div>
             <h4 class="section-title mb-1">เลือกบริการ</h4>
@@ -393,6 +408,20 @@
     .client-page {
         background: linear-gradient(180deg, #f8fbff 0%, #f4f7fb 100%);
         min-height: 100vh;
+        padding: 1.25rem 1.25rem 2rem;
+        overflow-x: hidden;
+        position: relative;
+        z-index: 1;
+    }
+
+    .client-topbar {
+        position: relative;
+        z-index: 3;
+    }
+
+    .topbar-left,
+    .topbar-right {
+        min-width: 0;
     }
 
     .btn-back {
@@ -401,7 +430,12 @@
         font-weight: 600;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: .55rem;
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.3;
     }
 
     .btn-back-icon {
@@ -413,11 +447,13 @@
         align-items: center;
         justify-content: center;
         font-size: 1.1rem;
+        flex: 0 0 auto;
     }
 
     .page-badge {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         padding: .55rem 1rem;
         border-radius: 999px;
         background: #ffffff;
@@ -425,6 +461,10 @@
         color: #0d6efd;
         font-weight: 600;
         box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        max-width: 100%;
+        text-align: center;
+        line-height: 1.35;
+        white-space: normal;
     }
 
     .page-header-card {
@@ -433,6 +473,7 @@
         border-radius: 24px;
         padding: 2rem;
         box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
     }
 
     .section-kicker {
@@ -452,6 +493,8 @@
         font-size: clamp(1.7rem, 2vw, 2.4rem);
         font-weight: 800;
         color: #1e293b;
+        line-height: 1.25;
+        word-break: break-word;
     }
 
     .page-subtitle {
@@ -468,6 +511,7 @@
         border: 1px solid rgba(15, 23, 42, .06);
         display: inline-block;
         min-width: 220px;
+        max-width: 100%;
     }
 
     .mini-stat-label {
@@ -479,6 +523,7 @@
     .mini-stat-value {
         color: #0f172a;
         font-weight: 700;
+        word-break: break-word;
     }
 
     .profile-card {
@@ -494,6 +539,10 @@
         justify-content: center;
     }
 
+    .profile-right-panel {
+        height: 100%;
+    }
+
     .profile-avatar-wrap {
         margin-bottom: 1.25rem;
     }
@@ -505,11 +554,14 @@
         border-radius: 50%;
         border: 5px solid rgba(255,255,255,.25);
         box-shadow: 0 20px 40px rgba(0,0,0,.18);
+        max-width: 100%;
     }
 
     .profile-name {
         font-weight: 800;
         font-size: 1.5rem;
+        line-height: 1.35;
+        word-break: break-word;
     }
 
     .profile-meta {
@@ -531,6 +583,10 @@
         border-radius: 999px;
         padding: .5rem .85rem;
         font-size: .85rem;
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+        text-align: center;
     }
 
     .detail-title {
@@ -546,6 +602,12 @@
         border-radius: 999px;
         font-size: .85rem;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        max-width: 100%;
+        white-space: normal;
     }
 
     .info-item {
@@ -555,6 +617,7 @@
         padding: 1rem 1.1rem;
         height: 100%;
         transition: all .25s ease;
+        overflow-wrap: anywhere;
     }
 
     .info-item:hover {
@@ -572,6 +635,7 @@
         color: #0f172a;
         font-weight: 700;
         line-height: 1.6;
+        word-break: break-word;
     }
 
     .profile-note {
@@ -580,6 +644,7 @@
         color: #475569;
         border-radius: 16px;
         padding: .95rem 1rem;
+        word-break: break-word;
     }
 
     .section-head {
@@ -646,6 +711,7 @@
         font-weight: 800;
         color: #0f172a;
         line-height: 1.1;
+        word-break: break-word;
     }
 
     .stat-desc {
@@ -660,6 +726,7 @@
         color: #475569;
         font-size: .92rem;
         line-height: 1.75;
+        word-break: break-word;
     }
 
     .stat-list li {
@@ -680,6 +747,7 @@
 
     .single-line-info {
         color: #475569;
+        word-break: break-word;
     }
 
     .service-card {
@@ -714,6 +782,7 @@
         color: #64748b;
         line-height: 1.7;
         min-height: 72px;
+        word-break: break-word;
     }
 
     .service-link {
@@ -723,16 +792,62 @@
         font-weight: 700;
         color: #0d6efd;
         text-decoration: none;
+        flex-wrap: wrap;
     }
 
     .service-link:hover {
         color: #0a58ca;
     }
 
+    @media (max-width: 1399.98px) {
+        .client-page {
+            padding: 1.1rem 1rem 2rem;
+        }
+    }
+
+    @media (max-width: 1199.98px) {
+        .client-topbar {
+            align-items: stretch !important;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            width: 100%;
+        }
+
+        .topbar-right {
+            text-align: left !important;
+        }
+
+        .btn-back,
+        .page-badge {
+            width: 100%;
+        }
+
+        .page-header-card {
+            padding: 1.5rem;
+        }
+
+        .header-mini-stat {
+            display: block;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .service-text {
+            min-height: auto;
+        }
+    }
+
     @media (max-width: 991.98px) {
+        .client-page {
+            padding: 1rem .9rem 1.5rem;
+        }
+
         .page-header-card,
-        .profile-left-panel,
-        .card-body {
+        .profile-card,
+        .stat-card,
+        .service-card {
             border-radius: 20px;
         }
 
@@ -740,8 +855,109 @@
             padding: 2rem 1.25rem;
         }
 
-        .service-text {
-            min-height: auto;
+        .profile-right-panel {
+            padding: 1.5rem !important;
+        }
+
+        .detail-head {
+            align-items: stretch !important;
+        }
+
+        .detail-status {
+            width: 100%;
+        }
+
+        .section-head {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .client-page {
+            padding: .85rem .75rem 1.25rem;
+        }
+
+        .btn-back {
+            padding: .7rem .95rem;
+            font-size: .95rem;
+        }
+
+        .page-badge {
+            padding: .7rem .95rem;
+            font-size: .95rem;
+        }
+
+        .page-header-card {
+            padding: 1.2rem 1rem;
+        }
+
+        .section-kicker {
+            font-size: .75rem;
+            padding: .38rem .7rem;
+        }
+
+        .page-title {
+            font-size: 1.45rem;
+        }
+
+        .page-subtitle {
+            font-size: .94rem;
+            line-height: 1.65;
+        }
+
+        .profile-avatar {
+            width: 128px;
+            height: 128px;
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+        }
+
+        .quick-tag {
+            width: 100%;
+        }
+
+        .info-item {
+            padding: .95rem 1rem;
+        }
+
+        .stat-number {
+            font-size: 1.9rem;
+        }
+
+        .service-icon {
+            width: 58px;
+            height: 58px;
+            font-size: 1.35rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .client-topbar {
+            gap: .85rem !important;
+        }
+
+        .btn-back {
+            border-radius: 18px;
+        }
+
+        .page-badge {
+            border-radius: 18px;
+        }
+
+        .profile-left-panel {
+            padding: 1.5rem 1rem;
+        }
+
+        .profile-right-panel {
+            padding: 1rem !important;
+        }
+
+        .stat-card .card-body,
+        .service-card .card-body {
+            padding: 1rem !important;
         }
     }
 </style>

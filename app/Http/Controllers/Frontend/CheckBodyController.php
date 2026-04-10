@@ -12,7 +12,11 @@ class CheckBodyController extends Controller
 {
     public function CheckBodyAdd($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // ใช้แนวทางเดียวกับหน้า EducationRecord
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $checkbodies = CheckBody::where('client_id', $client->id)
             ->orderByDesc('assessor_date')
@@ -33,6 +37,12 @@ class CheckBodyController extends Controller
     {
         $validated = $this->validateCheckBody($request);
 
+        // =========================
+        // PATCH: กันแก้ client_id จาก request เพื่อบันทึกให้ client ที่ไม่มีสิทธิ์
+        // ตรวจสิทธิ์ผ่าน Client::forUser(auth()->user()) ตามที่กำหนด
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
         if (($validated['development'] ?? null) === 'สมวัย') {
             $validated['detail'] = null;
         }
@@ -50,7 +60,12 @@ class CheckBodyController extends Controller
     public function CheckBodyEdit($id)
     {
         $checkbody = CheckBody::with('client')->findOrFail($id);
-        $client = $checkbody->client;
+
+        // =========================
+        // PATCH: กันเดา URL เข้ามาแก้ record ของ client ที่ไม่มีสิทธิ์
+        // ตรวจสิทธิ์ผ่าน client เจ้าของ record
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($checkbody->client_id);
 
         $checkbodies = CheckBody::where('client_id', $client->id)
             ->orderByDesc('assessor_date')
@@ -68,7 +83,18 @@ class CheckBodyController extends Controller
     {
         $checkbody = CheckBody::findOrFail($id);
 
+        // =========================
+        // PATCH: กันเดา URL เข้ามาอัปเดต record ของ client ที่ไม่มีสิทธิ์
+        // ต้องตรวจสิทธิ์ที่ record เดิมก่อน
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($checkbody->client_id);
+
         $validated = $this->validateCheckBody($request, $checkbody->id);
+
+        // =========================
+        // PATCH: กันส่ง client_id ใหม่จากฟอร์มไปยัง client ที่ไม่มีสิทธิ์
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
         if (($validated['development'] ?? null) === 'สมวัย') {
             $validated['detail'] = null;
@@ -87,6 +113,12 @@ class CheckBodyController extends Controller
     public function CheckBodyDelete($id)
     {
         $checkbody = CheckBody::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL เข้ามาลบ record ของ client ที่ไม่มีสิทธิ์
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($checkbody->client_id);
+
         $clientId = $checkbody->client_id;
         $checkbody->delete();
 
@@ -101,14 +133,18 @@ class CheckBodyController extends Controller
     public function CheckBodyReport($id)
     {
         $checkbody = CheckBody::with('client')->findOrFail($id);
-        $client = $checkbody->client;
+
+        // =========================
+        // PATCH: กันเดา URL เข้าดูรายงานของ client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($checkbody->client_id);
 
         return view('frontend.client.checkBody.report', compact('checkbody', 'client'));
     }
 
     private function validateCheckBody(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'client_id' => ['required', 'exists:clients,id'],
 
             'assessor_date' => [
@@ -160,5 +196,13 @@ class CheckBodyController extends Controller
             'recorder.required' => 'กรุณาระบุชื่อผู้ตรวจหรือผู้บันทึก',
             'recorder.max' => 'ชื่อผู้ตรวจหรือผู้บันทึกต้องไม่เกิน 255 ตัวอักษร',
         ]);
+
+        // =========================
+        // PATCH: ตรวจสิทธิ์ client_id ที่ถูกส่งมาจากฟอร์ม
+        // ป้องกันการแก้ hidden field / เดา URL / ยิง request ตรง
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
+        return $validated;
     }
 }

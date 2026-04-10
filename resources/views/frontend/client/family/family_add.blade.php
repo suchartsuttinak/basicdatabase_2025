@@ -368,6 +368,31 @@
         animation: familyFade .18s ease;
     }
 
+    .family-page .ajax-banner {
+        display: none;
+        margin-bottom: 1rem;
+        padding: .9rem 1rem;
+        border-radius: 14px;
+        font-weight: 700;
+        border: 1px solid transparent;
+    }
+
+    .family-page .ajax-banner.show {
+        display: block;
+    }
+
+    .family-page .ajax-banner.success {
+        background: #ecfdf5;
+        color: #065f46;
+        border-color: #a7f3d0;
+    }
+
+    .family-page .ajax-banner.error {
+        background: #fef2f2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+
     @keyframes familyFade {
         from { opacity: 0; transform: translateY(4px); }
         to   { opacity: 1; transform: translateY(0); }
@@ -460,10 +485,10 @@
 
 <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css') }}">
 
-@include('admin_client.include.tabs')
-
 <div class="family-page">
     <div class="family-shell">
+        <div id="familyAjaxBanner" class="ajax-banner"></div>
+
         <div class="family-topbar">
             <div class="family-title-wrap">
                 <h2 class="family-title">ข้อมูลครอบครัวและผู้เกี่ยวข้อง</h2>
@@ -472,7 +497,7 @@
                 </p>
             </div>
 
-            <div class="family-status-badge">
+            <div class="family-status-badge" id="familyStatusBadge">
                 <i class="bi bi-shield-check"></i>
                 <span>{{ $hasExistingData ? 'โหมดแก้ไขข้อมูล' : 'โหมดบันทึกข้อมูลใหม่' }}</span>
             </div>
@@ -868,6 +893,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const familyForm = document.getElementById('familyForm');
     const familySubmitBtn = document.getElementById('familySubmitBtn');
     const activeTabInput = document.getElementById('active_tab');
+    const familyAjaxBanner = document.getElementById('familyAjaxBanner');
+    const familyStatusBadge = document.getElementById('familyStatusBadge');
+    const familyTabs = document.getElementById('familyTabs');
+
+    const tabMap = {
+        father: 'father-tab',
+        mother: 'mother-tab',
+        spouse: 'spouse-tab',
+        relative: 'relative-tab'
+    };
 
     const fetchJSON = async (url) => {
         const response = await fetch(url, {
@@ -894,6 +929,66 @@ document.addEventListener('DOMContentLoaded', function () {
             html += `<option value="${item.id}" ${selected}>${text}</option>`;
         });
         selectEl.innerHTML = html;
+    };
+
+    const showBanner = (message, type = 'success') => {
+        if (!familyAjaxBanner) return;
+        familyAjaxBanner.className = `ajax-banner show ${type}`;
+        familyAjaxBanner.innerHTML = message;
+        window.scrollTo({ top: familyAjaxBanner.offsetTop - 80, behavior: 'smooth' });
+    };
+
+    const clearBanner = () => {
+        if (!familyAjaxBanner) return;
+        familyAjaxBanner.className = 'ajax-banner';
+        familyAjaxBanner.innerHTML = '';
+    };
+
+    const clearValidationErrors = () => {
+        document.querySelectorAll('.family-page .is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+
+        document.querySelectorAll('.family-page .field-error.is-ajax').forEach(el => {
+            el.remove();
+        });
+    };
+
+    const appendFieldError = (input, message) => {
+        if (!input) return;
+        input.classList.add('is-invalid');
+
+        let errorEl = input.parentElement?.nextElementSibling;
+        if (errorEl && errorEl.classList.contains('field-error') && errorEl.classList.contains('is-ajax')) {
+            errorEl.textContent = message;
+            return;
+        }
+
+        const span = document.createElement('span');
+        span.className = 'field-error is-ajax';
+        span.textContent = message;
+
+        const wrapper = input.closest('.field-group');
+        if (wrapper) {
+            wrapper.appendChild(span);
+        }
+    };
+
+    const activateTabByField = (fieldName) => {
+        if (!fieldName) return;
+
+        const prefix = fieldName.split('.')[0];
+        const tabId = tabMap[prefix];
+
+        if (!tabId) return;
+
+        const trigger = document.getElementById(tabId);
+        if (trigger && window.bootstrap) {
+            new bootstrap.Tab(trigger).show();
+            if (activeTabInput) {
+                activeTabInput.value = tabId;
+            }
+        }
     };
 
     const bindLocationGroup = (prefix) => {
@@ -1000,8 +1095,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    if (familyTabs) {
+        familyTabs.addEventListener('input', function (e) {
+            const target = e.target;
+            if (target.classList.contains('is-invalid')) {
+                target.classList.remove('is-invalid');
+            }
+        });
+
+        familyTabs.addEventListener('change', function (e) {
+            const target = e.target;
+            if (target.classList.contains('is-invalid')) {
+                target.classList.remove('is-invalid');
+            }
+        });
+    }
+
     if (familyForm) {
-        familyForm.addEventListener('submit', function () {
+        familyForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            clearBanner();
+            clearValidationErrors();
+
             const activeTab = document.querySelector('#familyTabs .nav-link.active');
             if (activeTabInput && activeTab) {
                 activeTabInput.value = activeTab.id;
@@ -1010,6 +1125,72 @@ document.addEventListener('DOMContentLoaded', function () {
             if (familySubmitBtn) {
                 familySubmitBtn.disabled = true;
                 familySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังบันทึกข้อมูล...';
+            }
+
+            try {
+                const formData = new FormData(familyForm);
+
+                const response = await fetch(familyForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.status === 422) {
+                    const errors = data.errors || {};
+                    const firstField = Object.keys(errors)[0] || null;
+
+                    if (firstField) {
+                        activateTabByField(firstField);
+                    }
+
+                    Object.entries(errors).forEach(([field, messages]) => {
+                        const inputName = field.replace(/\.(\w+)/g, '[$1]');
+                        const input = familyForm.querySelector(`[name="${inputName}"]`);
+                        appendFieldError(input, Array.isArray(messages) ? messages[0] : messages);
+                    });
+
+                    showBanner(data.message || 'กรุณาตรวจสอบข้อมูลที่กรอกอีกครั้ง', 'error');
+                    return;
+                }
+
+                if (!response.ok || !data.success) {
+                    showBanner(data.message || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+                    return;
+                }
+
+                if (familyStatusBadge) {
+                    familyStatusBadge.innerHTML = '<i class="bi bi-shield-check"></i><span>โหมดแก้ไขข้อมูล</span>';
+                }
+
+                if (familySubmitBtn) {
+                    familySubmitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>แก้ไขข้อมูล';
+                }
+
+                showBanner(data.message || 'บันทึกข้อมูลสำเร็จ', 'success');
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ',
+                        text: data.message || 'บันทึกข้อมูลสำเร็จ',
+                        timer: 1600,
+                        showConfirmButton: false
+                    });
+                }
+            } catch (error) {
+                console.error('Family submit failed:', error);
+                showBanner('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง', 'error');
+            } finally {
+                if (familySubmitBtn) {
+                    familySubmitBtn.disabled = false;
+                    familySubmitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>แก้ไขข้อมูล';
+                }
             }
         });
     }

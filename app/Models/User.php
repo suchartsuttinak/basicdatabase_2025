@@ -110,6 +110,14 @@ class User extends Authenticatable
     }
 
     /**
+     * ใช้แทน hasRole() แบบหลายค่า อ่านง่ายขึ้น
+     */
+    public function hasAnyRole(array $roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
+
+    /**
      * ผู้ใช้งานสามารถดูแลได้หลายบ้าน
      */
     public function houses(): BelongsToMany
@@ -118,8 +126,76 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * เผื่อใช้กรณีต้องการเฉพาะบ้านที่เปิดใช้งาน
+     * ถ้า table houses ไม่มีคอลัมน์ status/release_status ก็ไม่ต้องใช้เมธอดนี้
+     */
+    public function activeHouses(): BelongsToMany
+    {
+        return $this->belongsToMany(House::class, 'house_user', 'user_id', 'house_id')
+            ->withTimestamps()
+            ->where(function ($query) {
+                $query->whereNull('houses.status')
+                    ->orWhere('houses.status', 1)
+                    ->orWhere('houses.status', '1');
+            });
+    }
+
     public function operations(): HasMany
     {
         return $this->hasMany(Operation::class);
+    }
+
+    /**
+     * คืนค่า id บ้านทั้งหมดที่ user มีสิทธิ์
+     * admin = เห็นทุกบ้าน
+     */
+    public function accessibleHouseIds(): array
+    {
+        if ($this->isAdmin()) {
+            return House::query()
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->toArray();
+        }
+
+        $this->loadMissing('houses');
+
+        return $this->houses
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * ตรวจว่าผู้ใช้มีสิทธิ์เข้าถึงบ้านนี้หรือไม่
+     */
+    public function canAccessHouse(int|string|null $houseId): bool
+    {
+        if (empty($houseId)) {
+            return false;
+        }
+
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return in_array((int) $houseId, $this->accessibleHouseIds(), true);
+    }
+
+    /**
+     * ตรวจว่าผู้ใช้มีบ้านในความดูแลหรือไม่
+     */
+    public function hasAssignedHouses(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $this->loadMissing('houses');
+
+        return $this->houses->isNotEmpty();
     }
 }

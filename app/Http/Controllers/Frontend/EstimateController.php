@@ -10,33 +10,45 @@ use App\Models\Estimate;
 use App\Models\EstimatePicture;
 use Illuminate\Support\Facades\Validator;
 
-
-
 class EstimateController extends Controller
 {
-    // แสดงรายการทั้งหมดของ client
     public function IndexEstimate($client_id)
     {
-        $client = Client::with('estimates.pictures')->findOrFail($client_id);
+        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+            ->with('estimates.pictures')
+            ->findOrFail($client_id);
+
         return view('frontend.client.estimate.estimate_index', compact('client'));
     }
 
     public function ShowEstimate($client_id)
     {
-        $client = Client::with('estimates.pictures')->findOrFail($client_id);
+        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+            ->with('estimates.pictures')
+            ->findOrFail($client_id);
+
         return view('frontend.client.estimate.estimate_index', compact('client'));
     }
 
-    // ฟอร์มเพิ่มข้อมูล
     public function AddEstimate($id)
     {
-        $estimate = Estimate::with('pictures')->findOrFail($id);
+        $estimate = Estimate::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->with('pictures')
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         return response()->json($estimate);
     }
 
-    // บันทึกข้อมูลใหม่
     public function StoreEstimate(Request $request)
 {
+    // ✅ [แก้ไข] กัน POST ยิง client คนอื่น
+    $client = Client::forUser(auth()->user())
+        ->where('id', $request->client_id)
+        ->firstOrFail();
+
     $validator = Validator::make($request->all(), [
         'date' => [
             'required',
@@ -61,22 +73,24 @@ class EstimateController extends Controller
         return back()
             ->withErrors($validator)
             ->withInput()
-            ->with('form', 'add-estimate'); // ✅ บอกว่า error มาจาก Add
+            ->with('form', 'add-estimate');
     }
 
-    $estimate = Estimate::create($validator->validated());
+    $data = $validator->validated();
+    $data['client_id'] = $client->id; // ✅ [แก้ไข]
 
-    // reindex count ใหม่ทั้งหมด
+    $estimate = Estimate::create($data);
+
     $estimates = Estimate::where('client_id', $estimate->client_id)
         ->orderBy('date', 'asc')
         ->get();
+
     $counter = 1;
     foreach ($estimates as $item) {
         $item->update(['count' => $counter]);
         $counter++;
     }
 
-    // อัพโหลดรูป
     if ($request->hasFile('pictures')) {
         foreach ($request->file('pictures') as $file) {
             $path = $file->store('estimate_pictures', 'public');
@@ -91,11 +105,15 @@ class EstimateController extends Controller
         ]);
 }
 
-
-    // ฟอร์มแก้ไข
     public function EditEstimate($id)
     {
-        $estimate = Estimate::with('pictures')->findOrFail($id);
+        $estimate = Estimate::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->with('pictures')
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         return response()->json([
             'id'       => $estimate->id,
             'date'     => \Carbon\Carbon::parse($estimate->date)->format('Y-m-d'),
@@ -110,10 +128,13 @@ class EstimateController extends Controller
         ]);
     }
 
-    // อัพเดตข้อมูล
     public function UpdateEstimate(Request $request, $id)
     {
-        $estimate = Estimate::findOrFail($id);
+        $estimate = Estimate::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
 
         $validated = $request->validate([
             'date' => [
@@ -127,16 +148,10 @@ class EstimateController extends Controller
             'results' => 'nullable|string',
             'teacher' => 'nullable|string',
             'remark' => 'nullable|string',
-        ], [
-            'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น',
-            'date.required' => 'กรุณาเลือกวันที่',
-            'date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'follo_no.required' => 'กรุณาเลือกการดำเนินงาน',
         ]);
 
         $estimate->update($validated);
 
-        // ลบรูปเดิม
         if ($request->has('remove_pictures')) {
             foreach ($request->remove_pictures as $picId) {
                 $pic = EstimatePicture::find($picId);
@@ -147,7 +162,6 @@ class EstimateController extends Controller
             }
         }
 
-        // อัพโหลดรูปใหม่
         if ($request->hasFile('pictures')) {
             foreach ($request->file('pictures') as $file) {
                 $path = $file->store('estimate_pictures', 'public');
@@ -155,10 +169,10 @@ class EstimateController extends Controller
             }
         }
 
-        // reindex count
         $estimates = Estimate::where('client_id', $estimate->client_id)
             ->orderBy('date', 'asc')
             ->get();
+
         $counter = 1;
         foreach ($estimates as $item) {
             $item->update(['count' => $counter]);
@@ -172,17 +186,21 @@ class EstimateController extends Controller
             ]);
     }
 
-    // ลบข้อมูล
     public function DeleteEstimate($id)
     {
-        $estimate = Estimate::findOrFail($id);
+        $estimate = Estimate::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         $client_id = $estimate->client_id;
         $estimate->delete();
 
-        // reindex count ใหม่
         $estimates = Estimate::where('client_id', $client_id)
             ->orderBy('date', 'asc')
             ->get();
+
         $counter = 1;
         foreach ($estimates as $item) {
             $item->update(['count' => $counter]);
@@ -196,10 +214,14 @@ class EstimateController extends Controller
             ]);
     }
 
-    // ตรวจสอบวันที่ซ้ำ (AJAX)
     public function CheckDuplicate(Request $request)
     {
-        $exists = Estimate::where('client_id', $request->client_id)
+        // ✅ [แก้ไข] ตรวจสิทธิ์ client ก่อน
+        $client = Client::forUser(auth()->user())
+            ->where('id', $request->client_id)
+            ->firstOrFail();
+
+        $exists = Estimate::where('client_id', $client->id) // ✅ [แก้ไข]
             ->where('date', $request->date)
             ->where('id', '!=', $request->id)
             ->exists();

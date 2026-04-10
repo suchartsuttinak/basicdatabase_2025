@@ -411,7 +411,7 @@
 <div class="family-member-page">
     <div class="family-member-shell">
 
-        @include('admin_client.include.tabs')
+        {{-- @include('admin_client.include.tabs') --}}
 
         <div class="family-member-header">
             <div class="family-member-title-wrap">

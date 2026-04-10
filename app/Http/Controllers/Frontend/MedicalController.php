@@ -16,7 +16,11 @@ class MedicalController extends Controller
     // แสดงฟอร์มเพิ่มข้อมูลใหม่
     public function MedicalAdd($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
         $medicals = Medical::where('client_id', $client->id)
             ->orderBy('medical_date', 'desc')
             ->get();
@@ -53,6 +57,10 @@ class MedicalController extends Controller
         'refer.required'        => 'กรุณาเลือกการส่งต่อ',
     ]);
 
+        // =========================
+        // PATCH: กันยิง request เปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
         if ($data['refer'] === 'ไม่พบแพทย์') {
             $data['diagnosis'] = null;
@@ -75,6 +83,11 @@ class MedicalController extends Controller
 {
     $medical = Medical::findOrFail($id);
 
+    // =========================
+    // PATCH: กันเดา URL เรียก JSON ของ client คนอื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($medical->client_id);
+
     return response()->json([
         'id'           => $medical->id,
         'medical_date' => $medical->medical_date ? \Carbon\Carbon::parse($medical->medical_date)->format('Y-m-d') : null,
@@ -94,6 +107,11 @@ class MedicalController extends Controller
 public function MedicalUpdate(Request $request, $id)
 {
     $medical = Medical::findOrFail($id);
+
+    // =========================
+    // PATCH: กันเดา URL มา update record คนอื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($medical->client_id);
 
     $validator = Validator::make($request->all(), [
         'medical_date' => [
@@ -126,7 +144,6 @@ public function MedicalUpdate(Request $request, $id)
 
 
     if ($validator->fails()) {
-        // ❌ Validation fail → กลับไปหน้าเดิม + เปิด modal edit พร้อม error
         return back()
             ->withErrors($validator)
             ->withInput()
@@ -138,7 +155,11 @@ public function MedicalUpdate(Request $request, $id)
 
     $data = $validator->validated();
 
-    // ถ้าเลือก "ไม่พบแพทย์" → clear diagnosis และ appt_date
+    // =========================
+    // PATCH: กันเปลี่ยน client_id ไป client อื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
     if ($data['refer'] === 'ไม่พบแพทย์') {
         $data['diagnosis'] = null;
         $data['appt_date'] = null;
@@ -152,7 +173,6 @@ public function MedicalUpdate(Request $request, $id)
             'alert-type' => 'success'
         ];
 
-    // ✅ สำเร็จ → redirect ไปหน้าตาราง (เช่น medical.index หรือ medical.add)
     return redirect()
         ->route('medical.add', $medical->client_id)
         ->with($notification);
@@ -161,6 +181,12 @@ public function MedicalUpdate(Request $request, $id)
     public function MedicalDelete($id)
     {
         $medical   = Medical::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($medical->client_id);
+
         $clientId  = $medical->client_id;
         $medical->delete();
 

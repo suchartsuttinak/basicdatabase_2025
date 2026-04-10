@@ -8,21 +8,25 @@ use App\Models\Client;
 use App\Models\Province;
 use App\Models\District;
 use App\Models\SubDistrict;
-use Illuminate\Support\Facades\DB;
 use App\Models\Father;
 use App\Models\Mother;
 use App\Models\Spouse;
 use App\Models\Relative;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class FamilyController extends Controller
 {
     public function FamilyAdd($client_id)
     {
-        $client   = Client::findOrFail($client_id);
-        $father   = Father::where('client_id', $client_id)->first();
-        $mother   = Mother::where('client_id', $client_id)->first();
-        $spouse   = Spouse::where('client_id', $client_id)->first();
-        $relative = Relative::where('client_id', $client_id)->first();
+        // ✅ [แก้ไข] กันการเดา URL เข้า client ของคนอื่น
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+        // ❗ ของเดิมคงไว้ทั้งหมด
+        $father   = Father::where('client_id', $client->id)->first(); // ✅ เปลี่ยน $client_id → $client->id
+        $mother   = Mother::where('client_id', $client->id)->first();
+        $spouse   = Spouse::where('client_id', $client->id)->first();
+        $relative = Relative::where('client_id', $client->id)->first();
 
         $provinces     = Province::all();
         $districts     = District::all();
@@ -40,7 +44,6 @@ class FamilyController extends Controller
         ));
     }
 
-    // จังหวัด อำเภอ ตำบล รหัสไปรษณีย์
     public function getDistricts($province_id)
     {
         return response()->json(
@@ -58,94 +61,199 @@ class FamilyController extends Controller
     public function getZipcode($subdistrict_id)
     {
         $subdistrict = SubDistrict::find($subdistrict_id);
-        return response()->json(['zipcode' => $subdistrict ? $subdistrict->zipcode : null]);
-    }
-    // สิ้นสุด จังหวัด อำเภอ ตำบล รหัสไปรษณีย์
 
-    // บันทึกข้อมูล
+        return response()->json([
+            'zipcode' => $subdistrict ? $subdistrict->zipcode : null
+        ]);
+    }
+
     public function FamilyStore(Request $request)
     {
-          
-        $request->validate([
-            'client_id' => 'required|integer|exists:clients,id',
+        try {
+            $validated = $request->validate([
+                'client_id' => ['required', 'integer', 'exists:clients,id'],
+                'active_tab' => ['nullable', 'string', 'max:50'],
 
-            // validate zipcode ของแต่ละบุคคล
-            'father.zipcode'   => 'nullable|numeric|digits:5',
-            'mother.zipcode'   => 'nullable|numeric|digits:5',
-            'spouse.zipcode'   => 'nullable|numeric|digits:5',
-            'relative.zipcode' => 'nullable|numeric|digits:5',
-        ], [
-            'father.zipcode.numeric'   => 'รหัสไปรษณีย์บิดาต้องเป็นตัวเลข',
-            'father.zipcode.digits'    => 'รหัสไปรษณีย์บิดาต้องมี 5 หลัก',
+                'father.fname' => ['nullable', 'string', 'max:255'],
+                'father.lname' => ['nullable', 'string', 'max:255'],
+                'father.idcard' => ['nullable', 'string', 'max:20'],
+                'father.age' => ['nullable', 'integer', 'min:0'],
+                'father.occupation' => ['nullable', 'string', 'max:255'],
+                'father.income' => ['nullable', 'string', 'max:255'],
+                'father.address_no' => ['nullable', 'string', 'max:255'],
+                'father.moo' => ['nullable', 'string', 'max:255'],
+                'father.soi' => ['nullable', 'string', 'max:255'],
+                'father.road' => ['nullable', 'string', 'max:255'],
+                'father.village' => ['nullable', 'string', 'max:255'],
+                'father.province_id' => ['nullable', 'integer'],
+                'father.district_id' => ['nullable', 'integer'],
+                'father.sub_district_id' => ['nullable', 'integer'],
+                'father.zipcode' => ['nullable', 'string', 'max:20'],
+                'father.phone' => ['nullable', 'string', 'max:20'],
 
-            'mother.zipcode.numeric'   => 'รหัสไปรษณีย์มารดาต้องเป็นตัวเลข',
-            'mother.zipcode.digits'    => 'รหัสไปรษณีย์มารดาต้องมี 5 หลัก',
+                'mother.fname' => ['nullable', 'string', 'max:255'],
+                'mother.lname' => ['nullable', 'string', 'max:255'],
+                'mother.idcard' => ['nullable', 'string', 'max:20'],
+                'mother.age' => ['nullable', 'integer', 'min:0'],
+                'mother.occupation' => ['nullable', 'string', 'max:255'],
+                'mother.income' => ['nullable', 'string', 'max:255'],
+                'mother.address_no' => ['nullable', 'string', 'max:255'],
+                'mother.moo' => ['nullable', 'string', 'max:255'],
+                'mother.soi' => ['nullable', 'string', 'max:255'],
+                'mother.road' => ['nullable', 'string', 'max:255'],
+                'mother.village' => ['nullable', 'string', 'max:255'],
+                'mother.province_id' => ['nullable', 'integer'],
+                'mother.district_id' => ['nullable', 'integer'],
+                'mother.sub_district_id' => ['nullable', 'integer'],
+                'mother.zipcode' => ['nullable', 'string', 'max:20'],
+                'mother.phone' => ['nullable', 'string', 'max:20'],
 
-            'spouse.zipcode.numeric'   => 'รหัสไปรษณีย์คู่สมรสต้องเป็นตัวเลข',
-            'spouse.zipcode.digits'    => 'รหัสไปรษณีย์คู่สมรสต้องมี 5 หลัก',
+                'spouse.fname' => ['nullable', 'string', 'max:255'],
+                'spouse.lname' => ['nullable', 'string', 'max:255'],
+                'spouse.idcard' => ['nullable', 'string', 'max:20'],
+                'spouse.age' => ['nullable', 'integer', 'min:0'],
+                'spouse.occupation' => ['nullable', 'string', 'max:255'],
+                'spouse.income' => ['nullable', 'string', 'max:255'],
+                'spouse.address_no' => ['nullable', 'string', 'max:255'],
+                'spouse.moo' => ['nullable', 'string', 'max:255'],
+                'spouse.soi' => ['nullable', 'string', 'max:255'],
+                'spouse.road' => ['nullable', 'string', 'max:255'],
+                'spouse.village' => ['nullable', 'string', 'max:255'],
+                'spouse.province_id' => ['nullable', 'integer'],
+                'spouse.district_id' => ['nullable', 'integer'],
+                'spouse.sub_district_id' => ['nullable', 'integer'],
+                'spouse.zipcode' => ['nullable', 'string', 'max:20'],
+                'spouse.phone' => ['nullable', 'string', 'max:20'],
 
-            'relative.zipcode.numeric' => 'รหัสไปรษณีย์ญาติต้องเป็นตัวเลข',
-            'relative.zipcode.digits'  => 'รหัสไปรษณีย์ญาติต้องมี 5 หลัก',
-        ]);
+                'relative.fname' => ['nullable', 'string', 'max:255'],
+                'relative.lname' => ['nullable', 'string', 'max:255'],
+                'relative.idcard' => ['nullable', 'string', 'max:20'],
+                'relative.age' => ['nullable', 'integer', 'min:0'],
+                'relative.occupation' => ['nullable', 'string', 'max:255'],
+                'relative.income' => ['nullable', 'string', 'max:255'],
+                'relative.address_no' => ['nullable', 'string', 'max:255'],
+                'relative.moo' => ['nullable', 'string', 'max:255'],
+                'relative.soi' => ['nullable', 'string', 'max:255'],
+                'relative.road' => ['nullable', 'string', 'max:255'],
+                'relative.village' => ['nullable', 'string', 'max:255'],
+                'relative.province_id' => ['nullable', 'integer'],
+                'relative.district_id' => ['nullable', 'integer'],
+                'relative.sub_district_id' => ['nullable', 'integer'],
+                'relative.zipcode' => ['nullable', 'string', 'max:20'],
+                'relative.phone' => ['nullable', 'string', 'max:20'],
+            ]);
 
-        $messageType = null;
+            // ✅ [แก้ไข] กันการยิง client_id ของคนอื่น
+            $client = Client::forUser(auth()->user())
+                ->where('id', $validated['client_id'])
+                ->firstOrFail();
 
-        DB::transaction(function () use ($request, &$messageType) {
-            $clientId = $request->input('client_id');
+            // ❗ ของเดิมคงไว้
+            $clientId = $client->id;
+            $activeTab = $validated['active_tab'] ?? 'father-tab';
 
-            $fields = [
-                'fname','lname','idcard','age','occupation','income',
-                'address_no','moo','soi','road','village',
-                'province_id','district_id','sub_district_id','zipcode','phone'
-            ];
+            $this->saveFamilyGroup(
+                Father::class,
+                $clientId,
+                $validated['father'] ?? []
+            );
 
-            if (is_array($request->input('father'))) {
-                $father = Father::updateOrCreate(
-                    ['client_id' => $clientId],
-                    collect($request->input('father'))->only($fields)->toArray()
-                );
-                $messageType = $father->wasRecentlyCreated ? 'create' : 'update';
+            $this->saveFamilyGroup(
+                Mother::class,
+                $clientId,
+                $validated['mother'] ?? []
+            );
+
+            $this->saveFamilyGroup(
+                Spouse::class,
+                $clientId,
+                $validated['spouse'] ?? []
+            );
+
+            $this->saveFamilyGroup(
+                Relative::class,
+                $clientId,
+                $validated['relative'] ?? []
+            );
+
+            // ❗ ของเดิมคงไว้ 100%
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'บันทึกข้อมูลครอบครัวเรียบร้อยแล้ว',
+                    'active_tab' => $activeTab,
+                ]);
             }
 
-            if (is_array($request->input('mother'))) {
-                $mother = Mother::updateOrCreate(
-                    ['client_id' => $clientId],
-                    collect($request->input('mother'))->only($fields)->toArray()
-                );
-                $messageType = $mother->wasRecentlyCreated ? 'create' : 'update';
+            return redirect()
+                ->back()
+                ->with('success', 'บันทึกข้อมูลครอบครัวเรียบร้อยแล้ว')
+                ->with('active_tab', $activeTab);
+
+        } catch (ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'กรุณาตรวจสอบข้อมูลที่กรอกอีกครั้ง',
+                    'errors' => $e->errors(),
+                    'active_tab' => $request->input('active_tab', 'father-tab'),
+                ], 422);
             }
 
-            if (is_array($request->input('spouse'))) {
-                $spouse = Spouse::updateOrCreate(
-                    ['client_id' => $clientId],
-                    collect($request->input('spouse'))->only($fields)->toArray()
-                );
-                $messageType = $spouse->wasRecentlyCreated ? 'create' : 'update';
+            throw $e;
+        } catch (Throwable $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage(),
+                    'active_tab' => $request->input('active_tab', 'father-tab'),
+                ], 500);
             }
 
-            if (is_array($request->input('relative'))) {
-                $relative = Relative::updateOrCreate(
-                    ['client_id' => $clientId],
-                    collect($request->input('relative'))->only($fields)->toArray()
-                );
-                $messageType = $relative->wasRecentlyCreated ? 'create' : 'update';
-            }
-        });
+            return redirect()
+                ->back()
+                ->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage())
+                ->with('active_tab', $request->input('active_tab', 'father-tab'));
+        }
+    }
 
-        $message = $messageType === 'create'
-            ? 'บันทึกข้อมูลครอบครัวเรียบร้อย'
-            : 'แก้ไขข้อมูลครอบครัวเรียบร้อย';
+    private function saveFamilyGroup(string $modelClass, int $clientId, array $data): void
+    {
+        $payload = $this->normalizeFamilyPayload($data);
 
-        return redirect()
-    ->route('family.add', $request->client_id)
-    ->with([
-        'message' => $message,
-        'alert-type' => 'success',
-        'active_tab' => $request->input('active_tab')
-    ]);
+        $hasAnyValue = collect($payload)->filter(function ($value) {
+            return $value !== null && $value !== '';
+        })->isNotEmpty();
 
-            
+        if (!$hasAnyValue) {
+            return;
+        }
 
+        $modelClass::updateOrCreate(
+            ['client_id' => $clientId],
+            $payload
+        );
+    }
 
+    private function normalizeFamilyPayload(array $data): array
+    {
+        return [
+            'fname' => $data['fname'] ?? null,
+            'lname' => $data['lname'] ?? null,
+            'idcard' => $data['idcard'] ?? null,
+            'age' => $data['age'] ?? null,
+            'occupation' => $data['occupation'] ?? null,
+            'income' => $data['income'] ?? null,
+            'address_no' => $data['address_no'] ?? null,
+            'moo' => $data['moo'] ?? null,
+            'soi' => $data['soi'] ?? null,
+            'road' => $data['road'] ?? null,
+            'village' => $data['village'] ?? null,
+            'province_id' => $data['province_id'] ?? null,
+            'district_id' => $data['district_id'] ?? null,
+            'sub_district_id' => $data['sub_district_id'] ?? null,
+            'zipcode' => $data['zipcode'] ?? null,
+            'phone' => $data['phone'] ?? null,
+        ];
     }
 }

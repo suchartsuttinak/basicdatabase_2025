@@ -440,7 +440,7 @@
             @endif
         </div>
 
-        @include('admin_client.include.tabs')
+        {{-- @include('admin_client.include.tabs') --}}
 
         <div class="ff-body">
             <div class="ff-hero">

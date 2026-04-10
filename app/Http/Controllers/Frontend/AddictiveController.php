@@ -13,7 +13,10 @@ class AddictiveController extends Controller
     // โหลดฟอร์ม + ข้อมูลเดิม
     public function AddAddictive($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $addictives = Addictive::where('client_id', $client->id)
             ->orderBy('date', 'desc')
@@ -55,7 +58,10 @@ class AddictiveController extends Controller
             'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
         ]);
 
-
+        // =========================
+        // PATCH: กันยิง request เปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
         // นับจำนวนครั้งล่าสุด
         $latestCount = Addictive::where('client_id', $data['client_id'])->max('count') ?? 0;
@@ -93,6 +99,11 @@ class AddictiveController extends Controller
     {
         $addictive = Addictive::findOrFail($id);
 
+        // =========================
+        // PATCH: กันเดา URL เรียก JSON ของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($addictive->client_id);
+
         return response()->json([
             'id'       => $addictive->id,
             'date'     => \Carbon\Carbon::parse($addictive->date)->format('Y-m-d'),
@@ -108,6 +119,11 @@ class AddictiveController extends Controller
     public function UpdateAddictive(Request $request, $id)
     {
         $addictive = Addictive::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL มา update record คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($addictive->client_id);
 
         $data = $request->validate([
             'date'       => [
@@ -137,13 +153,14 @@ class AddictiveController extends Controller
             'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
         ]);
 
+        // =========================
+        // PATCH: กันเปลี่ยน client_id ไป client อื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
         if ($data['exam'] == 0) {
             $data['refer'] = null;
         }
-        // if (empty($data['recorder'])) {
-        //     $data['recorder'] = 'ไม่ระบุ';
-        // }
 
         $addictive->update($data);
 
@@ -159,6 +176,12 @@ class AddictiveController extends Controller
     public function DeleteAddictive($id)
     {
         $addictive = Addictive::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($addictive->client_id);
+
         $clientId = $addictive->client_id;
         $addictive->delete();
 

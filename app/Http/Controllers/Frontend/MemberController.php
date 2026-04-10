@@ -15,7 +15,7 @@ class MemberController extends Controller
     public function AddMember($client_id)
     {
      // ดึง client พร้อมสมาชิก
-    $client = Client::with('members')->findOrFail($client_id);
+    $client = Client::forUser(auth()->user())->with('members')->findOrFail($client_id); // ✅ [แก้ไข]
 
     // ถ้ามีสมาชิกแล้ว → ส่งไปหน้า edit พร้อมแจ้งเตือน
     if ($client->members->count() > 0) {
@@ -41,10 +41,10 @@ class MemberController extends Controller
 
     public function ShowMember($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
 
         $members = Member::with(['education', 'occupation', 'income'])
-                         ->where('client_id', $client_id)
+                         ->where('client_id', $client->id) // ✅ [แก้ไข]
                          ->get();
 
         return view('frontend.client.member.member_show', compact('client', 'members'));
@@ -64,7 +64,12 @@ class MemberController extends Controller
             'members.*.remark' => 'nullable|string|max:255',
         ]);
 
-        $client_id = $request->client_id;
+        // ✅ [แก้ไข] กัน POST ยิง client คนอื่น
+        $client = Client::forUser(auth()->user())
+            ->where('id', $request->client_id)
+            ->firstOrFail();
+
+        $client_id = $client->id; // ✅ [แก้ไข]
 
         foreach ($request->members as $memberData) {
             Member::create([
@@ -84,7 +89,6 @@ class MemberController extends Controller
             'alert-type' => 'success'
         ];
 
-        // ✅ เปลี่ยนให้กลับไปหน้า edit ของ client เดิม
         return redirect()
             ->route('member.show', $client_id)
             ->with($notification);
@@ -93,7 +97,7 @@ class MemberController extends Controller
     public function EditMember($id)
     {
         // ดึง Client พร้อมสมาชิกครอบครัวทั้งหมด
-        $client = Client::with('members')->findOrFail($id);
+        $client = Client::forUser(auth()->user())->with('members')->findOrFail($id); // ✅ [แก้ไข]
 
         $educations = Education::all();
         $occupations = Occupation::all();
@@ -118,9 +122,10 @@ class MemberController extends Controller
         'members.*.remark' => 'nullable|string|max:255',
     ]);
 
-    $client = Client::findOrFail($id);
+    // ✅ [แก้ไข] กันแก้ข้อมูล client คนอื่น
+    $client = Client::forUser(auth()->user())->findOrFail($id);
 
-    // ✅ ลบสมาชิกเดิมออกก่อน แล้วเพิ่มใหม่ (วิธีง่ายสุด)
+    // ✅ ลบสมาชิกเดิมออกก่อน แล้วเพิ่มใหม่ (ของเดิมคงไว้)
     $client->members()->delete();
 
     foreach ($request->members as $memberData) {

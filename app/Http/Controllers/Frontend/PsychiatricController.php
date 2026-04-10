@@ -15,7 +15,12 @@ class PsychiatricController extends Controller
     public function AddPsychiatric($client_id)
     {
         $psycho = Psycho::all();
-        $client = Client::findOrFail($client_id);
+
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
         $psychiatrics = Psychiatric::where('client_id', $client->id)
             ->orderBy('sent_date', 'desc')
             ->get();
@@ -64,6 +69,11 @@ class PsychiatricController extends Controller
             'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
         ]);
 
+        // =========================
+        // PATCH: กันยิง request เปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
         if ($data['drug_no'] === 'no') {
             $data['drug_name'] = null;
         }
@@ -84,6 +94,11 @@ class PsychiatricController extends Controller
 {
     $psychiatric = Psychiatric::findOrFail($id);
 
+    // =========================
+    // PATCH: กันเดา URL เรียก JSON ของ client คนอื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($psychiatric->client_id);
+
     return response()->json([
         'id'         => $psychiatric->id,
         'sent_date'  => \Carbon\Carbon::parse($psychiatric->sent_date)->format('Y-m-d'),
@@ -103,6 +118,11 @@ class PsychiatricController extends Controller
     {
             $psychiatric = Psychiatric::findOrFail($id);
 
+            // =========================
+            // PATCH: กันเดา URL มา update record คนอื่น
+            // =========================
+            Client::forUser(auth()->user())->findOrFail($psychiatric->client_id);
+
                 $data = $request->validate([
                 'sent_date'   => [
                     'required',
@@ -111,7 +131,7 @@ class PsychiatricController extends Controller
                         ->where(function ($query) use ($request) {
                             return $query->where('client_id', $request->client_id);
                         })
-                        ->ignore($id), // ✅ ยกเว้นเรคอร์ดที่กำลังแก้ไข
+                        ->ignore($id),
                 ],
                 'hotpital'    => 'required|string|max:255',
                 'psycho_id'   => 'required|exists:psychos,id',
@@ -142,13 +162,16 @@ class PsychiatricController extends Controller
                 'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
             ]);
 
+        // =========================
+        // PATCH: กันเปลี่ยน client_id ไป client อื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
         if ($data['drug_no'] === 'no') {
             $data['drug_name'] = null;
         }
 
-         // ✅ ถ้าผู้ใช้ลบชื่อสถานพยาบาลออก ให้ใส่ "ไม่ระบุ"
-            if (empty($data['hotpital'])) {
+         if (empty($data['hotpital'])) {
                 $data['hotpital'] = 'ไม่ระบุ';
             }
 
@@ -168,6 +191,12 @@ class PsychiatricController extends Controller
     public function DeletePsychiatric($id)
     {
         $psychiatric = Psychiatric::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($psychiatric->client_id);
+
         $clientId = $psychiatric->client_id;
         $psychiatric->delete();
 

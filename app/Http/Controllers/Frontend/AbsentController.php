@@ -17,7 +17,7 @@ class AbsentController extends Controller
 {
     public function AbsentAdd($client_id): View|RedirectResponse
     {
-        $client = Client::findOrFail($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
         $educationRecord = $this->getLatestEducationRecord($client_id);
 
         if (!$educationRecord) {
@@ -47,12 +47,18 @@ class AbsentController extends Controller
     {
         $validated = $request->validated();
 
+        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+            ->where('id', $validated['client_id'])
+            ->firstOrFail();
+
         // ยึดหลักเดียวกับ school_followup:
         // ต้องมี education_record_id ของช่วงเวลานั้นติดไปกับ record นี้
         if (empty($validated['education_record_id'])) {
             $educationRecord = $this->getLatestEducationRecord($validated['client_id']);
             $validated['education_record_id'] = $educationRecord?->id;
         }
+
+        $validated['client_id'] = $client->id; // ✅ [แก้ไข]
 
         Absent::create($validated);
 
@@ -68,7 +74,10 @@ class AbsentController extends Controller
     {
         try {
             $absent = Absent::with(['educationRecord.education', 'educationRecord.semester'])
-                ->findOrFail($id);
+                ->whereHas('client', function ($q) {
+                    $q->forUser(auth()->user());
+                })
+                ->findOrFail($id); // ✅ [แก้ไข]
 
             return response()->json([
                 'success' => true,
@@ -105,7 +114,12 @@ class AbsentController extends Controller
 
     public function AbsentUpdate(UpdateAbsentRequest $request, $id): JsonResponse|RedirectResponse
     {
-        $absent = Absent::findOrFail($id);
+        $absent = Absent::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         $validated = $request->validated();
 
         // สำคัญ: คง education_record_id เดิมของ record นี้ไว้
@@ -132,7 +146,12 @@ class AbsentController extends Controller
 
     public function AbsentDelete($id): RedirectResponse
     {
-        $absent = Absent::findOrFail($id);
+        $absent = Absent::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail(); // ✅ [แก้ไข]
+
         $clientId = $absent->client_id;
 
         $absent->delete();
@@ -148,9 +167,12 @@ class AbsentController extends Controller
     public function AbsentReport($absent_id): View
     {
         $absent = Absent::with(['educationRecord.education', 'educationRecord.semester'])
-            ->findOrFail($absent_id);
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($absent_id); // ✅ [แก้ไข]
 
-        $client = Client::findOrFail($absent->client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($absent->client_id); // ✅ [แก้ไข]
 
         // ใช้ข้อมูลการศึกษาที่ผูกอยู่กับ absent record นี้
         $educationRecord = $absent->educationRecord;

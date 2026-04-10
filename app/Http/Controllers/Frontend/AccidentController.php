@@ -11,7 +11,11 @@ class AccidentController extends Controller
 {
     public function AccidentAdd($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // ใช้แนวทางเดียวกับหน้า EducationRecord
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $accidents = Accident::where('client_id', $client->id)
             ->orderByDesc('incident_date')
@@ -32,6 +36,12 @@ class AccidentController extends Controller
     {
         $validated = $this->validateAccident($request);
 
+        // =========================
+        // PATCH: กันแก้ client_id จาก request เพื่อบันทึกให้ client ที่ไม่มีสิทธิ์
+        // ตรวจสิทธิ์ผ่าน Client::forUser(auth()->user()) ตามที่กำหนด
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
         if (($validated['treat_no'] ?? null) === 'ไม่พบแพทย์') {
             $validated['hospital'] = null;
             $validated['diagnosis'] = null;
@@ -51,7 +61,12 @@ class AccidentController extends Controller
     public function AccidentEdit($id)
     {
         $accident = Accident::with('client')->findOrFail($id);
-        $client = $accident->client;
+
+        // =========================
+        // PATCH: กันเดา URL เข้ามาแก้ record ของ client ที่ไม่มีสิทธิ์
+        // ตรวจสิทธิ์ผ่าน client เจ้าของ record
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($accident->client_id);
 
         $accidents = Accident::where('client_id', $client->id)
             ->orderByDesc('incident_date')
@@ -69,7 +84,18 @@ class AccidentController extends Controller
     {
         $accident = Accident::findOrFail($id);
 
+        // =========================
+        // PATCH: กันเดา URL เข้ามาอัปเดต record ของ client ที่ไม่มีสิทธิ์
+        // ต้องตรวจสิทธิ์ที่ record เดิมก่อน
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($accident->client_id);
+
         $validated = $this->validateAccident($request);
+
+        // =========================
+        // PATCH: กันส่ง client_id ใหม่จากฟอร์มไปยัง client ที่ไม่มีสิทธิ์
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
         if (($validated['treat_no'] ?? null) === 'ไม่พบแพทย์') {
             $validated['hospital'] = null;
@@ -90,6 +116,12 @@ class AccidentController extends Controller
     public function AccidentDelete($id)
     {
         $accident = Accident::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL เข้ามาลบ record ของ client ที่ไม่มีสิทธิ์
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($accident->client_id);
+
         $clientId = $accident->client_id;
         $accident->delete();
 
@@ -104,14 +136,18 @@ class AccidentController extends Controller
     public function AccidentReport($id)
     {
         $accident = Accident::with('client')->findOrFail($id);
-        $client = $accident->client;
+
+        // =========================
+        // PATCH: กันเดา URL เข้าดูรายงานของ client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($accident->client_id);
 
         return view('frontend.client.accident.report', compact('accident', 'client'));
     }
 
     private function validateAccident(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'client_id'     => 'required|exists:clients,id',
             'incident_date' => 'required|date',
             'location'      => 'required|string|max:255',
@@ -147,5 +183,13 @@ class AccidentController extends Controller
             'record_date.required'   => 'กรุณาระบุวันที่บันทึก',
             'record_date.date'       => 'วันที่บันทึกต้องเป็นรูปแบบวันที่',
         ]);
+
+        // =========================
+        // PATCH: ตรวจสิทธิ์ client_id ที่ถูกส่งมาจากฟอร์ม
+        // ป้องกันการแก้ hidden field / เดา URL / ยิง request ตรง
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
+        return $validated;
     }
 }

@@ -26,20 +26,41 @@
 @endphp
 
 <style>
-    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow {
+    /* ===== Sidebar arrow fix ===== */
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu li > a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         position: relative;
-        display: inline-block;
+    }
+
+    /* ปิดลูกศร/ไอคอนแทรกจาก theme เดิมทั้งหมด */
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu li > a::after,
+    .app-sidebar-menu.sidebar-arrow-fix .metismenu .has-arrow::after,
+    .app-sidebar-menu.sidebar-arrow-fix .metismenu .menu-arrow::after,
+    .app-sidebar-menu.sidebar-arrow-fix .metismenu .menu-arrow::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    /* สร้างลูกศรใหม่เฉพาะตัวที่ต้องใช้ */
+    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow {
+        margin-left: auto;
         width: 10px;
         min-width: 10px;
         height: 10px;
-        margin-left: auto;
-        font-size: 0 !important;
-        line-height: 0 !important;
-        color: transparent !important;
-        overflow: hidden;
+        display: inline-block;
+        position: relative;
+        flex: 0 0 10px;
     }
 
-    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow::before {
+    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow > span,
+    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow i,
+    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow svg {
+        display: none !important;
+    }
+
+    .app-sidebar-menu.sidebar-arrow-fix .menu-arrow-custom::before {
         content: "";
         position: absolute;
         top: 50%;
@@ -48,14 +69,16 @@
         height: 7px;
         border-right: 2px solid #64748b;
         border-bottom: 2px solid #64748b;
-        transform: translate(-50%, -50%) rotate(-45deg);
+        transform: translate(-50%, -58%) rotate(-45deg);
         transition: transform .2s ease;
+        box-sizing: border-box;
     }
 
-    .app-sidebar-menu.sidebar-arrow-fix a[aria-expanded="true"] > .menu-arrow::before {
-        transform: translate(-50%, -50%) rotate(45deg);
+    .app-sidebar-menu.sidebar-arrow-fix a[aria-expanded="true"] .menu-arrow-custom::before {
+        transform: translate(-50%, -42%) rotate(45deg);
     }
 
+    /* ป้องกัน feather render แล้วกระพริบ/เหลื่อม */
     .app-sidebar-menu.sidebar-arrow-fix i[data-feather] {
         opacity: 0;
     }
@@ -65,8 +88,33 @@
         opacity: 1;
     }
 
-    .app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a::after {
-        content: none !important;
+    /* ลิงก์ที่มี badge + arrow */
+    .app-sidebar-menu.sidebar-arrow-fix .menu-link-with-badge {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .app-sidebar-menu.sidebar-arrow-fix .menu-link-with-badge .menu-text {
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .sidebar-badge-soft {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.4;
+        background: rgba(59, 130, 246, .12);
+        color: #2563eb;
+        vertical-align: middle;
+        flex: 0 0 auto;
     }
 
     .sidebar-user-link-icon {
@@ -74,6 +122,7 @@
         align-items: center;
         justify-content: center;
         width: 18px;
+        min-width: 18px;
         margin-right: 8px;
         font-size: 15px;
         opacity: .92;
@@ -90,19 +139,6 @@
         transform: translateX(2px);
     }
 
-    .sidebar-badge-soft {
-        display: inline-block;
-        margin-left: 8px;
-        padding: 2px 8px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 600;
-        line-height: 1.4;
-        background: rgba(59, 130, 246, .12);
-        color: #2563eb;
-        vertical-align: middle;
-    }
-
     .menu-title-with-icon {
         display: flex;
         align-items: center;
@@ -112,6 +148,18 @@
     .menu-title-with-icon i {
         font-size: 14px;
         opacity: .85;
+    }
+
+    /* ระยะห่างไอคอนหลัก */
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a > i,
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a > svg,
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a > .bi {
+        flex: 0 0 18px;
+    }
+
+    /* กันข้อความชน */
+    .app-sidebar-menu.sidebar-arrow-fix #side-menu > li > a > span:not(.menu-arrow):not(.sidebar-badge-soft) {
+        min-width: 0;
     }
 </style>
 
@@ -143,7 +191,7 @@
                        class="{{ $isProfileOpen ? 'active' : '' }}">
                         <i data-feather="users"></i>
                         <span>บันทึกข้อมูลแรกเข้า</span>
-                        <span class="menu-arrow"></span>
+                        <span class="menu-arrow menu-arrow-custom"></span>
                     </a>
 
                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
@@ -178,7 +226,7 @@
                        class="{{ $isDashboardOpen ? 'active' : '' }}">
                         <i data-feather="layout"></i>
                         <span>เข้าสู่หน้ายินดีต้อนรับ</span>
-                        <span class="menu-arrow"></span>
+                        <span class="menu-arrow menu-arrow-custom"></span>
                     </a>
 
                     <div class="collapse {{ $isDashboardOpen ? 'show' : '' }}" id="sidebarDashboard">
@@ -217,7 +265,7 @@
                            class="{{ $isMasterMenu ? 'active' : '' }}">
                             <i data-feather="grid"></i>
                             <span>ประเภท / หมวดหมู่</span>
-                            <span class="menu-arrow"></span>
+                            <span class="menu-arrow menu-arrow-custom"></span>
                         </a>
 
                         <div class="collapse {{ $isMasterMenu ? 'show' : '' }}" id="sidebar-master-data">
@@ -286,9 +334,9 @@
                            aria-expanded="{{ $isUserMenu ? 'true' : 'false' }}"
                            class="{{ $isUserMenu ? 'active' : '' }}">
                             <i class="bi bi-people-fill"></i>
-                            <span>จัดการผู้ใช้งาน</span>
+                            <span class="menu-text">จัดการผู้ใช้งาน</span>
                             <span class="sidebar-badge-soft">Admin</span>
-                            <span class="menu-arrow"></span>
+                            <span class="menu-arrow menu-arrow-custom"></span>
                         </a>
 
                         <div class="collapse {{ $isUserMenu ? 'show' : '' }}" id="sidebarUsers">

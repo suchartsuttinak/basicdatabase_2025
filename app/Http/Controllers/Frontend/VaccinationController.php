@@ -14,7 +14,11 @@ class VaccinationController extends Controller
     // ✅ แสดงรายการวัคซีนของ client
     public function VaccineShow($client_id)
     {
-        $client = Client::findOrFail($client_id);
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
         $vaccinations = $client->vaccinations()->latest('date')->get();
 
         return view('frontend.client.vaccine.vaccine_show', compact('client', 'vaccinations'));
@@ -49,6 +53,11 @@ class VaccinationController extends Controller
             'remark.max'            => 'หมายเหตุต้องไม่เกิน 500 ตัวอักษร',
         ]);
 
+        // =========================
+        // PATCH: กันยิง request เปลี่ยน client_id
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
         Vaccination::create($validated);
 
         return redirect()->route('vaccine.index', $validated['client_id'])
@@ -59,6 +68,11 @@ class VaccinationController extends Controller
     public function VaccineEdit($id)
     {
         $vaccination = Vaccination::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL เรียกข้อมูลของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($vaccination->client_id);
 
         return response()->json([
             'id'           => $vaccination->id,
@@ -76,6 +90,11 @@ class VaccinationController extends Controller
     {
         $vaccination = Vaccination::findOrFail($id);
 
+        // =========================
+        // PATCH: กันเดา URL มา update record คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($vaccination->client_id);
+
         $validator = Validator::make($request->all(), [
             'client_id'    => ['required', 'integer', 'exists:clients,id'],
             'date'         => [
@@ -83,7 +102,7 @@ class VaccinationController extends Controller
                 'date',
                 Rule::unique('vaccinations')
                     ->where(fn($query) => $query->where('client_id', $request->client_id))
-                    ->ignore($vaccination->id, 'id'), // ✅ ยกเว้น record ปัจจุบัน
+                    ->ignore($vaccination->id, 'id'),
             ],
             'vaccine_name' => 'required|string|max:255',
             'hospital'     => 'nullable|string|max:255',
@@ -109,7 +128,14 @@ class VaccinationController extends Controller
                 ->with(['edit_mode' => true, 'edit_id' => $id]);
         }
 
-        $vaccination->update($validator->validated());
+        $data = $validator->validated();
+
+        // =========================
+        // PATCH: กันเปลี่ยน client_id ไป client อื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
+        $vaccination->update($data);
 
         return redirect()->route('vaccine.index', $vaccination->client_id)
                          ->with(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
@@ -119,6 +145,12 @@ class VaccinationController extends Controller
     public function VaccineDelete($id)
     {
         $vaccination = Vaccination::findOrFail($id);
+
+        // =========================
+        // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($vaccination->client_id);
+
         $client_id = $vaccination->client_id;
         $vaccination->delete();
 
