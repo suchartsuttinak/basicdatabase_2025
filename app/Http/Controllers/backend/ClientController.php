@@ -390,59 +390,111 @@ class ClientController extends Controller
             ->with('success', 'บันทึกข้อมูลเรียบร้อยแล้ว');
     }
 
-    public function ClientEdit($id)
-    {
-        $client        = $this->findAuthorizedClient($id);
-        $problems      = Problem::all();
-        $provinces     = Province::all();
-        $districts     = District::all();
-        $sub_districts = SubDistrict::all();
-        $nations       = National::all();
-        $religions     = Religion::all();
-        $maritals      = Marital::all();
-        $occupations   = Occupation::all();
-        $incomes       = Income::all();
-        $educations    = Education::all();
-        $contacts      = Contact::all();
-        $projects      = Project::all();
-        $statuses      = Status::all();
+        public function ClientEdit(Request $request, $id)
+        {
+            $client = $this->findAuthorizedClient($id);
+            $tab = $request->get('tab', 'profile');
 
-        // เห็นเฉพาะบ้านที่ตัวเองมีสิทธิ์
-        $houses        = $this->getAuthorizedHouses();
+            // ใช้ collect() กัน error เวลาบางแท็บไม่ได้โหลดข้อมูลชุดนั้น
+            $problems = collect();
+            $provinces = collect();
+            $districts = collect();
+            $sub_districts = collect();
+            $nations = collect();
+            $religions = collect();
+            $maritals = collect();
+            $occupations = collect();
+            $incomes = collect();
+            $educations = collect();
+            $contacts = collect();
+            $projects = collect();
+            $statuses = collect();
+            $targets = collect();
+            $titles = Title::all();
+            $origin_provinces = collect();
+            $origin_districts = collect();
+            $origin_sub_districts = collect();
+            $documents = collect();
 
-        $targets       = Target::all();
-        $titles        = Title::all();
+            // เห็นเฉพาะบ้านที่ตัวเองมีสิทธิ์
+            $houses = $this->getAuthorizedHouses();
 
-        $origin_provinces     = Province::all();
-        $origin_districts     = District::all();
-        $origin_sub_districts = SubDistrict::all();
+            // โหลดหนักเฉพาะแท็บ profile ก่อน
+            if ($tab === 'profile') {
+                $problems = Problem::all();
+                $provinces = Province::all();
+                $districts = District::all();
+                $sub_districts = SubDistrict::all();
+                $nations = National::all();
+                $religions = Religion::all();
+                $maritals = Marital::all();
+                $occupations = Occupation::all();
+                $incomes = Income::all();
+                $educations = Education::all();
+                $contacts = Contact::all();
+                $projects = Project::all();
+                $statuses = Status::all();
+                $targets = Target::all();
 
-        $documents = Document::all();
+                $origin_provinces = Province::all();
+                $origin_districts = District::all();
+                $origin_sub_districts = SubDistrict::all();
 
-        return view('backend.client.client_edit', compact(
-            'client',
-            'problems',
-            'provinces',
-            'districts',
-            'sub_districts',
-            'nations',
-            'religions',
-            'maritals',
-            'occupations',
-            'incomes',
-            'educations',
-            'contacts',
-            'projects',
-            'statuses',
-            'houses',
-            'targets',
-            'titles',
-            'origin_provinces',
-            'origin_districts',
-            'origin_sub_districts',
-            'documents'
-        ));
-    }
+                $documents = Document::all();
+            }
+
+            // ถ้าภายหลังแท็บ family / guardian / member ต้องใช้ข้อมูลเพิ่ม
+            // ค่อยเพิ่มโหลดเฉพาะแท็บนั้นทีหลัง
+            if ($tab === 'family') {
+                $provinces = Province::all();
+                $districts = District::all();
+                $sub_districts = SubDistrict::all();
+                $occupations = Occupation::all();
+                $educations = Education::all();
+                $incomes = Income::all();
+            }
+
+            if ($tab === 'guardian') {
+                $provinces = Province::all();
+                $districts = District::all();
+                $sub_districts = SubDistrict::all();
+                $occupations = Occupation::all();
+                $educations = Education::all();
+                $incomes = Income::all();
+                $contacts = Contact::all();
+            }
+
+            if ($tab === 'member') {
+                $occupations = Occupation::all();
+                $educations = Education::all();
+                $statuses = Status::all();
+            }
+
+            return view('backend.client.client_edit', compact(
+                'client',
+                'tab',
+                'problems',
+                'provinces',
+                'districts',
+                'sub_districts',
+                'nations',
+                'religions',
+                'maritals',
+                'occupations',
+                'incomes',
+                'educations',
+                'contacts',
+                'projects',
+                'statuses',
+                'houses',
+                'targets',
+                'titles',
+                'origin_provinces',
+                'origin_districts',
+                'origin_sub_districts',
+                'documents'
+            ));
+        }
 
     public function ClientUpdate(Request $request)
     {

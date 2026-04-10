@@ -47,6 +47,7 @@
 
     $savedActiveTab = session('active_tab', 'father-tab');
     $hasExistingData = isset($father) || isset($mother) || isset($spouse) || isset($relative);
+    $submitLabel = $hasExistingData ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูล';
 @endphp
 
 <style>
@@ -330,28 +331,80 @@
 
     .family-page .family-actionbar {
         display: flex;
-        justify-content: flex-end;
         align-items: center;
-        gap: .75rem;
-        margin-top: 1rem;
-        padding-top: 1rem;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.15rem;
+        padding: 1rem 0 0;
         border-top: 1px solid var(--fp-border);
     }
 
     .family-page .family-note {
-        margin-right: auto;
-        color: var(--fp-muted);
-        font-size: .88rem;
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+        min-height: 54px;
+        padding: .9rem 1rem;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #ffffff, #f9fcfc);
+        border: 1px solid var(--fp-border);
+        color: #52606d;
+        font-size: .9rem;
+        line-height: 1.45;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
+    }
+
+    .family-page .family-note::before {
+        content: "\F431";
+        font-family: "bootstrap-icons";
+        font-size: 1rem;
+        color: var(--fp-primary);
+        line-height: 1;
+        flex: 0 0 auto;
+    }
+
+    .family-page .family-action-buttons {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex: 0 0 auto;
+    }
+
+    .family-page .btn-family-back,
+    .family-page .btn-family-submit {
+        min-height: 50px;
+        padding: .85rem 1.2rem;
+        border-radius: 14px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+        transition: all .18s ease;
+        min-width: 150px;
+    }
+
+    .family-page .btn-family-back {
+        color: #475569;
+        background: #ffffff;
+        border: 1px solid #d8e2e8;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+        text-decoration: none;
+    }
+
+    .family-page .btn-family-back:hover {
+        color: #0f766e;
+        border-color: rgba(15, 118, 110, 0.24);
+        background: #f8fcfc;
+        transform: translateY(-1px);
     }
 
     .family-page .btn-family-submit {
-        min-height: 48px;
-        padding: .8rem 1.2rem;
-        border-radius: var(--fp-radius-md);
         border: 0;
-        font-weight: 800;
+        color: #fff;
         background: linear-gradient(135deg, var(--fp-primary), var(--fp-primary-2));
-        box-shadow: 0 10px 22px rgba(15, 118, 110, 0.18);
+        box-shadow: 0 12px 24px rgba(15, 118, 110, 0.18);
     }
 
     .family-page .btn-family-submit:hover {
@@ -360,7 +413,7 @@
     }
 
     .family-page .btn-family-submit:disabled {
-        opacity: .8;
+        opacity: .84;
         transform: none;
     }
 
@@ -428,6 +481,20 @@
             min-height: 46px;
             border-radius: 12px;
         }
+
+        .family-page .family-actionbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .family-page .family-note {
+            width: 100%;
+        }
+
+        .family-page .family-action-buttons {
+            width: 100%;
+            justify-content: flex-end;
+        }
     }
 
     @media (max-width: 767.98px) {
@@ -468,17 +535,19 @@
             grid-column: span 1;
         }
 
-        .family-page .family-actionbar {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .family-page .family-note {
-            margin-right: 0;
-        }
-
-        .family-page .family-actionbar .btn {
+        .family-page .family-action-buttons {
             width: 100%;
+            flex-direction: column-reverse;
+        }
+
+        .family-page .family-actionbar .btn,
+        .family-page .family-actionbar a {
+            width: 100%;
+        }
+
+        .family-page .btn-family-back,
+        .family-page .btn-family-submit {
+            min-width: 100%;
         }
     }
 </style>
@@ -879,10 +948,21 @@
                     ระบบจะบันทึกแท็บล่าสุดไว้ เพื่อให้กลับมาที่ส่วนเดิมหลังตรวจสอบหรือบันทึกข้อมูล
                 </div>
 
-                <button type="submit" id="familySubmitBtn" class="btn btn-primary btn-family-submit">
-                    <i class="bi bi-check-circle me-1"></i>
-                    {{ $hasExistingData ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูล' }}
-                </button>
+                <div class="family-action-buttons">
+                    <a href="{{ route('client.edit', $client->id) }}"
+                       class="btn btn-family-back">
+                        <i class="bi bi-arrow-left-circle"></i>
+                        <span>กลับหน้าก่อน</span>
+                    </a>
+
+                    <button type="submit"
+                            id="familySubmitBtn"
+                            class="btn btn-family-submit"
+                            data-default-label="{{ $submitLabel }}">
+                        <i class="bi bi-check-circle me-1"></i>
+                        <span>{{ $submitLabel }}</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -989,6 +1069,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 activeTabInput.value = tabId;
             }
         }
+    };
+
+    const setSubmitButtonState = (isLoading = false, forceEditMode = false) => {
+        if (!familySubmitBtn) return;
+
+        const defaultLabel = forceEditMode
+            ? 'แก้ไขข้อมูล'
+            : (familySubmitBtn.dataset.defaultLabel || 'บันทึกข้อมูล');
+
+        if (isLoading) {
+            familySubmitBtn.disabled = true;
+            familySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span><span>กำลังบันทึกข้อมูล...</span>';
+            return;
+        }
+
+        familySubmitBtn.disabled = false;
+        familySubmitBtn.innerHTML = `<i class="bi bi-check-circle me-1"></i><span>${defaultLabel}</span>`;
+        familySubmitBtn.dataset.defaultLabel = defaultLabel;
     };
 
     const bindLocationGroup = (prefix) => {
@@ -1122,10 +1220,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 activeTabInput.value = activeTab.id;
             }
 
-            if (familySubmitBtn) {
-                familySubmitBtn.disabled = true;
-                familySubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังบันทึกข้อมูล...';
-            }
+            setSubmitButtonState(true);
 
             try {
                 const formData = new FormData(familyForm);
@@ -1168,10 +1263,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     familyStatusBadge.innerHTML = '<i class="bi bi-shield-check"></i><span>โหมดแก้ไขข้อมูล</span>';
                 }
 
-                if (familySubmitBtn) {
-                    familySubmitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>แก้ไขข้อมูล';
-                }
-
+                setSubmitButtonState(false, true);
                 showBanner(data.message || 'บันทึกข้อมูลสำเร็จ', 'success');
 
                 if (typeof Swal !== 'undefined') {
@@ -1187,10 +1279,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Family submit failed:', error);
                 showBanner('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง', 'error');
             } finally {
-                if (familySubmitBtn) {
-                    familySubmitBtn.disabled = false;
-                    familySubmitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>แก้ไขข้อมูล';
-                }
+                setSubmitButtonState(false, familySubmitBtn?.dataset.defaultLabel === 'แก้ไขข้อมูล');
             }
         });
     }

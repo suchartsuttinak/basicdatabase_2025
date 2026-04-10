@@ -14,20 +14,17 @@ class FactfindingController extends Controller
 {
     public function FactfindingAdd($client_id)
     {
-        // ✅ [แก้ไข] ตรวจสิทธิ์ client ผ่าน Client::forUser(auth()->user())
-        // ป้องกันการเดา URL เข้า client ของคนที่ไม่มีสิทธิ์
+        // ✅ ตรวจสิทธิ์ client ผ่าน Client::forUser(auth()->user())
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-        // ✅ [แก้ไข] ตรวจ factfinding โดยอิง client ที่ user มีสิทธิ์เท่านั้น
+        // ✅ ตรวจ factfinding โดยอิง client ที่ user มีสิทธิ์เท่านั้น
         $factFinding = Factfinding::where('client_id', $client->id)->first();
 
         if ($factFinding) {
-            // ถ้ามีแล้ว → redirect ไปหน้า edit โดยส่ง factfinding_id
             return redirect()->route('factfinding.edit', $factFinding->id)
                              ->with('info', 'มีข้อมูลสอบข้อเท็จจริงอยู่แล้ว จึงเข้าสู่หน้าแก้ไข');
         }
 
-        // ✅ ถ้ายังไม่มี → ไปหน้า add
         $maritals = Marital::all();
         $documents = Document::all();
 
@@ -113,15 +110,13 @@ class FactfindingController extends Controller
             'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
         ]);
 
-        // ✅ แยก documents ออกมาก่อน
         $documents = $validated['documents'] ?? [];
         unset($validated['documents']);
 
-        // ✅ [แก้ไข] ดึงข้อมูล Client ผ่าน scope สิทธิ์ของ user
-        // ป้องกันการ POST client_id ของคนอื่นเข้ามาเอง
+        // ✅ ดึงข้อมูล Client ผ่าน scope สิทธิ์ของ user
         $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-        // ✅ [แก้ไข] ตรวจสอบว่ามี factfinding อยู่แล้วหรือไม่ โดยอิง client ที่ user มีสิทธิ์
+        // ✅ ตรวจสอบว่ามี factfinding อยู่แล้วหรือไม่
         $existing = Factfinding::where('client_id', $client->id)->first();
         if ($existing) {
             return redirect()
@@ -129,18 +124,14 @@ class FactfindingController extends Controller
                 ->with('error', 'มีข้อมูลของผู้รับรายนี้อยู่แล้ว ท่านสามารถแก้ไขแทนการบันทึกใหม่ได้');
         }
 
-        // ✅ [แก้ไข] บังคับ client_id จาก client ที่ผ่านสิทธิ์แล้ว
         $validated['client_id'] = $client->id;
 
-        // ✅ ถ้า sick = 0 ให้ลบค่า sick_detail
         if (($validated['sick'] ?? null) == 0) {
             $validated['sick_detail'] = null;
         }
 
-        // ✅ บันทึก factfinding โดยไม่ส่ง documents เข้าไป
         $factFinding = Factfinding::create($validated);
 
-        // ✅ แนบ documents ผ่าน pivot
         if (!empty($documents)) {
             foreach ($documents as $docId) {
                 FactFindingDocument::create([
@@ -156,15 +147,12 @@ class FactfindingController extends Controller
 
     public function FactfindingEdit($factfinding_id)
     {
-        // ✅ [แก้ไข] ดึง factfinding โดยตรวจย้อนสิทธิ์ผ่าน client ของ user
-        // ป้องกันการเดา factfinding_id แล้วเปิดข้อมูลของคนอื่น
+        // ✅ แก้จาก whereHas('client') เป็น whereIn(client_id, subquery)
+        // เพราะ Factfinding model ของคุณยังไม่มี relation client()
         $factFinding = Factfinding::where('id', $factfinding_id)
-            ->whereHas('client', function ($query) {
-                $query->forUser(auth()->user());
-            })
+            ->whereIn('client_id', Client::forUser(auth()->user())->select('id'))
             ->firstOrFail();
 
-        // ✅ [แก้ไข] ดึง client ผ่าน scope สิทธิ์อีกชั้น
         $client = Client::forUser(auth()->user())->findOrFail($factFinding->client_id);
 
         $documents = Document::all();
@@ -254,20 +242,13 @@ class FactfindingController extends Controller
             'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
         ]);
 
-        // ✅ [แก้ไข] ดึง factfinding ตาม factfinding_id โดยตรวจย้อนสิทธิ์ผ่าน client
-        // ป้องกันการเดา URL เข้าแก้ข้อมูลของคนอื่น
+        // ✅ แก้จาก whereHas('client') เป็น whereIn(client_id, subquery)
         $factFinding = Factfinding::where('id', $factfinding_id)
-            ->whereHas('client', function ($query) {
-                $query->forUser(auth()->user());
-            })
+            ->whereIn('client_id', Client::forUser(auth()->user())->select('id'))
             ->firstOrFail();
 
-        // ✅ [แก้ไข] ตรวจสิทธิ์ client_id ที่ส่งมาจากฟอร์มผ่าน Client::forUser(auth()->user())
-        // ป้องกันการแก้ hidden input / devtools เปลี่ยน client_id ไปเป็นของคนอื่น
         $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-        // ✅ [แก้ไข] ถ้ามี factfinding ของ client ปลายทางอยู่แล้ว และไม่ใช่รายการปัจจุบัน
-        // ให้กันข้อมูลซ้ำแบบเดิม แต่ปลอดภัยขึ้น
         $existing = Factfinding::where('client_id', $client->id)
             ->where('id', '!=', $factFinding->id)
             ->first();
@@ -278,14 +259,11 @@ class FactfindingController extends Controller
                 ->with('error', 'มีข้อมูลของผู้รับรายนี้อยู่แล้ว ท่านสามารถแก้ไขแทนการบันทึกใหม่ได้');
         }
 
-        // ✅ ถ้า sick = 0 ให้ลบค่า sick_detail
         if ($validated['sick'] == 0) {
             $validated['sick_detail'] = null;
         }
 
-        // ✅ เตรียม payload
         $payload = [
-            // ✅ [แก้ไข] ใช้ client_id จาก client ที่ผ่านการตรวจสิทธิ์แล้วเท่านั้น
             'client_id'   => (int) $client->id,
             'date'        => $validated['date'],
             'receive_date'=> $validated['receive_date'],
@@ -321,13 +299,10 @@ class FactfindingController extends Controller
             'active'          => $validated['active'] ?? 1,
         ];
 
-        // ✅ อัปเดต factfinding
         $factFinding->update($payload);
 
-        // ✅ ลบ pivot เดิม
         FactFindingDocument::where('factfinding_id', $factFinding->id)->delete();
 
-        // ✅ เพิ่ม pivot ใหม่
         if (!empty($validated['documents'])) {
             foreach ($validated['documents'] as $docId) {
                 FactFindingDocument::create([
@@ -337,13 +312,11 @@ class FactfindingController extends Controller
             }
         }
 
-        // ✅ แจ้งเตือน
         $notification = [
             'message'    => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
             'alert-type' => 'success'
         ];
 
-        // ✅ redirect กลับไปหน้า edit โดยใช้ factfinding_id
         return redirect()->route('factfinding.edit', $factFinding->id)
                          ->with($notification);
     }

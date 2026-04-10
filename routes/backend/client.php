@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,executive,social_worker')->group(function () {
         Route::get('/client/add', [ClientController::class, 'clientAdd'])->name('client.add');
         Route::post('/client/store', [ClientController::class, 'ClientStore'])->name('client.store');
+        // Route::get('/client/edit/{id}', [ClientController::class, 'ClientEdit'])->name('client.edit');
         Route::get('/client/edit/{id}', [ClientController::class, 'ClientEdit'])->name('client.edit');
         Route::post('/client/update', [ClientController::class, 'ClientUpdate'])->name('client.update');
 

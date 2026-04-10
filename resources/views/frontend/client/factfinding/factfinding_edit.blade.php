@@ -353,6 +353,27 @@
         transform:none;
     }
 
+        .ff-hero-badge {
+            background: linear-gradient(135deg, #f8fafc, #eef2f7);
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .ff-hero-badge:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+
+
     @media (max-width: 1199.98px){
         .ff-grid{
             grid-template-columns:1fr;
@@ -451,10 +472,12 @@
                     </p>
                 </div>
 
-                <div class="ff-hero-badge">
-                    <i class="bi bi-pencil-square"></i>
-                    <span>โหมดแก้ไขข้อมูล</span>
-                </div>
+               <a href="{{ route('client.edit', $client->id) }}" class="ff-hero-link">
+    <div class="ff-hero-badge">
+       <i class="bi bi-arrow-left"></i>
+        <span>ข้อมูลทั่วไป</span>
+    </div>
+</a>
             </div>
 
             <form action="{{ route('factfinding.update', $factFinding->id) }}" method="POST" id="factfindingEditForm" novalidate>

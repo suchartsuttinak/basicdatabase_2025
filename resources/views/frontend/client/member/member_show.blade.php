@@ -71,11 +71,64 @@
         color:var(--fmp-muted);
     }
 
+    .family-header-actions{
+        display:flex;
+        align-items:center;
+        gap:.65rem;
+        flex-wrap:wrap;
+    }
+
+    .family-back-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:.45rem;
+        min-height:42px;
+        padding:.68rem 1rem;
+        border-radius:999px;
+        border:1px solid rgba(15,23,42,.08);
+        background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);
+        color:#334155;
+        font-size:.89rem;
+        font-weight:800;
+        line-height:1;
+        text-decoration:none;
+        white-space:nowrap;
+        box-shadow:0 6px 16px rgba(15,23,42,.05);
+        transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .family-back-btn i{
+        font-size:.95rem;
+        line-height:1;
+    }
+
+    .family-back-btn:hover{
+        color:#0f172a;
+        background:linear-gradient(180deg,#ffffff 0%,#f1f5f9 100%);
+        border-color:rgba(13,71,161,.18);
+        box-shadow:0 10px 22px rgba(15,23,42,.08);
+        transform:translateY(-1px);
+        text-decoration:none;
+    }
+
+    .family-back-btn:active{
+        transform:translateY(0);
+        box-shadow:0 4px 10px rgba(15,23,42,.06);
+    }
+
+    .family-back-btn:focus-visible{
+        outline:none;
+        border-color:rgba(13,71,161,.38);
+        box-shadow:0 0 0 4px rgba(13,71,161,.12);
+    }
+
     .family-member-badge{
         display:inline-flex;
         align-items:center;
         gap:.5rem;
         padding:.68rem .9rem;
+        min-height:42px;
         border-radius:999px;
         border:1px solid var(--fmp-border);
         background:#fff;
@@ -369,6 +422,17 @@
             font-size:.88rem;
         }
 
+        .family-header-actions{
+            width:100%;
+            align-items:stretch;
+        }
+
+        .family-back-btn,
+        .family-member-badge{
+            width:100%;
+            justify-content:center;
+        }
+
         .family-client-card{
             padding:.82rem;
             border-radius:16px;
@@ -411,10 +475,9 @@
 <div class="family-member-page">
     <div class="family-member-shell">
 
-        {{-- @include('admin_client.include.tabs') --}}
-
         <div class="family-member-header">
             <div class="family-member-title-wrap">
+
                 <div class="family-member-title-box">
                     <h2 class="family-member-title">บันทึกสมาชิกในครอบครัว</h2>
                     <p class="family-member-subtitle">
@@ -422,10 +485,18 @@
                     </p>
                 </div>
 
-                <div class="family-member-badge">
-                    <i class="bi bi-people-fill"></i>
-                    <span>{{ $members->count() }} รายการ</span>
+                <div class="family-header-actions">
+                    <a href="{{ route('client.edit', $client->id) }}" class="family-back-btn">
+                        <i class="bi bi-arrow-left"></i>
+                        <span>กลับหน้าข้อมูลผู้รับบริการ</span>
+                    </a>
+
+                    <div class="family-member-badge">
+                        <i class="bi bi-people-fill"></i>
+                        <span>{{ $members->count() }} รายการ</span>
+                    </div>
                 </div>
+
             </div>
         </div>
 

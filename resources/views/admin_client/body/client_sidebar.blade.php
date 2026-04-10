@@ -57,12 +57,12 @@
                     </a>
                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('client.show') }}"
-                                   class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
-                                    ทะเบียนผู้รับ
-                                </a>
-                            </li>
+                           <li>
+    <a href="{{ route('client.edit', $client->id) }}"
+       class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
+        บันทึกข้อมูลทั่วไป
+    </a>
+</li>
                             <li>
                                 <a href="{{ route('client.report', $clientId) }}"
                                    class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">

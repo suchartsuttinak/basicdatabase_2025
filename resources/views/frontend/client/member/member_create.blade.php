@@ -102,15 +102,26 @@
         </table>
     </div>
 
-    <!-- ปุ่ม -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <button type="button" class="btn btn-outline-secondary btn-sm" id="add-member">
+   <!-- ปุ่ม -->
+<div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+
+    <!-- ซ้าย -->
+    <div class="d-flex gap-2">
+        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> กลับหน้าก่อน
+        </a>
+
+        <button type="button" class="btn btn-outline-primary btn-sm" id="add-member">
             <i class="bi bi-plus-circle me-1"></i> เพิ่มสมาชิก
         </button>
-        <button type="submit" class="btn btn-success btn-sm">
-            <i class="bi bi-save me-1"></i> บันทึกข้อมูล
-        </button>
     </div>
+
+    <!-- ขวา -->
+    <button type="submit" class="btn btn-success btn-sm">
+        <i class="bi bi-save me-1"></i> บันทึกข้อมูล
+    </button>
+
+</div>
 </form>
 
 <script>
