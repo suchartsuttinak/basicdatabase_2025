@@ -315,4 +315,12 @@ class Client extends Model
         // ไม่มีบ้าน = ไม่เห็นข้อมูล
         return $query->whereRaw('1 = 0');
     }
+
+
+
+        // ความสัมพันธ์กับ Followup (ติดตามผล)
+    public function followups()
+{
+    return $this->hasMany(\App\Models\Followup::class, 'client_id');
+}
 }

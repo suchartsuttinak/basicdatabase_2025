@@ -1,10 +1,10 @@
 @extends('admin_client.admin_client')
 
-@section('content')
- @push('styles')
-    <link rel="stylesheet" href="{{ asset('backend/assets/css/observe.css') }}">
-    @endpush
+@push('styles')
+<link rel="stylesheet" href="{{ asset('backend/assets/css/observe.css') }}">
+@endpush
 
+@section('content')
 <div class="observe-page">
     <div class="observe-shell">
 
@@ -43,39 +43,31 @@
         </div>
 
         {{-- Summary --}}
-       
         @include('frontend.client.observe.partials.summary')
 
-
         {{-- Main content --}}
-        @include('frontend.client.observe.partials._table') 
+        @include('frontend.client.observe.partials._table')
 
-        </div>
-     </div> 
+    </div>
 
-        {{-- Modal บันทึก/แก้ไขพฤติกรรม --}}
-        @include('frontend.client.observe.partials.observeModal')
+    {{-- Modal บันทึก/แก้ไขพฤติกรรม --}}
+    @include('frontend.client.observe.partials.observeModal')
 
-   
-        {{-- Modal แก้ไขการติดตามผล --}}
-        @include('frontend.client.observe.partials.editFollowupModal')
+    {{-- Modal แก้ไขการติดตามผล --}}
+    @include('frontend.client.observe.partials.editFollowupModal')
+</div>
 
+@if ($errors->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalEl = document.getElementById('observeModal');
 
-        @if ($errors->any())
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const modalEl = document.getElementById('observeModal');
-                if (modalEl) {
-                    const observeModal = new bootstrap.Modal(modalEl);
-                    observeModal.show();
-                }
-            });
-        </script>
-        @endif
+        if (modalEl && window.bootstrap) {
+            const observeModal = new bootstrap.Modal(modalEl);
+            observeModal.show();
+        }
 
-    @if ($errors->any())
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        if (window.Swal) {
             Swal.fire({
                 icon: 'error',
                 title: 'เกิดข้อผิดพลาด',
@@ -88,23 +80,24 @@
                 `,
                 confirmButtonText: 'ตกลง'
             });
-        });
-    </script>
-    @endif
+        }
+    });
+</script>
+@endif
 
-    @if (session('success'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
+@if (session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.Swal) {
             Swal.fire({
                 icon: 'success',
-                title: '{{ session('success') }}',
+                title: @json(session('success')),
                 showConfirmButton: true,
                 timer: 3000,
                 timerProgressBar: true
             });
-        });
-    </script>
-
-
-    @endif
+        }
+    });
+</script>
+@endif
 @endsection

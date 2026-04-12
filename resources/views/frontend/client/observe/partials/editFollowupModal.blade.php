@@ -13,7 +13,7 @@
                     </div>
 
                     <div class="modal-body">
-                        <form action="{{ route('followup.update', $f->id) }}"
+                        <form action="{{ route('observe.followup.update', $f->id) }}"
                               method="POST"
                               class="needs-validation"
                               novalidate>
@@ -76,7 +76,7 @@
 
                         <div class="modal-footer-modern pt-0 border-0">
                             <form id="delete-form-followup-{{ $f->id }}"
-                                  action="{{ route('followup.delete', $f->id) }}"
+                                  action="{{ route('observe.followup.delete', $f->id) }}"
                                   method="POST"
                                   class="d-inline">
                                 @csrf

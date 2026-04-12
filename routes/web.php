@@ -68,19 +68,6 @@ Route::delete('/about/{id}', [AboutController::class, 'destroy'])->name('landing
 
    
 
-//     Route::get('/', function () {
-//     return view('welcome');
-// });
-
-// Route::get('/', function () {
-//     return view('landing'); // ชี้ไปที่ resources/views/landing.blade.php
-// });
-
-
-//     Route::get('/dashboard', function () {
-//     return view('admin.index');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
 // User Profile
     Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -151,6 +138,7 @@ require __DIR__.'/auth.php';
     Route::patch('/toggle-status/{id}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
+
 
 
     //Backend Route All
@@ -260,6 +248,10 @@ require __DIR__.'/auth.php';
 
      // บันทึกรายการเอกสาร
       require __DIR__.'/frontend/client_files.php';
+
+
+    // ===== ติดตามผล =====
+      require __DIR__.'/frontend/followup.php';
 
 
 

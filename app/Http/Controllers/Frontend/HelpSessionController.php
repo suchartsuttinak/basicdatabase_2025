@@ -11,22 +11,34 @@ use Illuminate\Validation\Rule;
 
 class HelpSessionController extends Controller
 {
-    public function show(Client $client)
-    {
-        // =========================
-        // PATCH: กันเดา URL (Route Model Binding)
-        // =========================
-        $client = Client::forUser(auth()->user())->findOrFail($client->id);
+    public function show(Request $request, Client $client)
+{
+    // =========================
+    // PATCH: กันเดา URL (Route Model Binding)
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client->id);
 
-       $sessions = HelpSession::where('client_id', $client->id)
+    $query = HelpSession::where('client_id', $client->id)
         ->with('items')
-        ->orderBy('help_date', 'desc')
-        ->get();
+        ->orderBy('help_date', 'desc');
 
+    if ($request->filled('from') && $request->filled('to')) {
+        $query->whereBetween('help_date', [$request->from, $request->to]);
+    } elseif ($request->filled('from')) {
+        $query->whereDate('help_date', '>=', $request->from);
+    } elseif ($request->filled('to')) {
+        $query->whereDate('help_date', '<=', $request->to);
+    }
+
+    $sessions = $query->get();
     $grandTotal = $sessions->sum('total_amount');
 
-    return view('frontend.client.helping.help_sessions_show', compact('client', 'sessions', 'grandTotal'));
-    }
+    return view('frontend.client.helping.help_sessions_show', compact(
+        'client',
+        'sessions',
+        'grandTotal'
+    ));
+}
 
     public function store(Request $request, Client $client)
     {
@@ -113,6 +125,34 @@ class HelpSessionController extends Controller
         return view('frontend.client.helping.help_sessions_create', compact('client'));
     }
 
+
+    public function report(Client $client, HelpSession $session)
+{
+    // =========================
+    // PATCH: กันเดา URL (Route Model Binding)
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
+    // =========================
+    // PATCH: ตรวจว่า session เป็นของ client นี้จริง
+    // =========================
+    if ($session->client_id !== $client->id) {
+        abort(403);
+    }
+
+    $session->load('items');
+
+    $grandTotal = $session->items->sum(function ($item) {
+        return (float) $item->quantity * (float) $item->unit_price;
+    });
+
+    return view('frontend.client.helping.report', compact(
+        'client',
+        'session',
+        'grandTotal'
+    ));
+}
+
 public function edit(Client $client, HelpSession $session)
 {
     // =========================
@@ -179,5 +219,40 @@ public function update(Request $request, Client $client, HelpSession $session)
                         'message' => 'แก้ไขข้อมูลเรียบร้อย',
                         'alert-type' => 'success'
                      ]);
+}
+
+
+public function reportRange(Request $request, Client $client)
+{
+    // =========================
+    // PATCH: กันเดา URL (Route Model Binding)
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client->id);
+
+    $query = HelpSession::where('client_id', $client->id)
+        ->with('items')
+        ->orderBy('help_date', 'asc');
+
+    if ($request->filled('from') && $request->filled('to')) {
+        $query->whereBetween('help_date', [$request->from, $request->to]);
+    } elseif ($request->filled('from')) {
+        $query->whereDate('help_date', '>=', $request->from);
+    } elseif ($request->filled('to')) {
+        $query->whereDate('help_date', '<=', $request->to);
+    }
+
+    $sessions = $query->get();
+
+    $grandTotal = $sessions->sum(function ($session) {
+        return $session->items->sum(function ($item) {
+            return (float) $item->quantity * (float) $item->unit_price;
+        });
+    });
+
+    return view('frontend.client.helping.report_range', compact(
+        'client',
+        'sessions',
+        'grandTotal'
+    ));
 }
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Frontend\HelpSessionController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +16,14 @@ Route::prefix('clients/{client}')->group(function () {
     // บันทึกการช่วยเหลือใหม่
     Route::post('help-sessions', [HelpSessionController::class, 'store'])
         ->name('help_sessions.store');
+
+    // หน้า report รวมตามช่วงวันที่
+    Route::get('help-sessions/report/range', [HelpSessionController::class, 'reportRange'])
+        ->name('help_sessions.report_range');
+
+    // หน้า report เฉพาะ session
+    Route::get('help-sessions/{session}/report', [HelpSessionController::class, 'report'])
+        ->name('help_sessions.report');
 
     // หน้า form แก้ไขการช่วยเหลือ
     Route::get('help-sessions/{session}/edit', [HelpSessionController::class, 'edit'])

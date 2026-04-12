@@ -283,6 +283,13 @@
                                     รายการการช่วยเหลือ
                                 </a>
                             </li>
+                           
+                   <li>
+    <a href="{{ route('followup.index', $clientId) }}"
+       class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
+        การติดตามผล
+    </a>
+</li>
                         </ul>
                     </div>
                 </li>

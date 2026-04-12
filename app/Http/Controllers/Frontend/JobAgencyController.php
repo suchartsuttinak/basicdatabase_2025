@@ -19,17 +19,26 @@ class JobAgencyController extends Controller
     /**
      * แสดงข้อมูล JobAgency ของ client
      */
-    public function showJobAgency($client_id)
+   public function showJobAgency(Request $request, $client_id)
 {
     // =========================
     // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
     // =========================
     $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-    $jobAgencies = JobAgency::where('client_id', $client->id)
-        ->orderBy('income', 'desc')
-        ->with('occupation') // ✅ eager load occupation
-        ->get();
+    $query = JobAgency::where('client_id', $client->id)
+        ->with('occupation')
+        ->orderBy('income', 'desc');
+
+    if ($request->filled('start_date')) {
+        $query->whereDate('job_date', '>=', $request->start_date);
+    }
+
+    if ($request->filled('end_date')) {
+        $query->whereDate('job_date', '<=', $request->end_date);
+    }
+
+    $jobAgencies = $query->get();
 
     $occupations = Occupation::all();
 
@@ -40,7 +49,6 @@ class JobAgencyController extends Controller
         'occupations'
     ));
 }
-
 public function storeJobAgency(Request $request)
 {
     $validated = $request->validate([
@@ -171,4 +179,31 @@ public function storeJobAgency(Request $request)
     ->with('success', 'ลบข้อมูลเรียบร้อย');
 }
  
+
+public function reportJobAgency(Request $request, $client_id)
+{
+    // =========================
+    // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+    $query = JobAgency::where('client_id', $client->id)
+        ->with('occupation')
+        ->orderBy('job_date', 'desc');
+
+    if ($request->filled('start_date')) {
+        $query->whereDate('job_date', '>=', $request->start_date);
+    }
+
+    if ($request->filled('end_date')) {
+        $query->whereDate('job_date', '<=', $request->end_date);
+    }
+
+    $jobAgencies = $query->get();
+
+    return view('frontend.client.job_agency.report', compact(
+        'client',
+        'jobAgencies'
+    ));
+}
 }
