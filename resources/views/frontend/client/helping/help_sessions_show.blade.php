@@ -158,7 +158,7 @@
         <div class="hp-body">
 
             {{-- Profile Card --}}
-            @include('frontend.client.helping.partials.profile-card')
+            {{-- @include('frontend.client.helping.partials.profile-card') --}}
 
             {{-- Help Sessions Table --}}
             @include('frontend.client.helping.partials._table')

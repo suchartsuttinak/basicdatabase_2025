@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;   // ✅ import ที่นี่เท่านั้น
+use Illuminate\Support\Facades\Validator;
 use App\Models\Client;
 use App\Models\CaseOutside;
 use App\Models\Outside;
@@ -20,14 +20,15 @@ class CaseOutsideController extends Controller
         // =========================
         // PATCH: กันเดา URL เข้า client
         // =========================
-        $client  = Client::forUser(auth()->user())->findOrFail($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $caseoutsides = CaseOutside::where('client_id', $client->id)
-            ->orderBy('count', 'desc')
+            ->orderBy('date', 'asc')
+            ->orderBy('count', 'asc')
             ->get();
 
         return view('frontend.client.case_outside.case_outside_create',
-            compact('client','client_id','caseoutsides','outside'));
+            compact('client', 'client_id', 'caseoutsides', 'outside'));
     }
 
     public function StoreCaseOutside(Request $request)
@@ -48,9 +49,9 @@ class CaseOutsideController extends Controller
             'dormitory'  => 'required|string',
             'client_id'  => 'required|exists:clients,id',
         ], [
-            'date.required'     => 'กรุณากรอกวันที่',
-            'date.date'         => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'date.unique'       => 'วันที่ติดตามนี้มีอยู่แล้ว ห้ามซ้ำ',
+            'date.required'       => 'กรุณากรอกวันที่',
+            'date.date'           => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'date.unique'         => 'วันที่ติดตามนี้มีอยู่แล้ว ห้ามซ้ำ',
             'outside_id.required' => 'กรุณาเลือกข้อมูลภายนอก',
             'outside_id.exists'   => 'ข้อมูลภายนอกไม่ถูกต้อง',
             'follo_no.required'   => 'กรุณากรอกเลขที่ติดตาม',
@@ -70,7 +71,16 @@ class CaseOutsideController extends Controller
         Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
         DB::transaction(function () use ($validated) {
+            // =========================
+            // PATCH: ไม่รับ count จากฟอร์ม ให้ระบบจัดใหม่ตาม date เท่านั้น
+            // =========================
+            unset($validated['count']);
+
             $case = CaseOutside::create($validated);
+
+            // =========================
+            // AUTO: เรียง count ใหม่ตามวันที่เสมอ
+            // =========================
             $this->reindexCounts($case->client_id);
         });
 
@@ -134,7 +144,16 @@ class CaseOutsideController extends Controller
         Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
         DB::transaction(function () use ($case, $data) {
+            // =========================
+            // PATCH: ไม่รับ count จากฟอร์ม ให้ระบบจัดใหม่ตาม date เท่านั้น
+            // =========================
+            unset($data['count']);
+
             $case->update($data);
+
+            // =========================
+            // AUTO: เรียง count ใหม่ตามวันที่เสมอ
+            // =========================
             $this->reindexCounts($case->client_id);
         });
 
@@ -143,7 +162,7 @@ class CaseOutsideController extends Controller
             ->with('success', 'แก้ไขข้อมูลเรียบร้อย');
     }
 
-     public function DeleteCaseOutside($id)
+    public function DeleteCaseOutside($id)
     {
         $case = CaseOutside::findOrFail($id);
 
@@ -158,6 +177,9 @@ class CaseOutsideController extends Controller
             $client_id = $case->client_id;
             $case->delete();
 
+            // =========================
+            // AUTO: เรียง count ใหม่ตามวันที่เสมอหลังลบ
+            // =========================
             $this->reindexCounts($client_id);
         });
 
@@ -172,6 +194,7 @@ class CaseOutsideController extends Controller
     {
         $items = CaseOutside::where('client_id', $client_id)
             ->orderBy('date', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         $counter = 1;
@@ -179,5 +202,48 @@ class CaseOutsideController extends Controller
             $item->update(['count' => $counter]);
             $counter++;
         }
+    }
+
+    public function FilterCaseOutside($client_id)
+    {
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+        $outside = Outside::all();
+
+        return view('frontend.client.case_outside.case_outside_filter', compact(
+            'client',
+            'outside'
+        ));
+    }
+
+    public function ReportCaseOutside(Request $request, $client_id)
+    {
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+        $query = CaseOutside::where('client_id', $client->id)->with('outside');
+
+        if ($request->filled('date_start')) {
+            $query->whereDate('date', '>=', $request->date_start);
+        }
+
+        if ($request->filled('date_end')) {
+            $query->whereDate('date', '<=', $request->date_end);
+        }
+
+        if ($request->filled('outside_id')) {
+            $query->where('outside_id', $request->outside_id);
+        }
+
+        if ($request->filled('follo_no')) {
+            $query->where('follo_no', $request->follo_no);
+        }
+
+        $caseoutsides = $query->orderBy('date', 'asc')
+            ->orderBy('count', 'asc')
+            ->get();
+
+        return view('frontend.client.case_outside.case_outside_report', compact(
+            'client',
+            'caseoutsides'
+        ));
     }
 }

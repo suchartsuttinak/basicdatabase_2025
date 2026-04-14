@@ -17,7 +17,11 @@ use Illuminate\Support\Facades\Route;
 
     // ✅ เปลี่ยน CopyEscape ให้เป็น GET
     Route::get('/copy/{id}', [EscapeController::class, 'CopyEscape'])->name('escape.copy');
+
+     // ✅ เพิ่ม route รายงาน
+    Route::get('/report/{id}', [EscapeController::class, 'ReportEscape'])->name('escape.report');
 });
+
 
 // EscapeFollow
     Route::prefix('escape-follows')->group(function(){

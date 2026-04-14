@@ -11,6 +11,9 @@ Route::prefix('observe')->group(function () {
     Route::put('/update/{id}', [ObserveController::class, 'UpdateObserve'])->name('observe.update');
     Route::delete('/delete/{id}', [ObserveController::class, 'DeleteObserve'])->name('observe.delete');
 
+       // ✅ เพิ่ม route รายงาน
+    Route::get('/report/{id}', [ObserveController::class, 'ReportObserve'])->name('observe.report');
+
     // Followup ของ observe
     Route::post('/followup/store', [ObserveController::class, 'StoreFollowup'])->name('observe.followup.store');
     Route::get('/followup/edit/{id}', [ObserveController::class, 'EditFollowup'])->name('observe.followup.edit');

@@ -16,6 +16,17 @@
         --obs-radius-sm: 12px;
     }
 
+    .observe-body .btn-action-primary{
+    background:#0d6efd;
+    color:#fff;
+    border:none;
+}
+
+.observe-body .btn-action-primary:hover{
+    background:#0b5ed7;
+    color:#fff;
+}
+
     .observe-page {
         padding: 1rem;
     }

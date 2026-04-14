@@ -168,4 +168,22 @@ class EscapeController extends Controller
 
         return view('frontend.client.escape.escape_create', compact('client','retires','escape','mode'));
     }
+
+    public function ReportEscape($id)
+{
+    $escape = Escape::with([
+        'client',
+        'retire',
+        'follows' => function ($query) {
+            $query->orderBy('count', 'asc')->orderBy('trace_date', 'asc');
+        }
+    ])->findOrFail($id);
+
+    // =========================
+    // PATCH: กันเข้าดู report ของ client คนอื่น
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
+
+    return view('frontend.client.escape.escape_report', compact('escape', 'client'));
+}
 }

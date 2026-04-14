@@ -264,6 +264,9 @@
     </div>
 </div>
 
+ {{-- Profile Card --}}
+            @include('frontend.client.helping.partials.profile-card')
+
 <div class="hp-filter-card">
     <div class="hp-filter-head">
         <div>

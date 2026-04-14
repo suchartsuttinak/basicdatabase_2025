@@ -7,6 +7,7 @@
 <div class="container-fluid escape-page">
 
     <div class="escape-shell">
+
         {{-- Header --}}
          @include('frontend.client.escape.partials._header')
       

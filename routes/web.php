@@ -15,9 +15,6 @@ use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
-
-
-
 // ประมวลผล/สถิติ หน้า dashboard
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');

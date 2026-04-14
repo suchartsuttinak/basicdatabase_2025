@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Client;
 use App\Models\Escape;
 use App\Models\EscapeFollow;
+use Carbon\Carbon;
 
 class EscapeFollowController extends Controller
 {
@@ -14,11 +16,10 @@ class EscapeFollowController extends Controller
     {
         $escape = Escape::findOrFail($escape_id);
 
-        // หาครั้งล่าสุดแล้ว +1
-        $lastFollow = EscapeFollow::where('escape_id', $escape_id)
-            ->orderByDesc('count')
-            ->first();
-        $nextCount = $lastFollow ? $lastFollow->count + 1 : 1;
+        // =========================
+        // PATCH: กันเข้าถึง client คนอื่น
+        // =========================
+        Client::forUser(auth()->user())->findOrFail($escape->client_id);
 
         $data = $request->validate([
             'trace_date'  => 'required|date',
@@ -31,19 +32,43 @@ class EscapeFollowController extends Controller
             'remark'      => 'nullable|string',
         ]);
 
+        // =========================
+        // AUTO: นับครั้งอัตโนมัติจากจำนวนปัจจุบัน + 1
+        // =========================
+        $nextCount = EscapeFollow::where('escape_id', $escape_id)->count() + 1;
+
+        // =========================
+        // VALIDATE: วันที่ของครั้งใหม่ ต้อง "มากกว่า" วันที่ของครั้งล่าสุดเท่านั้น
+        // ห้ามซ้ำ และห้ามน้อยกว่า
+        // =========================
+        $lastFollow = EscapeFollow::where('escape_id', $escape_id)
+            ->orderByDesc('count')
+            ->first();
+
+        if ($lastFollow && $lastFollow->trace_date) {
+            $newTraceDate  = Carbon::parse($data['trace_date'])->startOfDay();
+            $lastTraceDate = Carbon::parse($lastFollow->trace_date)->startOfDay();
+
+            if ($newTraceDate->lte($lastTraceDate)) {
+                return redirect()->back()
+                    ->withErrors([
+                        'trace_date' => 'วันที่ติดตามของครั้งที่ ' . $nextCount . ' ต้องมากกว่าวันที่ของครั้งที่ ' . $lastFollow->count . ' เท่านั้น'
+                    ])
+                    ->withInput();
+            }
+        }
+
         $data['escape_id'] = $escape->id;
-        $data['count']     = $nextCount; // กำหนดอัตโนมัติ
+        $data['count']     = $nextCount;
 
         EscapeFollow::create($data);
 
-        $notification = [
-        'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-        'alert-type' => 'success'
-    ];
-
         return redirect()
             ->route('escape.edit', $escape->id)
-            ->with($notification);
+            ->with([
+                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                'alert-type' => 'success'
+            ]);
     }
 
     // อัปเดตการติดตาม
@@ -51,6 +76,12 @@ class EscapeFollowController extends Controller
     {
         $follow = EscapeFollow::findOrFail($id);
 
+        // =========================
+        // PATCH: กันแก้ข้อมูล client คนอื่น
+        // =========================
+        $escape = Escape::findOrFail($follow->escape_id);
+        Client::forUser(auth()->user())->findOrFail($escape->client_id);
+
         $data = $request->validate([
             'trace_date'  => 'required|date',
             'trac_no'     => 'required|string',
@@ -62,35 +93,100 @@ class EscapeFollowController extends Controller
             'remark'      => 'nullable|string',
         ]);
 
-        // สำหรับ update เราไม่ต้องเปลี่ยน count ให้มันคงเดิม
+        $newTraceDate = Carbon::parse($data['trace_date'])->startOfDay();
+
+        // =========================
+        // VALIDATE: ต้อง "มากกว่า" ครั้งก่อนหน้า
+        // ห้ามซ้ำ และห้ามน้อยกว่า
+        // =========================
+        $prevFollow = EscapeFollow::where('escape_id', $follow->escape_id)
+            ->where('count', '<', $follow->count)
+            ->orderByDesc('count')
+            ->first();
+
+        if ($prevFollow && $prevFollow->trace_date) {
+            $prevTraceDate = Carbon::parse($prevFollow->trace_date)->startOfDay();
+
+            if ($newTraceDate->lte($prevTraceDate)) {
+                return redirect()->back()
+                    ->withErrors([
+                        'trace_date' => 'วันที่ติดตามของครั้งที่ ' . $follow->count . ' ต้องมากกว่าวันที่ของครั้งที่ ' . $prevFollow->count . ' เท่านั้น'
+                    ])
+                    ->withInput();
+            }
+        }
+
+        // =========================
+        // VALIDATE: ต้อง "น้อยกว่า" ครั้งถัดไป
+        // ห้ามซ้ำ และห้ามมากกว่า
+        // =========================
+        $nextFollow = EscapeFollow::where('escape_id', $follow->escape_id)
+            ->where('count', '>', $follow->count)
+            ->orderBy('count', 'asc')
+            ->first();
+
+        if ($nextFollow && $nextFollow->trace_date) {
+            $nextTraceDate = Carbon::parse($nextFollow->trace_date)->startOfDay();
+
+            if ($newTraceDate->gte($nextTraceDate)) {
+                return redirect()->back()
+                    ->withErrors([
+                        'trace_date' => 'วันที่ติดตามของครั้งที่ ' . $follow->count . ' ต้องน้อยกว่าวันที่ของครั้งที่ ' . $nextFollow->count . ' เท่านั้น'
+                    ])
+                    ->withInput();
+            }
+        }
+
+        // =========================
+        // คงเลขครั้งเดิมไว้
+        // =========================
         $data['count'] = $follow->count;
 
         $follow->update($data);
 
-        $notification = [
-        'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
-        'alert-type' => 'success'
-    ];
-
         return redirect()
             ->route('escape.edit', $follow->escape_id)
-            ->with($notification);
+            ->with([
+                'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
+                'alert-type' => 'success'
+            ]);
     }
 
     // ลบการติดตาม
     public function DeleteFollow($id)
     {
         $follow = EscapeFollow::findOrFail($id);
+
+        // =========================
+        // PATCH: กันลบข้อมูล client คนอื่น
+        // =========================
+        $escape = Escape::findOrFail($follow->escape_id);
+        Client::forUser(auth()->user())->findOrFail($escape->client_id);
+
         $escape_id = $follow->escape_id;
+
+        // ลบรายการที่เลือก
         $follow->delete();
 
-            $notification = [
-        'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
-        'alert-type' => 'success'
-    ];
+        // =========================
+        // AUTO: จัดลำดับ count ใหม่ให้ต่อเนื่องหลังลบ
+        // =========================
+        $remainingFollows = EscapeFollow::where('escape_id', $escape_id)
+            ->orderBy('count', 'asc')
+            ->orderBy('trace_date', 'asc')
+            ->get();
+
+        foreach ($remainingFollows as $index => $item) {
+            $item->update([
+                'count' => $index + 1
+            ]);
+        }
 
         return redirect()
             ->route('escape.edit', $escape_id)
-            ->with($notification);
+            ->with([
+                'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
+                'alert-type' => 'success'
+            ]);
     }
 }

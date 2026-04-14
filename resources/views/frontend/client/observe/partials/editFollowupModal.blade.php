@@ -37,14 +37,14 @@
                                                required>
                                     </div>
 
-                                    <div class="col-12 col-md-6">
+                                  <div class="col-12 col-md-6">
                                         <label class="form-label-modern">ครั้งที่</label>
-                                        <input type="number"
-                                               name="followup_count"
-                                               class="form-control form-control-modern"
-                                               min="1"
-                                               value="{{ old('followup_count', $f->followup_count) }}"
-                                               readonly>
+                                        <div class="form-control form-control-modern d-flex align-items-center" style="background-color:#f8fafc;">
+                                            {{ old('followup_count', $f->followup_count) }}
+                                        </div>
+                                        <input type="hidden"
+                                            name="followup_count"
+                                            value="{{ old('followup_count', $f->followup_count) }}">
                                     </div>
 
                                     <div class="col-12">
