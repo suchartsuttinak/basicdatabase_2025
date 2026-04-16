@@ -178,7 +178,7 @@
                         <tr>
                             <td class="text-center">
                                 <span class="hp-date-badge">
-                                    {{ \Carbon\Carbon::parse($session->help_date)->format('d/m/Y') }}
+                                    {{ \Carbon\Carbon::parse($session->help_date)->addYears(543)->format('d/m/Y') }}
                                 </span>
                             </td>
 
@@ -244,7 +244,7 @@
                                             <div class="hp-detail-head">
                                                 <div class="hp-detail-title">
                                                     <i class="bi bi-bag-heart-fill"></i>
-                                                    <span>รายละเอียดการช่วยเหลือ วันที่ {{ \Carbon\Carbon::parse($session->help_date)->format('d/m/Y') }}</span>
+                                                    <span>รายละเอียดการช่วยเหลือ วันที่ {{ \Carbon\Carbon::parse($session->help_date)->addYears(543)->format('d/m/Y') }}</span>
                                                 </div>
                                                 <div class="small fw-bold text-secondary">
                                                     รวม {{ $session->items->count() }} รายการ

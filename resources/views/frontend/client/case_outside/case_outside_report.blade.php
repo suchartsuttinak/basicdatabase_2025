@@ -5,17 +5,26 @@
     <title>รายงานติดตามเด็กที่อยู่นอกสถานสงเคราะห์</title>
 
    <style>
+    @page{
+        size: A4 landscape;
+        margin: 12mm 14mm;
+    }
+
+    html, body{
+        margin: 0;
+        padding: 0;
+    }
+
     body{
         font-family: "TH Sarabun New", "Sarabun", sans-serif;
         font-size: 17px;
         line-height: 1.45;
         color:#1f2937;
-        margin: 0;
         background:#f4f7fb;
     }
 
     .report-page{
-        max-width: 1120px;
+        width: min(96vw, 1400px);
         margin: 24px auto;
         background:#ffffff;
         border:1px solid #e5e7eb;
@@ -123,6 +132,7 @@
         padding:8px 9px;
         vertical-align:top;
         word-wrap:break-word;
+        overflow-wrap:break-word;
     }
 
     th{
@@ -163,9 +173,19 @@
         text-align:right;
     }
 
+    @media (max-width: 1024px){
+        .report-page{
+            width: calc(100vw - 24px);
+            margin: 12px auto;
+            padding: 20px 18px 18px;
+            border-radius:16px;
+        }
+    }
+
     @media (max-width: 768px){
         .report-page{
-            margin: 12px;
+            width: calc(100vw - 24px);
+            margin: 12px auto;
             padding: 18px 16px 16px;
             border-radius:16px;
         }
@@ -208,44 +228,82 @@
     }
 
     @media print{
+        @page{
+            size: A4 landscape;
+            margin: 12mm 14mm;
+        }
+
+        html, body{
+            width: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
+            background:#ffffff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
         body{
-            background:#ffffff;
             font-size:16px;
+            line-height:1.35;
         }
 
         .report-page{
-            max-width:none;
-            margin:0;
-            padding:0;
-            border:none;
-            border-radius:0;
-            box-shadow:none;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
         }
 
         .report-toolbar{
-            display:none;
+            display:none !important;
+        }
+
+        .report-header{
+            margin-bottom:12px !important;
+            padding-bottom:8px !important;
         }
 
         .report-title{
-            font-size:24px;
+            font-size:24px !important;
+            line-height:1.2 !important;
         }
 
         .report-sub{
-            font-size:18px;
+            font-size:18px !important;
+            line-height:1.3 !important;
+        }
+
+        .report-table-wrap{
+            overflow: visible !important;
+        }
+
+        table{
+            width:100% !important;
+            table-layout: fixed !important;
         }
 
         th, td{
-            font-size:15px;
-            padding:6px 7px;
+            font-size:15px !important;
+            padding:6px 7px !important;
+            line-height:1.2 !important;
         }
 
         .report-print-date{
-            font-size:14px;
+            font-size:14px !important;
         }
 
         .no-data{
-            font-size:16px;
-            padding:16px;
+            font-size:16px !important;
+            padding:16px !important;
+        }
+
+        tr, td, th{
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
     }
 </style>
@@ -291,7 +349,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:8%;">ลำดับ</th>
+                        {{-- <th style="width:8%;">ลำดับ</th> --}}
                         <th style="width:12%;">วันที่</th>
                         <th style="width:18%;">สาเหตุ</th>
                         <th style="width:16%;">สถานที่พัก</th>
@@ -306,7 +364,7 @@
                             $caseDateThai = $caseDate->format('d/m/') . ($caseDate->year + 543);
                         @endphp
                         <tr>
-                            <td class="text-center">{{ $case->count }}</td>
+                            {{-- <td class="text-center">{{ $case->count }}</td> --}}
                             <td class="text-center">{{ $caseDateThai }}</td>
                             <td>{{ $case->outside->outside_name ?? '-' }}</td>
                             <td>{{ $case->dormitory ?? '-' }}</td>

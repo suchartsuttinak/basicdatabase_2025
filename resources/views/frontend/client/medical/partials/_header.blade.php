@@ -16,6 +16,7 @@
                 </div>
             </div>
 
+            @if($medicals->isNotEmpty())
             <div class="medical-hero__actions">
                 <button type="button"
                         class="btn btn-primary medical-btn medical-btn-primary"
@@ -25,6 +26,7 @@
                     <span>เพิ่มข้อมูลการรักษา</span>
                 </button>
             </div>
+            @endif
         </div>
     </div>
 </div>

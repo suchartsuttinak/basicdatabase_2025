@@ -14,19 +14,36 @@ use Illuminate\Validation\Rule;
 class MedicalController extends Controller
 {
     // แสดงฟอร์มเพิ่มข้อมูลใหม่
-    public function MedicalAdd($client_id)
-    {
-        // =========================
-        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
-        // =========================
-        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+    public function MedicalAdd(Request $request, $client_id)
+{
+    // =========================
+    // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+    // =========================
+    $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-        $medicals = Medical::where('client_id', $client->id)
-            ->orderBy('medical_date', 'desc')
-            ->get();
+    $request->validate([
+        'start_date' => ['nullable', 'date'],
+        'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+    ], [
+        'end_date.after_or_equal' => 'วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น',
+    ]);
 
-        return view('frontend.client.medical.medical_create', compact('client', 'client_id', 'medicals'));
+    $query = Medical::where('client_id', $client->id)
+        ->orderByDesc('medical_date')
+        ->orderByDesc('id');
+
+    if ($request->filled('start_date')) {
+        $query->whereDate('medical_date', '>=', $request->start_date);
     }
+
+    if ($request->filled('end_date')) {
+        $query->whereDate('medical_date', '<=', $request->end_date);
+    }
+
+    $medicals = $query->get();
+
+    return view('frontend.client.medical.medical_create', compact('client', 'client_id', 'medicals'));
+}
 
     // บันทึกข้อมูลใหม่
     public function MedicalStore(Request $request)
@@ -193,4 +210,39 @@ public function MedicalUpdate(Request $request, $id)
         return redirect()->route('medical.add', $clientId)
                          ->with(['message' => 'ลบข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
+
+    // ✅ หน้ารายงานการรักษาพยาบาล
+        public function MedicalReport(Request $request, $client_id)
+        {
+            // =========================
+            // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+            // =========================
+            $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+            $request->validate([
+                'start_date' => ['nullable', 'date'],
+                'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+            ], [
+                'end_date.after_or_equal' => 'วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น',
+            ]);
+
+            $query = Medical::where('client_id', $client->id)
+                ->orderByDesc('medical_date')
+                ->orderByDesc('id');
+
+            if ($request->filled('start_date')) {
+                $query->whereDate('medical_date', '>=', $request->start_date);
+            }
+
+            if ($request->filled('end_date')) {
+                $query->whereDate('medical_date', '<=', $request->end_date);
+            }
+
+            $medicals = $query->get();
+
+            return view('frontend.client.medical.report', compact(
+                'client',
+                'medicals'
+            ));
+        }
 }

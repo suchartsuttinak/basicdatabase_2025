@@ -12,14 +12,31 @@ use Illuminate\Validation\Rule;
 class VaccinationController extends Controller
 {
     // ✅ แสดงรายการวัคซีนของ client
-    public function VaccineShow($client_id)
+    public function VaccineShow(Request $request, $client_id)
     {
         // =========================
         // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
         // =========================
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-        $vaccinations = $client->vaccinations()->latest('date')->get();
+        $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+        ], [
+            'end_date.after_or_equal' => 'วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น',
+        ]);
+
+        $query = $client->vaccinations()->orderByDesc('date')->orderByDesc('id');
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+
+        $vaccinations = $query->get();
 
         return view('frontend.client.vaccine.vaccine_show', compact('client', 'vaccinations'));
     }
@@ -32,7 +49,7 @@ class VaccinationController extends Controller
             'date'         => [
                 'required',
                 'date',
-                Rule::unique('vaccinations')->where(fn($query) => 
+                Rule::unique('vaccinations')->where(fn($query) =>
                     $query->where('client_id', $request->client_id)
                 ),
             ],
@@ -60,7 +77,7 @@ class VaccinationController extends Controller
 
         Vaccination::create($validated);
 
-        return redirect()->route('vaccine.index', $validated['client_id'])
+        return redirect()->route('vaccine.index', ['client_id' => $validated['client_id']])
                          ->with(['message' => 'บันทึกข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
 
@@ -137,7 +154,7 @@ class VaccinationController extends Controller
 
         $vaccination->update($data);
 
-        return redirect()->route('vaccine.index', $vaccination->client_id)
+        return redirect()->route('vaccine.index', ['client_id' => $vaccination->client_id])
                          ->with(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
 
@@ -154,7 +171,40 @@ class VaccinationController extends Controller
         $client_id = $vaccination->client_id;
         $vaccination->delete();
 
-        return redirect()->route('vaccine.index', $client_id)
+        return redirect()->route('vaccine.index', ['client_id' => $client_id])
                          ->with(['message' => 'ลบข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+    }
+
+    // ✅ หน้ารายงานวัคซีน
+    public function VaccineReport(Request $request, $client_id)
+    {
+        // =========================
+        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+        // =========================
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+        $request->validate([
+            'start_date' => ['nullable', 'date'],
+            'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
+        ], [
+            'end_date.after_or_equal' => 'วันที่สิ้นสุดต้องไม่น้อยกว่าวันที่เริ่มต้น',
+        ]);
+
+        $query = $client->vaccinations()->orderByDesc('date')->orderByDesc('id');
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+
+        $vaccinations = $query->get();
+
+        return view('frontend.client.vaccine.report', compact(
+            'client',
+            'vaccinations'
+        ));
     }
 }

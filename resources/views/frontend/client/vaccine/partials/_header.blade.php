@@ -12,7 +12,7 @@
                     </div>
                 </div>
             </div>
-
+        @if($vaccinations->isNotEmpty())
             <div class="vaccine-toolbar-scroll">
                 <div class="vaccine-toolbar-actions">
                     <button type="button"
@@ -24,6 +24,7 @@
                     </button>
                 </div>
             </div>
+        @endif
         </div>
     </div>
 </div>

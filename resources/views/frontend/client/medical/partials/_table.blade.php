@@ -57,11 +57,11 @@
                                         <span>ลบ</span>
                                     </button>
 
-                                    <a href="{{ route('medical.report', $medical->id) }}"
+                                    {{-- <a href="{{ route('medical.report', $medical->id) }}"
                                        class="btn btn-info btn-sm action-btn text-white">
                                         <i class="bi bi-file-earmark-text"></i>
                                         <span>รายงาน</span>
-                                    </a>
+                                    </a> --}}
                                 </div>
 
                                 <form id="delete-form-medical-{{ $medical->id }}"

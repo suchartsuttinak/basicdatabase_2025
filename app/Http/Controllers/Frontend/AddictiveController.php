@@ -7,6 +7,8 @@ use App\Models\Addictive;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class AddictiveController extends Controller
 {
@@ -19,7 +21,7 @@ class AddictiveController extends Controller
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $addictives = Addictive::where('client_id', $client->id)
-            ->orderBy('date', 'desc')
+            ->orderBy('count', 'asc')
             ->get();
 
         $addictive = null; // สำหรับเพิ่มใหม่
@@ -30,13 +32,13 @@ class AddictiveController extends Controller
     // บันทึกข้อมูลใหม่
     public function StoreAddictive(Request $request)
     {
-       $data = $request->validate([
-        'date'       => [
-            'required',
-            'date',
-            Rule::unique('addictives')->where(function ($query) use ($request) {
-                return $query->where('client_id', $request->client_id);
-            }),
+        $data = $request->validate([
+            'date'       => [
+                'required',
+                'date',
+                Rule::unique('addictives')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                }),
             ],
             'exam'       => 'required|in:0,1',
             'refer'      => 'nullable|in:1,2',
@@ -69,15 +71,32 @@ class AddictiveController extends Controller
 
         // ตรวจสอบว่ามี count นี้อยู่แล้วหรือไม่
         $exists = Addictive::where('client_id', $data['client_id'])
-                           ->where('count', $nextCount)
-                           ->exists();
+            ->where('count', $nextCount)
+            ->exists();
 
         if ($exists) {
             if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)', 'errors' => []]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)',
+                    'errors' => []
+                ]);
             }
-            return redirect()->back()->with(['message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)', 'alert-type' => 'error']);
+
+            return redirect()->back()->withInput()->with([
+                'message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)',
+                'alert-type' => 'error'
+            ]);
         }
+
+        // =========================
+        // PATCH: ครั้งใหม่ต้องมีวันที่มากกว่าครั้งก่อนหน้าเสมอ
+        // =========================
+        $this->validateDateOrderByCount(
+            clientId: $data['client_id'],
+            currentCount: $nextCount,
+            inputDate: $data['date']
+        );
 
         $data['count'] = $nextCount;
 
@@ -88,10 +107,17 @@ class AddictiveController extends Controller
         $addictive = Addictive::create($data);
 
         if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว', 'data' => $addictive]);
+            return response()->json([
+                'success' => true,
+                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                'data' => $addictive
+            ]);
         }
 
-        return redirect()->back()->with(['message' => 'บันทึกข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+        return redirect()->back()->with([
+            'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+            'alert-type' => 'success'
+        ]);
     }
 
     // โหลดข้อมูลเดิมสำหรับแก้ไข (JSON)
@@ -158,6 +184,18 @@ class AddictiveController extends Controller
         // =========================
         Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
+        // =========================
+        // PATCH: ตอนแก้ไขก็ต้องคงกฎ count/date เช่นกัน
+        // - ต้องมากกว่าครั้งก่อนหน้า
+        // - ต้องน้อยกว่าครั้งถัดไป
+        // =========================
+        $this->validateDateOrderByCount(
+            clientId: $data['client_id'],
+            currentCount: $addictive->count,
+            inputDate: $data['date'],
+            ignoreId: $addictive->id
+        );
+
         if ($data['exam'] == 0) {
             $data['refer'] = null;
         }
@@ -165,31 +203,150 @@ class AddictiveController extends Controller
         $addictive->update($data);
 
         if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว', 'data' => $addictive]);
+            return response()->json([
+                'success' => true,
+                'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
+                'data' => $addictive
+            ]);
         }
 
         return redirect()->route('addictive.create', $addictive->client_id)
-                         ->with(['message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+            ->with([
+                'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
+                'alert-type' => 'success'
+            ]);
     }
 
     // ลบข้อมูล
-    public function DeleteAddictive($id)
+    // ลบข้อมูล
+public function DeleteAddictive($id)
+{
+    $addictive = Addictive::findOrFail($id);
+
+    // =========================
+    // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($addictive->client_id);
+
+    $clientId = $addictive->client_id;
+
+    // เก็บ count เดิมไว้ก่อนลบ
+    $deletedCount = $addictive->count;
+
+    $addictive->delete();
+
+    // =========================
+    // PATCH: เมื่อมีการลบ ให้เลื่อนครั้งถัดไปขึ้นมาแทน
+    // เช่น ลบครั้งที่ 1 -> ครั้งที่ 2 กลายเป็น 1, ครั้งที่ 3 กลายเป็น 2
+    // =========================
+    Addictive::where('client_id', $clientId)
+        ->where('count', '>', $deletedCount)
+        ->decrement('count');
+
+    if (request()->ajax()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'ลบข้อมูลเรียบร้อยแล้ว'
+        ]);
+    }
+
+    return redirect()->route('addictive.create', $clientId)
+        ->with([
+            'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
+            'alert-type' => 'success'
+        ]);
+}
+
+    // หน้ารายงาน
+    public function ReportAddictive($id)
     {
         $addictive = Addictive::findOrFail($id);
 
         // =========================
-        // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
+        // PATCH: กันเดา URL รายงานของ client คนอื่น
         // =========================
-        Client::forUser(auth()->user())->findOrFail($addictive->client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($addictive->client_id);
 
-        $clientId = $addictive->client_id;
-        $addictive->delete();
+        return view('frontend.client.addictive.addictive_report', compact('client', 'addictive'));
+    }
 
-        if (request()->ajax()) {
-            return response()->json(['success' => true, 'message' => 'ลบข้อมูลเรียบร้อยแล้ว']);
+    /**
+     * ตรวจสอบลำดับวันที่ตามครั้ง
+     * กติกา:
+     * - ครั้งที่มากกว่า ต้องมีวันที่มากกว่าครั้งที่น้อยกว่า
+     * - ตอนแก้ไข ต้องตรวจทั้งก่อนหน้าและถัดไป
+     */
+    private function validateDateOrderByCount(int $clientId, int $currentCount, string $inputDate, ?int $ignoreId = null): void
+    {
+        $input = Carbon::parse($inputDate)->startOfDay();
+
+        // หา record ก่อนหน้า (count น้อยกว่า currentCount ที่มากที่สุด)
+        $previous = Addictive::where('client_id', $clientId)
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->where('count', '<', $currentCount)
+            ->orderBy('count', 'desc')
+            ->first();
+
+        if ($previous && $previous->date) {
+            $previousDate = Carbon::parse($previous->date)->startOfDay();
+
+            if ($input->lte($previousDate)) {
+                throw ValidationException::withMessages([
+                    'date' => 'วันที่ของครั้งที่ ' . $currentCount . ' ต้องมากกว่าวันที่ของครั้งที่ ' . $previous->count . ' (' . $previousDate->format('d/m/') . ($previousDate->year + 543) . ')'
+                ]);
+            }
         }
 
-        return redirect()->route('addictive.create', $clientId)
-                         ->with(['message' => 'ลบข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+        // หา record ถัดไป (count มากกว่า currentCount ที่น้อยที่สุด)
+        $next = Addictive::where('client_id', $clientId)
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->where('count', '>', $currentCount)
+            ->orderBy('count', 'asc')
+            ->first();
+
+        if ($next && $next->date) {
+            $nextDate = Carbon::parse($next->date)->startOfDay();
+
+            if ($input->gte($nextDate)) {
+                throw ValidationException::withMessages([
+                    'date' => 'วันที่ของครั้งที่ ' . $currentCount . ' ต้องน้อยกว่าวันที่ของครั้งที่ ' . $next->count . ' (' . $nextDate->format('d/m/') . ($nextDate->year + 543) . ')'
+                ]);
+            }
+        }
     }
-}
+
+    // รายงานทั้งหมดของผู้รับบริการ + filter ช่วงวันที่
+        public function ReportAddictiveAll(Request $request, $client_id)
+        {
+            // =========================
+            // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
+            // =========================
+            $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+            $request->validate([
+                'date_from' => 'nullable|date',
+                'date_to'   => 'nullable|date|after_or_equal:date_from',
+            ], [
+                'date_from.date'            => 'รูปแบบวันที่เริ่มต้นไม่ถูกต้อง',
+                'date_to.date'              => 'รูปแบบวันที่สิ้นสุดไม่ถูกต้อง',
+                'date_to.after_or_equal'    => 'วันที่สิ้นสุดต้องมากกว่าหรือเท่ากับวันที่เริ่มต้น',
+            ]);
+
+            $query = Addictive::where('client_id', $client->id);
+
+            if ($request->filled('date_from')) {
+                $query->whereDate('date', '>=', $request->date_from);
+            }
+
+            if ($request->filled('date_to')) {
+                $query->whereDate('date', '<=', $request->date_to);
+            }
+
+            $addictives = $query->orderBy('count', 'asc')->get();
+
+            return view('frontend.client.addictive.addictive_report_all', compact(
+                'client',
+                'addictives'
+            ));
+        }
+        }

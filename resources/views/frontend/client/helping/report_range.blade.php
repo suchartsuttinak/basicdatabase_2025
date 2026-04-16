@@ -38,205 +38,165 @@
 @endphp
 
 <style>
+    /* ============================= */
+    /* REPORT LAYOUT (A4 LANDSCAPE) */
+    /* ============================= */
+
+    @page {
+        size: A4 landscape;
+        margin: 10mm 12mm;
+    }
+
+    body {
+        font-size: 13px;
+        color: #111;
+    }
+
     .help-report-page{
-        padding: 12px 0 24px;
+        padding: 8px 0;
     }
 
     .help-report-box{
         background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 24px;
+        border: none;
+        border-radius: 0;
+        padding: 0;
     }
+
+    /* ============================= */
+    /* HEADER */
+    /* ============================= */
 
     .help-report-header{
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #ccc;
     }
 
     .help-report-title{
         margin: 0;
-        font-size: 1.35rem;
+        font-size: 16px;
         font-weight: 700;
-        color: #111827;
-        line-height: 1.4;
     }
 
     .help-report-subtitle{
-        margin: 6px 0 0;
-        font-size: .95rem;
-        color: #6b7280;
-        line-height: 1.6;
+        margin: 2px 0 0;
+        font-size: 12px;
+        color: #555;
     }
 
-    .help-report-actions{
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .help-report-actions .btn{
-        border-radius: 10px;
-        font-weight: 600;
-        min-height: 42px;
-        padding: .6rem 1rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        line-height: 1.2;
-        white-space: nowrap;
-    }
+    /* ============================= */
+    /* META */
+    /* ============================= */
 
     .help-report-meta{
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-bottom: 10px;
     }
 
     .help-report-meta-item{
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 14px;
-        background: #fafafa;
+        border: 1px solid #ddd;
+        padding: 6px 8px;
     }
 
     .help-report-meta-label{
-        font-size: .85rem;
-        color: #6b7280;
-        margin-bottom: 6px;
+        font-size: 11px;
+        color: #666;
     }
 
     .help-report-meta-value{
-        font-size: 1rem;
-        font-weight: 700;
-        color: #111827;
-        line-height: 1.5;
-        word-break: break-word;
+        font-size: 13px;
+        font-weight: 600;
     }
 
+    /* ============================= */
+    /* TABLE */
+    /* ============================= */
+
     .help-report-table-wrap{
-        overflow-x: auto;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        border: 1px solid #000;
     }
 
     .help-report-table{
         width: 100%;
-        min-width: 860px;
         border-collapse: collapse;
-        background: #fff;
         table-layout: fixed;
     }
 
-    .help-report-table thead th{
-        background: #f9fafb;
-        color: #374151;
-        font-size: .93rem;
-        font-weight: 700;
-        text-align: center;
-        vertical-align: middle;
-        padding: 14px 12px;
-        border-bottom: 1px solid #e5e7eb;
-        line-height: 1.45;
+    .help-report-table th,
+    .help-report-table td{
+        border: 1px solid #000;
+        padding: 6px 6px;
+        font-size: 12px;
     }
 
-    .help-report-table tbody td,
-    .help-report-table tfoot th{
-        padding: 13px 12px;
-        border-bottom: 1px solid #edf0f2;
-        color: #111827;
-        vertical-align: middle;
-        font-size: .94rem;
-        line-height: 1.55;
+    .help-report-table thead th{
+        background: #f2f2f2;
+        font-weight: 700;
+        text-align: center;
     }
 
     .help-col-date{
         text-align: center;
-        white-space: nowrap;
+        width: 14%;
     }
 
     .help-col-item{
         text-align: left;
-        word-break: break-word;
+        width: 36%;
     }
 
     .help-col-qty{
         text-align: center;
-        white-space: nowrap;
+        width: 10%;
     }
 
-    .help-col-unit,
+    .help-col-unit{
+        text-align: right;
+        width: 20%;
+    }
+
     .help-col-total{
         text-align: right;
-        white-space: nowrap;
-        font-variant-numeric: tabular-nums;
+        width: 20%;
+        font-weight: 600;
     }
 
-    .help-report-empty{
-        padding: 32px 16px;
-        text-align: center;
-        color: #6b7280;
+    tfoot th{
+        font-weight: 700;
+        background: #fafafa;
     }
+
+    /* ============================= */
+    /* SIGN */
+    /* ============================= */
 
     .help-report-sign{
-        margin-top: 28px;
+        margin-top: 20px;
         display: flex;
         justify-content: flex-end;
     }
 
     .help-report-sign-box{
-        width: 280px;
-        max-width: 100%;
+        width: 240px;
         text-align: center;
-        color: #374151;
+        font-size: 12px;
     }
 
     .help-report-sign-line{
-        margin-top: 56px;
-        border-top: 1px solid #9ca3af;
-        padding-top: 8px;
+        margin-top: 40px;
+        border-top: 1px solid #000;
+        padding-top: 4px;
     }
 
-    @media (max-width: 991.98px){
-        .help-report-meta{
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-    }
-
-    @media (max-width: 767.98px){
-        .help-report-box{
-            padding: 16px;
-        }
-
-        .help-report-title{
-            font-size: 1.15rem;
-        }
-
-        .help-report-meta{
-            grid-template-columns: 1fr;
-        }
-
-        .help-report-actions{
-            width: 100%;
-        }
-
-        .help-report-actions .btn{
-            width: 100%;
-        }
-
-        .help-report-table{
-            min-width: 760px;
-        }
-    }
+    /* ============================= */
+    /* PRINT ONLY */
+    /* ============================= */
 
     @media print{
         .navbar-custom,
@@ -247,19 +207,8 @@
             display: none !important;
         }
 
-        .help-report-page{
-            padding: 0 !important;
-        }
-
-        .help-report-box{
-            border: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-
         body{
-            background: #fff !important;
+            background: #fff;
         }
     }
 </style>

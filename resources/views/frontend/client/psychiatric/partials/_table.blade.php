@@ -489,7 +489,7 @@
                 <table id="datatable-psychiatric" class="table align-middle psy-inline-table">
                     <thead>
                         <tr>
-                            <th style="width: 70px;">ลำดับ</th>
+                            {{-- <th style="min-width: 40px;">#</th> --}}
                             <th style="min-width: 130px;">วันที่ส่งตรวจ</th>
                             <th style="min-width: 220px;">สถานพยาบาล</th>
                             <th style="min-width: 280px;">ผลการตรวจ</th>
@@ -502,7 +502,7 @@
                     <tbody>
                         @foreach ($psychiatrics as $index => $psychiatric)
                             <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
+                                {{-- <td class="text-center">{{ $index + 1 }}</td> --}}
 
                                 <td class="text-center">
                                     {{ $psychiatric->sent_date ? \Carbon\Carbon::parse($psychiatric->sent_date)->format('d/m/Y') : '-' }}
@@ -552,11 +552,6 @@
                                             <span>ลบ</span>
                                         </button>
 
-                                        <a href="#"
-                                           class="btn btn-info btn-sm psy-inline-btn-action">
-                                            <i class="bi bi-file-earmark-text"></i>
-                                            <span>รายงาน</span>
-                                        </a>
                                     </div>
 
                                     <form id="delete-form-psychiatric-{{ $psychiatric->id }}"

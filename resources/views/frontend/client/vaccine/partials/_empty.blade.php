@@ -8,13 +8,13 @@
             <p class="text-muted mb-3 small">
                 เริ่มต้นเพิ่มข้อมูลวัคซีนเพื่อให้ระบบติดตามได้ครบถ้วน
             </p>
-            {{-- <button type="button"
+            <button type="button"
                     class="btn btn-primary vaccine-btn vaccine-btn-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#add-vaccine-modal">
                 <i class="bi bi-plus-circle"></i>
                 <span>เพิ่มข้อมูล</span>
-            </button> --}}
+            </button>
         </div>
     </div>
 </div>

@@ -328,73 +328,73 @@
         </div>
 
         <div class="ja-table-wrap">
-            <table id="datatable-jobagency" class="table table-hover align-middle ja-table">
-                <thead>
-                    <tr>
-                        <th class="text-center">วันที่เริ่มงาน</th>
-                        <th>อาชีพ</th>
-                        <th>ตำแหน่ง</th>
-                        <th class="text-center">รายได้/เดือน</th>
-                        <th>บริษัท</th>
-                        <th class="text-center" style="width: 180px;">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($jobAgencies as $job)
-                        <tr>
-                            <td class="text-center">
-                                {{ \Carbon\Carbon::parse($job->job_date)->format('d/m/Y') }}
-                            </td>
+    <table id="datatable-jobagency" class="table table-hover align-middle ja-table">
+        <thead>
+            <tr>
+                <th class="text-center">วันที่เริ่มงาน</th>
+                <th>อาชีพ</th>
+                <th>ตำแหน่ง</th>
+                <th class="text-center">รายได้/เดือน</th>
+                <th>บริษัท</th>
+                <th class="text-center" style="width: 180px;">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($jobAgencies as $job)
+                <tr>
+                    <td class="text-center">
+                        {{ \Carbon\Carbon::parse($job->job_date)->addYears(543)->format('d/m/Y') }}
+                    </td>
 
-                            <td>
-                                <div class="ja-cell">{{ $job->occupation->occupation_name ?? '-' }}</div>
-                            </td>
+                    <td>
+                        <div class="ja-cell">{{ $job->occupation->occupation_name ?? '-' }}</div>
+                    </td>
 
-                            <td>
-                                <div class="ja-cell">{{ $job->position ?? '-' }}</div>
-                            </td>
+                    <td>
+                        <div class="ja-cell">{{ $job->position ?? '-' }}</div>
+                    </td>
 
-                            <td class="text-center">
-                                <span class="ja-income-badge">
-                                    {{ number_format($job->income ?? 0, 2) }}
-                                </span>
-                            </td>
+                    <td class="text-center">
+                        <span class="ja-income-badge">
+                            {{ number_format($job->income ?? 0, 2) }}
+                        </span>
+                    </td>
 
-                            <td>
-                                <div class="ja-cell">{{ $job->company ?? '-' }}</div>
-                            </td>
+                    <td>
+                        <div class="ja-cell">{{ $job->company ?? '-' }}</div>
+                    </td>
 
-                            <td class="text-center">
-                                <div class="ja-actions">
-                                    <button type="button"
-                                            class="btn btn-warning ja-btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editJobAgencyModal{{ $job->id }}">
-                                        <i class="bi bi-pencil-square"></i>
-                                        <span>แก้ไข</span>
-                                    </button>
+                    <td class="text-center">
+                        <div class="ja-actions">
+                            <button type="button"
+                                    class="btn btn-warning ja-btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editJobAgencyModal{{ $job->id }}">
+                                <i class="bi bi-pencil-square"></i>
+                                <span>แก้ไข</span>
+                            </button>
 
-                                    <form id="delete-form-job-{{ $job->id }}"
-                                          action="{{ route('job_agencies.delete', $job->id) }}"
-                                          method="POST"
-                                          class="d-inline-block">
-                                        @csrf
-                                        @method('DELETE')
+                            <form id="delete-form-job-{{ $job->id }}"
+                                  action="{{ route('job_agencies.delete', $job->id) }}"
+                                  method="POST"
+                                  class="d-inline-block">
+                                @csrf
+                                @method('DELETE')
 
-                                        <button type="button"
-                                                class="btn btn-danger ja-btn-sm"
-                                                onclick="confirmDelete('delete-form-job-{{ $job->id }}', 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่?')">
-                                            <i class="bi bi-trash"></i>
-                                            <span>ลบ</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                                <button type="button"
+                                        class="btn btn-danger ja-btn-sm"
+                                        onclick="confirmDelete('delete-form-job-{{ $job->id }}', 'คุณต้องการลบข้อมูลนี้ใช่หรือไม่?')">
+                                    <i class="bi bi-trash"></i>
+                                    <span>ลบ</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
     </div>
 @else
     <div class="ja-table-card">
