@@ -23,4 +23,8 @@ Route::prefix('school_followup')->group(function () {
     Route::get('/{followup_id}', [SchoolFollowupController::class, 'SchoolFollowupReport'])
         ->whereNumber('followup_id')
         ->name('school_followup.report');
-});
+
+        // ✅ รายงานรวม + filter
+    Route::get('/report-range/{client_id}', [SchoolFollowupController::class, 'SchoolFollowupReportRange'])
+        ->name('school_followup.report.range');
+    });

@@ -239,4 +239,41 @@ class EducationRecordController extends Controller
         return redirect()->route('education_record_show', ['client_id' => $client_id])
                          ->with('success', 'ลบข้อมูลผลการเรียนเรียบร้อยแล้ว');
     }
+
+
+    public function EducationRecordReport($client_id)
+{
+    $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ จำกัดสิทธิ์เหมือนเดิม
+
+    $educationRecords = EducationRecord::with(['subjects', 'education', 'semester', 'institution'])
+        ->where('client_id', $client_id)
+        ->orderBy('record_date', 'desc')
+        ->get();
+
+    return view('frontend.client.education_record.education_record_report', compact(
+        'client',
+        'educationRecords'
+    ));
+}
+
+public function EducationRecordReportById($id)
+{
+    $record = EducationRecord::with(['subjects', 'education', 'semester', 'institution'])
+        ->where('id', $id)
+        ->whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->firstOrFail(); // ✅ จำกัดสิทธิ์เหมือนเมธอดอื่น
+
+    $client = Client::forUser(auth()->user())
+        ->findOrFail($record->client_id); // ✅ จำกัดสิทธิ์เหมือนเดิม
+
+    // ✅ ส่งเป็น collection 1 รายการ เพื่อใช้ view เดิมโดยไม่กระทบส่วนอื่น
+    $educationRecords = collect([$record]);
+
+    return view('frontend.client.education_record.education_record_report', compact(
+        'client',
+        'educationRecords'
+    ));
+}
 }

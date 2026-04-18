@@ -11,37 +11,56 @@ use App\Models\EducationRecord;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AbsentController extends Controller
 {
-    public function AbsentAdd($client_id): View|RedirectResponse
-    {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
-        $educationRecord = $this->getLatestEducationRecord($client_id);
+    public function AbsentAdd(Request $request, $client_id): View|RedirectResponse
+{
+    $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
+    $educationRecord = $this->getLatestEducationRecord($client_id);
 
-        if (!$educationRecord) {
-            return redirect()
-                ->route('education_record.add', $client_id)
-                ->with([
-                    'message' => 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการขาดเรียน',
-                    'alert-type' => 'warning',
-                ]);
-        }
-
-        $absents = Absent::with(['educationRecord.education', 'educationRecord.semester'])
-            ->where('client_id', $client_id)
-            ->orderByDesc('absent_date')
-            ->orderByDesc('id')
-            ->get();
-
-        return view('frontend.client.absent.absent_create', compact(
-            'client',
-            'educationRecord',
-            'client_id',
-            'absents'
-        ));
+    if (!$educationRecord) {
+        return redirect()
+            ->route('education_record.add', $client_id)
+            ->with([
+                'message' => 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการขาดเรียน',
+                'alert-type' => 'warning',
+            ]);
     }
+
+    $startDate = $request->filled('start_date')
+        ? Carbon::parse($request->start_date)->startOfDay()
+        : null;
+
+    $endDate = $request->filled('end_date')
+        ? Carbon::parse($request->end_date)->endOfDay()
+        : null;
+
+    $absentsQuery = Absent::with(['educationRecord.education', 'educationRecord.semester'])
+        ->where('client_id', $client_id);
+
+    if ($startDate) {
+        $absentsQuery->whereDate('absent_date', '>=', $startDate->toDateString());
+    }
+
+    if ($endDate) {
+        $absentsQuery->whereDate('absent_date', '<=', $endDate->toDateString());
+    }
+
+    $absents = $absentsQuery
+        ->orderByDesc('absent_date')
+        ->orderByDesc('id')
+        ->get();
+
+    return view('frontend.client.absent.absent_create', compact(
+        'client',
+        'educationRecord',
+        'client_id',
+        'absents'
+    ));
+}
 
     public function AbsentStore(StoreAbsentRequest $request): RedirectResponse
     {
@@ -51,8 +70,6 @@ class AbsentController extends Controller
             ->where('id', $validated['client_id'])
             ->firstOrFail();
 
-        // ยึดหลักเดียวกับ school_followup:
-        // ต้องมี education_record_id ของช่วงเวลานั้นติดไปกับ record นี้
         if (empty($validated['education_record_id'])) {
             $educationRecord = $this->getLatestEducationRecord($validated['client_id']);
             $validated['education_record_id'] = $educationRecord?->id;
@@ -97,7 +114,6 @@ class AbsentController extends Controller
                     'remark' => $absent->remark,
                     'teacher' => $absent->teacher,
 
-                    // ข้อมูลการศึกษาของ record นี้
                     'school_name' => optional($absent->educationRecord)->school_name ?? 'ไม่พบข้อมูล',
                     'education_name' => optional(optional($absent->educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล',
                     'semester_name' => optional(optional($absent->educationRecord)->semester)->semester_name ?? 'ไม่พบข้อมูล',
@@ -122,8 +138,6 @@ class AbsentController extends Controller
 
         $validated = $request->validated();
 
-        // สำคัญ: คง education_record_id เดิมของ record นี้ไว้
-        // เพื่อไม่ให้บันทึกเก่าถูกย้ายไปภาคเรียน/ปีการศึกษาใหม่
         $validated['education_record_id'] = $absent->education_record_id;
 
         $absent->update($validated);
@@ -174,7 +188,6 @@ class AbsentController extends Controller
 
         $client = Client::forUser(auth()->user())->findOrFail($absent->client_id); // ✅ [แก้ไข]
 
-        // ใช้ข้อมูลการศึกษาที่ผูกอยู่กับ absent record นี้
         $educationRecord = $absent->educationRecord;
 
         $age = $client->birth_date
@@ -189,6 +202,54 @@ class AbsentController extends Controller
             'education_name' => optional(optional($educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล',
             'term' => optional(optional($educationRecord)->semester)->semester_name ?? 'ไม่พบข้อมูล',
             'age' => $age,
+        ]);
+    }
+
+    // ✅ รายงานรวม + filter ช่วงวันที่
+    public function AbsentReportRange(Request $request, $client_id): View
+    {
+        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [SECURITY]
+
+        $educationRecord = $this->getLatestEducationRecord($client_id);
+
+        $startDate = $request->filled('start_date')
+            ? Carbon::parse($request->start_date)->startOfDay()
+            : null;
+
+        $endDate = $request->filled('end_date')
+            ? Carbon::parse($request->end_date)->endOfDay()
+            : null;
+
+        $query = Absent::with(['educationRecord.education', 'educationRecord.semester'])
+            ->where('client_id', $client_id);
+
+        if ($startDate) {
+            $query->whereDate('absent_date', '>=', $startDate->toDateString());
+        }
+
+        if ($endDate) {
+            $query->whereDate('absent_date', '<=', $endDate->toDateString());
+        }
+
+        $absents = $query
+            ->orderByDesc('absent_date')
+            ->orderByDesc('id')
+            ->get();
+
+        $age = $client->birth_date
+            ? Carbon::parse($client->birth_date)->age
+            : 'ไม่พบข้อมูล';
+
+        return view('frontend.client.absent.absent_report_range', [
+            'client' => $client,
+            'educationRecord' => $educationRecord,
+            'absents' => $absents,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'age' => $age,
+            'school_name' => optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล',
+            'education_name' => optional(optional($educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล',
+            'term' => optional(optional($educationRecord)->semester)->semester_name ?? 'ไม่พบข้อมูล',
         ]);
     }
 

@@ -25,6 +25,7 @@
 <div class="container-fluid py-4 school-followup-page">
     @include('frontend.client.school_followup.partials.header')
     @include('frontend.client.school_followup.partials.summary')
+    @include('frontend.client.school_followup.partials.school_followup_fillter')
     @include('frontend.client.school_followup.partials.table')
 </div>
 

@@ -1,6 +1,58 @@
 @php
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Request;
+
     $id = Auth::user()->id;
     $profileData = App\Models\User::find($id);
+
+    // กัน error กรณีบางหน้าไม่มี $client
+    $clientId = $client->id ?? request()->route('client_id') ?? request()->route('id');
+
+    // Active ของเมนูหลัก
+    $isDashboardActive = Request::routeIs('dashboard');
+
+    $isHistoryActive =
+        Request::routeIs('client.edit') ||
+        Request::routeIs('factfinding.add') ||
+        Request::routeIs('family.add') ||
+        Request::routeIs('visitFamily.create') ||
+        Request::routeIs('member.create') ||
+        Request::routeIs('client_files.index') ||
+        Request::routeIs('client.report');
+
+    $isEducationActive =
+        Request::routeIs('education_record.add') ||
+        Request::routeIs('education_record.store') ||
+        Request::routeIs('education_record.edit') ||
+        Request::routeIs('education_record.report') ||
+        Request::routeIs('education_record.report_by_id') ||
+        Request::routeIs('education_record_add') ||
+        Request::routeIs('education_record_store') ||
+        Request::routeIs('education_record_show') ||
+        Request::routeIs('education_record_edit') ||
+        Request::routeIs('education_record_update') ||
+        Request::routeIs('education_record_delete') ||
+        Request::routeIs('education_record_report') ||
+        Request::routeIs('education_record_report_by_id') ||
+        Request::routeIs('school_followup_add') ||
+        Request::routeIs('absent.add');
+
+    $isHealthActive =
+        Request::routeIs('accident.add') ||
+        Request::routeIs('check_body.add') ||
+        Request::routeIs('medical.add') ||
+        Request::routeIs('vaccine.index') ||
+        Request::routeIs('psychiatric.create') ||
+        Request::routeIs('addictive.create');
+
+    $isSocialActive =
+        Request::routeIs('observe.create') ||
+        Request::routeIs('escape.index') ||
+        Request::routeIs('case_outside.show') ||
+        Request::routeIs('refers.index') ||
+        Request::routeIs('job_agencies.show') ||
+        Request::routeIs('help_sessions.show') ||
+        Request::routeIs('followup.index');
 @endphp
 
 <style>
@@ -68,7 +120,7 @@
     <div class="container-fluid px-2 px-lg-3">
         <nav class="navbar navbar-expand-xl navbar-light topbar-navbar">
 
-            <!-- Left: mobile toggle -->
+            <!-- Left -->
             <div class="d-flex align-items-center topbar-left-group">
                 <button class="navbar-toggler topbar-toggler"
                         type="button"
@@ -88,9 +140,7 @@
                     <span class="topbar-brand-badge">
                         <i class="fas fa-people-group"></i>
                     </span>
-                    <span class="topbar-brand-text">
-                        ระบบข้อมูลผู้รับบริการ
-                    </span>
+                    <span class="topbar-brand-text">ระบบข้อมูลผู้รับบริการ</span>
                 </a>
             </div>
 
@@ -99,7 +149,7 @@
 
                 <ul class="navbar-nav topbar-menu mb-2 mb-xl-0">
                     <li class="nav-item">
-                        <a class="nav-link topbar-link {{ Request::routeIs('dashboard') ? 'active' : '' }}"
+                        <a class="nav-link topbar-link {{ $isDashboardActive ? 'active' : '' }}"
                            href="{{ route('dashboard') }}">
                             <i class="fas fa-home"></i>
                             <span>หน้าหลัก</span>
@@ -107,24 +157,65 @@
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link topbar-link dropdown-toggle {{ Request::is('history*') ? 'active' : '' }}"
+                        <a class="nav-link topbar-link dropdown-toggle {{ $isHistoryActive ? 'active' : '' }}"
                            href="#"
                            id="historyDropdown"
                            role="button"
                            data-bs-toggle="dropdown"
                            aria-expanded="false">
                             <i class="fas fa-book"></i>
-                            <span>ทะเบียนประวัติ</span>
+                            <span>ทะเบียนแรกเข้า</span>
                         </a>
                         <ul class="dropdown-menu topbar-dropdown" aria-labelledby="historyDropdown">
-                            <li><a class="dropdown-item" href="#">ร้องเรียนทั่วไป</a></li>
-                            <li><a class="dropdown-item" href="#">ร้องเรียนการศึกษา</a></li>
-                            <li><a class="dropdown-item" href="#">ร้องเรียนอื่น ๆ</a></li>
+                            @if($clientId)
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('client.edit') ? 'active' : '' }}"
+                                       href="{{ route('client.edit', $clientId) }}">
+                                        ประวัติผู้รับบริการ
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('factfinding.add') ? 'active' : '' }}"
+                                       href="{{ route('factfinding.add', $clientId) }}">
+                                        สอบข้อเท็จจริงเบื้องต้น
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('family.add') ? 'active' : '' }}"
+                                       href="{{ route('family.add', $clientId) }}">
+                                        บันทึกข้อมูลครอบครัว
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('visitFamily.create') ? 'active' : '' }}"
+                                       href="{{ route('visitFamily.create', $clientId) }}">
+                                        เยี่ยมบ้านครอบครัว
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('member.create') ? 'active' : '' }}"
+                                       href="{{ route('member.create', $clientId) }}">
+                                        บันทึกสมาชิกครอบครัว
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('client_files.index') ? 'active' : '' }}"
+                                       href="{{ route('client_files.index', $clientId) }}">
+                                        จัดเก็บไฟล์เอกสาร
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('client.report') ? 'active' : '' }}"
+                                       href="{{ route('client.report', $clientId) }}">
+                                        รายงานผู้รับบริการ
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link topbar-link dropdown-toggle {{ Request::is('education*') ? 'active' : '' }}"
+                        <a class="nav-link topbar-link dropdown-toggle {{ $isEducationActive ? 'active' : '' }}"
                            href="#"
                            id="educationDropdown"
                            role="button"
@@ -134,28 +225,37 @@
                             <span>การศึกษา</span>
                         </a>
                         <ul class="dropdown-menu topbar-dropdown" aria-labelledby="educationDropdown">
-                            <li>
-                                <a class="dropdown-item {{ setActive('education_record_add') }}"
-                                   href="{{ route('education_record_add', ['client_id' => $client->id]) }}">
-                                    บันทึกผลการเรียน
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item {{ setActive('education_record_show') }}"
-                                   href="{{ route('education_record_show', $client->id) }}">
-                                    แสดงผลการเรียน
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item {{ setActive('education_other') }}" href="#">
-                                    ร้องเรียนอื่น ๆ
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('education_record_add') ? 'active' : '' }}"
+                                       href="{{ route('education_record_add', ['client_id' => $clientId]) }}">
+                                        บันทึกผลการเรียน
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('education_record_show') ? 'active' : '' }}"
+                                       href="{{ route('education_record_show', $clientId) }}">
+                                        แสดงผลการเรียน
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('school_followup_add') ? 'active' : '' }}"
+                                       href="{{ route('school_followup_add', $clientId) }}">
+                                        ติดตามสถานศึกษา
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('absent.add') ? 'active' : '' }}"
+                                       href="{{ route('absent.add', $clientId) }}">
+                                        บันทึกการขาดเรียน
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link topbar-link dropdown-toggle {{ Request::is('health*') ? 'active' : '' }}"
+                        <a class="nav-link topbar-link dropdown-toggle {{ $isHealthActive ? 'active' : '' }}"
                            href="#"
                            id="healthDropdown"
                            role="button"
@@ -165,14 +265,49 @@
                             <span>สุขภาพ</span>
                         </a>
                         <ul class="dropdown-menu topbar-dropdown" aria-labelledby="healthDropdown">
-                            <li><a class="dropdown-item" href="#">ร้องเรียนทั่วไป</a></li>
-                            <li><a class="dropdown-item" href="#">ร้องเรียนการศึกษา</a></li>
-                            <li><a class="dropdown-item" href="#">ร้องเรียนอื่น ๆ</a></li>
+                            @if($clientId)
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('accident.add') ? 'active' : '' }}"
+                                       href="{{ route('accident.add', $clientId) }}">
+                                        บันทึกการบาดเจ็บ
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('check_body.add') ? 'active' : '' }}"
+                                       href="{{ route('check_body.add', $clientId) }}">
+                                        บันทึกการตรวจสุขภาพ
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('medical.add') ? 'active' : '' }}"
+                                       href="{{ route('medical.add', $clientId) }}">
+                                        บันทึกการรักษาพยาบาล
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('vaccine.index') ? 'active' : '' }}"
+                                       href="{{ route('vaccine.index', $clientId) }}">
+                                        ประวัติการรับวัคซีน
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('psychiatric.create') ? 'active' : '' }}"
+                                       href="{{ route('psychiatric.create', $clientId) }}">
+                                        การวินิจฉัยทางจิตเวช
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('addictive.create') ? 'active' : '' }}"
+                                       href="{{ route('addictive.create', $clientId) }}">
+                                        การตรวจสารเสพติด
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link topbar-link dropdown-toggle {{ Request::is('social*') ? 'active' : '' }}"
+                        <a class="nav-link topbar-link dropdown-toggle {{ $isSocialActive ? 'active' : '' }}"
                            href="#"
                            id="socialDropdown"
                            role="button"
@@ -182,9 +317,50 @@
                             <span>สังคมสงเคราะห์</span>
                         </a>
                         <ul class="dropdown-menu topbar-dropdown" aria-labelledby="socialDropdown">
-                            <li><a class="dropdown-item" href="#">ค้นหาสถานศึกษา</a></li>
-                            <li><a class="dropdown-item" href="#">ค้นหาครอบครัว</a></li>
-                            <li><a class="dropdown-item" href="#">ค้นหาบุคคล</a></li>
+                            @if($clientId)
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('observe.create') ? 'active' : '' }}"
+                                       href="{{ route('observe.create', $clientId) }}">
+                                        บันทึกปัญหาพฤติกรรม
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('escape.index') ? 'active' : '' }}"
+                                       href="{{ route('escape.index', $clientId) }}">
+                                        การหลบหนีจากที่พักพิง
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('case_outside.show') ? 'active' : '' }}"
+                                       href="{{ route('case_outside.show', $clientId) }}">
+                                        การติดตามเด็กที่อยู่ภายนอก
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('refers.index') ? 'active' : '' }}"
+                                       href="{{ route('refers.index', $clientId) }}">
+                                        บันทึกการจำหน่าย
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('job_agencies.show') ? 'active' : '' }}"
+                                       href="{{ route('job_agencies.show', $clientId) }}">
+                                        การหางานให้ผู้รับบริการ
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('help_sessions.show') ? 'active' : '' }}"
+                                       href="{{ route('help_sessions.show', $clientId) }}">
+                                        ช่วยเหลือสิ่งของ/เครื่องใช้
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('followup.index') ? 'active' : '' }}"
+                                       href="{{ route('followup.index', $clientId) }}">
+                                        บันทึกการติดตามผล
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </li>
                 </ul>

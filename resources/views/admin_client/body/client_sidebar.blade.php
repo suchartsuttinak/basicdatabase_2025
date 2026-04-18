@@ -58,11 +58,11 @@
                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
                            <li>
-    <a href="{{ route('client.edit', $client->id) }}"
-       class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
-        บันทึกข้อมูลทั่วไป
-    </a>
-</li>
+                            <a href="{{ route('client.edit', $client->id) }}"
+                            class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
+                                บันทึกข้อมูลทั่วไป
+                            </a>
+                        </li>
                             <li>
                                 <a href="{{ route('client.report', $clientId) }}"
                                    class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">
@@ -102,7 +102,7 @@
                             <li>
                                 <a href="{{ route('visitFamily.create', $clientId) }}"
                                    class="tp-link {{ Request::routeIs('visitFamily.*') ? 'active' : '' }}">
-                                    เยี่ยมครอบครัว
+                                    เยี่ยมบ้านครอบครัว
                                 </a>
                             </li>
                             <li>
@@ -284,12 +284,12 @@
                                 </a>
                             </li>
                            
-                   <li>
-    <a href="{{ route('followup.index', $clientId) }}"
-       class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
-        การติดตามผล
-    </a>
-</li>
+                             <li>
+                                <a href="{{ route('followup.index', $clientId) }}"
+                                class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
+                                    การติดตามผล
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>

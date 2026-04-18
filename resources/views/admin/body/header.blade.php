@@ -179,7 +179,7 @@
                         url('upload/no_image.jpg') }}" alt="user-image"
                         class="rounded-circle">
                         <span class="pro-user-name ms-1">
-                        {{$profileData->name}} <i class="mdi mdi-chevron-down"></i> 
+                        {{$profileData->name}}</i> 
                         </span>
                     </a>
                      <!-- สิ้นสุดชื่อและรูปโปรไฟล์-->
@@ -193,7 +193,7 @@
                         <!-- item-->
                         <a href="{{ route('admin.profile') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-account-circle-outline fs-16 align-middle"></i>
-                            <span>My Account</span>
+                            <span>ข้อมูลส่วนตัว</span>
                         </a>
 
                         <!-- item-->
@@ -207,7 +207,7 @@
                         <!-- item-->
                         <a href="{{ route('admin.logout') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-location-exit fs-16 align-middle"></i>
-                            <span>Logout</span>
+                            <span>ออกจากระบบ</span>
                         </a>
 
                     </div>

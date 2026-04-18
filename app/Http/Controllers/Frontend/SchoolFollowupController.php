@@ -9,36 +9,56 @@ use App\Models\Client;
 use App\Models\EducationRecord;
 use App\Models\SchoolFollowup;
 use Carbon\Carbon;
+use Illuminate\Http\Request; // ✅ เพิ่มบรรทัดนี้
 
 class SchoolFollowupController extends Controller
 {
-    public function SchoolFollowupAdd($client_id)
-    {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
-        $educationRecord = $this->getLatestEducationRecord($client_id);
+    public function SchoolFollowupAdd(Request $request, $client_id)
+{
+    $client = Client::forUser(auth()->user())->findOrFail($client_id);
+    $educationRecord = $this->getLatestEducationRecord($client_id);
 
-        if (!$educationRecord) {
-            return redirect()
-                ->route('education_record_add', $client_id)
-                ->with('warning', 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการติดตาม');
-        }
-
-        $followups = SchoolFollowup::with([
-                'educationRecord.education',
-                'educationRecord.semester'
-            ])
-            ->where('client_id', $client_id)
-            ->orderByDesc('follow_date')
-            ->orderByDesc('id')
-            ->get();
-
-        return view('frontend.client.school_followup.school_followup_create', compact(
-            'client',
-            'educationRecord',
-            'client_id',
-            'followups'
-        ));
+    if (!$educationRecord) {
+        return redirect()
+            ->route('education_record_add', $client_id)
+            ->with('warning', 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการติดตาม');
     }
+
+    // ✅ เพิ่ม filter
+    $startDate = $request->filled('start_date')
+        ? Carbon::parse($request->start_date)->startOfDay()
+        : null;
+
+    $endDate = $request->filled('end_date')
+        ? Carbon::parse($request->end_date)->endOfDay()
+        : null;
+
+    $query = SchoolFollowup::with([
+            'educationRecord.education',
+            'educationRecord.semester'
+        ])
+        ->where('client_id', $client_id);
+
+    if ($startDate) {
+        $query->whereDate('follow_date', '>=', $startDate->toDateString());
+    }
+
+    if ($endDate) {
+        $query->whereDate('follow_date', '<=', $endDate->toDateString());
+    }
+
+    $followups = $query
+        ->orderByDesc('follow_date')
+        ->orderByDesc('id')
+        ->get();
+
+    return view('frontend.client.school_followup.school_followup_create', compact(
+        'client',
+        'educationRecord',
+        'client_id',
+        'followups'
+    ));
+}
 
     public function SchoolFollowupStore(StoreSchoolFollowupRequest $request)
     {
@@ -225,4 +245,54 @@ class SchoolFollowupController extends Controller
             ->select('education_records.*')
             ->first();
     }
+
+    public function SchoolFollowupReportRange(Request $request, $client_id)
+{
+    $client = Client::forUser(auth()->user())->findOrFail($client_id);
+
+    $educationRecord = $this->getLatestEducationRecord($client_id);
+
+    $startDate = $request->filled('start_date')
+        ? Carbon::parse($request->start_date)->startOfDay()
+        : null;
+
+    $endDate = $request->filled('end_date')
+        ? Carbon::parse($request->end_date)->endOfDay()
+        : null;
+
+    $query = SchoolFollowup::with([
+            'educationRecord.education',
+            'educationRecord.semester'
+        ])
+        ->where('client_id', $client_id);
+
+    if ($startDate) {
+        $query->whereDate('follow_date', '>=', $startDate->toDateString());
+    }
+
+    if ($endDate) {
+        $query->whereDate('follow_date', '<=', $endDate->toDateString());
+    }
+
+    $followups = $query
+        ->orderByDesc('follow_date')
+        ->orderByDesc('id')
+        ->get();
+
+    $age = $client->birth_date
+        ? Carbon::parse($client->birth_date)->age
+        : 'ไม่พบข้อมูล';
+
+    return view('frontend.client.school_followup.school_followup_report_range', [
+        'client' => $client,
+        'educationRecord' => $educationRecord,
+        'followups' => $followups,
+        'start_date' => $request->start_date,
+        'end_date' => $request->end_date,
+        'age' => $age,
+        'school_name' => optional($educationRecord)->school_name ?? '-',
+        'education_name' => optional(optional($educationRecord)->education)->education_name ?? '-',
+        'term' => optional(optional($educationRecord)->semester)->semester_name ?? '-',
+    ]);
+}
 }

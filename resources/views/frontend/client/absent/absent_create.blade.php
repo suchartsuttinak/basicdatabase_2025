@@ -138,6 +138,7 @@
 <div class="container-fluid absent-page absent-page-wrap">
     @include('frontend.client.absent.partials.header')
     @include('frontend.client.absent.partials.summary')
+   @include('frontend.client.absent.partials._report_filter')
     @include('frontend.client.absent.partials.table')
 </div>
 

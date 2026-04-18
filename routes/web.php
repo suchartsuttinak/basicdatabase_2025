@@ -85,7 +85,7 @@ require __DIR__.'/auth.php';
 
 
     // AdminClient Route All
-    Route::middleware('auth')->group(function () {
+   Route::middleware('auth')->group(function () {
     Route::get('/admin/client/{id}', [AdminClientController::class, 'Index'])
         ->whereNumber('id')
         ->name('admin.index');
@@ -93,7 +93,31 @@ require __DIR__.'/auth.php';
     Route::get('/client/report/{id}', [AdminClientController::class, 'ClientReport'])
         ->whereNumber('id')
         ->name('client.report');
+
+    Route::get('/admin/client/{id}/overview', [AdminClientController::class, 'Overview'])
+        ->whereNumber('id')
+        ->name('admin.client.overview');
+
+    Route::get('/admin/client/{id}/service-logs', [AdminClientController::class, 'ServiceLogs'])
+        ->whereNumber('id')
+        ->name('admin.client.service_logs');
+
+    Route::get('/admin/client/{id}/health', [AdminClientController::class, 'HealthDashboard'])
+        ->whereNumber('id')
+        ->name('admin.client.health');
+
+    Route::get('/admin/client/{id}/publicize', [AdminClientController::class, 'PublicizeDashboard'])
+        ->name('admin.client.publicize');
 });
+
+
+
+
+
+
+
+
+
 
 
 // User Management (Admin Only)

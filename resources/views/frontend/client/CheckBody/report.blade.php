@@ -1,76 +1,214 @@
-@php use App\Helpers\ThaiDateHelper; @endphp
+@php
+    use App\Helpers\ThaiDateHelper;
+@endphp
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <title>รายงานตรวจสุขภาพเบื้องต้น</title>
     <style>
-        body {
-            font-family: "TH Sarabun New", sans-serif;
-            font-size: 18px;
-            color: #000;
-            margin: 24px;
+        :root{
+            --text-main:#1f2937;
+            --text-soft:#6b7280;
+            --line:#d1d5db;
+            --line-strong:#9ca3af;
+            --bg-head:#f1f5f9;
         }
 
-        .report-wrap {
-            max-width: 900px;
-            margin: 0 auto;
+        body{
+            margin:0;
+            font-family:"TH Sarabun New","Sarabun",sans-serif;
+            font-size:16px;
+            line-height:1.4;
+            color:var(--text-main);
+            background:#f3f4f6;
         }
 
-        .text-center { text-align: center; }
-        .mb-2 { margin-bottom: 16px; }
-        .mb-3 { margin-bottom: 24px; }
-        .fw-bold { font-weight: bold; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .report-page{
+            max-width:900px;
+            margin:20px auto;
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            padding:20px 26px;
         }
 
-        td, th {
-            border: 1px solid #000;
-            padding: 8px 10px;
-            vertical-align: top;
+        /* 🔥 toolbar ใหม่ */
+        .report-toolbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:10px;
         }
 
-        .no-border td {
-            border: 0;
-            padding: 2px 0;
+        .toolbar-left,
+        .toolbar-right{
+            display:flex;
+            align-items:center;
+            gap:8px;
         }
 
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 12mm;
+        .btn{
+            border:0;
+            font-size:15px;
+            padding:6px 14px;
+            border-radius:6px;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+        }
+
+        .btn-back{
+            background:#e5e7eb;
+            color:#111827;
+        }
+
+        .btn-back:hover{
+            background:#d1d5db;
+        }
+
+        .btn-print{
+            background:#1d4ed8;
+            color:#fff;
+        }
+
+        .report-header{
+            text-align:center;
+            margin-bottom:14px;
+        }
+
+        .report-title{
+            font-size:22px;
+            font-weight:700;
+            margin:0;
+        }
+
+        .report-subtitle{
+            font-size:15px;
+            color:var(--text-soft);
+            margin-top:4px;
+        }
+
+        .client-info{
+            display:flex;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            border-bottom:1px solid #e5e7eb;
+            padding-bottom:8px;
+            margin-bottom:12px;
+        }
+
+        .client-info span{
+            font-size:16px;
+        }
+
+        .label{
+            font-weight:600;
+            margin-right:6px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            font-size:15px;
+        }
+
+        th, td{
+            border:1px solid var(--line);
+            padding:7px 9px;
+            vertical-align:top;
+        }
+
+        th{
+            width:26%;
+            background:var(--bg-head);
+            text-align:left;
+            font-weight:600;
+            white-space:nowrap;
+        }
+
+        @media (max-width:768px){
+            .report-page{
+                margin:0;
+                border:0;
+                border-radius:0;
+                padding:14px;
             }
 
-            .print-btn {
-                display: none;
+            .client-info{
+                flex-direction:column;
+                gap:4px;
+            }
+
+            th{
+                width:34%;
+            }
+        }
+
+        @media print{
+            @page{
+                size:A4 portrait;
+                margin:12mm;
+            }
+
+            body{
+                background:#fff;
+                font-size:15px;
+            }
+
+            .report-page{
+                border:0;
+                margin:0;
+                padding:0;
+            }
+
+            /* 🔥 ซ่อนปุ่มทั้งหมด */
+            .report-toolbar{
+                display:none !important;
             }
         }
     </style>
 </head>
 <body>
-<div class="report-wrap">
-    <div class="text-center mb-3">
-        <div class="fw-bold" style="font-size: 26px;">รายงานการตรวจสุขภาพเบื้องต้น</div>
-        <div>ข้อมูลผู้รับบริการและผลการประเมินสุขภาพ</div>
+
+<div class="report-page">
+
+    <!-- 🔥 toolbar -->
+    <div class="report-toolbar">
+        <div class="toolbar-left">
+            <button class="btn btn-back" onclick="history.back()">
+                ← กลับหน้าก่อน
+            </button>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="btn btn-print" onclick="window.print()">
+                🖨 พิมพ์รายงาน
+            </button>
+        </div>
     </div>
 
-    <div class="mb-2">
-        <button class="print-btn" onclick="window.print()">พิมพ์รายงาน</button>
+    <div class="report-header">
+        <div class="report-title">รายงานการตรวจสุขภาพเบื้องต้น</div>
+        <div class="report-subtitle">ข้อมูลผู้รับบริการและผลการประเมินสุขภาพ</div>
     </div>
 
-    <table class="no-border mb-2">
-        <tr>
-            <td><strong>ชื่อผู้รับบริการ:</strong> {{ $client->fullname ?? $client->name ?? '-' }}</td>
-            <td><strong>อายุ:</strong> {{ $client->age ?? '-' }} ปี</td>
-        </tr>
-    </table>
+    <div class="client-info">
+        <span>
+            <span class="label">ชื่อผู้รับบริการ:</span>
+            {{ $client->fullname ?? $client->name ?? '-' }}
+        </span>
+
+        <span>
+            <span class="label">อายุ:</span>
+            {{ $client->age ?? '-' }} ปี
+        </span>
+    </div>
 
     <table>
         <tr>
-            <th style="width: 24%;">วันที่ตรวจ</th>
+            <th>วันที่ตรวจ</th>
             <td>{{ ThaiDateHelper::formatThaiDate($checkbody->assessor_date) }}</td>
         </tr>
         <tr>
@@ -146,6 +284,7 @@
             <td>{{ $checkbody->remark ?? '-' }}</td>
         </tr>
     </table>
+
 </div>
 </body>
 </html>

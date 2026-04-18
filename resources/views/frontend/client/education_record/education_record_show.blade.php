@@ -22,6 +22,9 @@
         --info-btn: #58afe0;
         --info-btn-hover: #459fd2;
 
+        --report-btn: #4f46e5;
+        --report-btn-hover: #4338ca;
+
         --success: #059669;
         --success-soft: #e8f7f1;
 
@@ -88,6 +91,15 @@
         padding: 1rem;
     }
 
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
     .section-title {
         display: flex;
         align-items: center;
@@ -95,7 +107,25 @@
         font-size: 1.05rem;
         font-weight: 800;
         color: var(--text-main);
-        margin-bottom: 1rem;
+        margin-bottom: .25rem;
+    }
+
+    .section-subtitle {
+        color: var(--text-soft);
+        font-size: .9rem;
+        margin-bottom: 0;
+    }
+
+    .summary-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .72rem 1rem;
+        border-radius: 999px;
+        background: var(--success-soft);
+        color: var(--success);
+        font-weight: 800;
+        white-space: nowrap;
     }
 
     .btn-modern {
@@ -112,6 +142,7 @@
         white-space: nowrap;
         transition: .18s ease;
         box-shadow: none !important;
+        text-decoration: none;
     }
 
     .btn-modern:hover {
@@ -158,6 +189,16 @@
         color: #fff;
     }
 
+    .btn-report-soft {
+        background: var(--report-btn);
+        color: #fff;
+    }
+
+    .btn-report-soft:hover {
+        background: var(--report-btn-hover);
+        color: #fff;
+    }
+
     .btn-table {
         padding: .52rem .82rem;
         font-size: .81rem;
@@ -166,51 +207,41 @@
     }
 
     .page-actions {
-    align-items: center;
-}
-
-.btn-add-modern {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    padding: .72rem 1.1rem;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-    border: 1px solid transparent;
-    border-radius: 12px;
-    font-size: .95rem;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
-    transition: all .2s ease;
-    white-space: nowrap;
-}
-
-.btn-add-modern:hover {
-    color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
-}
-
-.btn-add-modern:active {
-    transform: translateY(0);
-}
-
-.btn-add-modern i {
-    font-size: 1rem;
-    line-height: 1;
-}
-
-@media (max-width: 767.98px) {
-    .page-actions {
-        width: 100%;
+        align-items: center;
     }
 
     .btn-add-modern {
-        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        padding: .72rem 1.1rem;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        font-size: .95rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+        transition: all .2s ease;
+        white-space: nowrap;
     }
-}
+
+    .btn-add-modern:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .btn-add-modern:active {
+        transform: translateY(0);
+    }
+
+    .btn-add-modern i {
+        font-size: 1rem;
+        line-height: 1;
+    }
 
     .table-shell {
         border: 1px solid var(--line);
@@ -236,7 +267,7 @@
 
     .education-table {
         width: 100%;
-        min-width: 1220px; /* ให้เลื่อนได้เมื่อพื้นที่ไม่พอ */
+        min-width: 1360px;
         margin-bottom: 0;
         border-collapse: separate;
         border-spacing: 0;
@@ -251,6 +282,7 @@
         padding: 1rem .95rem;
         border-bottom: 1px solid var(--line);
         white-space: nowrap;
+        text-align: center;
     }
 
     .education-table tbody td {
@@ -349,6 +381,7 @@
         font-size: .86rem;
         font-weight: 800;
         white-space: nowrap;
+        text-align: center;
     }
 
     .subject-table td {
@@ -428,6 +461,13 @@
         gap: .5rem;
     }
 
+    .mobile-actions .mobile-actions-row {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .5rem;
+    }
+
     .mobile-actions form .btn-modern,
     .mobile-actions .btn-modern,
     .mobile-actions form {
@@ -455,7 +495,7 @@
 
     @media (max-width: 1199.98px) {
         .education-table {
-            min-width: 1160px;
+            min-width: 1320px;
         }
     }
 
@@ -466,6 +506,16 @@
 
         .mobile-list {
             display: block;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .summary-pill {
+            width: 100%;
+            justify-content: center;
         }
     }
 
@@ -480,6 +530,14 @@
             display: flex;
             width: 100%;
             border-radius: 14px;
+        }
+
+        .page-actions {
+            width: 100%;
+        }
+
+        .btn-add-modern {
+            width: 100%;
         }
 
         .page-actions .btn-modern {
@@ -498,7 +556,8 @@
             flex-direction: column;
         }
 
-        .mobile-actions {
+        .mobile-actions,
+        .mobile-actions .mobile-actions-row {
             grid-template-columns: 1fr;
         }
 
@@ -508,17 +567,27 @@
     }
 </style>
 
+@php
+    $recordsWithGpa = $educationRecords->filter(function ($record) {
+        return !empty($record->grade_average) && $record->grade_average > 0;
+    });
+
+    $overallAverageGpa = $recordsWithGpa->count()
+        ? round($recordsWithGpa->avg('grade_average'), 2)
+        : null;
+@endphp
+
 <div class="container-fluid education-page py-3 py-md-4">
     <div class="education-shell">
 
         <div class="page-panel">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <h1 class="page-title">แบบรายงานผลการเรียน</h1>
-                    <p class="page-subtitle">แสดงรายการผลการเรียน รองรับจอคอมพิวเตอร์ แท็บเล็ต และโทรศัพท์</p>
+                    <h1 class="page-title">ผลการเรียน</h1>
+                    <p class="page-subtitle">แสดงข้อมูลผลการเรียนและรายวิชาที่บันทึกไว้ในระบบ</p>
                 </div>
 
-              <div class="page-actions d-flex flex-wrap gap-2">
+                <div class="page-actions d-flex flex-wrap gap-2">
                     <a href="{{ route('education_record_add', $client->id) }}" class="btn btn-add-modern">
                         <i data-feather="plus-circle"></i>
                         <span>เพิ่มผลการเรียนใหม่</span>
@@ -528,14 +597,26 @@
 
             <div class="client-badge">
                 <i class="bi bi-person-circle"></i>
-                <span>ชื่อ-สกุล : {{ $client->full_name ?? '-' }}</span>
+                <span>ชื่อ-สกุล : {{ $client->full_name ?? $client->fullname ?? '-' }}</span>
             </div>
         </div>
 
         <div class="list-panel">
-            <div class="section-title">
-                <i class="bi bi-journal-text text-primary"></i>
-                รายการผลการเรียน
+            <div class="section-header">
+                <div>
+                    <div class="section-title">
+                        <i class="bi bi-journal-text text-primary"></i>
+                        ตารางผลการเรียน
+                    </div>
+                    <p class="section-subtitle">แสดงรายการผลการเรียน พร้อมจัดการข้อมูลและดูรายวิชาในแต่ละรายการ</p>
+                </div>
+
+                <div class="summary-pill">
+                    <i class="bi bi-award-fill"></i>
+                    <span>เกรดเฉลี่ยรวม :
+                        {{ $overallAverageGpa !== null ? number_format($overallAverageGpa, 2) : '-' }}
+                    </span>
+                </div>
             </div>
 
             @if($educationRecords->isNotEmpty())
@@ -547,12 +628,12 @@
                             <table class="table education-table align-middle">
                                 <thead>
                                     <tr>
-                                        <th style="width: 14%;">วันที่บันทึก</th>
-                                        <th style="width: 20%;">ระดับชั้น</th>
+                                        <th style="width: 12%;">วันที่บันทึก</th>
+                                        <th style="width: 18%;">ระดับชั้น</th>
                                         <th style="width: 10%;">ภาคเรียน</th>
-                                        <th style="width: 28%;">ชื่อสถานศึกษา</th>
+                                        <th style="width: 24%;">ชื่อสถานศึกษา</th>
                                         <th style="width: 10%;">เกรดเฉลี่ย</th>
-                                        <th style="width: 18%;" class="text-end">จัดการ</th>
+                                        <th style="width: 26%;" class="text-center">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -586,7 +667,7 @@
                                                 @endif
                                             </td>
 
-                                            <td class="text-end col-actions">
+                                            <td class="text-center col-actions">
                                                 <div class="table-actions">
                                                     <a href="{{ route('education_record_edit', $record->id) }}"
                                                        class="btn btn-modern btn-table btn-edit-soft">
@@ -606,6 +687,12 @@
                                                             ลบ
                                                         </button>
                                                     </form>
+
+                                                   <a href="{{ route('education_record.report_by_id', $record->id) }}"
+                                                        class="btn btn-modern btn-table btn-report-soft">
+                                                            <i class="bi bi-printer"></i>
+                                                            รายงาน
+                                                        </a>
 
                                                     <button class="btn btn-modern btn-table btn-info-soft toggle-subject-btn"
                                                             type="button"
@@ -639,9 +726,7 @@
                                                                             <tr>
                                                                                 <td>{{ $subject->subject_name ?? '-' }}</td>
                                                                                 <td class="text-center">{{ $subject->pivot->score ?? '-' }}</td>
-                                                                                <td class="text-center">
-                                                                                    {{ isset($subject->pivot->grade) ? number_format($subject->pivot->grade, 2) : '-' }}
-                                                                                </td>
+                                                                                <td class="text-center">{{ $subject->pivot->grade ?? '-' }}</td>
                                                                             </tr>
                                                                         @endforeach
                                                                     </tbody>
@@ -705,34 +790,44 @@
                             </div>
 
                             <div class="mobile-actions">
-                                <a href="{{ route('education_record_edit', $record->id) }}"
-                                   class="btn btn-modern btn-table btn-edit-soft">
-                                    <i class="bi bi-pencil-square"></i>
-                                    แก้ไข
-                                </a>
+                                <div class="mobile-actions-row">
+                                    <a href="{{ route('education_record_edit', $record->id) }}"
+                                       class="btn btn-modern btn-table btn-edit-soft">
+                                        <i class="bi bi-pencil-square"></i>
+                                        แก้ไข
+                                    </a>
 
-                                <form id="mobile-delete-form-{{ $record->id }}"
-                                      action="{{ route('education_record_delete', $record->id) }}"
-                                      method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button"
-                                            class="btn btn-modern btn-table btn-delete-soft"
-                                            onclick="confirmDelete('mobile-delete-form-{{ $record->id }}', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลผลการเรียนนี้?')">
-                                        <i class="bi bi-trash"></i>
-                                        ลบ
+                                    <form id="mobile-delete-form-{{ $record->id }}"
+                                          action="{{ route('education_record_delete', $record->id) }}"
+                                          method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                                class="btn btn-modern btn-table btn-delete-soft"
+                                                onclick="confirmDelete('mobile-delete-form-{{ $record->id }}', 'คุณแน่ใจหรือไม่ที่จะลบข้อมูลผลการเรียนนี้?')">
+                                            <i class="bi bi-trash"></i>
+                                            ลบ
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="mobile-actions-row">
+                                    <a href="{{ route('education_record.report', $client->id) }}"
+                                       class="btn btn-modern btn-table btn-report-soft">
+                                        <i class="bi bi-printer"></i>
+                                        รายงาน
+                                    </a>
+
+                                    <button class="btn btn-modern btn-table btn-info-soft btn-show toggle-subject-btn"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#mobile-record-{{ $record->id }}"
+                                            aria-expanded="false"
+                                            aria-controls="mobile-record-{{ $record->id }}">
+                                        <i class="bi bi-list-ul"></i>
+                                        <span class="btn-label">แสดงรายวิชา</span>
                                     </button>
-                                </form>
-
-                                <button class="btn btn-modern btn-table btn-info-soft btn-show toggle-subject-btn"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#mobile-record-{{ $record->id }}"
-                                        aria-expanded="false"
-                                        aria-controls="mobile-record-{{ $record->id }}">
-                                    <i class="bi bi-list-ul"></i>
-                                    <span class="btn-label">แสดงรายวิชา</span>
-                                </button>
+                                </div>
                             </div>
 
                             <div id="mobile-record-{{ $record->id }}" class="collapse mt-3">
@@ -752,9 +847,7 @@
                                                         <tr>
                                                             <td>{{ $subject->subject_name ?? '-' }}</td>
                                                             <td class="text-center">{{ $subject->pivot->score ?? '-' }}</td>
-                                                            <td class="text-center">
-                                                                {{ isset($subject->pivot->grade) ? number_format($subject->pivot->grade, 2) : '-' }}
-                                                            </td>
+                                                            <td class="text-center">{{ $subject->pivot->grade ?? '-' }}</td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

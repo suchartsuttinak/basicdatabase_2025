@@ -71,12 +71,7 @@
                     แสดงรายละเอียดเฉพาะราย ข้อมูลพื้นฐาน และเมนูบริการที่เกี่ยวข้องอย่างเป็นระบบ
                 </p>
             </div>
-            <div class="col-lg-4 text-lg-end">
-                <div class="header-mini-stat">
-                    <div class="mini-stat-label">วันที่เปิดดูข้อมูล</div>
-                    <div class="mini-stat-value">{{ now()->locale('th')->translatedFormat('d F') }} {{ now()->year + 543 }}</div>
-                </div>
-            </div>
+           
         </div>
     </div>
 
@@ -311,7 +306,7 @@
         </div>
     </div>
 
-    <div class="row g-4">
+    <di class="row g-4">
         <div class="col-xl-4 col-md-6">
             <div class="card service-card border-0 shadow-sm h-100">
                 <div class="card-body p-4">
@@ -320,72 +315,254 @@
                     </div>
                     <h5 class="service-title">ข้อมูลภาพรวม</h5>
                     <p class="service-text">ดูรายละเอียดเบื้องต้นของผู้รับบริการ ประวัติ และข้อมูลสรุปในระบบ</p>
-                    <a href="javascript:void(0)" class="service-link">
-                        เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
-                    </a>
+                   <a href="{{ route('admin.client.overview', $client->id) }}" class="service-link">
+                เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
+            </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+<div class="col-xl-4 col-md-6">
+    <div class="card service-card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+            <div class="service-icon bg-warning-subtle text-warning">
+                <i class="bi bi-clipboard2-pulse"></i>
+            </div>
+
+            <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
+                <h5 class="service-title mb-0">ข้อมูลเบื้องต้นที่ควรบันทึก</h5>
+
+                @if(($serviceLogCount ?? 0) > 0)
+                    <span class="service-mini-badge">
+                        ต้องตรวจสอบ
+                    </span>
+                @else
+                    <span class="service-mini-badge">
+                        ครบถ้วน
+                    </span>
+                @endif
+            </div>
+
+            <p class="service-text mb-2">
+                ตรวจสอบข้อมูลสำคัญที่ยังไม่มีการบันทึก เช่น สอบข้อเท็จจริง ครอบครัว สมาชิก เอกสาร ตรวจร่างกาย การศึกษา และติดตามผล
+            </p>
+
+            <div class="service-meta-list mb-3">
+                <div class="service-meta-item">
+                    <span class="service-meta-label">จำนวนที่ยังขาด</span>
+                    <span class="service-meta-value">{{ $serviceLogCount ?? 0 }}</span>
                 </div>
+
+                <div class="service-meta-item">
+                    <span class="service-meta-label">รายการแรกที่ยังขาด</span>
+                    <span class="service-meta-value">{{ $serviceLogLatestType ?? 'ข้อมูลเบื้องต้นครบถ้วน' }}</span>
+                </div>
+
+                <div class="service-meta-item">
+                    <span class="service-meta-label">สถานะ</span>
+                    <span class="service-meta-value">
+                        @if(($serviceLogCount ?? 0) > 0)
+                            ยังมีข้อมูลที่ควรบันทึก
+                        @else
+                            ข้อมูลเบื้องต้นครบถ้วน
+                        @endif
+                    </span>
+                </div>
+            </div>
+
+            <a href="{{ route('admin.client.service_logs', $client->id) }}" class="service-link">
+                เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+      <div class="col-xl-4 col-md-6">
+    <div class="card service-card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+            <div class="service-icon bg-danger-subtle text-danger">
+                <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+
+            <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
+                <h5 class="service-title mb-0">สุขภาพและการรักษา</h5>
+
+                @if(!empty($healthLatestTreatmentDate))
+                    <span class="service-mini-badge service-mini-badge-danger">
+                        อัปเดตล่าสุด
+                    </span>
+                @endif
+            </div>
+
+            <p class="service-text mb-2">
+                ตรวจสอบข้อมูลด้านสุขภาพ การนัดหมาย และประวัติการรักษาที่เกี่ยวข้อง
+            </p>
+
+            <div class="service-meta-list mb-3">
+                <div class="service-meta-item">
+                    <span class="service-meta-label">นัดหมายถัดไป</span>
+                    <span class="service-meta-value">
+                        @if(!empty($healthNextAppointment['date']))
+                            {{ $healthNextAppointment['type'] ?? 'นัดหมาย' }}
+                        @else
+                            ไม่มีนัด
+                        @endif
+                    </span>
+                </div>
+
+                <div class="service-meta-item">
+                    <span class="service-meta-label">จำนวนรอนัด</span>
+                    <span class="service-meta-value">{{ $healthAppointmentCount ?? 0 }}</span>
+                </div>
+
+                <div class="service-meta-item">
+                    <span class="service-meta-label">วันที่รักษาล่าสุด</span>
+                    <span class="service-meta-value">
+                        @if(!empty($healthLatestTreatmentDate))
+                            {{ \Carbon\Carbon::parse($healthLatestTreatmentDate)->locale('th')->translatedFormat('d F') }}
+                            {{ \Carbon\Carbon::parse($healthLatestTreatmentDate)->year + 543 }}
+                        @else
+                            ไม่มีข้อมูล
+                        @endif
+                    </span>
+                </div>
+            </div>
+
+            <a href="{{ route('admin.client.health', $client->id) }}" class="service-link">
+                ดูทั้งหมด <i class="bi bi-arrow-right-short"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <div class="col-xl-4 col-md-6">
+    <a href="{{ route('publicizes.index') }}" class="service-card-link">
+
+        <div class="card service-card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <div class="service-icon bg-warning-subtle text-warning">
+                    <i class="bi bi-megaphone-fill"></i>
+                </div>
+
+                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
+                    <h5 class="service-title mb-0">ข่าวสารและกิจกรรม</h5>
+
+                    @if(!empty($publicizeLatestDate))
+                        <span class="service-mini-badge">
+                            ล่าสุด
+                        </span>
+                    @endif
+                </div>
+
+                <p class="service-text mb-2">
+                    แสดงข้อมูลข่าวสาร เอกสาร และกิจกรรมประชาสัมพันธ์ล่าสุดของระบบ
+                </p>
+
+                <div class="service-meta-list mb-3">
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">จำนวนทั้งหมด</span>
+                        <span class="service-meta-value">
+                            {{ $publicizeCount ?? 0 }}
+                        </span>
+                    </div>
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">หมวดล่าสุด</span>
+                        <span class="service-meta-value">
+                            {{ $publicizeLatestCategory ?? '-' }}
+                        </span>
+                    </div>
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">วันที่ล่าสุด</span>
+                        <span class="service-meta-value">
+                            @if(!empty($publicizeLatestDate))
+                                {{ \Carbon\Carbon::parse($publicizeLatestDate)->locale('th')->translatedFormat('d F') }}
+                                {{ \Carbon\Carbon::parse($publicizeLatestDate)->year + 543 }}
+                            @else
+                                -
+                            @endif
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="service-link">
+                    เปิดดูข้อมูล <i class="bi bi-arrow-right-short"></i>
+                </div>
+
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6">
-            <div class="card service-card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="service-icon bg-success-subtle text-success">
-                        <i class="bi bi-journal-text"></i>
-                    </div>
-                    <h5 class="service-title">บันทึกการให้บริการ</h5>
-                    <p class="service-text">ติดตามข้อมูลการให้บริการ การประเมิน และประวัติการดูแลแต่ละรายการ</p>
-                    <a href="javascript:void(0)" class="service-link">
-                        เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
-                    </a>
+    </a>
+</div>
+
+       <div class="col-xl-4 col-md-6">
+    <a href="{{ route('client_files.index', $client->id) }}" class="service-card-link">
+
+        <div class="card service-card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <div class="service-icon bg-info-subtle text-info">
+                    <i class="bi bi-folder-fill"></i>
                 </div>
+
+                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
+                    <h5 class="service-title mb-0">เอกสารและไฟล์</h5>
+
+                    @if(!empty($fileLatestDate))
+                        <span class="service-mini-badge">
+                            ล่าสุด
+                        </span>
+                    @endif
+                </div>
+
+                <p class="service-text mb-2">
+                    จัดเก็บเอกสารสำคัญ เช่น บัตรประชาชน ทะเบียนบ้าน และเอกสารอื่น ๆ ของผู้รับบริการ
+                </p>
+
+                <div class="service-meta-list mb-3">
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">จำนวนไฟล์</span>
+                        <span class="service-meta-value">
+                            {{ $filesCount ?? 0 }}
+                        </span>
+                    </div>
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">ประเภทล่าสุด</span>
+                        <span class="service-meta-value">
+                            {{ $fileLatestType }}
+                        </span>
+                    </div>
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">อัปโหลดล่าสุด</span>
+                        <span class="service-meta-value">
+                            @if(!empty($fileLatestDate))
+                                {{ \Carbon\Carbon::parse($fileLatestDate)->locale('th')->translatedFormat('d F') }}
+                                {{ \Carbon\Carbon::parse($fileLatestDate)->year + 543 }}
+                            @else
+                                -
+                            @endif
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="service-link">
+                    เปิดดูไฟล์ <i class="bi bi-arrow-right-short"></i>
+                </div>
+
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6">
-            <div class="card service-card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="service-icon bg-danger-subtle text-danger">
-                        <i class="bi bi-heart-pulse-fill"></i>
-                    </div>
-                    <h5 class="service-title">สุขภาพและการรักษา</h5>
-                    <p class="service-text">ตรวจสอบข้อมูลด้านสุขภาพ การนัดหมาย และประวัติการรักษาที่เกี่ยวข้อง</p>
-                    <a href="javascript:void(0)" class="service-link">
-                        เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="card service-card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="service-icon bg-warning-subtle text-warning">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <h5 class="service-title">ครอบครัวและผู้เกี่ยวข้อง</h5>
-                    <p class="service-text">รวมข้อมูลผู้ปกครอง ญาติ บุคคลอ้างอิง และความสัมพันธ์ที่เกี่ยวข้อง</p>
-                    <a href="javascript:void(0)" class="service-link">
-                        เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="card service-card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="service-icon bg-info-subtle text-info">
-                        <i class="bi bi-file-earmark-bar-graph-fill"></i>
-                    </div>
-                    <h5 class="service-title">รายงานและสรุปผล</h5>
-                    <p class="service-text">จัดทำรายงานผล รายละเอียดการติดตาม และเอกสารสรุปสำหรับใช้งานต่อ</p>
-                    <a href="javascript:void(0)" class="service-link">
-                        เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+    </a>
+</div>
 
         <div class="col-xl-4 col-md-6">
             <div class="card service-card border-0 shadow-sm h-100">
@@ -799,6 +976,97 @@
         color: #0a58ca;
     }
 
+    .service-mini-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:.35rem .7rem;
+    border-radius:999px;
+    background:#ecfdf3;
+    border:1px solid #cdebd8;
+    color:#198754;
+    font-size:.78rem;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.service-meta-list{
+    display:flex;
+    flex-direction:column;
+    gap:.45rem;
+    padding:.8rem .9rem;
+    border-radius:16px;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.06);
+}
+
+.service-meta-item{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:.75rem;
+}
+
+.service-meta-label{
+    color:#64748b;
+    font-size:.86rem;
+    line-height:1.5;
+}
+
+.service-meta-value{
+    color:#0f172a;
+    font-weight:700;
+    font-size:.9rem;
+    text-align:right;
+    line-height:1.5;
+    word-break:break-word;
+}
+.service-mini-badge-danger{
+    background:#fff1f2;
+    border:1px solid #fecdd3;
+    color:#dc2626;
+}
+
+/* ทำให้ทั้งการ์ดคลิกได้ */
+.service-card-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+}
+
+.service-card-link:hover{
+    text-decoration:none;
+    color:inherit;
+}
+
+/* hover effect */
+.service-card-link .service-card{
+    transition:all .25s ease;
+}
+
+.service-card-link:hover .service-card{
+    transform:translateY(-4px);
+    box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+.service-card-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+}
+
+.service-card-link:hover{
+    color:inherit;
+}
+
+.service-card-link .service-card{
+    transition:all .25s ease;
+}
+
+.service-card-link:hover .service-card{
+    transform:translateY(-4px);
+    box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
     @media (max-width: 1399.98px) {
         .client-page {
             padding: 1.1rem 1rem 2rem;
@@ -959,6 +1227,16 @@
         .service-card .card-body {
             padding: 1rem !important;
         }
+
+        @media (max-width: 575.98px){
+    .service-meta-item{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .service-meta-value{
+        text-align:left;
+    }
     }
 </style>
 
