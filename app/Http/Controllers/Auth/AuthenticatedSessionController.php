@@ -28,7 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // [SECURITY / UX]
+        // หลังล็อกอินให้แยกปลายทางตามสิทธิ์ผู้ใช้
+        // - admin / executive / social_worker -> ไปหน้า dashboard
+        // - role อื่นทั้งหมด -> ไปหน้า client.show
+        $user = Auth::user();
+
+        if ($user && in_array($user->role, ['admin', 'executive', 'social_worker'])) {
+            // ผู้มีสิทธิ์เข้าหน้าสถิติ
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
+        // ผู้ใช้ที่ไม่มีสิทธิ์เข้าหน้าสถิติ ให้ไปหน้ารายชื่อผู้รับบริการแทน
+        return redirect()->intended(route('client.show', absolute: false));
     }
 
     /**

@@ -11,5 +11,9 @@ use Illuminate\Support\Facades\Route;
     Route::get('/edit/{id}', [EstimateController::class, 'EditEstimate'])->name('estimate.edit');
     Route::put('/update/{id}', [EstimateController::class, 'UpdateEstimate'])->name('estimate.update');
     Route::delete('/delete/{id}', [EstimateController::class, 'DeleteEstimate'])->name('estimate.delete');
+
+     // ✅ เพิ่มหน้ารายงานรายรายการ
+    Route::get('/report/{id}', [EstimateController::class, 'ReportEstimate'])->name('estimate.report');
     Route::get('/estimate/check-duplicate', [EstimateController::class, 'CheckDuplicate']);
+   
 });

@@ -4,6 +4,7 @@
     $isProfileOpen =
         Request::routeIs('client.show') ||
         Request::routeIs('client.report') ||
+        Request::routeIs('client.edit') ||
         Request::routeIs('issues.index');
 
     $isProcessOpen =
@@ -25,7 +26,8 @@
         Request::routeIs('medical.*') ||
         Request::routeIs('vaccine.*') ||
         Request::routeIs('psychiatric.*') ||
-        Request::routeIs('addictive.*');
+        Request::routeIs('addictive.*') ||
+        Request::routeIs('healthc_heckups.*');
 
     $isBehaviorOpen =
         Request::routeIs('observe.*') ||
@@ -35,7 +37,8 @@
         Request::routeIs('case_outside.*') ||
         Request::routeIs('refers.*') ||
         Request::routeIs('job_agencies.*') ||
-        Request::routeIs('help_sessions.*');
+        Request::routeIs('help_sessions.*') ||
+        Request::routeIs('followup.*');
 @endphp
 
 <div class="app-sidebar-menu">
@@ -57,19 +60,18 @@
                     </a>
                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
-                           <li>
-                            <a href="{{ route('client.edit', $client->id) }}"
-                            class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
-                                บันทึกข้อมูลทั่วไป
-                            </a>
-                        </li>
+                            <li>
+                                <a href="{{ route('client.edit', $client->id) }}"
+                                   class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
+                                    บันทึกข้อมูลทั่วไป
+                                </a>
+                            </li>
                             <li>
                                 <a href="{{ route('client.report', $clientId) }}"
                                    class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">
                                     รายงานผู้รับบริการ
                                 </a>
                             </li>
-                         
                         </ul>
                     </div>
                 </li>
@@ -213,6 +215,12 @@
                                     การตรวจสารเสพติด
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('healthc_heckups.index') }}"
+                                   class="tp-link {{ Request::routeIs('healthc_heckups.*') ? 'active' : '' }}">
+                                    ตรวจสุขภาพประจำปี
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -283,10 +291,9 @@
                                     รายการการช่วยเหลือ
                                 </a>
                             </li>
-                           
-                             <li>
+                            <li>
                                 <a href="{{ route('followup.index', $clientId) }}"
-                                class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
+                                   class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
                                     การติดตามผล
                                 </a>
                             </li>

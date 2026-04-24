@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\backend\OperationController;
 use App\Http\Controllers\backend\PublicizeController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
+use App\Http\Controllers\Frontend\HealthcHeckupController;
 use App\Http\Controllers\Landing\AboutController;
 use App\Http\Controllers\Landing\IssueController;
 use App\Http\Controllers\Landing\LandingController;
@@ -15,42 +16,39 @@ use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
-// ประมวลผล/สถิติ หน้า dashboard
-Route::middleware('auth')->group(function () {
+// ประมวลผล/สถิติ หน้า dashboard (จำกัดสิทธิ์)
+Route::middleware(['auth','role:admin,executive,social_worker'])->group(function () {
     Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 });
 
 
+    // หน้า Landing
+    Route::get('/', [LandingController::class, 'index'])->name('landing.index');
 
-Route::post('/issues', [IssueController::class, 'store'])->name('issues.store');
+    // [SECURITY] จำกัดสิทธิ์เฉพาะ admin / executive / social_worker
+    Route::middleware(['auth', 'role:admin,executive,social_worker'])->group(function () {
 
-// Landing Issue donation
+  // แสดงหน้า issues
+    Route::get('/issues', [IssueController::class, 'index'])
+        ->name('issues.index');
 
-Route::middleware('auth')->group(function () {
-Route::get('/issues', [IssueController::class, 'index'])->name('issues.index');
+    // บันทึกข้อมูล issues
+    Route::post('/issues', [IssueController::class, 'store'])
+        ->name('issues.store');
 
+    // หน้า News CRUD
+    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+    Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
+
+    // หน้า about (ฟอร์มกรอกข้อมูล history, objective, mission, contact)
+    Route::get('/about', [AboutController::class, 'index'])->name('landing.about.index');
+    Route::post('/about', [AboutController::class, 'store'])->name('landing.about.store');
+    Route::delete('/about/{id}', [AboutController::class, 'destroy'])->name('landing.about.delete');
 });
-
-
-// หน้า Landing
-Route::get('/', [LandingController::class, 'index'])->name('landing.index');
-
-// หน้า News CRUD
-Route::get('/news', [NewsController::class, 'index'])->name('news.index');
-Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
-Route::post('/news', [NewsController::class, 'store'])->name('news.store');
-Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
-
-
-
-
-
-// หน้า about (ฟอร์มกรอกข้อมูล history, objective, mission, contact)
-Route::get('/about', [AboutController::class, 'index'])->name('landing.about.index');
-Route::post('/about', [AboutController::class, 'store'])->name('landing.about.store');
-Route::delete('/about/{id}', [AboutController::class, 'destroy'])->name('landing.about.delete');
-
+// สิ้นสุดหน้า Landing
 
 
 // หน้า publicizes (ฟอร์มกรอกข้อมูลข่าวสาร/กิจกรรม)
@@ -159,6 +157,29 @@ require __DIR__.'/auth.php';
     Route::patch('/toggle-status/{id}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
+
+
+
+
+
+
+
+    Route::middleware(['auth', 'role:admin,executive,social_worker'])->prefix('healthc-checkups')->group(function () {
+    Route::get('/', [HealthcHeckupController::class, 'index'])->name('healthc_heckups.index');
+    Route::post('/store', [HealthcHeckupController::class, 'store'])->name('healthc_heckups.store');
+    Route::get('/edit-json/{id}', [HealthcHeckupController::class, 'editJson'])->name('healthc_heckups.edit_json');
+    Route::put('/update/{id}', [HealthcHeckupController::class, 'update'])->name('healthc_heckups.update');
+    Route::delete('/delete/{id}', [HealthcHeckupController::class, 'destroy'])->name('healthc_heckups.delete');
+    Route::get('/report', [HealthcHeckupController::class, 'report'])->name('healthc_heckups.report');
+});
+
+
+
+
+
+
+
+
 
 
 

@@ -198,4 +198,9 @@ class User extends Authenticatable
 
         return $this->houses->isNotEmpty();
     }
+
+    public function healthcHeckups()
+{
+    return $this->hasMany(\App\Models\HealthcHeckup::class, 'recorded_by');
+}
 }

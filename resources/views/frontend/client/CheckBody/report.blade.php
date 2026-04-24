@@ -33,12 +33,13 @@
             padding:20px 26px;
         }
 
-        /* 🔥 toolbar ใหม่ */
         .report-toolbar{
             display:flex;
             justify-content:space-between;
             align-items:center;
             margin-bottom:10px;
+            gap:10px;
+            flex-wrap:wrap;
         }
 
         .toolbar-left,
@@ -46,6 +47,7 @@
             display:flex;
             align-items:center;
             gap:8px;
+            flex-wrap:wrap;
         }
 
         .btn{
@@ -94,6 +96,7 @@
             display:flex;
             justify-content:space-between;
             flex-wrap:wrap;
+            gap:8px 16px;
             border-bottom:1px solid #e5e7eb;
             padding-bottom:8px;
             margin-bottom:12px;
@@ -126,6 +129,10 @@
             text-align:left;
             font-weight:600;
             white-space:nowrap;
+        }
+
+        .text-muted{
+            color:var(--text-soft);
         }
 
         @media (max-width:768px){
@@ -161,9 +168,9 @@
                 border:0;
                 margin:0;
                 padding:0;
+                max-width:none;
             }
 
-            /* 🔥 ซ่อนปุ่มทั้งหมด */
             .report-toolbar{
                 display:none !important;
             }
@@ -174,7 +181,6 @@
 
 <div class="report-page">
 
-    <!-- 🔥 toolbar -->
     <div class="report-toolbar">
         <div class="toolbar-left">
             <button class="btn btn-back" onclick="history.back()">
@@ -224,12 +230,43 @@
             <td>{{ $checkbody->detail ?? '-' }}</td>
         </tr>
         <tr>
+            <th>การพัฒนา</th>
+            <td>{{ $checkbody->development_type ?? '-' }}</td>
+        </tr>
+
+        @if(($checkbody->development_type ?? null) === 'เด็กกลุ่มพิเศษ')
+            <tr>
+                <th>ประเภทการสนับสนุน</th>
+                <td>{{ $checkbody->special_support_type ?? '-' }}</td>
+            </tr>
+
+            @if(($checkbody->special_support_type ?? null) === 'อื่น ๆ')
+                <tr>
+                    <th>รายละเอียดอื่น ๆ</th>
+                    <td>{{ $checkbody->special_support_other ?? '-' }}</td>
+                </tr>
+            @endif
+        @endif
+
+        <tr>
             <th>น้ำหนัก</th>
-            <td>{{ $checkbody->weight ?? '-' }} กิโลกรัม</td>
+            <td>
+                @if(!is_null($checkbody->weight) && $checkbody->weight !== '')
+                    {{ $checkbody->weight }} กิโลกรัม
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <th>ส่วนสูง</th>
-            <td>{{ $checkbody->height ?? '-' }} เซนติเมตร</td>
+            <td>
+                @if(!is_null($checkbody->height) && $checkbody->height !== '')
+                    {{ $checkbody->height }} เซนติเมตร
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <th>สุขภาพช่องปาก</th>

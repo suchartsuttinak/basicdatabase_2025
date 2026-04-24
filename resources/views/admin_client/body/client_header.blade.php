@@ -8,8 +8,12 @@
     // กัน error กรณีบางหน้าไม่มี $client
     $clientId = $client->id ?? request()->route('client_id') ?? request()->route('id');
 
-    // Active ของเมนูหลัก
-    $isDashboardActive = Request::routeIs('dashboard');
+   
+    // Active ของเมนูหลัก (หน้าหลัก / dashboard client)
+    $isDashboardActive =
+    Request::routeIs('admin.index') ||   // หน้าหลัก admin client
+    Request::routeIs('dashboard') ||     // dashboard ระบบ (เผื่อใช้)
+    Request::routeIs('statistics.index'); // หน้าสถิติ
 
     $isHistoryActive =
         Request::routeIs('client.edit') ||
@@ -43,7 +47,8 @@
         Request::routeIs('medical.add') ||
         Request::routeIs('vaccine.index') ||
         Request::routeIs('psychiatric.create') ||
-        Request::routeIs('addictive.create');
+        Request::routeIs('addictive.create') ||
+        Request::routeIs('healthc_heckups.index');
 
     $isSocialActive =
         Request::routeIs('observe.create') ||
@@ -140,7 +145,7 @@
                     <span class="topbar-brand-badge">
                         <i class="fas fa-people-group"></i>
                     </span>
-                    <span class="topbar-brand-text">ระบบข้อมูลผู้รับบริการ</span>
+                    <span class="topbar-brand-text">หน้าระบบผู้รับบริการ</span>
                 </a>
             </div>
 
@@ -150,7 +155,7 @@
                 <ul class="navbar-nav topbar-menu mb-2 mb-xl-0">
                     <li class="nav-item">
                         <a class="nav-link topbar-link {{ $isDashboardActive ? 'active' : '' }}"
-                           href="{{ route('dashboard') }}">
+                           href="{{ route('admin.index', $client->id) }}">
                             <i class="fas fa-home"></i>
                             <span>หน้าหลัก</span>
                         </a>
@@ -302,6 +307,13 @@
                                         การตรวจสารเสพติด
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item {{ Request::routeIs('healthc_heckups.index') ? 'active' : '' }}"
+                                       href="{{ route('healthc_heckups.index', $clientId) }}">
+                                        ตรวจสุขภาพประจำปี
+                                    </a>
+                                </li>
+
                             @endif
                         </ul>
                     </li>

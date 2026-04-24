@@ -372,13 +372,13 @@
         </div>
     </div>
 
-        <div class="collapse {{ $errors->any() || $isEdit ? 'show' : '' }}" id="checkBodyFormCollapse">
-            @include('frontend.client.checkBody._form')
-        </div>
+    <div class="collapse {{ $errors->any() || $isEdit ? 'show' : '' }}" id="checkBodyFormCollapse">
+        @include('frontend.client.checkBody._form')
+    </div>
 
-        @include('frontend.client.checkBody._table')
-        </div>
-        @endsection
+    @include('frontend.client.checkBody._table')
+</div>
+@endsection
 
 @push('scripts')
 <script>
@@ -386,6 +386,14 @@
         const devNormal = document.getElementById('development_normal');
         const devAbnormal = document.getElementById('development_abnormal');
         const detailField = document.getElementById('development-detail-field');
+
+        const devTypeNormal = document.getElementById('development_type_normal');
+        const devTypeSpecial = document.getElementById('development_type_special');
+        const specialSupportSection = document.getElementById('special-support-section');
+        const specialSupportType = document.getElementById('special_support_type');
+        const specialSupportOtherWrap = document.getElementById('special-support-other-wrap');
+        const specialSupportOther = document.getElementById('special_support_other');
+
         const formCollapse = document.getElementById('checkBodyFormCollapse');
         const toggleBtn = document.getElementById('toggleCheckBodyBtn');
 
@@ -394,10 +402,56 @@
             detailField.style.display = devAbnormal.checked ? 'block' : 'none';
         }
 
+        function toggleSpecialSupportSection() {
+            if (!specialSupportSection || !devTypeNormal || !devTypeSpecial) return;
+
+            if (devTypeSpecial.checked) {
+                specialSupportSection.style.display = 'block';
+            } else {
+                specialSupportSection.style.display = 'none';
+
+                if (specialSupportType) {
+                    specialSupportType.value = '';
+                }
+
+                if (specialSupportOtherWrap) {
+                    specialSupportOtherWrap.style.display = 'none';
+                }
+
+                if (specialSupportOther) {
+                    specialSupportOther.value = '';
+                }
+            }
+
+            toggleSpecialSupportOther();
+        }
+
+        function toggleSpecialSupportOther() {
+            if (!specialSupportType || !specialSupportOtherWrap || !specialSupportOther) return;
+
+            if (specialSupportType.value === 'อื่น ๆ') {
+                specialSupportOtherWrap.style.display = 'block';
+            } else {
+                specialSupportOtherWrap.style.display = 'none';
+                specialSupportOther.value = '';
+            }
+        }
+
         if (devNormal && devAbnormal) {
             devNormal.addEventListener('change', toggleDevelopmentDetail);
             devAbnormal.addEventListener('change', toggleDevelopmentDetail);
             toggleDevelopmentDetail();
+        }
+
+        if (devTypeNormal && devTypeSpecial) {
+            devTypeNormal.addEventListener('change', toggleSpecialSupportSection);
+            devTypeSpecial.addEventListener('change', toggleSpecialSupportSection);
+            toggleSpecialSupportSection();
+        }
+
+        if (specialSupportType) {
+            specialSupportType.addEventListener('change', toggleSpecialSupportOther);
+            toggleSpecialSupportOther();
         }
 
         if (formCollapse && toggleBtn) {

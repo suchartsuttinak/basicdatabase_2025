@@ -101,16 +101,34 @@ class ClientController extends Controller
     /**
      * หน้าแสดงรายการ client
      */
-    public function ClientShow()
-    {
-        $clients = Client::forUser(auth()->user())
-            ->with('problems')
-            ->where('release_status', 'show')
-            ->latest()
-            ->get();
+   public function ClientShow()
+{
+    $clients = Client::forUser(auth()->user())
+        ->with('problems')
+        ->where(function ($query) {
+            $query
+                // =========================
+                // PATCH: ผู้ที่อยู่ในระบบปกติ
+                // =========================
+                ->where('release_status', 'show')
 
-        return view('backend.client.client_show', compact('clients'));
-    }
+                // =========================
+                // PATCH: ผู้ที่รออนุมัติจำหน่ายจริง
+                // ต้องเป็น pending_refer และต้องมี refer ที่ยัง pending
+                // เพื่อกันไม่ให้ข้อมูลที่จำหน่ายแล้วกลับมาแสดง
+                // =========================
+                ->orWhere(function ($subQuery) {
+                    $subQuery->where('release_status', 'pending_refer')
+                        ->whereHas('refers', function ($referQuery) {
+                            $referQuery->where('approve_status', 'pending');
+                        });
+                });
+        })
+        ->latest()
+        ->get();
+
+    return view('backend.client.client_show', compact('clients'));
+}
 
     /**
      * หน้าแสดงรายละเอียด client สำหรับ route เช่น /admin/client/{id}

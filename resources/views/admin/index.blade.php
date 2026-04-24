@@ -3,7 +3,7 @@
 @section('admin')
 
       <!-- ทำงานที่หน้า StatisticsController -->
-  
+
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
@@ -604,9 +604,6 @@
         min-height: 360px;
     }
 
-    /* =========================
-       RESPONSIVE
-    ========================= */
     @media (max-width: 991.98px) {
         .dashboard-hero {
             padding: 1.25rem;
@@ -664,7 +661,6 @@
             min-height: 300px;
         }
 
-        /* จอเล็กให้ table เลื่อนได้สบาย */
         .dashboard-table-scroll {
             margin: 0 -2px;
             padding-bottom: .15rem;
@@ -726,6 +722,62 @@
                 </div>
             </div>
         </div>
+
+        {{-- =========================
+             PATCH: แจ้งเตือนรายการจำหน่ายรออนุมัติ
+             แสดงเฉพาะ admin / executive เท่านั้น
+             ไม่กระทบส่วนแจ้งเตือนเดิม
+        ========================= --}}
+        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'executive']) && isset($pendingReferApprovals) && $pendingReferApprovals->count() > 0)
+            <div class="card dashboard-card mb-4">
+                <div class="card-header">
+                    <div class="alert-appointment-header">
+                        <div>
+                            <h5 class="section-title mb-1">แจ้งเตือนการจำหน่ายรออนุมัติ</h5>
+                            <p class="section-subtitle mb-0">รายการเหล่านี้ยังไม่ออกจากระบบ จนกว่าจะได้รับการอนุมัติ</p>
+                        </div>
+                        <div class="alert-chip" style="background:#fff7ed;color:#c2410c;">
+                            <i class="bi bi-bell-fill"></i>
+                            <span>{{ $pendingReferApprovals->count() }} รายการ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="dashboard-table-scroll dashboard-table-fade">
+                        <table class="table appointment-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ชื่อ - สกุล</th>
+                                    <th class="text-center">วันที่นำส่ง</th>
+                                    <th class="text-center">สาเหตุ</th>
+                                    <th class="text-center">สถานที่นำส่ง</th>
+                                    <th class="text-center">ดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingReferApprovals as $item)
+                                    <tr class="table-warning">
+                                        <td>{{ $item->client->fullname ?? $item->client->name ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ \Carbon\Carbon::parse($item->refer_date)->format('d/m/Y') }}
+                                        </td>
+                                        <td class="text-center">{{ $item->translate->translate_name ?? '-' }}</td>
+                                        <td>{{ $item->destination ?? '-' }}</td>
+                                        <td class="text-center">
+                                            <a href="{{ route('refers.index', $item->client_id) }}" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                                <span>เปิดหน้าอนุมัติ</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <div class="card dashboard-card mb-4">
             <div class="card-header">
@@ -887,6 +939,15 @@
                             <input class="form-check-input" type="radio" name="release_status" id="statusShow" value="show"
                                    {{ ($releaseStatus ?? '')=='show' ? 'checked' : '' }}>
                             <label class="form-check-label" for="statusShow">อยู่อาศัย</label>
+                        </div>
+
+                        {{-- =========================
+                             PATCH: เพิ่มสถานะรออนุมัติจำหน่าย
+                        ========================= --}}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="release_status" id="statusPendingRefer" value="pending_refer"
+                                   {{ ($releaseStatus ?? '')=='pending_refer' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="statusPendingRefer">รออนุมัติจำหน่าย</label>
                         </div>
 
                         <div class="form-check form-check-inline">
@@ -1115,6 +1176,8 @@
                                         <th>ระดับการศึกษา</th>
                                         <th>ภาคเรียน</th>
                                         <th>สถานศึกษา</th>
+                                        {{-- PATCH: เพิ่มสถานะเพื่อให้ตรวจสอบการรออนุมัติได้ง่าย --}}
+                                        <th>สถานะ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1143,10 +1206,25 @@
                                                 <td class="table-muted">-</td>
                                                 <td class="table-muted">-</td>
                                             @endif
+
+                                            <td>
+                                                {{-- =========================
+                                                     PATCH: แสดงสถานะผู้รับบริการ
+                                                ========================= --}}
+                                                @if($c->release_status === 'show')
+                                                    <span class="badge bg-primary">อยู่อาศัย</span>
+                                                @elseif($c->release_status === 'pending_refer')
+                                                    <span class="badge bg-warning text-dark">รออนุมัติจำหน่าย</span>
+                                                @elseif($c->release_status === 'refer')
+                                                    <span class="badge bg-success">ถูกจำหน่าย</span>
+                                                @else
+                                                    <span class="badge bg-secondary">-</span>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted">ไม่มีข้อมูล</td>
+                                            <td colspan="7" class="text-center text-muted">ไม่มีข้อมูล</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

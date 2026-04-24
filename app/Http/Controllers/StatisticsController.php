@@ -11,6 +11,7 @@ use App\Models\Education;
 use App\Models\Problem;
 use App\Models\Medical;
 use App\Models\Psychiatric;
+use App\Models\Refer; // PATCH: เพิ่ม Refer สำหรับแจ้งเตือนรายการจำหน่ายรออนุมัติ
 use Carbon\Carbon;
 
 class StatisticsController extends Controller
@@ -34,15 +35,18 @@ class StatisticsController extends Controller
         $endMonth   = $request->input('end_month', null);
         $endYear    = $request->input('end_year', null);
 
-        $query = Client::with(['educationRecords' => function($q) use ($education, $institutionId) {
-            if ($education) {
-                $q->where('education_id', $education);
-            }
-            if ($institutionId) {
-                $q->where('institution_id', $institutionId);
-            }
-            $q->with(['education','semester','institution']);
-        }, 'problems']);
+        $query = Client::with([
+            'educationRecords' => function ($q) use ($education, $institutionId) {
+                if ($education) {
+                    $q->where('education_id', $education);
+                }
+                if ($institutionId) {
+                    $q->where('institution_id', $institutionId);
+                }
+                $q->with(['education', 'semester', 'institution']);
+            },
+            'problems'
+        ]);
 
         // ✅ กรองตามช่วงเดือน/ปี (start → end)
         if ($startMonth && $startYear && $endMonth && $endYear) {
@@ -56,38 +60,48 @@ class StatisticsController extends Controller
         } elseif ($yearMin && $yearMax) {
             // fallback: กรองตามปี พ.ศ.
             $query->whereBetween('created_at', [
-                ($yearMin - 543).'-01-01',
-                ($yearMax - 543).'-12-31'
+                ($yearMin - 543) . '-01-01',
+                ($yearMax - 543) . '-12-31'
             ]);
         }
 
         if ($month) {
             $query->whereMonth('created_at', $month);
         }
+
         if ($gender) {
             $query->where('gender', $gender);
         }
+
         if ($ageMin && $ageMax) {
             $query->whereBetween('birth_date', [
                 now()->subYears($ageMax),
                 now()->subYears($ageMin)
             ]);
         }
+
         if ($education) {
-            $query->whereHas('educationRecords', function($q) use ($education) {
+            $query->whereHas('educationRecords', function ($q) use ($education) {
                 $q->where('education_id', $education);
             });
         }
+
         if ($institutionId) {
-            $query->whereHas('educationRecords', function($q) use ($institutionId) {
+            $query->whereHas('educationRecords', function ($q) use ($institutionId) {
                 $q->where('institution_id', $institutionId);
             });
         }
+
         if ($problemId) {
-            $query->whereHas('problems', function($q) use ($problemId) {
+            $query->whereHas('problems', function ($q) use ($problemId) {
                 $q->where('problems.id', $problemId);
             });
         }
+
+        // =========================
+        // PATCH: รองรับการกรอง release_status แบบเดิมทั้งหมด
+        // และรองรับค่าใหม่ pending_refer โดยไม่กระทบ flow เดิม
+        // =========================
         if (!empty($releaseStatus) && $releaseStatus !== 'all') {
             $query->whereIn('release_status', (array) $releaseStatus);
         }
@@ -108,7 +122,7 @@ class StatisticsController extends Controller
             }
         }
 
-        $today = Carbon::today();
+        $today        = Carbon::today();
         $fiveDaysLater = Carbon::today()->addDays(5);
 
         // ✅ ขาดเรียนวันนี้
@@ -117,6 +131,7 @@ class StatisticsController extends Controller
             ->groupBy('client_id')
             ->selectRaw('MIN(id) as id, client_id')
             ->get();
+
         $absentCount = $absentRecords->count();
         $absentNames = $absentRecords->map(fn($record) => $record->client->fullname)->toArray();
 
@@ -126,6 +141,7 @@ class StatisticsController extends Controller
             ->groupBy('client_id')
             ->selectRaw('MIN(id) as id, client_id')
             ->get();
+
         $accidentCount = $accidentRecords->count();
         $accidentNames = $accidentRecords->map(fn($record) => $record->client->fullname)->toArray();
 
@@ -135,6 +151,7 @@ class StatisticsController extends Controller
             ->groupBy('client_id')
             ->selectRaw('MIN(id) as id, client_id')
             ->get();
+
         $escapeCount = $escapeRecords->count();
         $escapeNames = $escapeRecords->map(fn($record) => $record->client->fullname)->toArray();
 
@@ -145,52 +162,69 @@ class StatisticsController extends Controller
         $medicalRecords = Medical::with('client')
             ->whereBetween('appt_date', [$today, $fiveDaysLater])
             ->get();
+
         foreach ($medicalRecords as $m) {
             $age = Carbon::parse($m->client->birth_date)->age;
-           $appointments->push([
-            'fullname' => $m->client->fullname,   // ใช้ fullname อย่างเดียว
-            'age'      => $age,
-            'type'     => 'พบแพทย์',
-            'date'     => $m->appt_date
-        ]);
-    }
+            $appointments->push([
+                'fullname' => $m->client->fullname,
+                'age'      => $age,
+                'type'     => 'พบแพทย์',
+                'date'     => $m->appt_date
+            ]);
+        }
 
         // Psychiatric
         $psychiatricRecords = Psychiatric::with('client')
             ->whereBetween('appoin_date', [$today, $fiveDaysLater])
             ->get();
+
         foreach ($psychiatricRecords as $p) {
             $age = Carbon::parse($p->client->birth_date)->age;
-           $appointments->push([
-            'fullname' => $p->client->fullname,   // ใช้ fullname อย่างเดียว
-            'age'      => $age,
-            'type'     => 'พบจิตแพทย์',
-            'date'     => $p->appoin_date
-        ]);
-      }
+            $appointments->push([
+                'fullname' => $p->client->fullname,
+                'age'      => $age,
+                'type'     => 'พบจิตแพทย์',
+                'date'     => $p->appoin_date
+            ]);
+        }
 
         // Accident ที่มี appointment
         $accidentAppointments = Accident::with('client')
             ->whereNotNull('appointment')
             ->whereBetween('appointment', [$today, $fiveDaysLater])
             ->get();
+
         foreach ($accidentAppointments as $a) {
             $age = Carbon::parse($a->client->birth_date)->age;
-           $appointments->push([
-            'fullname' => $a->client->fullname,   // ใช้ fullname อย่างเดียว
-            'age'      => $age,
-            'type'     => $a->treat_no,
-            'date'     => $a->appointment
-        ]);
-     }
+            $appointments->push([
+                'fullname' => $a->client->fullname,
+                'age'      => $age,
+                'type'     => $a->treat_no,
+                'date'     => $a->appointment
+            ]);
+        }
 
-        $appointments = $appointments->sortBy('date');
+        $appointments     = $appointments->sortBy('date');
         $appointmentCount = $appointments->count();
 
-                $educations = Education::all();
-                $problems   = Problem::all();
+        $educations = Education::all();
+        $problems   = Problem::all();
 
-            return view('admin.index', [
+        // =========================
+        // PATCH: รายการจำหน่ายรออนุมัติ
+        // แสดงเฉพาะ admin / executive
+        // ไม่กระทบผู้ใช้งานกลุ่มอื่น
+        // =========================
+        $pendingReferApprovals = collect();
+
+        if (auth()->check() && in_array(auth()->user()->role, ['admin', 'executive'])) {
+            $pendingReferApprovals = Refer::with(['client', 'translate'])
+                ->where('approve_status', 'pending')
+                ->latest()
+                ->get();
+        }
+
+        return view('admin.index', [
             'clients'          => $clients,
             'yearMin'          => $yearMin ?? '',
             'yearMax'          => $yearMax ?? '',
@@ -225,6 +259,11 @@ class StatisticsController extends Controller
             // ✅ การนัดหมายแพทย์ล่วงหน้า 5 วัน
             'appointments'     => $appointments,
             'appointmentCount' => $appointmentCount,
+
+            // =========================
+            // PATCH: ส่งรายการจำหน่ายรออนุมัติไปหน้า dashboard
+            // =========================
+            'pendingReferApprovals' => $pendingReferApprovals,
         ]);
-     }
- }
+    }
+}

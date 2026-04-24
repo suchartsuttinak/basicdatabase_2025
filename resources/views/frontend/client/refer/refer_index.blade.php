@@ -1,26 +1,28 @@
 @extends('admin_client.admin_client')
 @section('content')
 
+@php
+    $canApproveRefer = auth()->check() && in_array(auth()->user()->role, ['admin', 'executive']);
+@endphp
 
-    @push('styles')
-    <link rel="stylesheet" href="{{ asset('backend/assets/css/refer.css') }}">
-    @endpush
+@push('styles')
+<link rel="stylesheet" href="{{ asset('backend/assets/css/refer.css') }}">
+@endpush
 
+<div class="container-fluid mt-2 refer-page">
+    <div class="rf-main-card">
 
-    <div class="container-fluid mt-2 refer-page">
-        <div class="rf-main-card">
-        
-            <!-- Header -->
-            @include('frontend.client.refer.partials._header')
+        <!-- Header -->
+        @include('frontend.client.refer.partials._header')
 
         <div class="rf-body">
 
-               <!-- Info Card -->
+            <!-- Info Card -->
             @include('frontend.client.refer.partials.info-card')
 
-               <!-- Table -->
+            <!-- Table -->
             @include('frontend.client.refer.partials._table')
- 
+
         </div>
     </div>
 
@@ -252,12 +254,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ถ้ามี old guardian จาก validation ฝั่ง server
     if (form && "{{ old('guardian') }}" === 'มี') {
         setGuardianState(true);
     }
 
-    // DataTable adjust
     function adjustReferTable() {
         if (window.jQuery && jQuery.fn.DataTable && jQuery.fn.DataTable.isDataTable('#datatable-refer')) {
             const dt = jQuery('#datatable-refer').DataTable();
@@ -284,23 +284,48 @@ document.addEventListener('DOMContentLoaded', function () {
                 bootstrap.Modal.getOrCreateInstance(modalEl).show();
             }
 
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                html: `{!! implode('<br>', $errors->all()) !!}`,
-                confirmButtonText: 'ตกลง'
-            });
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    html: `{!! implode('<br>', $errors->all()) !!}`,
+                    confirmButtonText: 'ตกลง'
+                });
+            }
         })();
     @endif
 
-    @if (session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'สำเร็จ',
-            text: '{{ session('success') }}',
-            timer: 2500,
-            confirmButtonText: 'ตกลง'
-        });
+    @if (session('message'))
+        (function () {
+            let swalIcon = 'success';
+            const alertType = @json(session('alert-type'));
+
+            if (alertType === 'warning') swalIcon = 'warning';
+            if (alertType === 'error') swalIcon = 'error';
+            if (alertType === 'info') swalIcon = 'info';
+
+            if (window.Swal) {
+                Swal.fire({
+                    icon: swalIcon,
+                    title: alertType === 'success' ? 'สำเร็จ' : (alertType === 'warning' ? 'แจ้งเตือน' : (alertType === 'info' ? 'ข้อมูล' : 'เกิดข้อผิดพลาด')),
+                    text: @json(session('message')),
+                    timer: alertType === 'success' ? 2500 : undefined,
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+        })();
+    @endif
+
+    @if (session('success') && !session('message'))
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'success',
+                title: 'สำเร็จ',
+                text: @json(session('success')),
+                timer: 2500,
+                confirmButtonText: 'ตกลง'
+            });
+        }
     @endif
 });
 </script>

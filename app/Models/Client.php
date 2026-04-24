@@ -323,4 +323,9 @@ class Client extends Model
 {
     return $this->hasMany(\App\Models\Followup::class, 'client_id');
 }
+
+public function healthcHeckups()
+{
+    return $this->hasMany(\App\Models\HealthcHeckup::class, 'client_id');
+}
 }

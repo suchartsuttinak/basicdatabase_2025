@@ -317,6 +317,16 @@
                     </a>
                 </li>
 
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'executive']))
+    <li class="nav-item">
+        <a href="{{ route('refers.all') }}"
+           class="nav-link {{ request()->routeIs('refers.all') ? 'active' : '' }}">
+            <i class="bi bi-box-arrow-right me-2"></i>
+            <span>รายงานการจำหน่าย</span>
+        </a>
+    </li>
+@endif
+
                 {{-- =========================
                     จัดการผู้ใช้งาน
                 ========================== --}}

@@ -25,12 +25,12 @@ class CheckBodyController extends Controller
 
         $checkbody = null;
 
-       return view('frontend.client.checkBody.index', compact(
-    'client',
-    'client_id',
-    'checkbodies',
-    'checkbody'
-));
+        return view('frontend.client.checkBody.index', compact(
+            'client',
+            'client_id',
+            'checkbodies',
+            'checkbody'
+        ));
     }
 
     public function CheckBodyStore(Request $request)
@@ -43,8 +43,21 @@ class CheckBodyController extends Controller
         // =========================
         Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
+        // =========================
+        // PATCH: เคลียร์รายละเอียดกรณีสมวัย
+        // =========================
         if (($validated['development'] ?? null) === 'สมวัย') {
             $validated['detail'] = null;
+        }
+
+        // =========================
+        // PATCH: เคลียร์ข้อมูลส่วนการพัฒนาใหม่ตามเงื่อนไข
+        // =========================
+        if (($validated['development_type'] ?? null) !== 'เด็กกลุ่มพิเศษ') {
+            $validated['special_support_type'] = null;
+            $validated['special_support_other'] = null;
+        } elseif (($validated['special_support_type'] ?? null) !== 'อื่น ๆ') {
+            $validated['special_support_other'] = null;
         }
 
         CheckBody::create($validated);
@@ -96,8 +109,21 @@ class CheckBodyController extends Controller
         // =========================
         Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
+        // =========================
+        // PATCH: เคลียร์รายละเอียดกรณีสมวัย
+        // =========================
         if (($validated['development'] ?? null) === 'สมวัย') {
             $validated['detail'] = null;
+        }
+
+        // =========================
+        // PATCH: เคลียร์ข้อมูลส่วนการพัฒนาใหม่ตามเงื่อนไข
+        // =========================
+        if (($validated['development_type'] ?? null) !== 'เด็กกลุ่มพิเศษ') {
+            $validated['special_support_type'] = null;
+            $validated['special_support_other'] = null;
+        } elseif (($validated['special_support_type'] ?? null) !== 'อื่น ๆ') {
+            $validated['special_support_other'] = null;
         }
 
         $checkbody->update($validated);
@@ -158,6 +184,23 @@ class CheckBodyController extends Controller
             'development' => ['required', 'in:สมวัย,ไม่สมวัย'],
             'detail' => ['nullable', 'string'],
 
+            // =========================
+            // PATCH: ฟิลด์ใหม่
+            // =========================
+            'development_type' => ['nullable', 'in:เด็กทั่วไป,เด็กกลุ่มพิเศษ'],
+            'special_support_type' => [
+                'nullable',
+                Rule::in([
+                    'ต้องการการสนับสนุนด้านการเรียนรู้ (อ่าน เขียน คำนวณ)',
+                    'ต้องการการสนับสนุนด้านพฤติกรรมและอารมณ์ (การควบคุมอารมณ์, สมาธิ)',
+                    'ต้องการการสนับสนุนด้านสังคม (การเข้าสังคม, ทำงานร่วมกับเพื่อน)',
+                    'ต้องการการสนับสนุนด้านร่างกาย (การเคลื่อนไหว, สุขภาพ)',
+                    'มีศักยภาพพิเศษที่ควรส่งเสริม (ดนตรี, กีฬา, ศิลปะ)',
+                    'อื่น ๆ',
+                ]),
+            ],
+            'special_support_other' => ['nullable', 'string', 'max:255'],
+
             'weight' => ['nullable', 'numeric', 'min:0'],
             'height' => ['nullable', 'numeric', 'min:0'],
 
@@ -186,6 +229,10 @@ class CheckBodyController extends Controller
 
             'development.required' => 'กรุณาเลือกผลการประเมินพัฒนาการ',
             'development.in' => 'ค่าพัฒนาการไม่ถูกต้อง',
+
+            'development_type.in' => 'ค่าการพัฒนาไม่ถูกต้อง',
+            'special_support_type.in' => 'ประเภทการสนับสนุนไม่ถูกต้อง',
+            'special_support_other.max' => 'รายละเอียดอื่น ๆ ต้องไม่เกิน 255 ตัวอักษร',
 
             'weight.numeric' => 'น้ำหนักต้องเป็นตัวเลข',
             'weight.min' => 'น้ำหนักต้องไม่น้อยกว่า 0',

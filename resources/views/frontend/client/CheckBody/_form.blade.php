@@ -3,6 +3,8 @@
 
     $isEdit = isset($checkbody) && $checkbody;
     $oldDevelopment = old('development', $checkbody->development ?? 'สมวัย');
+    $oldDevelopmentType = old('development_type', $checkbody->development_type ?? 'เด็กทั่วไป');
+    $oldSpecialSupportType = old('special_support_type', $checkbody->special_support_type ?? '');
     $assessorDateValue = old('assessor_date', ThaiDateHelper::toInputDate($checkbody->assessor_date ?? null));
 @endphp
 
@@ -119,6 +121,109 @@
                     @error('detail')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
+                </div>
+
+                {{-- PATCH: เพิ่มส่วนการพัฒนาใหม่ --}}
+                <div class="col-12">
+                    <label class="modern-label d-block">การส่งเสริมและพัฒนา<span class="required">*</span></label>
+                    <div class="radio-card-group">
+                        <div class="radio-card">
+                            <input
+                                type="radio"
+                                name="development_type"
+                                id="development_type_normal"
+                                value="เด็กทั่วไป"
+                                {{ $oldDevelopmentType === 'เด็กทั่วไป' ? 'checked' : '' }}
+                            >
+                            <label for="development_type_normal">
+                                <span class="icon-wrap"><i class="bi bi-person"></i></span>
+                                <span>เด็กทั่วไป</span>
+                            </label>
+                        </div>
+
+                        <div class="radio-card">
+                            <input
+                                type="radio"
+                                name="development_type"
+                                id="development_type_special"
+                                value="เด็กกลุ่มพิเศษ"
+                                {{ $oldDevelopmentType === 'เด็กกลุ่มพิเศษ' ? 'checked' : '' }}
+                            >
+                            <label for="development_type_special">
+                                <span class="icon-wrap"><i class="bi bi-stars"></i></span>
+                                <span>เด็กกลุ่มพิเศษ</span>
+                            </label>
+                        </div>
+                    </div>
+                    @error('development_type')
+                        <div class="text-danger small mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div
+                    class="col-12"
+                    id="special-support-section"
+                    style="{{ $oldDevelopmentType === 'เด็กกลุ่มพิเศษ' ? '' : 'display:none;' }}"
+                >
+                    <div class="metric-box">
+                        <div class="row g-3">
+                            <div class="col-lg-8">
+                                <label class="modern-label">ประเภทการสนับสนุน</label>
+                                <select
+                                    name="special_support_type"
+                                    id="special_support_type"
+                                    class="form-select @error('special_support_type') is-invalid @enderror"
+                                >
+                                    <option value="">-- กรุณาเลือก --</option>
+                                    <option value="ต้องการการสนับสนุนด้านการเรียนรู้ (อ่าน เขียน คำนวณ)"
+                                        {{ $oldSpecialSupportType === 'ต้องการการสนับสนุนด้านการเรียนรู้ (อ่าน เขียน คำนวณ)' ? 'selected' : '' }}>
+                                        ต้องการการสนับสนุนด้านการเรียนรู้ (อ่าน เขียน คำนวณ)
+                                    </option>
+                                    <option value="ต้องการการสนับสนุนด้านพฤติกรรมและอารมณ์ (การควบคุมอารมณ์, สมาธิ)"
+                                        {{ $oldSpecialSupportType === 'ต้องการการสนับสนุนด้านพฤติกรรมและอารมณ์ (การควบคุมอารมณ์, สมาธิ)' ? 'selected' : '' }}>
+                                        ต้องการการสนับสนุนด้านพฤติกรรมและอารมณ์ (การควบคุมอารมณ์, สมาธิ)
+                                    </option>
+                                    <option value="ต้องการการสนับสนุนด้านสังคม (การเข้าสังคม, ทำงานร่วมกับเพื่อน)"
+                                        {{ $oldSpecialSupportType === 'ต้องการการสนับสนุนด้านสังคม (การเข้าสังคม, ทำงานร่วมกับเพื่อน)' ? 'selected' : '' }}>
+                                        ต้องการการสนับสนุนด้านสังคม (การเข้าสังคม, ทำงานร่วมกับเพื่อน)
+                                    </option>
+                                    <option value="ต้องการการสนับสนุนด้านร่างกาย (การเคลื่อนไหว, สุขภาพ)"
+                                        {{ $oldSpecialSupportType === 'ต้องการการสนับสนุนด้านร่างกาย (การเคลื่อนไหว, สุขภาพ)' ? 'selected' : '' }}>
+                                        ต้องการการสนับสนุนด้านร่างกาย (การเคลื่อนไหว, สุขภาพ)
+                                    </option>
+                                    <option value="มีศักยภาพพิเศษที่ควรส่งเสริม (ดนตรี, กีฬา, ศิลปะ)"
+                                        {{ $oldSpecialSupportType === 'มีศักยภาพพิเศษที่ควรส่งเสริม (ดนตรี, กีฬา, ศิลปะ)' ? 'selected' : '' }}>
+                                        มีศักยภาพพิเศษที่ควรส่งเสริม (ดนตรี, กีฬา, ศิลปะ)
+                                    </option>
+                                    <option value="อื่น ๆ" {{ $oldSpecialSupportType === 'อื่น ๆ' ? 'selected' : '' }}>
+                                        อื่น ๆ
+                                    </option>
+                                </select>
+                                @error('special_support_type')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div
+                                class="col-lg-4"
+                                id="special-support-other-wrap"
+                                style="{{ $oldSpecialSupportType === 'อื่น ๆ' ? '' : 'display:none;' }}"
+                            >
+                                <label class="modern-label">อื่น ๆ (ระบุ)</label>
+                                <input
+                                    type="text"
+                                    name="special_support_other"
+                                    id="special_support_other"
+                                    class="form-control @error('special_support_other') is-invalid @enderror"
+                                    value="{{ old('special_support_other', $checkbody->special_support_other ?? '') }}"
+                                    placeholder="ระบุรายละเอียดเพิ่มเติม"
+                                >
+                                @error('special_support_other')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-12">

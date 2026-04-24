@@ -7,14 +7,6 @@
                         <i data-feather="menu" class="noti-icon"></i>
                     </button>
                 </li>
-                <li class="d-none d-lg-block">
-                    <div class="position-relative topbar-search">
-                        <input type="text" class="form-control bg-light bg-opacity-75 border-light ps-4"
-                            placeholder="Search...">
-                        <i
-                            class="mdi mdi-magnify fs-16 position-absolute text-muted top-50 translate-middle-y ms-2"></i>
-                    </div>
-                </li>
             </ul>
 
             <ul class="list-unstyled topnav-menu mb-0 d-flex align-items-center">
@@ -25,197 +17,275 @@
                     </button>
                 </li>
 
-                <li class="dropdown notification-list topbar-dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                        aria-haspopup="false" aria-expanded="false">
-                        <i data-feather="bell" class="noti-icon"></i>
-                        <span class="badge bg-danger rounded-circle noti-icon-badge">9</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end dropdown-lg">
+                @php
+                    $pendingRefers = $pendingRefers ?? 0;
+                    $todayAbsents = $todayAbsents ?? 0;
+                    $todayIllnesses = $todayIllnesses ?? 0;
+                    $upcomingAppointments = $upcomingAppointments ?? 0;
 
-                        <!-- item-->
-                        <div class="dropdown-item noti-title">
-                            <h5 class="m-0">
-                                <span class="float-end">
-                                    <a href="" class="text-dark">
-                                        <small>Clear All</small>
-                                    </a>
-                                </span>Notification
-                            </h5>
-                        </div>
+                    $notificationCount =
+                        $pendingRefers
+                        + $todayAbsents
+                        + $todayIllnesses
+                        + $upcomingAppointments;
 
-                        <div class="noti-scroll" data-simplebar>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);"
-                                class="dropdown-item notify-item text-muted link-primary active">
-                                <div class="notify-icon">
-                                    <img src="{{ asset('backend/assets/images/users/user-12.jpg') }}"
-                                        class="img-fluid rounded-circle" alt="" />
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <p class="notify-details">Carl Steadham</p>
-                                    <small class="text-muted">5 min ago</small>
-                                </div>
-                                <p class="mb-0 user-msg">
-                                    <small class="fs-14">Completed <span class="text-reset">Improve workflow in
-                                            Figma</span></small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
-                                <div class="notify-icon">
-                                    <img src="{{ asset('backend/assets/images/users/user-2.jpg') }}"
-                                        class="img-fluid rounded-circle" alt="" />
-                                </div>
-                                <div class="notify-content">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <p class="notify-details">Olivia McGuire</p>
-                                        <small class="text-muted">1 min ago</small>
-                                    </div>
-
-                                    <div class="d-flex mt-2 align-items-center">
-                                        <div class="notify-sub-icon">
-                                            <i class="mdi mdi-download-box text-dark"></i>
-                                        </div>
-
-                                        <div>
-                                            <p class="notify-details mb-0">dark-themes.zip</p>
-                                            <small class="text-muted">2.4 MB</small>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
-                                <div class="notify-icon">
-                                    <img src="{{ asset('backend/assets/images/users/user-3.jpg') }}"
-                                        class="img-fluid rounded-circle" alt="" />
-                                </div>
-                                <div class="notify-content">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <p class="notify-details">Travis Williams</p>
-                                        <small class="text-muted">7 min ago</small>
-                                    </div>
-                                    <p class="noti-mentioned p-2 rounded-2 mb-0 mt-2"><span
-                                            class="text-primary">@Patryk</span> Please make sure that you're....
-                                    </p>
-                                </div>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
-                                <div class="notify-icon">
-                                    <img src="assets/images/users/user-8.jpg" class="img-fluid rounded-circle"
-                                        alt="" />
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <p class="notify-details">Violette Lasky</p>
-                                    <small class="text-muted">5 min ago</small>
-                                </div>
-                                <p class="mb-0 user-msg">
-                                    <small class="fs-14">Completed <span class="text-reset">Create new
-                                            components</span></small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
-                                <div class="notify-icon">
-                                    <img src="assets/images/users/user-5.jpg" class="img-fluid rounded-circle"
-                                        alt="" />
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <p class="notify-details">Ralph Edwards</p>
-                                    <small class="text-muted">5 min ago</small>
-                                </div>
-                                <p class="mb-0 user-msg">
-                                    <small class="fs-14">Completed <span class="text-reset">Improve workflow
-                                            in React</span></small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item text-muted link-primary">
-                                <div class="notify-icon">
-                                    <img src="assets/images/users/user-6.jpg" class="img-fluid rounded-circle"
-                                        alt="" />
-                                </div>
-                                <div class="notify-content">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <p class="notify-details">Jocab jones</p>
-                                        <small class="text-muted">7 min ago</small>
-                                    </div>
-                                    <p class="noti-mentioned p-2 rounded-2 mb-0 mt-2"><span
-                                            class="text-reset">@Patryk</span> Please make sure that you're....
-                                    </p>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- All-->
-                        <a href="javascript:void(0);"
-                            class="dropdown-item text-center text-primary notify-item notify-all">
-                            View all
-                            <i class="fe-arrow-right"></i>
-                        </a>
-
-                    </div>
-                </li>
-
-                <!-- ชื่อและรูปโปรไฟล์-->
-                 @php
                     $id = Auth::user()->id;
                     $profileData = App\Models\User::find($id);
                 @endphp
 
                 <li class="dropdown notification-list topbar-dropdown">
-                    <a class="nav-link dropdown-toggle nav-user me-0" data-bs-toggle="dropdown" href="#"
-                        role="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : 
-                        url('upload/no_image.jpg') }}" alt="user-image"
-                        class="rounded-circle">
+                    <a class="nav-link dropdown-toggle position-relative"
+                       data-bs-toggle="dropdown"
+                       href="#"
+                       role="button">
+                        <i data-feather="bell" class="noti-icon"></i>
+
+                        @if($notificationCount > 0)
+                            <span class="badge bg-danger rounded-circle noti-icon-badge">
+                                {{ $notificationCount }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-end dropdown-lg shadow border-0 notification-panel">
+                        <div class="dropdown-item noti-title border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0 fw-bold notification-title">
+                                        <i class="mdi mdi-bell-ring-outline me-1"></i>
+                                        ศูนย์แจ้งเตือนผู้รับบริการ
+                                    </h5>
+                                    <small class="text-muted">รายการติดตามสำคัญ</small>
+                                </div>
+
+                                @if($notificationCount > 0)
+                                    <span class="badge bg-danger">
+                                        {{ $notificationCount }}
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="noti-scroll" data-simplebar style="max-height:420px;">
+                            @if($notificationCount > 0)
+
+                                @foreach(($upcomingAppointmentItems ?? collect()) as $item)
+                                    @php
+                                        $client = $item->client ?? null;
+                                        $clientName = $client->fullname ?? trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
+
+                                        $appointDate = $item->appointment_date ?? $item->appoin_date ?? null;
+                                        $appointDateText = $appointDate
+                                            ? \Carbon\Carbon::parse($appointDate)->addYears(543)->format('d/m/Y')
+                                            : '-';
+                                    @endphp
+
+                                    <a href="{{ $client ? route('client.edit', $client->id) : route('client.show') }}"
+                                       class="dropdown-item notify-item">
+                                        <div class="notify-icon bg-warning-subtle text-warning">
+                                            <i class="mdi mdi-calendar-clock"></i>
+                                        </div>
+
+                                        <div class="notify-content">
+                                            <div class="fw-semibold">
+                                                นัดพบแพทย์: {{ $clientName ?: '-' }}
+                                            </div>
+
+                                            <small class="text-muted d-block">
+                                                เลขทะเบียน {{ $client->register_number ?? '-' }}
+                                            </small>
+
+                                            <small class="text-danger d-block fw-semibold">
+                                                นัดวันที่ {{ $appointDateText }}
+                                            </small>
+                                        </div>
+                                    </a>
+                                @endforeach
+
+                                @foreach(($pendingReferItems ?? collect()) as $item)
+                                    @php
+                                        $client = $item->client ?? null;
+                                        $clientName = $client->fullname ?? trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
+                                    @endphp
+
+                                    <a href="{{ Route::has('refers.all') ? route('refers.all') : route('client.show') }}"
+                                       class="dropdown-item notify-item">
+                                        <div class="notify-icon bg-primary-subtle text-primary">
+                                            <i class="mdi mdi-file-clock-outline"></i>
+                                        </div>
+
+                                        <div class="notify-content">
+                                            <div class="fw-semibold">
+                                                จำหน่ายรออนุมัติ: {{ $clientName ?: '-' }}
+                                            </div>
+
+                                            <small class="text-muted d-block">
+                                                เลขทะเบียน {{ $client->register_number ?? '-' }}
+                                            </small>
+                                        </div>
+                                    </a>
+                                @endforeach
+
+                                @foreach(($todayAbsentItems ?? collect()) as $item)
+                                    @php
+                                        $client = $item->client ?? null;
+                                        $clientName = $client->fullname ?? trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
+                                    @endphp
+
+                                    <a href="{{ $client ? route('client.edit', $client->id) : route('client.show') }}"
+                                       class="dropdown-item notify-item">
+                                        <div class="notify-icon bg-info-subtle text-info">
+                                            <i class="mdi mdi-school-outline"></i>
+                                        </div>
+
+                                        <div class="notify-content">
+                                            <div class="fw-semibold">
+                                                ขาดเรียนวันนี้: {{ $clientName ?: '-' }}
+                                            </div>
+
+                                            <small class="text-muted d-block">
+                                                เลขทะเบียน {{ $client->register_number ?? '-' }}
+                                            </small>
+                                        </div>
+                                    </a>
+                                @endforeach
+
+                                @foreach(($todayIllnessItems ?? collect()) as $item)
+                                    @php
+                                        $client = $item->client ?? null;
+                                        $clientName = $client->fullname ?? trim(($client->first_name ?? '').' '.($client->last_name ?? ''));
+                                    @endphp
+
+                                    <a href="{{ $client ? route('client.edit', $client->id) : route('client.show') }}"
+                                       class="dropdown-item notify-item">
+                                        <div class="notify-icon bg-success-subtle text-success">
+                                            <i class="mdi mdi-medical-bag"></i>
+                                        </div>
+
+                                        <div class="notify-content">
+                                            <div class="fw-semibold">
+                                                เจ็บป่วยวันนี้: {{ $clientName ?: '-' }}
+                                            </div>
+
+                                            <small class="text-muted d-block">
+                                                เลขทะเบียน {{ $client->register_number ?? '-' }}
+                                            </small>
+                                        </div>
+                                    </a>
+                                @endforeach
+
+                            @else
+                                <div class="dropdown-item text-center py-4">
+                                    <i class="mdi mdi-bell-outline fs-26 text-muted d-block mb-2"></i>
+                                    <div class="fw-semibold text-muted">ไม่มีการแจ้งเตือน</div>
+                                    <small class="text-muted">ระบบติดตามเป็นปกติ</small>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </li>
+
+                <li class="dropdown notification-list topbar-dropdown">
+                    <a class="nav-link dropdown-toggle nav-user me-0"
+                       data-bs-toggle="dropdown"
+                       href="#"
+                       role="button"
+                       aria-haspopup="false"
+                       aria-expanded="false">
+                        <img src="{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}"
+                             alt="user-image"
+                             class="rounded-circle">
+
                         <span class="pro-user-name ms-1">
-                        {{$profileData->name}}</i> 
+                            {{ $profileData->name }}
                         </span>
                     </a>
-                     <!-- สิ้นสุดชื่อและรูปโปรไฟล์-->
 
-                    <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
-                        <!-- item-->
+                    <div class="dropdown-menu dropdown-menu-end profile-dropdown">
                         <div class="dropdown-header noti-title">
                             <h6 class="text-overflow m-0">Welcome !</h6>
                         </div>
 
-                        <!-- item-->
                         <a href="{{ route('admin.profile') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-account-circle-outline fs-16 align-middle"></i>
                             <span>ข้อมูลส่วนตัว</span>
                         </a>
 
-                        <!-- item-->
-                        <a href="auth-lock-screen.html" class="dropdown-item notify-item">
+                        <a href="javascript:void(0);" class="dropdown-item notify-item">
                             <i class="mdi mdi-lock-outline fs-16 align-middle"></i>
                             <span>Lock Screen</span>
                         </a>
 
                         <div class="dropdown-divider"></div>
 
-                        <!-- item-->
                         <a href="{{ route('admin.logout') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-location-exit fs-16 align-middle"></i>
                             <span>ออกจากระบบ</span>
                         </a>
-
                     </div>
                 </li>
 
             </ul>
         </div>
-
     </div>
-
 </div>
+
+<style>
+.notification-panel{
+    border-radius:16px;
+    min-width:390px;
+    overflow:hidden;
+}
+
+.notification-title{
+    font-size:15px;
+}
+
+.notify-item{
+    padding:14px 16px;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    transition:.2s;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.notify-item:hover{
+    background:#f8fbff;
+}
+
+.notify-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    flex-shrink:0;
+}
+
+.notify-content{
+    line-height:1.35;
+    min-width:0;
+}
+
+.noti-icon-badge{
+    font-size:10px;
+    min-width:18px;
+    height:18px;
+    line-height:18px;
+    top:8px;
+    right:4px;
+    position:absolute;
+    padding:0 5px;
+    box-shadow:0 0 0 2px #fff;
+}
+
+@media (max-width:575.98px){
+    .notification-panel{
+        min-width:300px;
+        max-width:92vw;
+    }
+}
+</style>

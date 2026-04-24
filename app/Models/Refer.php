@@ -15,18 +15,24 @@ class Refer extends Model
 
     // ✅ เปิด mass assignment
     protected $fillable = [
-        'refer_date',
-        'translate_id',
-        'destination',
-        'address',
-        'guardian',
-        'parent_name',
-        'parent_tel',
-        'member',
-        'teacher',
-        'remark',
-        'client_id',
-    ];
+    'refer_date',
+    'translate_id',
+    'destination',
+    'address',
+    'guardian',
+    'parent_name',
+    'parent_tel',
+    'member',
+    'teacher',
+    'committee_result',
+    'meeting_report_file',
+    'remark',
+    'client_id',
+    'approve_status',
+    'created_by',
+    'approved_by',
+    'approved_at',
+];
 
     // ✅ ให้ Eloquent จัดการ timestamps (ต้องตรงกับชนิดคอลัมน์)
     public $timestamps = true;
