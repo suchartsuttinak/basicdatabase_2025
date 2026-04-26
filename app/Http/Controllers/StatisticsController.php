@@ -220,6 +220,10 @@ class StatisticsController extends Controller
         if (auth()->check() && in_array(auth()->user()->role, ['admin', 'executive'])) {
             $pendingReferApprovals = Refer::with(['client', 'translate'])
                 ->where('approve_status', 'pending')
+                ->whereHas('client', function ($query) {
+                    $query->where('release_status', 'pending_refer');
+                })
+                ->whereIn('client_id', Client::forUser(auth()->user())->pluck('id'))
                 ->latest()
                 ->get();
         }

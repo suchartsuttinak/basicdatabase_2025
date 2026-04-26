@@ -677,3 +677,25 @@ private function authorizeRole(): void
 วิธีที่ดีกว่า (แนะนำมาก)
 ✅ วิธีที่ 2 — ทำเป็น “Trait” ใช้ร่วมกัน
 1. สร้างไฟล์
+<?php
+
+namespace App\Traits;
+
+trait AuthorizeRoleTrait
+{
+    protected function authorizeRole(array $roles = ['admin','executive','social_worker']): void
+    {
+        abort_unless(
+            auth()->check() && in_array(auth()->user()->role, $roles),
+            403,
+            'คุณไม่มีสิทธิ์เข้าถึงข้อมูล'
+        );
+    }
+}
+------------------------------
+use App\Traits\AuthorizeRoleTrait;
+
+class HealthcHeckupController extends Controller
+{
+    use AuthorizeRoleTrait;
+    ------------------------------------------------------------------------------------------------------

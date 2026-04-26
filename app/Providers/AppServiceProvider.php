@@ -39,15 +39,18 @@ class AppServiceProvider extends ServiceProvider
             $authorizedClientIds = Client::forUser(auth()->user())->pluck('id');
 
             if (class_exists(Refer::class) && Schema::hasTable('refers')) {
-                $pendingReferItems = Refer::with('client')
-                    ->where('approve_status', 'pending')
-                    ->whereIn('client_id', $authorizedClientIds)
-                    ->latest()
-                    ->limit(10)
-                    ->get();
+                    $pendingReferItems = Refer::with('client')
+                        ->where('approve_status', 'pending')
+                        ->whereIn('client_id', $authorizedClientIds)
+                        ->whereHas('client', function ($query) {
+                            $query->where('release_status', 'pending_refer');
+                        })
+                        ->latest()
+                        ->limit(10)
+                        ->get();
 
-                $pendingRefers = $pendingReferItems->count();
-            }
+                    $pendingRefers = $pendingReferItems->count();
+                }
 
             if (class_exists(Absent::class) && Schema::hasTable('absents') && Schema::hasColumn('absents', 'absent_date')) {
                 $todayAbsentItems = Absent::with('client')
