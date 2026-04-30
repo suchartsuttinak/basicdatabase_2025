@@ -26,7 +26,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
-      /* ===== BASE ===== */
 body{
     font-family:"TH Sarabun New","Sarabun",sans-serif;
     font-size:14px;
@@ -37,7 +36,6 @@ body{
     padding:22px 12px;
 }
 
-/* ===== LAYOUT ===== */
 .estimate-report-page{
     max-width:1020px;
     margin:0 auto;
@@ -51,7 +49,6 @@ body{
     overflow:hidden;
 }
 
-/* ===== TOOLBAR ===== */
 .estimate-report-toolbar{
     display:flex;
     justify-content:space-between;
@@ -68,7 +65,6 @@ body{
     gap:8px;
 }
 
-/* ===== BUTTON ===== */
 .estimate-report-btn{
     display:inline-flex;
     align-items:center;
@@ -99,23 +95,15 @@ body{
     background:#1d4ed8;
 }
 
-/* ===== CONTENT ===== */
 .estimate-report-content{
     padding:28px 32px 32px;
 }
 
-/* ===== HEADER ===== */
 .estimate-report-head{
     text-align:center;
     margin-bottom:18px;
     padding-bottom:14px;
     border-bottom:1px solid #e2e8f0;
-}
-
-.estimate-report-head-sub{
-    font-size:13px;
-    font-weight:600;
-    color:#64748b;
 }
 
 .estimate-report-head-title{
@@ -124,12 +112,6 @@ body{
     margin:4px 0;
 }
 
-.estimate-report-head-desc{
-    font-size:13px;
-    color:#64748b;
-}
-
-/* ===== META ===== */
 .estimate-report-meta{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -148,7 +130,6 @@ body{
     color:#0f172a;
 }
 
-/* ===== SECTION ===== */
 .estimate-report-section{
     margin-bottom:16px;
 }
@@ -161,7 +142,6 @@ body{
     border-bottom:1px solid #e5edf5;
 }
 
-/* ===== DATA ===== */
 .estimate-report-lines{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -187,7 +167,6 @@ body{
     flex:1;
 }
 
-/* ===== BADGE ===== */
 .estimate-report-inline-badge{
     padding:2px 10px;
     border-radius:999px;
@@ -197,23 +176,53 @@ body{
     font-weight:700;
 }
 
-/* ===== IMAGE ===== */
+.estimate-report-empty{
+    color:#64748b;
+    font-size:14px;
+    padding:6px 0;
+}
+
+/* ===== IMAGE: แก้เฉพาะส่วนนี้ ไม่ให้รูปจอใหญ่เต็มแถว ===== */
 .estimate-report-pictures{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    grid-template-columns:repeat(auto-fit, minmax(220px, 280px));
     gap:12px;
+    justify-content:start;
+    align-items:start;
+}
+
+.estimate-report-picture-item{
+    width:100%;
+    max-width:280px;
+}
+
+.estimate-report-picture-frame{
+    width:100%;
 }
 
 .estimate-report-picture-frame img{
     width:100%;
     height:180px;
     object-fit:cover;
+    object-position:center;
     border-radius:10px;
+    border:1px solid #dbe3ec;
+    display:block;
+}
+
+.estimate-report-picture-caption{
+    font-size:13px;
+    color:#334155;
+    margin-top:6px;
+}
+
+/* กรณีมีรูปเดียว ไม่ให้ยืดเต็มจอ */
+.estimate-report-pictures:has(.estimate-report-picture-item:only-child){
+    grid-template-columns:280px;
 }
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px){
-
     .estimate-report-content{
         padding:18px 14px;
     }
@@ -232,6 +241,18 @@ body{
 
     .estimate-report-label{
         min-width:auto;
+    }
+
+    .estimate-report-pictures{
+        grid-template-columns:1fr;
+    }
+
+    .estimate-report-picture-item{
+        max-width:100%;
+    }
+
+    .estimate-report-picture-frame img{
+        height:220px;
     }
 }
 
@@ -253,6 +274,20 @@ body{
 
     .estimate-report-content{
         padding:0;
+    }
+
+    .estimate-report-pictures{
+        grid-template-columns:repeat(2, 1fr);
+        gap:10px;
+    }
+
+    .estimate-report-picture-item{
+        max-width:100%;
+    }
+
+    .estimate-report-picture-frame img{
+        height:180px;
+        border-radius:6px;
     }
 }
     </style>
@@ -278,9 +313,7 @@ body{
             <div class="estimate-report-content">
 
                 <div class="estimate-report-head">
-                   
                     <h3 class="estimate-report-head-title">รายงานการติดตามและประเมินครอบครัวเด็ก</h3>
-                   
                 </div>
 
                 <div class="estimate-report-meta">

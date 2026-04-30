@@ -26,41 +26,71 @@ Route::middleware(['auth','role:admin,executive,social_worker'])->group(function
     // หน้า Landing
     Route::get('/', [LandingController::class, 'index'])->name('landing.index');
 
-    // [SECURITY] จำกัดสิทธิ์เฉพาะ admin / executive / social_worker
-    Route::middleware(['auth', 'role:admin,executive,social_worker'])->group(function () {
+   // หน้า Landing
+Route::get('/', [LandingController::class, 'index'])->name('landing.index');
 
-  // แสดงหน้า issues
+// ✅ ให้ประชาชนทั่วไปแจ้งเรื่องได้ ไม่ต้อง login
+Route::post('/issues', [IssueController::class, 'store'])
+    ->name('issues.store');
+
+
+// ✅ ข่าวหน้าเว็บ Public ทุกคนดูได้
+Route::get('/news', [NewsController::class, 'index'])
+    ->name('news.index');
+
+Route::get('/news/{id}', [NewsController::class, 'show'])
+    ->name('news.show');
+
+
+// [SECURITY] จำกัดสิทธิ์เฉพาะ admin / executive / social_worker
+Route::middleware(['auth', 'role:admin,executive,social_worker'])->group(function () {
+
+    // ✅ หน้าแสดงรายการ issues สำหรับเจ้าหน้าที่เท่านั้น
     Route::get('/issues', [IssueController::class, 'index'])
         ->name('issues.index');
 
-    // บันทึกข้อมูล issues
-    Route::post('/issues', [IssueController::class, 'store'])
-        ->name('issues.store');
+    // ✅ News CRUD เฉพาะเจ้าหน้าที่
+    Route::get('/news/create', [NewsController::class, 'create'])
+        ->name('news.create');
 
-    // หน้า News CRUD
-    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
-    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
-    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
-    Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
+    Route::post('/news', [NewsController::class, 'store'])
+        ->name('news.store');
 
-    // หน้า about (ฟอร์มกรอกข้อมูล history, objective, mission, contact)
-    Route::get('/about', [AboutController::class, 'index'])->name('landing.about.index');
-    Route::post('/about', [AboutController::class, 'store'])->name('landing.about.store');
-    Route::delete('/about/{id}', [AboutController::class, 'destroy'])->name('landing.about.delete');
-});
-// สิ้นสุดหน้า Landing
+    // หน้า about เฉพาะเจ้าหน้าที่
+    Route::get('/about', [AboutController::class, 'index'])
+        ->name('landing.about.index');
 
+    Route::post('/about', [AboutController::class, 'store'])
+        ->name('landing.about.store');
 
-// หน้า publicizes (ฟอร์มกรอกข้อมูลข่าวสาร/กิจกรรม)
-   Route::prefix('publicizes')->group(function () {
-    Route::get('/', [PublicizeController::class, 'index'])->name('publicizes.index');
-    Route::get('/create', [PublicizeController::class, 'create'])->name('publicizes.create');
-    Route::post('/store', [PublicizeController::class, 'store'])->name('publicizes.store');
-    Route::get('/edit/{publicize}', [PublicizeController::class, 'edit'])->name('publicizes.edit');
-    Route::put('/update/{publicize}', [PublicizeController::class, 'update'])->name('publicizes.update');
-    Route::delete('/delete/{publicize}', [PublicizeController::class, 'destroy'])->name('publicizes.destroy');
+    Route::delete('/about/{id}', [AboutController::class, 'destroy'])
+        ->name('landing.about.delete');
 });
 
+
+// ✅ publicizes ถ้าเป็นหน้าจัดการ ควรล็อกอินด้วย
+Route::middleware(['auth', 'role:admin,executive,social_worker'])
+    ->prefix('publicizes')
+    ->group(function () {
+
+        Route::get('/', [PublicizeController::class, 'index'])
+            ->name('publicizes.index');
+
+        Route::get('/create', [PublicizeController::class, 'create'])
+            ->name('publicizes.create');
+
+        Route::post('/store', [PublicizeController::class, 'store'])
+            ->name('publicizes.store');
+
+        Route::get('/edit/{publicize}', [PublicizeController::class, 'edit'])
+            ->name('publicizes.edit');
+
+        Route::put('/update/{publicize}', [PublicizeController::class, 'update'])
+            ->name('publicizes.update');
+
+        Route::delete('/delete/{publicize}', [PublicizeController::class, 'destroy'])
+            ->name('publicizes.destroy');
+    });
    
 
 // User Profile

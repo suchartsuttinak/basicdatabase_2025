@@ -303,4 +303,22 @@ public function replaceImage(Request $request, $id)
     return response()->json(['success' => true, 'id' => $image->id, 'url' => asset('storage/'.$path)]);
 }
 
-}
+        public function ReportVisitFamily($id)
+        {
+            $visitFamily = VisitFamily::with(['client', 'income', 'images'])
+                ->where('id', $id)
+                ->whereHas('client', function ($q) {
+                    $q->forUser(auth()->user());
+                })
+                ->firstOrFail();
+
+            $client = Client::forUser(auth()->user())
+                ->findOrFail($visitFamily->client_id);
+
+            return view('frontend.client.visitFamily.visitFamily_report', compact(
+                'visitFamily',
+                'client'
+            ));
+        }
+
+        }

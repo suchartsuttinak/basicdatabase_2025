@@ -675,8 +675,10 @@
                                                 type="text"
                                                 name="{{ $prefix }}[idcard]"
                                                 id="{{ $prefix }}_idcard"
-                                                class="form-control {{ $errors->has($idcardField) ? 'is-invalid' : '' }}"
+                                                class="form-control js-thai-idcard {{ $errors->has($idcardField) ? 'is-invalid' : '' }}"
                                                 value="{{ old($idcardField, $person->idcard ?? '') }}"
+                                                maxlength="17"
+                                                placeholder="0-0000-00000-00-0"
                                                 inputmode="numeric"
                                                 autocomplete="off"
                                             >
@@ -984,6 +986,60 @@ document.addEventListener('DOMContentLoaded', function () {
         relative: 'relative-tab'
     };
 
+    /*
+    |--------------------------------------------------------------------------
+    | จัดรูปแบบเลขประจำตัวประชาชน
+    |--------------------------------------------------------------------------
+    | ให้เหมือนหน้า client:
+    | 1-2345-67890-12-3
+    | รองรับทั้งกรณีพิมพ์ใหม่ และกรณีข้อมูลเดิมในฐานข้อมูลเป็นเลขติดกัน 13 หลัก
+    */
+    const formatThaiIdCard = (value) => {
+        let digits = String(value || '').replace(/\D/g, '').substring(0, 13);
+
+        if (digits.length <= 1) {
+            return digits;
+        }
+
+        let formatted = digits.substring(0, 1);
+
+        if (digits.length > 1) {
+            formatted += '-' + digits.substring(1, 5);
+        }
+
+        if (digits.length > 5) {
+            formatted += '-' + digits.substring(5, 10);
+        }
+
+        if (digits.length > 10) {
+            formatted += '-' + digits.substring(10, 12);
+        }
+
+        if (digits.length > 12) {
+            formatted += '-' + digits.substring(12, 13);
+        }
+
+        return formatted;
+    };
+
+    const bindThaiIdCards = () => {
+        document.querySelectorAll('.family-page .js-thai-idcard').forEach(input => {
+            input.value = formatThaiIdCard(input.value);
+
+            input.addEventListener('input', function () {
+                this.value = formatThaiIdCard(this.value);
+
+                if (this.classList.contains('is-invalid')) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+
+            input.addEventListener('blur', function () {
+                this.value = formatThaiIdCard(this.value);
+            });
+        });
+    };
+
     const fetchJSON = async (url) => {
         const response = await fetch(url, {
             headers: {
@@ -1038,9 +1094,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!input) return;
         input.classList.add('is-invalid');
 
-        let errorEl = input.parentElement?.nextElementSibling;
-        if (errorEl && errorEl.classList.contains('field-error') && errorEl.classList.contains('is-ajax')) {
-            errorEl.textContent = message;
+        const oldAjaxError = input.closest('.field-group')?.querySelector('.field-error.is-ajax');
+        if (oldAjaxError) {
+            oldAjaxError.textContent = message;
             return;
         }
 
@@ -1174,6 +1230,8 @@ document.addEventListener('DOMContentLoaded', function () {
         preload();
     };
 
+    bindThaiIdCards();
+
     ['father', 'mother', 'spouse', 'relative'].forEach(bindLocationGroup);
 
     const savedTab = activeTabInput?.value || '';
@@ -1214,6 +1272,8 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             clearBanner();
             clearValidationErrors();
+
+            bindThaiIdCards();
 
             const activeTab = document.querySelector('#familyTabs .nav-link.active');
             if (activeTabInput && activeTab) {
@@ -1287,3 +1347,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 @endsection
+

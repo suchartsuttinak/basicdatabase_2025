@@ -6,7 +6,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<style>
+{{-- <style>
     .registry-page {
         background: #f5f6f8;
         padding: 12px;
@@ -14,8 +14,9 @@
 
     .registry-wrapper {
         background: #fff;
-        border: 1px solid #bfc7d1;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        border: 1px solid #d5dbe3;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         overflow: hidden;
     }
 
@@ -30,120 +31,102 @@
         font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif;
     }
 
-    .registry-topnav {
-        background: #234f87;
-        border-top: 1px solid rgba(255,255,255,.15);
-        border-bottom: 1px solid #c8d0da;
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .registry-topnav a {
-        color: #fff;
-        text-decoration: none;
-        padding: 8px 18px;
-        font-size: 14px;
-        border-right: 1px solid rgba(255,255,255,.15);
-        transition: .2s ease;
-    }
-
-    .registry-topnav a:hover,
-    .registry-topnav a.active {
-        background: rgba(255,255,255,.12);
-    }
-
-    .registry-subnav {
-        background: #f1f1f1;
-        border-bottom: 1px solid #cfd5dc;
-        padding: 0 8px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2px;
-    }
-
-    .registry-subnav a {
-        color: #333;
-        text-decoration: none;
-        padding: 8px 10px;
-        font-size: 14px;
-        border-top: 2px solid transparent;
-    }
-
-    .registry-subnav a.active {
-        background: #fff;
-        border: 1px solid #d4d8dd;
-        border-bottom-color: #fff;
-        border-top: 2px solid #234f87;
-        margin-bottom: -1px;
-    }
-
     .registry-body {
         padding: 12px;
     }
 
     .panel-box {
-        border: 1px solid #c9ced6;
+        border: 1px solid #d2d8e1;
         background: #fff;
         margin-bottom: 12px;
-        padding: 10px 12px;
+        padding: 12px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
     }
 
     .panel-title {
         font-size: 20px;
         font-weight: 700;
         color: #486b97;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif;
         line-height: 1;
     }
 
     .compact-row {
         --bs-gutter-x: 10px;
-        --bs-gutter-y: 6px;
+        --bs-gutter-y: 8px;
     }
 
     .form-label {
         font-size: 14px;
         font-weight: 600;
-        color: #444;
-        margin-bottom: 3px;
+        color: #374151;
+        margin-bottom: 4px;
     }
 
     .form-control,
     .form-select {
         width: 100%;
-        min-height: 34px;
-        height: 34px;
-        padding: 4px 8px;
+        min-height: 36px;
+        height: 36px;
+        padding: 5px 10px;
         font-size: 14px;
-        border-radius: 0;
-        border-color: #bfc5cc;
+        border-radius: 6px;
+        border: 1px solid #c4ccd8;
+        background-color: #fff;
         box-shadow: none !important;
+        transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
     }
 
     textarea.form-control {
-        min-height: 80px;
+        min-height: 84px;
         height: auto;
+        border-radius: 6px;
+    }
+
+    .form-control:hover,
+    .form-select:hover {
+        border-color: #9fb3c8;
+        background-color: #fbfdff;
     }
 
     .form-control:focus,
     .form-select:focus {
         border-color: #234f87;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px rgba(35, 79, 135, .12) !important;
+    }
+
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 2px rgba(220, 53, 69, .10) !important;
     }
 
     .inline-radio-group {
         display: flex;
         align-items: center;
         gap: 14px;
-        min-height: 34px;
-        border: 1px solid #bfc5cc;
-        padding: 0 10px;
+        min-height: 36px;
+        border: 1px solid #c4ccd8;
+        border-radius: 6px;
+        padding: 5px 10px;
         background: #fff;
         flex-wrap: wrap;
     }
 
     .inline-radio-group .form-check {
         margin: 0;
+        display: flex;
+        align-items: center;
+        min-height: 24px;
+    }
+
+    .inline-radio-group .form-check-input {
+        margin-top: 0;
+        margin-right: 5px;
+        flex-shrink: 0;
     }
 
     .inline-radio-group .form-check-label {
@@ -163,94 +146,86 @@
         width: 110px;
         height: 130px;
         object-fit: cover;
-        border: 1px solid #8e99a7;
+        border: 1px solid #b8c2cf;
         background: #fff;
         padding: 2px;
         display: block;
+        border-radius: 6px;
+        box-shadow: 0 3px 8px rgba(15, 23, 42, .10);
     }
 
     .photo-btn {
-        border-radius: 0;
+        border-radius: 6px;
         font-size: 13px;
-        padding: 4px 10px;
+        padding: 5px 12px;
         margin-top: 8px;
         white-space: nowrap;
+        border: 1px solid #c4ccd8;
+        background: #fff;
+        color: #234f87;
+        font-weight: 600;
     }
 
-   .problem-full-width{
-    width: 100%;
-}
-
-.problem-box{
-    border: 1px solid #c9ced6;
-    background: #fcfcfc;
-    padding: 10px;
-    width: 100%;
-}
-
-.problem-grid{
-    display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 1fr));
-    gap: 10px 14px;
-    width: 100%;
-}
-
-.problem-item{
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 8px 10px;
-    border: 1px solid #e1e5ea;
-    background: #fff;
-    cursor: pointer;
-    min-height: 48px;
-    margin: 0;
-    transition: all .2s ease;
-}
-
-.problem-item:hover{
-    border-color: #9fb3c8;
-    background: #f8fbff;
-}
-
-.problem-item input[type="checkbox"]{
-    margin-top: 3px;
-    flex: 0 0 auto;
-}
-
-.problem-item span{
-    font-size: 14px;
-    line-height: 1.45;
-    color: #222;
-    word-break: break-word;
-}
-
-.problem-item:has(input:checked){
-    border-color: #234f87;
-    background: #eef4fb;
-}
-
-@media (max-width: 991.98px){
-    .problem-grid{
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
-    }
-}
-
-@media (max-width: 575.98px){
-    .problem-grid{
-        grid-template-columns: 1fr;
+    .photo-btn:hover {
+        background: #eef4fb;
+        border-color: #9fb3c8;
+        color: #163b68;
     }
 
-    .problem-item{
-        min-height: auto;
+    .problem-full-width {
+        width: 100%;
+    }
+
+    .problem-box {
+        border: 1px solid #d2d8e1;
+        background: #f8fafc;
+        padding: 10px;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .problem-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 10px 14px;
+        width: 100%;
+    }
+
+    .problem-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
         padding: 8px 10px;
+        border: 1px solid #dde4ec;
+        background: #fff;
+        cursor: pointer;
+        min-height: 46px;
+        margin: 0;
+        border-radius: 6px;
+        transition: all .2s ease;
     }
 
-    .problem-item span{
-        font-size: 13px;
-        line-height: 1.4;
+    .problem-item:hover {
+        border-color: #9fb3c8;
+        background: #f8fbff;
     }
-}
+
+    .problem-item input[type="checkbox"] {
+        margin-top: 3px;
+        flex: 0 0 auto;
+    }
+
+    .problem-item span {
+        font-size: 14px;
+        line-height: 1.45;
+        color: #222;
+        word-break: break-word;
+    }
+
+    .problem-item:has(input:checked) {
+        border-color: #234f87;
+        background: #eef4fb;
+    }
 
     .address-grid {
         display: grid;
@@ -259,26 +234,52 @@
     }
 
     .copy-check {
-        margin-bottom: 8px;
+        margin-bottom: 10px;
+        padding: 7px 10px;
+        border: 1px solid #d2d8e1;
+        background: #f8fbff;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
+    .copy-check .form-check-input {
+        position: static;
+        float: none;
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    .copy-check .form-check-label,
     .copy-check label {
         font-size: 14px;
         color: #234f87;
         font-weight: 600;
+        margin: 0;
+        line-height: 1.35;
     }
 
     .action-bar {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
+        gap: 10px;
+        margin-top: 12px;
     }
 
     .btn-registry {
-        min-width: 130px;
-        border-radius: 0;
+        min-width: 135px;
+        border-radius: 6px;
         font-size: 14px;
+        font-weight: 700;
+        padding: 7px 16px;
+        box-shadow: 0 3px 8px rgba(15, 23, 42, .12);
+        transition: all .2s ease;
+    }
+
+    .btn-registry:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 12px rgba(15, 23, 42, .16);
     }
 
     .required-star {
@@ -308,6 +309,10 @@
     }
 
     @media (max-width: 991.98px) {
+        .problem-grid {
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+        }
+
         .client-main-row {
             flex-direction: column;
         }
@@ -335,20 +340,18 @@
             padding: 8px;
         }
 
+        .registry-wrapper {
+            border-radius: 6px;
+        }
+
         .registry-header {
             font-size: 22px;
             padding: 10px;
         }
 
-        .registry-topnav a,
-        .registry-subnav a {
-            width: 100%;
-            border-right: 0;
-            border-bottom: 1px solid rgba(255,255,255,.15);
-        }
-
         .panel-box {
-            padding: 8px;
+            padding: 10px;
+            border-radius: 6px;
         }
 
         .form-label {
@@ -360,11 +363,13 @@
             font-size: 13px;
             min-height: 36px;
             height: 36px;
+            border-radius: 6px;
         }
 
         .inline-radio-group {
             min-height: 36px;
             gap: 10px;
+            border-radius: 6px;
         }
 
         .photo-preview {
@@ -372,11 +377,34 @@
             height: 140px;
         }
 
-        .problem-box .row > div {
+        .problem-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .problem-item {
+            min-height: auto;
+            padding: 8px 10px;
+        }
+
+        .problem-item span {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .copy-check {
+            align-items: flex-start;
+        }
+
+        .copy-check .form-check-input {
+            margin-top: 2px;
+        }
+
+        .btn-registry {
             width: 100%;
+            min-width: 100%;
         }
     }
-</style>
+</style> --}}
 
 <div class="container-fluid registry-page">
     <div class="registry-wrapper">
@@ -404,15 +432,51 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-5">
-                                    <label for="id_card" class="form-label">เลขประจำตัวประชาชน</label>
-                                    <input type="text" name="id_card" id="id_card"
-                                        class="form-control @error('id_card') is-invalid @enderror"
-                                        value="{{ old('id_card') }}">
-                                    @error('id_card')
-                                        <small class="text-danger error-message" id="error-id_card">{{ $message }}</small>
-                                    @enderror
-                                </div>
+                           <div class="col-md-5">
+    <label for="id_card" class="form-label">เลขประจำตัวประชาชน</label>
+
+    <input type="text"
+           name="id_card"
+           id="id_card"
+           maxlength="17"
+           placeholder="0-0000-00000-00-0"
+           class="form-control @error('id_card') is-invalid @enderror"
+           value="{{ old('id_card') }}"
+           inputmode="numeric">
+
+    @error('id_card')
+        <small class="text-danger error-message" id="error-id_card">
+            {{ $message }}
+        </small>
+    @enderror
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const idCard = document.getElementById('id_card');
+
+    if (idCard) {
+        idCard.addEventListener('input', function () {
+            let value = this.value.replace(/\D/g, '').substring(0, 13);
+
+            if (value.length > 1) {
+                value = value.substring(0, 1) + '-' + value.substring(1);
+            }
+            if (value.length > 6) {
+                value = value.substring(0, 6) + '-' + value.substring(6);
+            }
+            if (value.length > 12) {
+                value = value.substring(0, 12) + '-' + value.substring(12);
+            }
+            if (value.length > 15) {
+                value = value.substring(0, 15) + '-' + value.substring(15);
+            }
+
+            this.value = value;
+        });
+    }
+});
+</script>
 
                                 <div class="col-md-2">
                                     <label for="title_id" class="form-label">คำนำหน้า</label>
@@ -436,13 +500,20 @@
                                         value="{{ old('nick_name') }}">
                                 </div>
 
-                                <div class="col-md-3">
-                                    <label for="first_name" class="form-label">ชื่อ <span class="required-star">*</span></label>
+                              <div class="col-md-3">
+                                    <label for="first_name" class="form-label">
+                                        ชื่อ <span class="required-star">*</span>
+                                    </label>
+
                                     <input type="text" name="first_name" id="first_name"
+                                        placeholder="กรอกชื่อ (ไม่ต้องใส่คำนำหน้าชื่อ)"
                                         class="form-control @error('first_name') is-invalid @enderror"
                                         value="{{ old('first_name') }}">
+
                                     @error('first_name')
-                                        <small class="text-danger error-message" id="error-first_name">{{ $message }}</small>
+                                        <small class="text-danger error-message" id="error-first_name">
+                                            {{ $message }}
+                                        </small>
                                     @enderror
                                 </div>
 
@@ -581,10 +652,14 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-4">
+                               <div class="col-md-4">
                                     <label for="scholl" class="form-label">โรงเรียน/สถาบัน</label>
-                                    <input type="text" name="scholl" id="scholl" class="form-control"
+
+                                    <input type="text" name="scholl" id="scholl"
+                                        placeholder="เช่น โรงเรียนชลกันยานุกูล"
+                                        class="form-control"
                                         value="{{ old('scholl') }}">
+
                                     @error('scholl')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
@@ -708,7 +783,7 @@
                         value="{{ $problem->id }}"
                         id="problem{{ $problem->id }}"
                         {{ is_array(old('problems')) && in_array($problem->id, old('problems')) ? 'checked' : '' }}>
-                    <span>{{ $problem->name }}</span>
+                    <span>{{ $problem->problem_name }}</span>
                 </label>
             @endforeach
         </div>
@@ -740,126 +815,8 @@
 
                 {{-- ที่อยู่ --}}
                 <div class="address-grid">
-                    {{-- ภูมิลำเนาเดิม --}}
-                    <div class="panel-box">
-                        <div class="panel-title">ภูมิลำเนาเดิม</div>
 
-                        <div class="row compact-row">
-                            <div class="col-md-6">
-                                <label for="origin_address" class="form-label">เลขที่</label>
-                                <input type="text" name="origin_address" id="origin_address"
-                                    class="form-control"
-                                    value="{{ old('origin_address', $client->origin_address ?? '') }}">
-                                @error('origin_address')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_moo" class="form-label">หมู่ที่</label>
-                                <input type="text" name="origin_moo" id="origin_moo"
-                                    class="form-control"
-                                    value="{{ old('origin_moo', $client->origin_moo ?? '') }}">
-                                @error('origin_moo')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_soi" class="form-label">ซอย</label>
-                                <input type="text" name="origin_soi" id="origin_soi"
-                                    class="form-control"
-                                    value="{{ old('origin_soi', $client->origin_soi ?? '') }}">
-                                @error('origin_soi')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_road" class="form-label">ถนน</label>
-                                <input type="text" name="origin_road" id="origin_road"
-                                    class="form-control"
-                                    value="{{ old('origin_road', $client->origin_road ?? '') }}">
-                                @error('origin_road')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_village" class="form-label">ภาค/หมู่บ้าน</label>
-                                <input type="text" name="origin_village" id="origin_village"
-                                    class="form-control"
-                                    value="{{ old('origin_village', $client->origin_village ?? '') }}">
-                                @error('origin_village')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_province" class="form-label">จังหวัด</label>
-                                <select name="origin_province_id" id="origin_province" class="form-select">
-                                    <option value="">--เลือกจังหวัด--</option>
-                                    @foreach($origin_provinces as $province)
-                                        <option value="{{ $province->id }}"
-                                            {{ old('origin_province_id', $client->origin_province_id ?? '') == $province->id ? 'selected' : '' }}>
-                                            {{ $province->prov_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_district" class="form-label">อำเภอ/เขต</label>
-                                <select name="origin_district_id" id="origin_district" class="form-select">
-                                    <option value="">--เลือกอำเภอ--</option>
-                                    @foreach($origin_districts as $district)
-                                        <option value="{{ $district->id }}"
-                                            {{ old('origin_district_id', $client->origin_district_id ?? '') == $district->id ? 'selected' : '' }}>
-                                            {{ $district->dist_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_subdistrict" class="form-label">ตำบล/แขวง</label>
-                                <select name="origin_sub_district_id" id="origin_subdistrict" class="form-select">
-                                    <option value="">--เลือกตำบล--</option>
-                                    @foreach($origin_sub_districts as $subdistrict)
-                                        <option value="{{ $subdistrict->id }}"
-                                            {{ old('origin_sub_district_id', $client->origin_sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
-                                            {{ $subdistrict->subdist_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('origin_sub_district_id')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="origin_zipcode" class="form-label">รหัสไปรษณีย์</label>
-                                <input type="text" name="origin_zipcode" id="origin_zipcode"
-                                    class="form-control"
-                                    value="{{ old('origin_zipcode', $client->origin_zipcode ?? '') }}">
-                                @error('origin_zipcode')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12">
-                                <label for="origin_phone" class="form-label">โทรศัพท์</label>
-                                <input type="text" name="origin_phone" id="origin_phone"
-                                    class="form-control"
-                                    value="{{ old('origin_phone', $client->origin_phone ?? '') }}">
-                                @error('origin_phone')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- ที่อยู่ปัจจุบัน --}}
+  {{-- ที่อยู่ปัจจุบัน --}}
                     <div class="panel-box">
                         <div class="panel-title">ที่อยู่ปัจจุบัน</div>
 
@@ -984,6 +941,128 @@
                             </div>
                         </div>
                     </div>
+
+
+                    {{-- ภูมิลำเนาเดิม --}}
+                    <div class="panel-box">
+                        <div class="panel-title">ภูมิลำเนาเดิม</div>
+
+                        <div class="row compact-row">
+                            <div class="col-md-6">
+                                <label for="origin_address" class="form-label">เลขที่</label>
+                                <input type="text" name="origin_address" id="origin_address"
+                                    class="form-control"
+                                    value="{{ old('origin_address', $client->origin_address ?? '') }}">
+                                @error('origin_address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_moo" class="form-label">หมู่ที่</label>
+                                <input type="text" name="origin_moo" id="origin_moo"
+                                    class="form-control"
+                                    value="{{ old('origin_moo', $client->origin_moo ?? '') }}">
+                                @error('origin_moo')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_soi" class="form-label">ซอย</label>
+                                <input type="text" name="origin_soi" id="origin_soi"
+                                    class="form-control"
+                                    value="{{ old('origin_soi', $client->origin_soi ?? '') }}">
+                                @error('origin_soi')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_road" class="form-label">ถนน</label>
+                                <input type="text" name="origin_road" id="origin_road"
+                                    class="form-control"
+                                    value="{{ old('origin_road', $client->origin_road ?? '') }}">
+                                @error('origin_road')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_village" class="form-label">ภาค/หมู่บ้าน</label>
+                                <input type="text" name="origin_village" id="origin_village"
+                                    class="form-control"
+                                    value="{{ old('origin_village', $client->origin_village ?? '') }}">
+                                @error('origin_village')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_province" class="form-label">จังหวัด</label>
+                                <select name="origin_province_id" id="origin_province" class="form-select">
+                                    <option value="">--เลือกจังหวัด--</option>
+                                    @foreach($origin_provinces as $province)
+                                        <option value="{{ $province->id }}"
+                                            {{ old('origin_province_id', $client->origin_province_id ?? '') == $province->id ? 'selected' : '' }}>
+                                            {{ $province->prov_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_district" class="form-label">อำเภอ/เขต</label>
+                                <select name="origin_district_id" id="origin_district" class="form-select">
+                                    <option value="">--เลือกอำเภอ--</option>
+                                    @foreach($origin_districts as $district)
+                                        <option value="{{ $district->id }}"
+                                            {{ old('origin_district_id', $client->origin_district_id ?? '') == $district->id ? 'selected' : '' }}>
+                                            {{ $district->dist_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_subdistrict" class="form-label">ตำบล/แขวง</label>
+                                <select name="origin_sub_district_id" id="origin_subdistrict" class="form-select">
+                                    <option value="">--เลือกตำบล--</option>
+                                    @foreach($origin_sub_districts as $subdistrict)
+                                        <option value="{{ $subdistrict->id }}"
+                                            {{ old('origin_sub_district_id', $client->origin_sub_district_id ?? '') == $subdistrict->id ? 'selected' : '' }}>
+                                            {{ $subdistrict->subdist_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('origin_sub_district_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="origin_zipcode" class="form-label">รหัสไปรษณีย์</label>
+                                <input type="text" name="origin_zipcode" id="origin_zipcode"
+                                    class="form-control"
+                                    value="{{ old('origin_zipcode', $client->origin_zipcode ?? '') }}">
+                                @error('origin_zipcode')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="origin_phone" class="form-label">โทรศัพท์</label>
+                                <input type="text" name="origin_phone" id="origin_phone"
+                                    class="form-control"
+                                    value="{{ old('origin_phone', $client->origin_phone ?? '') }}">
+                                @error('origin_phone')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                  
                 </div>
 
                 <div class="action-bar">
@@ -1208,5 +1287,33 @@ $(function () {
     });
 </script>
 @endif
+
+      <!-- สคริปต์สำหรับฟอร์แมตเลขบัตรประชาชน -->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const idCard = document.getElementById('id_card');
+
+    if (idCard) {
+        idCard.addEventListener('input', function () {
+            let value = this.value.replace(/\D/g, '').substring(0, 13);
+
+            if (value.length > 1) {
+                value = value.substring(0, 1) + '-' + value.substring(1);
+            }
+            if (value.length > 6) {
+                value = value.substring(0, 6) + '-' + value.substring(6);
+            }
+            if (value.length > 12) {
+                value = value.substring(0, 12) + '-' + value.substring(12);
+            }
+            if (value.length > 15) {
+                value = value.substring(0, 15) + '-' + value.substring(15);
+            }
+
+            this.value = value;
+        });
+    }
+});
+</script>
 
 @endsection

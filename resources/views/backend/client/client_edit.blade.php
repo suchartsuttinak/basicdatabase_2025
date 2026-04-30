@@ -78,15 +78,25 @@
                                     </div>
 
                                     <div class="col-12 col-md-8 col-lg-5">
-                                        <label for="id_card" class="form-label">เลขประจำตัวประชาชน <span class="required-star">*</span></label>
-                                        <input type="text" name="id_card" id="id_card"
-                                            class="form-control @error('id_card') is-invalid @enderror"
-                                            value="{{ old('id_card', $client?->id_card) }}">
-                                        @error('id_card')
-                                            <small class="text-danger error-message" id="error-id_card">{{ $message }}</small>
-                                        @enderror
-                                    </div>
+                                            <label for="id_card" class="form-label">
+                                                เลขประจำตัวประชาชน <span class="required-star">*</span>
+                                            </label>
 
+                                            <input type="text"
+                                                name="id_card"
+                                                id="id_card"
+                                                maxlength="17"
+                                                placeholder="0-0000-00000-00-0"
+                                                inputmode="numeric"
+                                                class="form-control @error('id_card') is-invalid @enderror"
+                                                value="{{ old('id_card', $client?->id_card) }}">
+
+                                            @error('id_card')
+                                                <small class="text-danger error-message" id="error-id_card">
+                                                    {{ $message }}
+                                                </small>
+                                            @enderror
+                                        </div>
                                     <div class="col-6 col-md-3 col-lg-2">
                                         <label for="title_id" class="form-label">คำนำหน้า <span class="required-star">*</span></label>
                                         <select name="title_id" id="title_id"
@@ -411,7 +421,7 @@
                                                 <input class="form-check-input" type="checkbox"
                                                     name="problems[]" value="{{ $problem->id }}" id="problem{{ $problem->id }}"
                                                     {{ in_array($problem->id, old('problems', $client?->problems->pluck('id')->toArray() ?? [])) ? 'checked' : '' }}>
-                                                <span>{{ $problem->name }}</span>
+                                                <span>{{ $problem->problem_name }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -901,4 +911,44 @@ $(function () {
 </script>
 @endif
 
-@endsection
+        <!-- JavaScript สำหรับจัดรูปแบบเลขบัตรประชาชน -->
+      <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const idCard = document.getElementById('id_card');
+
+    function formatThaiId(value){
+        value = value.replace(/\D/g,'').substring(0,13);
+
+        if(value.length > 1){
+            value = value.substring(0,1)+'-'+value.substring(1);
+        }
+        if(value.length > 6){
+            value = value.substring(0,6)+'-'+value.substring(6);
+        }
+        if(value.length > 12){
+            value = value.substring(0,12)+'-'+value.substring(12);
+        }
+        if(value.length > 15){
+            value = value.substring(0,15)+'-'+value.substring(15);
+        }
+
+        return value;
+    }
+
+    if(idCard){
+
+        // โหลดข้อมูลเดิมตอน edit ให้จัด format อัตโนมัติ
+        idCard.value = formatThaiId(idCard.value);
+
+        // ตอนพิมพ์ให้ใส่ขีดอัตโนมัติ
+        idCard.addEventListener('input', function(){
+            this.value = formatThaiId(this.value);
+        });
+
+    }
+
+});
+</script>
+
+        @endsection

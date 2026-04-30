@@ -486,11 +486,11 @@
                                         </div>
 
                                         {{-- ปุ่มลบ overlay --}}
-                                        <button type="button"
-                                                class="btn btn-danger btn-sm position-absolute top-0 start-0 ms-2 mt-2 delete-image"
-                                                data-url="{{ route('image.destroy', $img->id) }}"
-                                                data-id="{{ $img->id }}">
-                                        ลบภาพ
+                                      <button type="button"
+                                            class="btn btn-danger btn-sm position-absolute bottom-0 end-0 me-2 mb-2 delete-image"
+                                            data-url="{{ route('image.destroy', $img->id) }}"
+                                            data-id="{{ $img->id }}">
+                                            ลบภาพ
                                         </button>
                                     </div>
                                 </div>
@@ -498,11 +498,19 @@
                         </div>
                     </div>
                 @endif
-            <div class="text-start">
-                <button type="submit" class="btn btn-success">
-                    {{ isset($visitFamily) ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูลใหม่' }}
-                </button>
-            </div>
+           <div class="d-flex flex-wrap gap-2 mt-3">
+    <button type="submit" class="btn btn-success">
+        {{ isset($visitFamily) ? 'แก้ไขข้อมูล' : 'บันทึกข้อมูลใหม่' }}
+    </button>
+
+    @if(isset($visitFamily) && !empty($visitFamily->id))
+        <a href="{{ route('vitsitFamily.report', $visitFamily->id) }}"
+           class="btn btn-primary"
+           target="_blank">
+            <i class="bi bi-printer me-1"></i> รายงาน
+        </a>
+    @endif
+</div>
         </form>
     </div>
 </div>

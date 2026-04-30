@@ -1020,11 +1020,12 @@
                             <label class="form-label">สภาพปัญหา</label>
                             <select name="problem" class="form-select">
                                 <option value="">ทั้งหมด</option>
-                                @foreach($problems as $prob)
-                                    <option value="{{ $prob->id }}" {{ request('problem')==$prob->id ? 'selected' : '' }}>
-                                        {{ $prob->name }}
+                                 @foreach($problems as $prob)
+                                    <option value="{{ $prob->id }}"
+                                    {{ request('problem')==$prob->id ? 'selected' : '' }}>
+                                    {{ $prob->problem_name ?? $prob->name ?? '-' }}
                                     </option>
-                                @endforeach
+                                    @endforeach
                             </select>
                         </div>
 

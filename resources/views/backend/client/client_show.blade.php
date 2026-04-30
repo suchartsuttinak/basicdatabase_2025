@@ -312,7 +312,7 @@
                                             @if($client->problems->isNotEmpty())
                                                 <ul class="problem-list">
                                                     @foreach($client->problems as $problem)
-                                                        <li>{{ $problem->name }}</li>
+                                                        <li>{{ $problem->problem_name }}</li>
                                                     @endforeach
                                                 </ul>
                                             @else

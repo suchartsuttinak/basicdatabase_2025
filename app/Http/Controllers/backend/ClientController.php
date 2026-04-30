@@ -279,7 +279,11 @@ class ClientController extends Controller
             'first_name'      => 'required|string|max:255',
             'last_name'       => 'required|string|max:255',
             'birth_date'      => 'required|date',
-            'id_card'         => 'nullable|string|max:13|unique:clients,id_card',
+            // 'id_card'         => 'nullable|string|max:13|unique:clients,id_card',
+            'id_card' => [
+                'nullable',
+                'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/',
+            ],
             'national_id'     => 'required|integer',
             'religion_id'     => 'required|integer',
             'marital_id'      => 'required|integer',
@@ -326,7 +330,8 @@ class ClientController extends Controller
             'first_name.required'    => 'กรุณากรอกชื่อ',
             'last_name.required'     => 'กรุณากรอกนามสกุล',
             'birth_date.required'    => 'กรุณากรอกวัน/เดือน/ปีเกิด',
-            'id_card.unique'         => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
+            // 'id_card.unique'         => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
+            'id_card.regex' => 'รูปแบบเลขประชาชนต้องเป็น 0-0000-00000-00-0',
             'national_id.required'   => 'กรุณาเลือกสัญชาติ',
             'religion_id.required'   => 'กรุณาเลือกศาสนา',
             'marital_id.required'    => 'กรุณาเลือกสถานภาพสมรส',
@@ -411,7 +416,14 @@ class ClientController extends Controller
         public function ClientEdit(Request $request, $id)
         {
             $client = $this->findAuthorizedClient($id);
-            $tab = $request->get('tab', 'profile');
+           $tab = $request->get('tab', 'profile');
+
+            // PATCH: กันค่า tab ไม่ตรง ทำให้ select หลักไม่โหลด
+            $profileTabs = ['profile', 'detail', 'client', 'information'];
+
+            if (!in_array($tab, ['profile', 'detail', 'client', 'information', 'family', 'guardian', 'member'], true)) {
+                $tab = 'profile';
+            }
 
             // ใช้ collect() กัน error เวลาบางแท็บไม่ได้โหลดข้อมูลชุดนั้น
             $problems = collect();
@@ -438,7 +450,7 @@ class ClientController extends Controller
             $houses = $this->getAuthorizedHouses();
 
             // โหลดหนักเฉพาะแท็บ profile ก่อน
-            if ($tab === 'profile') {
+          if (in_array($tab, $profileTabs, true)) {
                 $problems = Problem::all();
                 $provinces = Province::all();
                 $districts = District::all();
@@ -523,7 +535,12 @@ class ClientController extends Controller
 
         $validated = $request->validate([
             'register_number' => 'nullable|unique:clients,register_number,' . $id,
-            'id_card'         => 'nullable|unique:clients,id_card,' . $id,
+            // 'id_card'         => 'nullable|unique:clients,id_card,' . $id,
+           'id_card' => [
+            'nullable',
+            'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/',
+            'unique:clients,id_card,' . $id,
+        ],
             'title_id'        => 'required|integer',
             'nick_name'       => 'nullable|string|max:255',
             'first_name'      => 'required|string|max:255',
@@ -573,9 +590,8 @@ class ClientController extends Controller
             'register_number.unique' => 'เลขทะเบียนนี้ถูกใช้แล้ว',
             'register_number.string' => 'เลขทะเบียนต้องเป็นตัวอักษร',
             'register_number.max'    => 'เลขทะเบียนต้องไม่เกิน 255 ตัวอักษร',
-            'id_card.unique'         => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
-            'id_card.string'         => 'เลขบัตรประชาชนต้องเป็นตัวอักษร',
-            'id_card.max'            => 'เลขบัตรประชาชนต้องไม่เกิน 13 หลัก',
+            'id_card.unique' => 'เลขบัตรประชาชนนี้ถูกใช้แล้ว',
+            'id_card.regex'  => 'เลขบัตรประชาชนต้องอยู่ในรูปแบบ 0-0000-00000-00-0',
             'case_resident.required' => 'กรุณาเลือกสถานะการอยู่อาศัย',
             'case_resident.in'       => 'สถานะการอยู่อาศัยต้องเป็น Active หรือ Inactive เท่านั้น',
         ]);

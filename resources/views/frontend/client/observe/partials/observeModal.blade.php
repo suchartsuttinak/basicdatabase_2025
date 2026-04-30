@@ -129,14 +129,19 @@
                                        value="{{ old('record_date', $observe->record_date ?? '') }}">
                             </div>
 
-                            <div class="col-12 col-md-8">
+                          <div class="col-12 col-md-8">
                                 <label for="recorder" class="form-label-modern">ผู้บันทึก</label>
+
                                 <input type="text"
-                                       name="recorder"
-                                       id="recorder"
-                                       class="form-control form-control-modern"
-                                       value="{{ old('recorder', $observe->recorder ?? '') }}"
-                                       placeholder="ชื่อผู้บันทึก">
+                                    name="recorder"
+                                    id="recorder"
+                                    class="form-control form-control-modern bg-light"
+                                    value="{{ auth()->user()->name ?? '-' }}"
+                                    readonly>
+
+                                <small class="text-muted">
+                                    ระบบดึงชื่อผู้ใช้งานที่เข้าสู่ระบบอัตโนมัติ
+                                </small>
                             </div>
                         </div>
 

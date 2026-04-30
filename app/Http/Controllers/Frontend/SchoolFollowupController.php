@@ -13,7 +13,7 @@ use Illuminate\Http\Request; // ✅ เพิ่มบรรทัดนี้
 
 class SchoolFollowupController extends Controller
 {
-    public function SchoolFollowupAdd(Request $request, $client_id)
+   public function SchoolFollowupAdd(Request $request, $client_id)
 {
     $client = Client::forUser(auth()->user())->findOrFail($client_id);
     $educationRecord = $this->getLatestEducationRecord($client_id);
@@ -21,7 +21,7 @@ class SchoolFollowupController extends Controller
     if (!$educationRecord) {
         return redirect()
             ->route('education_record_add', $client_id)
-            ->with('warning', 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการติดตาม');
+            ->with('info', 'ต้องบันทึกผลการเรียนก่อนเข้าเมนูติดตามผลการเรียน');
     }
 
     // ✅ เพิ่ม filter

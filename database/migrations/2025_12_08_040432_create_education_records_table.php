@@ -6,37 +6,41 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('education_records', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('client_id');       // FK ไปยัง clients
-            $table->unsignedBigInteger('education_id');    // ฟิลด์ใหม่ที่คุณต้องการ
-            $table->string('semester');                    // เช่น 1/2568
+
+            $table->foreignId('client_id')
+                ->constrained('clients')
+                ->cascadeOnDelete();
+
+            $table->foreignId('education_id')
+                ->constrained('education_levels')
+                ->cascadeOnDelete();
+
+            $table->foreignId('institution_id')
+                ->nullable()
+                ->constrained('institutions')
+                ->nullOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreignId('semester_id')
+                ->nullable()
+                ->constrained('semesters')
+                ->nullOnDelete();
+
+            // เก็บไว้กันข้อมูลเก่า / แต่ไม่บังคับแล้ว
+            $table->string('semester')->nullable();
+
             $table->string('school_name');
             $table->date('record_date');
+            $table->decimal('grade_average', 5, 2)->nullable();
+
             $table->timestamps();
-
-            // FK ไปยัง clients
-            $table->foreign('client_id')
-                  ->references('id')->on('clients')
-                  ->onDelete('cascade');
-
-            // FK ไปยัง education (ถ้ามีตาราง education อยู่แล้ว)
-            $table->foreign('education_id')
-                  ->references('id')->on('education')
-                  ->onDelete('cascade');
-
-
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('education_records');

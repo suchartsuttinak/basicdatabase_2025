@@ -7,20 +7,92 @@
 <div class="container-fluid edurec-create-page">
     <div class="edurec-wrap">
 
-        {{-- ✅ แสดงข้อความแจ้งเตือน --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-check-circle-fill me-1"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+     {{-- ✅ แสดงข้อความแจ้งเตือน --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('info'))
+        <style>
+            div.swal2-popup.swal2-toast.edurec-toast{
+                width:420px !important;
+                padding:1rem 1.2rem !important;
+                border-radius:18px !important;
+                background:linear-gradient(135deg,#fff7d6 0%, #fff3bf 100%) !important;
+                border-left:6px solid #f59e0b !important;
+                box-shadow:0 12px 32px rgba(245,158,11,.25)!important;
+            }
+
+            .edurec-toast .swal2-title{
+                font-size:1.05rem !important;
+                font-weight:800 !important;
+                color:#92400e !important;
+                margin:0 !important;
+            }
+
+            .edurec-toast .swal2-html-container{
+                font-size:.92rem !important;
+                line-height:1.6 !important;
+                margin:.45rem 0 0 0 !important;
+                color:#78350f !important;
+            }
+
+            .edurec-toast .swal2-icon{
+                transform:scale(.95);
+                margin:.2rem .6rem .2rem .15rem !important;
+            }
+
+            .edurec-toast .swal2-timer-progress-bar{
+                background:#f59e0b !important;
+            }
+
+            @media (max-width: 575.98px){
+                div.swal2-popup.swal2-toast.edurec-toast{
+                    width: calc(100vw - 28px) !important;
+                    padding:.9rem 1rem !important;
+                }
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'กรุณาบันทึกผลการเรียนก่อน',
+                        html: @json(session('info')),
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'edurec-toast'
+                        },
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer);
+                            toast.addEventListener('mouseleave', Swal.resumeTimer);
+                        }
+                    });
+                }
+            });
+        </script>
+    @endif
+
+
+<div class="edurec-card">
 
         <div class="edurec-card">
             <div class="edurec-header">
@@ -483,4 +555,6 @@ document.addEventListener('DOMContentLoaded', function () {
     refreshSubjectLabels();
 });
 </script>
+
+
 @endsection

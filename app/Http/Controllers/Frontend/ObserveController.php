@@ -33,49 +33,55 @@ class ObserveController extends Controller
 
     // บันทึกข้อมูลใหม่
     public function StoreObserve(Request $request)
-    {
-        $data = $request->validate([
-            'date' => [
-                'required',
-                'date',
-                Rule::unique('observes')->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
-                }),
-            ],
-            'behavior'       => 'required|string',
-            'cause'          => 'required|string',
-            'solution'       => 'required|string',
-            'action'         => 'required|string',
-            'obstacles'      => 'nullable|string',
-            'result'         => 'required|string',
-            'record_date'    => 'required|date',
-            'recorder'       => 'nullable|string|max:100',
-            'misbehavior_id' => 'required|integer',
-            'client_id'      => 'required|integer',
-        ], [
-            'date.required'           => 'กรุณาระบุวันที่',
-            'date.date'               => 'วันที่ไม่ถูกต้อง',
-            'date.unique'             => 'วันที่นี้ถูกบันทึกแล้วสำหรับนักเรียนรายนี้',
-            'behavior.required'       => 'กรุณาระบุพฤติกรรม',
-            'cause.required'          => 'กรุณาระบุสาเหตุ',
-            'solution.required'       => 'กรุณาระบุแนวทางแก้ไข',
-            'action.required'         => 'กรุณาระบุการดำเนินการ',
-            'result.required'         => 'กรุณาระบุผลการดำเนินการ',
-            'record_date.required'    => 'กรุณาระบุวันที่บันทึก',
-            'misbehavior_id.required' => 'กรุณาเลือกประเภทพฤติกรรมไม่เหมาะสม',
-            'client_id.required'      => 'กรุณาเลือกนักเรียน',
-        ]);
+{
+    $data = $request->validate([
+        'date' => [
+            'required',
+            'date',
+            Rule::unique('observes')->where(function ($query) use ($request) {
+                return $query->where('client_id', $request->client_id);
+            }),
+        ],
+        'behavior'       => 'required|string',
+        'cause'          => 'required|string',
+        'solution'       => 'required|string',
+        'action'         => 'required|string',
+        'obstacles'      => 'nullable|string',
+        'result'         => 'required|string',
+        'record_date'    => 'required|date',
+        'recorder'       => 'nullable|string|max:100',
+        'misbehavior_id' => 'required|integer',
+        'client_id'      => 'required|integer',
+    ], [
+        'date.required'           => 'กรุณาระบุวันที่',
+        'date.date'               => 'วันที่ไม่ถูกต้อง',
+        'date.unique'             => 'วันที่นี้ถูกบันทึกแล้วสำหรับนักเรียนรายนี้',
+        'behavior.required'       => 'กรุณาระบุพฤติกรรม',
+        'cause.required'          => 'กรุณาระบุสาเหตุ',
+        'solution.required'       => 'กรุณาระบุแนวทางแก้ไข',
+        'action.required'         => 'กรุณาระบุการดำเนินการ',
+        'result.required'         => 'กรุณาระบุผลการดำเนินการ',
+        'record_date.required'    => 'กรุณาระบุวันที่บันทึก',
+        'misbehavior_id.required' => 'กรุณาเลือกประเภทพฤติกรรมไม่เหมาะสม',
+        'client_id.required'      => 'กรุณาเลือกนักเรียน',
+    ]);
 
-        // =========================
-        // PATCH: กันเปลี่ยน client_id
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+    // =========================
+    // PATCH: กันเปลี่ยน client_id
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
-        Observe::create($data);
+    // =========================
+    // PATCH: ผู้บันทึกใช้ชื่อ user ที่ login เท่านั้น
+    // ไม่รับค่าจาก input เพื่อป้องกันการแก้ชื่อเอง
+    // =========================
+    $data['recorder'] = auth()->user()->name ?? null;
 
-        return redirect()->route('observe.create', $data['client_id'])
-            ->with('success', 'บันทึกข้อมูลเรียบร้อย');
-    }
+    Observe::create($data);
+
+    return redirect()->route('observe.create', $data['client_id'])
+        ->with('success', 'บันทึกข้อมูลเรียบร้อย');
+}
 
     // หน้าแก้ไข
     public function EditObserve($id)
@@ -97,43 +103,50 @@ class ObserveController extends Controller
     }
 
     // อัปเดตข้อมูล
-    public function UpdateObserve(Request $request, $id)
-    {
-        $observe = Observe::findOrFail($id);
+   public function UpdateObserve(Request $request, $id)
+{
+    $observe = Observe::findOrFail($id);
 
-        // =========================
-        // PATCH: กัน update record คนอื่น
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($observe->client_id);
+    // =========================
+    // PATCH: กัน update record คนอื่น
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($observe->client_id);
 
-        $data = $request->validate([
-            'date' => [
-                'required',
-                'date',
-                Rule::unique('observes')->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
-                })->ignore($id),
-            ],
-            'behavior'       => 'required|string',
-            'cause'          => 'required|string',
-            'solution'       => 'required|string',
-            'action'         => 'required|string',
-            'result'         => 'required|string',
-            'record_date'    => 'required|date',
-            'misbehavior_id' => 'required|integer',
-            'client_id'      => 'required|integer',
-        ]);
+    $data = $request->validate([
+        'date' => [
+            'required',
+            'date',
+            Rule::unique('observes')->where(function ($query) use ($request) {
+                return $query->where('client_id', $request->client_id);
+            })->ignore($id),
+        ],
+        'behavior'       => 'required|string',
+        'cause'          => 'required|string',
+        'solution'       => 'required|string',
+        'action'         => 'required|string',
+        'result'         => 'required|string',
+        'record_date'    => 'required|date',
+        'recorder'       => 'nullable|string|max:100',
+        'misbehavior_id' => 'required|integer',
+        'client_id'      => 'required|integer',
+    ]);
 
-        // =========================
-        // PATCH: กันเปลี่ยน client_id
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+    // =========================
+    // PATCH: กันเปลี่ยน client_id
+    // =========================
+    Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
-        $observe->update($data);
+    // =========================
+    // PATCH: ผู้บันทึกใช้ชื่อ user ที่ login เท่านั้น
+    // ไม่รับค่าจาก input เพื่อป้องกันการแก้ชื่อเอง
+    // =========================
+    $data['recorder'] = auth()->user()->name ?? null;
 
-        return redirect()->route('observe.create', $data['client_id'])
-            ->with('success', 'อัปเดตข้อมูลเรียบร้อย');
-    }
+    $observe->update($data);
+
+    return redirect()->route('observe.create', $data['client_id'])
+        ->with('success', 'อัปเดตข้อมูลเรียบร้อย');
+}
 
     // ลบข้อมูล
     public function DeleteObserve($id)

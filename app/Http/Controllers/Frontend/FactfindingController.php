@@ -68,7 +68,7 @@ class FactfindingController extends Controller
             'diagnosis'       => 'nullable|string',
 
             'case_history'    => 'nullable|string',
-            'recorder'        => 'required|string',
+             // [AUTO RECORDER] ไม่รับชื่อผู้บันทึกจากฟอร์ม ให้ระบบบันทึกจากผู้ใช้งานที่ login
             'active'          => 'nullable|boolean',
 
             'documents'   => 'nullable|array',
@@ -103,8 +103,8 @@ class FactfindingController extends Controller
             'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
             'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
 
-            'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
-            'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+            // 'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
+            // 'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
 
             'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
             'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
@@ -129,8 +129,10 @@ class FactfindingController extends Controller
         if (($validated['sick'] ?? null) == 0) {
             $validated['sick_detail'] = null;
         }
+            // [AUTO RECORDER] บันทึกชื่อผู้บันทึกจากผู้ใช้งานที่ login
+            $validated['recorder'] = auth()->user()->name ?? 'ไม่ระบุผู้บันทึก';
 
-        $factFinding = Factfinding::create($validated);
+            $factFinding = Factfinding::create($validated);
 
         if (!empty($documents)) {
             foreach ($documents as $docId) {
@@ -200,7 +202,7 @@ class FactfindingController extends Controller
             'diagnosis'       => 'nullable|string',
 
             'case_history'    => 'nullable|string',
-            'recorder'        => 'required|string',
+            // [AUTO RECORDER] ไม่รับชื่อผู้บันทึกจากฟอร์ม ให้ระบบบันทึกจากผู้ใช้งานที่ login
             'active'          => 'nullable|boolean',
 
             'documents'   => 'nullable|array',
@@ -235,8 +237,8 @@ class FactfindingController extends Controller
             'height.min'     => 'ส่วนสูงต้องไม่น้อยกว่า 30 เซนติเมตร',
             'height.max'     => 'ส่วนสูงต้องไม่เกิน 300 เซนติเมตร',
 
-            'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
-            'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
+            // 'recorder.required'  => 'กรุณากรอกชื่อผู้บันทึก',
+            // 'recorder.string'    => 'ชื่อผู้บันทึกต้องเป็นข้อความ',
 
             'documents.array'    => 'เอกสารต้องอยู่ในรูปแบบรายการ',
             'documents.*.integer'=> 'รหัสเอกสารต้องเป็นตัวเลข',
@@ -263,7 +265,7 @@ class FactfindingController extends Controller
             $validated['sick_detail'] = null;
         }
 
-        $payload = [
+            $payload = [
             'client_id'   => (int) $client->id,
             'date'        => $validated['date'],
             'receive_date'=> $validated['receive_date'],
@@ -295,7 +297,10 @@ class FactfindingController extends Controller
             'information'     => $validated['information'] ?? '',
             'diagnosis'       => $validated['diagnosis'] ?? '',
             'case_history'    => $validated['case_history'] ?? '',
-            'recorder'        => $validated['recorder'] ?? '',
+
+            // [AUTO RECORDER] บันทึกชื่อผู้แก้ไขล่าสุดจากผู้ใช้งานที่ login
+            'recorder'        => auth()->user()->name ?? 'ไม่ระบุผู้บันทึก',
+
             'active'          => $validated['active'] ?? 1,
         ];
 

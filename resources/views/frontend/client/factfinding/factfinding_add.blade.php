@@ -773,39 +773,55 @@
                                     @enderror
                                 </div>
 
-                                <div class="ff-field ff-span-4">
-                                    <label for="receive_date" class="ff-label">วันที่บันทึก <span class="ff-required">*</span></label>
-                                    <input type="date" name="receive_date" id="receive_date" class="form-control ff-input @error('receive_date') is-invalid @enderror" value="{{ old('receive_date') }}">
-                                    @error('receive_date')
-                                        <span class="ff-error" id="receive_date-error">{{ $message }}</span>
-                                    @enderror
-                                </div>
+                               <div class="ff-field ff-span-4">
+                            <label for="receive_date" class="ff-label">
+                                วันที่บันทึก <span class="ff-required">*</span>
+                            </label>
 
-                                <div class="ff-field ff-span-8">
-                                    <label for="recorder" class="ff-label">ชื่อผู้บันทึก <span class="ff-required">*</span></label>
-                                    <input type="text" name="recorder" id="recorder" class="form-control ff-input @error('recorder') is-invalid @enderror" value="{{ old('recorder') }}">
-                                    @error('recorder')
-                                        <span class="ff-error" id="recorder-error">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
+                            <input type="date"
+                                name="receive_date"
+                                id="receive_date"
+                                class="form-control ff-input @error('receive_date') is-invalid @enderror"
+                                value="{{ old('receive_date') }}">
+
+                            @error('receive_date')
+                                <span class="ff-error" id="receive_date-error">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
-                    </section>
-                </div>
 
-                <div class="ff-actions">
-                    <div class="ff-actions-note">
-                        กรุณาตรวจสอบข้อมูลสำคัญให้ครบถ้วนก่อนบันทึก
-                    </div>
+                        <div class="ff-field ff-span-6">
+                            <label class="ff-label">ผู้บันทึก</label>
 
-                    <button type="submit" class="btn btn-success ff-submit" id="ffSubmitBtn">
-                        <i class="bi bi-check-circle me-1"></i> บันทึกข้อมูล
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+                            <input type="text"
+                                class="form-control ff-input"
+                                value="{{ auth()->user()->name ?? 'ไม่ระบุผู้บันทึก' }}"
+                                readonly>
+                        </div>
+
+                        </div> {{-- ff-form-grid --}}
+                        </div> {{-- ff-card-body --}}
+                        </section> {{-- ff-card --}}
+                        </div> {{-- ff-grid --}}
+
+                        <div class="ff-actions">
+                            <div class="ff-actions-note">
+                                กรุณาตรวจสอบข้อมูลสำคัญให้ครบถ้วนก่อนบันทึก
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success ff-submit"
+                                    id="ffSubmitBtn">
+                                <i class="bi bi-check-circle me-1"></i>
+                                บันทึกข้อมูล
+                            </button>
+                        </div>
+
+                        </form>
+                        </div> {{-- ff-body --}}
+                        </div> {{-- ff-shell --}}
+                        </div> {{-- ff-page --}}
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

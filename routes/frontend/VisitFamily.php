@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
     Route::post('/store/{client_id}', [VisitFamilyController::class, 'StoreVisitFamily'])->name('vitsitFamily.store');
     Route::get('/edit/{id}', [VisitFamilyController::class, 'EditVisitFamily'])->name('vitsitFamily.edit');
     Route::put('/update/{id}', [VisitFamilyController::class, 'UpdateVisitFamily'])->name('vitsitFamily.update');
+    Route::get('/report/{id}', [VisitFamilyController::class, 'ReportVisitFamily'])
+    ->name('vitsitFamily.report');
   
     // (ตัวเลือก) ถ้าจะทำ “แทนที่รูป” ให้เพิ่ม route นี้
     Route::patch('/image/{id}', [VisitFamilyController::class, 'replaceImage'])->name('image.replace');
@@ -26,4 +28,5 @@ use Illuminate\Support\Facades\Route;
 
     Route::get('/get-zipcode/{subdistrict_id}', [VisitFamilyController::class, 'getZipcode'])
         ->name('vitsitFamily.getZipcode');
+
 });

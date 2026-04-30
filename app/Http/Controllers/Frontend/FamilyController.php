@@ -76,7 +76,8 @@ class FamilyController extends Controller
 
                 'father.fname' => ['nullable', 'string', 'max:255'],
                 'father.lname' => ['nullable', 'string', 'max:255'],
-                'father.idcard' => ['nullable', 'string', 'max:20'],
+                // 'father.idcard' => ['nullable', 'string', 'max:20'],
+                'father.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
                 'father.age' => ['nullable', 'integer', 'min:0'],
                 'father.occupation' => ['nullable', 'string', 'max:255'],
                 'father.income' => ['nullable', 'string', 'max:255'],
@@ -93,7 +94,7 @@ class FamilyController extends Controller
 
                 'mother.fname' => ['nullable', 'string', 'max:255'],
                 'mother.lname' => ['nullable', 'string', 'max:255'],
-                'mother.idcard' => ['nullable', 'string', 'max:20'],
+                // 'mother.idcard' => ['nullable', 'string', 'max:20'],
                 'mother.age' => ['nullable', 'integer', 'min:0'],
                 'mother.occupation' => ['nullable', 'string', 'max:255'],
                 'mother.income' => ['nullable', 'string', 'max:255'],
@@ -110,7 +111,8 @@ class FamilyController extends Controller
 
                 'spouse.fname' => ['nullable', 'string', 'max:255'],
                 'spouse.lname' => ['nullable', 'string', 'max:255'],
-                'spouse.idcard' => ['nullable', 'string', 'max:20'],
+                // 'spouse.idcard' => ['nullable', 'string', 'max:20'],
+                'spouse.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
                 'spouse.age' => ['nullable', 'integer', 'min:0'],
                 'spouse.occupation' => ['nullable', 'string', 'max:255'],
                 'spouse.income' => ['nullable', 'string', 'max:255'],
@@ -127,7 +129,8 @@ class FamilyController extends Controller
 
                 'relative.fname' => ['nullable', 'string', 'max:255'],
                 'relative.lname' => ['nullable', 'string', 'max:255'],
-                'relative.idcard' => ['nullable', 'string', 'max:20'],
+                // 'relative.idcard' => ['nullable', 'string', 'max:20'],
+                'relative.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
                 'relative.age' => ['nullable', 'integer', 'min:0'],
                 'relative.occupation' => ['nullable', 'string', 'max:255'],
                 'relative.income' => ['nullable', 'string', 'max:255'],
