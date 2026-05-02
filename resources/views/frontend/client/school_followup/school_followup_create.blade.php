@@ -12,7 +12,8 @@
     $clientAge = $client->age ?? '-';
     $schoolName = optional($educationRecord)->school_name ?? 'ไม่พบข้อมูล';
     $educationName = optional(optional($educationRecord)->education)->education_name ?? 'ไม่พบข้อมูล';
-    $semesterName = optional(optional($educationRecord)->semester)->semester_name ?? 'ไม่พบข้อมูล';
+ $semesterName = $educationRecord->semester_label
+    ?? data_get($educationRecord, 'semester.semester_name', 'ไม่พบข้อมูล');
 
     $profileImage = asset('upload/no_image.jpg');
     $clientImageFile = !empty($client->image) ? public_path('upload/client_images/' . $client->image) : null;

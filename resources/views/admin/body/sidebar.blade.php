@@ -219,40 +219,53 @@
                     Dashboard
                 ========================== --}}
                 <li class="menu-title">Dashboard</li>
-                <li>
-                    <a href="#sidebarDashboard"
-                       data-bs-toggle="collapse"
-                       aria-expanded="{{ $isDashboardOpen ? 'true' : 'false' }}"
-                       class="{{ $isDashboardOpen ? 'active' : '' }}">
-                        <i data-feather="layout"></i>
-                        <span>เข้าสู่หน้ายินดีต้อนรับ</span>
-                        <span class="menu-arrow menu-arrow-custom"></span>
-                    </a>
+               <li>
+    <a href="#sidebarDashboard"
+       data-bs-toggle="collapse"
+       aria-expanded="{{ $isDashboardOpen ? 'true' : 'false' }}"
+       class="{{ $isDashboardOpen ? 'active' : '' }}">
+        <i data-feather="layout"></i>
+        <span>เข้าสู่หน้ายินดีต้อนรับ</span>
+        <span class="menu-arrow menu-arrow-custom"></span>
+    </a>
 
-                    <div class="collapse {{ $isDashboardOpen ? 'show' : '' }}" id="sidebarDashboard">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('issues.index') }}"
-                                   class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
-                                    แจ้งเรื่องช่วยเหลือ
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('news.create') }}"
-                                   class="tp-link {{ Request::routeIs('news.create') ? 'active' : '' }}">
-                                    เพิ่มข่าวสาร
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('landing.about.index') }}"
-                                   class="tp-link {{ Request::routeIs('landing.about.index') ? 'active' : '' }}">
-                                    ประวัติความเป็นมา
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+    <div class="collapse {{ $isDashboardOpen ? 'show' : '' }}" id="sidebarDashboard">
+        <ul class="nav-second-level">
 
+            <li>
+                <a href="{{ route('issues.index') }}"
+                   class="tp-link {{ Request::routeIs('issues.index') ? 'active' : '' }}">
+                    แจ้งเรื่องช่วยเหลือ
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('news.create') }}"
+                   class="tp-link {{ Request::routeIs('news.create') ? 'active' : '' }}">
+                    เพิ่มข่าวสาร
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('landing.about.index') }}"
+                   class="tp-link {{ Request::routeIs('landing.about.index') ? 'active' : '' }}">
+                    ประวัติความเป็นมา
+                </a>
+            </li>
+
+            {{-- ✅ เพิ่มตรงนี้ --}}
+            @if(auth()->check() && auth()->user()->role === 'admin')
+            <li>
+                <a href="{{ route('scholarship.index') }}"
+                   class="tp-link {{ Request::routeIs('scholarship.index') ? 'active' : '' }}">
+                    ผู้สนับสนุนทุนการศึกษา
+                </a>
+            </li>
+            @endif
+
+        </ul>
+    </div>
+</li>
                 {{-- =========================
                     ข้อมูลอ้างอิง
                 ========================== --}}

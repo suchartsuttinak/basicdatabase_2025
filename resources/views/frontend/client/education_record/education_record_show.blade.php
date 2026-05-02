@@ -649,10 +649,11 @@
                                                 <div class="record-level">{{ $record->education->education_name ?? '-' }}</div>
                                             </td>
 
-                                            <td class="col-term">
-                                                <div class="fw-bold">{{ $record->semester->semester_name ?? '-' }}</div>
-                                            </td>
-
+                                           <td class="col-term">
+    <div class="fw-bold">
+        {{ $record->semester_label ?? ($record->semester->semester_name ?? '-') }}
+    </div>
+</td>
                                             <td>
                                                 <div class="record-school">{{ $record->school_name ?? '-' }}</div>
                                             </td>
@@ -773,7 +774,7 @@
                             <div class="mobile-grid">
                                 <div class="mobile-item">
                                     <span class="mobile-label">ภาคเรียน</span>
-                                    <div class="mobile-value">{{ $record->semester->semester_name ?? '-' }}</div>
+                                    <div class="mobile-value">{{ $record->semester_label ?? data_get($record, 'semester.semester_name', '-') }}</div>
                                 </div>
 
                                 <div class="mobile-item">

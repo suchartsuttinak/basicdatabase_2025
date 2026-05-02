@@ -11,31 +11,26 @@ class SchoolFollowup extends Model
 
     protected $table = 'school_followups';
 
- protected $fillable = [
-    'client_id',
-    'education_record_id',
-    'follow_date',
-    'teacher_name',
-    'tel',
-    'follow_type',
-    'result',
-    'remark',
-    'contact_name',
-    'follo_no',
-];
+    protected $fillable = [
+        'client_id',
+        'education_record_id',
+        'follow_date',
+        'teacher_name',
+        'tel',
+        'follow_type',
+        'result',
+        'remark',
+        'contact_name',
+        'follo_no',
+    ];
 
-
-
-    // ความสัมพันธ์
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class, 'client_id', 'id');
     }
 
     public function educationRecord()
     {
-        return $this->belongsTo(EducationRecord::class);
+        return $this->belongsTo(EducationRecord::class, 'education_record_id', 'id');
     }
-
-
 }

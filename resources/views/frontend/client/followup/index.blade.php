@@ -2,8 +2,6 @@
 
 @section('content')
 
-
-
 @if(session('error'))
     <div class="alert alert-danger mx-3 mx-md-4 mb-3">
         {{ session('error') }}
@@ -21,11 +19,6 @@
     </div>
 @endif
 
-
-
-
-
-
 <div class="followup-page">
     <style>
         .followup-page {
@@ -41,9 +34,9 @@
         }
 
         .followup-page .followup-header {
-            padding: 1.25rem 1.25rem 0.75rem;
+            padding: 1.25rem;
             border-bottom: 1px solid #eef2f7;
-            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
         }
 
         .followup-page .followup-title-wrap {
@@ -79,6 +72,25 @@
             white-space: nowrap;
         }
 
+        .followup-page .client-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem .75rem;
+            margin-top: .75rem;
+        }
+
+        .followup-page .client-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .45rem .8rem;
+            border-radius: 999px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            font-size: .92rem;
+        }
+
         .followup-page .followup-toolbar {
             display: flex;
             justify-content: space-between;
@@ -99,6 +111,25 @@
         .followup-page .followup-note {
             color: #64748b;
             font-size: .95rem;
+        }
+
+        .followup-page .followup-filter-box {
+            margin: 0 1.25rem 1.25rem;
+            padding: 1rem;
+            border-radius: 18px;
+            border: 1px solid #e8edf4;
+            background: #fbfdff;
+        }
+
+        .followup-page .followup-filter-box .form-control {
+            min-height: 44px;
+            border-radius: 14px;
+        }
+
+        .followup-page .followup-filter-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
         }
 
         .followup-page .table-wrap {
@@ -144,58 +175,41 @@
             color: #dc2626;
         }
 
-        .followup-page .client-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .5rem .75rem;
-            margin-top: .75rem;
-        }
-
-        .followup-page .client-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            padding: .45rem .8rem;
-            border-radius: 999px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #334155;
-            font-size: .92rem;
-        }
-
         .followup-page .followup-empty {
             margin: 0 1.25rem 1.25rem;
-            padding: 2rem 1.25rem;
+            padding: 3rem 1.25rem;
             border: 1px dashed #cbd5e1;
-            border-radius: 18px;
-            background: #f8fafc;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
             text-align: center;
         }
 
         .followup-page .followup-empty-icon {
-            width: 64px;
-            height: 64px;
+            width: 82px;
+            height: 82px;
             margin: 0 auto 1rem;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #e2e8f0;
-            color: #475569;
-            font-size: 1.5rem;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 2rem;
+            box-shadow: 0 12px 28px rgba(29, 78, 216, .12);
         }
 
         .followup-page .followup-empty h4 {
             margin: 0 0 .5rem;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #1e293b;
         }
 
         .followup-page .followup-empty p {
-            margin: 0;
+            max-width: 620px;
+            margin: 0 auto 1.25rem;
             color: #64748b;
-            line-height: 1.7;
+            line-height: 1.8;
         }
 
         @media (max-width: 767.98px) {
@@ -206,6 +220,7 @@
                 padding-right: 1rem;
             }
 
+            .followup-page .followup-filter-box,
             .followup-page .followup-empty {
                 margin-left: 1rem;
                 margin-right: 1rem;
@@ -220,8 +235,10 @@
                 width: 100%;
             }
 
-            .followup-page .followup-toolbar-right .btn {
-                flex: 1 1 auto;
+            .followup-page .followup-toolbar-left .btn,
+            .followup-page .followup-toolbar-right .btn,
+            .followup-page .followup-filter-actions .btn {
+                flex: 1 1 100%;
             }
         }
     </style>
@@ -241,6 +258,17 @@
             11 => 'พฤศจิกายน',
             12 => 'ธันวาคม',
         ];
+
+        $hasFollowupRows = isset($followups) && $followups->count() > 0;
+
+        $hasDateFilter = request()->filled('date_from')
+            || request()->filled('date_to')
+            || !empty($dateFrom)
+            || !empty($dateTo);
+
+        // ✅ มีข้อมูล หรือมีการค้นหาตามวันที่แล้ว ให้แสดง filter/table
+        // ✅ ถ้ายังไม่มีข้อมูลจริงและไม่ได้ค้นหา ให้ซ่อน filter/table
+        $showDataSection = $hasFollowupRows || $hasDateFilter;
     @endphp
 
     <div class="followup-card">
@@ -290,7 +318,7 @@
                     กลับหน้าแก้ไขผู้รับบริการ
                 </a>
 
-                @if($followups->count() > 0)
+                @if($hasFollowupRows)
                     <a href="{{ route('followup.report', $client->id) }}" target="_blank" class="btn btn-outline-primary">
                         <i class="bi bi-printer me-1"></i>
                         รายงาน
@@ -312,114 +340,143 @@
             </div>
         </div>
 
+        @if($showDataSection)
+            <div class="followup-filter-box">
+                <form action="{{ route('followup.index', $client->id) }}" method="GET" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label fw-semibold">วันที่เริ่มต้น</label>
+                        <input type="date" name="date_from" class="form-control" value="{{ $dateFrom ?? request('date_from') }}">
+                    </div>
 
-        <div class="px-3 px-md-4 pb-3">
-    <form action="{{ route('followup.index', $client->id) }}" method="GET" class="row g-3 align-items-end">
-        <div class="col-md-3">
-            <label class="form-label fw-semibold">วันที่เริ่มต้น</label>
-            <input type="date" name="date_from" class="form-control" value="{{ $dateFrom ?? request('date_from') }}">
-        </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label fw-semibold">วันที่สิ้นสุด</label>
+                        <input type="date" name="date_to" class="form-control" value="{{ $dateTo ?? request('date_to') }}">
+                    </div>
 
-        <div class="col-md-3">
-            <label class="form-label fw-semibold">วันที่สิ้นสุด</label>
-            <input type="date" name="date_to" class="form-control" value="{{ $dateTo ?? request('date_to') }}">
-        </div>
+                    <div class="col-12 col-md-6">
+                        <div class="followup-filter-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel me-1"></i>
+                                ค้นหาตามช่วงวันที่
+                            </button>
 
-        <div class="col-md-6">
-            <div class="d-flex flex-wrap gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-funnel me-1"></i>
-                    ค้นหาตามช่วงวันที่
-                </button>
+                            <a href="{{ route('followup.index', $client->id) }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-1"></i>
+                                ล้างตัวกรอง
+                            </a>
 
-                <a href="{{ route('followup.index', $client->id) }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-clockwise me-1"></i>
-                    ล้างตัวกรอง
-                </a>
-
-                <a href="{{ route('followup.report', ['client_id' => $client->id, 'date_from' => request('date_from'), 'date_to' => request('date_to')]) }}"
-                   target="_blank"
-                   class="btn btn-outline-primary">
-                    <i class="bi bi-file-earmark-text me-1"></i>
-                    รายงานตามช่วงวันที่
-                </a>
-
-              
+                            @if($hasFollowupRows)
+                                <a href="{{ route('followup.report', ['client_id' => $client->id, 'date_from' => request('date_from'), 'date_to' => request('date_to')]) }}"
+                                   target="_blank"
+                                   class="btn btn-outline-primary">
+                                    <i class="bi bi-file-earmark-text me-1"></i>
+                                    รายงานตามช่วงวันที่
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
             </div>
-        </div>
-    </form>
-</div>
 
-        @if($followups->count() > 0)
-            <div class="table-wrap">
-                <table id="followupTable" class="table table-bordered table-hover align-middle followup-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 180px;">วันเดือนปี</th>
-                            <th>การช่วยเหลือและติดตามผล</th>
-                            <th>หมายเหตุ</th>
-                            <th style="width: 160px;">รายงาน</th>
-                            <th style="width: 160px;">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($followups as $item)
-                            @php
-                                $date = \Carbon\Carbon::parse($item->followup_date);
-                                $thaiDate = $date->day . ' ' . $thaiMonths[$date->month] . ' ' . ($date->year + 543);
-                            @endphp
+            @if($hasFollowupRows)
+                <div class="table-wrap">
+                    <table id="followupTable" class="table table-bordered table-hover align-middle followup-table">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ $thaiDate }}</td>
-                                <td class="text-preline">{{ $item->assistance_detail }}</td>
-                                <td class="text-preline">{{ $item->note ?: '-' }}</td>
-                               <td class="text-center">
-    <a href="{{ route('followup.report_item', $item->id) }}"
-       target="_blank"
-       class="btn btn-outline-primary btn-sm">
-        <i class="bi bi-file-earmark-text me-1"></i>
-        เปิดรายงาน
-    </a>
-</td>
-                                <td class="text-center">
-                                    <div class="action-group justify-content-center">
-                                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'executive', 'social_worker']))
-                                            <button
-                                                type="button"
-                                                class="btn btn-warning btn-sm btn-action edit-followup-btn"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editFollowupModal"
-                                                data-id="{{ $item->id }}"
-                                                data-date="{{ \Carbon\Carbon::parse($item->followup_date)->format('Y-m-d') }}"
-                                                data-detail="{{ e($item->assistance_detail) }}"
-                                                data-note="{{ e($item->note) }}"
-                                                title="แก้ไข"
-                                            >
-                                                <i class="bi bi-pencil-square"></i>
-                                            </button>
-                                        @endif
-
-                                        @if(auth()->check() && auth()->user()->role === 'admin')
-                                            <form action="{{ route('followup.delete', $item->id) }}" method="POST" class="d-inline delete-followup-form">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm btn-action" title="ลบ">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
+                                <th style="width: 180px;">วันเดือนปี</th>
+                                <th>การช่วยเหลือและติดตามผล</th>
+                                <th>หมายเหตุ</th>
+                                <th style="width: 160px;">รายงาน</th>
+                                <th style="width: 160px;">จัดการ</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach($followups as $item)
+                                @php
+                                    $date = \Carbon\Carbon::parse($item->followup_date);
+                                    $thaiDate = $date->day . ' ' . $thaiMonths[$date->month] . ' ' . ($date->year + 543);
+                                @endphp
+
+                                <tr>
+                                    <td>{{ $thaiDate }}</td>
+                                    <td class="text-preline">{{ $item->assistance_detail }}</td>
+                                    <td class="text-preline">{{ $item->note ?: '-' }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('followup.report_item', $item->id) }}"
+                                           target="_blank"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-file-earmark-text me-1"></i>
+                                            เปิดรายงาน
+                                        </a>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="action-group justify-content-center">
+                                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'executive', 'social_worker']))
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-warning btn-sm btn-action edit-followup-btn"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editFollowupModal"
+                                                    data-id="{{ $item->id }}"
+                                                    data-date="{{ \Carbon\Carbon::parse($item->followup_date)->format('Y-m-d') }}"
+                                                    data-detail="{{ e($item->assistance_detail) }}"
+                                                    data-note="{{ e($item->note) }}"
+                                                    title="แก้ไข"
+                                                >
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                            @endif
+
+                                            @if(auth()->check() && auth()->user()->role === 'admin')
+                                                <form action="{{ route('followup.delete', $item->id) }}" method="POST" class="d-inline delete-followup-form">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm btn-action" title="ลบ">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="followup-empty">
+                    <div class="followup-empty-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <h4>ไม่พบข้อมูลตามช่วงวันที่ที่ค้นหา</h4>
+                    <p>
+                        กรุณาปรับช่วงวันที่ใหม่ หรือล้างตัวกรองเพื่อกลับไปดูข้อมูลทั้งหมด
+                    </p>
+
+                    <a href="{{ route('followup.index', $client->id) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        ล้างตัวกรอง
+                    </a>
+                </div>
+            @endif
         @else
             <div class="followup-empty">
                 <div class="followup-empty-icon">
                     <i class="bi bi-inbox"></i>
                 </div>
+
                 <h4>ยังไม่มีข้อมูลติดตามผล</h4>
-                <p>เมื่อมีการบันทึกข้อมูล ระบบจะแสดงรายการในส่วนนี้โดยอัตโนมัติ</p>
+                <p>
+                    เมื่อยังไม่มีข้อมูล ระบบจะซ่อนช่องค้นหาช่วงวันที่ ปุ่มรายงาน และตารางไว้ก่อน
+                    เพื่อให้หน้าจอดูสะอาดและใช้งานง่ายขึ้น
+                </p>
+
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'executive', 'social_worker']))
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFollowupModal">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        เพิ่มข้อมูลติดตามผล
+                    </button>
+                @endif
             </div>
         @endif
     </div>
@@ -465,6 +522,7 @@
                     <button type="button" class="btn btn-light border" data-bs-dismiss="modal">
                         ปิด
                     </button>
+
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-circle me-1"></i>
                         บันทึกข้อมูล
@@ -515,6 +573,7 @@
                     <button type="button" class="btn btn-light border" data-bs-dismiss="modal">
                         ปิด
                     </button>
+
                     <button type="submit" class="btn btn-warning">
                         <i class="bi bi-check-circle me-1"></i>
                         บันทึกการแก้ไข

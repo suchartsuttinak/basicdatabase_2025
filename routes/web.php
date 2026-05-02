@@ -4,11 +4,11 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\backend\OperationController;
 use App\Http\Controllers\backend\PublicizeController;
 use App\Http\Controllers\ClientAdmin\AdminClientController;
-use App\Http\Controllers\Frontend\HealthcHeckupController;
 use App\Http\Controllers\Landing\AboutController;
 use App\Http\Controllers\Landing\IssueController;
 use App\Http\Controllers\Landing\LandingController;
 use App\Http\Controllers\Landing\NewsController;
+use App\Http\Controllers\Landing\ScholarshipController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\UserController;
@@ -16,62 +16,60 @@ use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
-// ประมวลผล/สถิติ หน้า dashboard (จำกัดสิทธิ์)
-Route::middleware(['auth','role:admin,executive,social_worker'])->group(function () {
-    Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');
-    Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
-});
+        // ประมวลผล/สถิติ หน้า dashboard (จำกัดสิทธิ์)
+        Route::middleware(['auth','role:admin,executive,social_worker'])->group(function () {
+            Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');
+            Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+        });
 
 
-    // หน้า Landing
-    Route::get('/', [LandingController::class, 'index'])->name('landing.index');
+        // หน้า Landing
+        Route::get('/', [LandingController::class, 'index'])->name('landing.index');
 
-   // หน้า Landing
-Route::get('/', [LandingController::class, 'index'])->name('landing.index');
+        // หน้า Landing
+        Route::get('/', [LandingController::class, 'index'])->name('landing.index');
 
-// ✅ ให้ประชาชนทั่วไปแจ้งเรื่องได้ ไม่ต้อง login
-Route::post('/issues', [IssueController::class, 'store'])
-    ->name('issues.store');
-
-
-// ✅ ข่าวหน้าเว็บ Public ทุกคนดูได้
-Route::get('/news', [NewsController::class, 'index'])
-    ->name('news.index');
-
-Route::get('/news/{id}', [NewsController::class, 'show'])
-    ->name('news.show');
+        // ✅ ให้ประชาชนทั่วไปแจ้งเรื่องได้ ไม่ต้อง login
+        Route::post('/issues', [IssueController::class, 'store'])
+            ->name('issues.store');
 
 
-// [SECURITY] จำกัดสิทธิ์เฉพาะ admin / executive / social_worker
-Route::middleware(['auth', 'role:admin,executive,social_worker'])->group(function () {
-
-    // ✅ หน้าแสดงรายการ issues สำหรับเจ้าหน้าที่เท่านั้น
-    Route::get('/issues', [IssueController::class, 'index'])
-        ->name('issues.index');
-
-    // ✅ News CRUD เฉพาะเจ้าหน้าที่
-    Route::get('/news/create', [NewsController::class, 'create'])
-        ->name('news.create');
-
-    Route::post('/news', [NewsController::class, 'store'])
-        ->name('news.store');
-
-    // หน้า about เฉพาะเจ้าหน้าที่
-    Route::get('/about', [AboutController::class, 'index'])
-        ->name('landing.about.index');
-
-    Route::post('/about', [AboutController::class, 'store'])
-        ->name('landing.about.store');
-
-    Route::delete('/about/{id}', [AboutController::class, 'destroy'])
-        ->name('landing.about.delete');
-});
+        // ✅ Public: ทุกคนดูข่าวได้
+        Route::get('/news', [NewsController::class, 'index'])
+            ->name('news.index');
 
 
-// ✅ publicizes ถ้าเป็นหน้าจัดการ ควรล็อกอินด้วย
-Route::middleware(['auth', 'role:admin,executive,social_worker'])
-    ->prefix('publicizes')
-    ->group(function () {
+        // [SECURITY] จำกัดสิทธิ์เฉพาะ admin / executive / social_worker
+        Route::middleware(['auth', 'role:admin,executive,social_worker'])->group(function () {
+
+        Route::get('/issues', [IssueController::class, 'index'])
+            ->name('issues.index');
+
+        Route::get('/news/create', [NewsController::class, 'create'])
+            ->name('news.create');
+
+        Route::post('/news', [NewsController::class, 'store'])
+            ->name('news.store');
+
+        Route::get('/about', [AboutController::class, 'index'])
+            ->name('landing.about.index');
+
+        Route::post('/about', [AboutController::class, 'store'])
+            ->name('landing.about.store');
+
+        Route::delete('/about/{id}', [AboutController::class, 'destroy'])
+            ->name('landing.about.delete');
+    });
+
+
+        // ✅ Public: รายละเอียดข่าว ต้องวางไว้ล่างสุด
+        Route::get('/news/{id}', [NewsController::class, 'show'])
+            ->whereNumber('id')
+            ->name('news.show');
+        // ✅ publicizes ถ้าเป็นหน้าจัดการ ควรล็อกอินด้วย
+        Route::middleware(['auth', 'role:admin,executive,social_worker'])
+            ->prefix('publicizes')
+            ->group(function () {
 
         Route::get('/', [PublicizeController::class, 'index'])
             ->name('publicizes.index');
@@ -91,29 +89,73 @@ Route::middleware(['auth', 'role:admin,executive,social_worker'])
         Route::delete('/delete/{publicize}', [PublicizeController::class, 'destroy'])
             ->name('publicizes.destroy');
     });
+
+
+        // ฟอร์มสนับสนุนการศึกษา (Public)
+        Route::get('/scholarship/create', [ScholarshipController::class, 'create'])
+            ->name('scholarship.create');
+
+        // บันทึกฟอร์ม สนับสนุนการศึกษา (Public)
+        Route::post('/scholarship/store', [ScholarshipController::class, 'store'])
+            ->name('scholarship.store');
+
+
+        // =========================
+        // 🔒 Admin เท่านั้น การสนับสนุนทุนการศึกษา (หน้าสาธารณะ)
+        // =========================
+        Route::middleware(['auth', 'role:admin'])->group(function () {
+
+        // รายการผู้สนับสนุน
+        Route::get('/scholarship', [ScholarshipController::class, 'index'])
+            ->name('scholarship.index');
+
+        // ฟอร์มบันทึกการบริจาค
+        Route::get('/scholarship/{scholarship}/donation/create', [ScholarshipController::class, 'createDonation'])
+            ->whereNumber('scholarship') // 🔥 กันชน route
+            ->name('scholarship.donation.create');
+
+        // บันทึกการบริจาค
+        Route::post('/scholarship/{scholarship}/donation/store', [ScholarshipController::class, 'storeDonation'])
+            ->whereNumber('scholarship')
+            ->name('scholarship.donation.store');
+
+            Route::get('/scholarship/{scholarship}/donations', [ScholarshipController::class, 'donationIndex'])
+        ->whereNumber('scholarship')
+        ->name('scholarship.donation.index');
+
+    });
+
+        // ✅ Admin เท่านั้น ดูรายการผู้สนับสนุนทุนการศึกษา (หน้าสาธารณะ)
+        Route::middleware(['auth', 'role:admin'])->group(function () {
+            Route::get('/scholarship', [ScholarshipController::class, 'index'])
+                ->name('scholarship.index');
+        });
    
+// สิ้นสุด ฟอร์มสนับสนุนการศึกษา (Public)
 
-// User Profile
-    Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-require __DIR__.'/auth.php';
-// Admin Logout
-    Route::get('/admin/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
 
-// Admin Profile
-    Route::middleware('auth')->group(function () {
-    Route::get('/profile', [AdminController::class, 'AdminProfile'])->name('admin.profile');
-    Route::post('/profile/store', [AdminController::class, 'ProfileStore'])->name('profile.store');
-    Route::post('/admin/password/update', [AdminController::class, 'PasswordUpdate'])->name('admin.password.update');  
-});
+    // User Profile
+        Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
+
+    require __DIR__.'/auth.php';
+    // Admin Logout
+        Route::get('/admin/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
+
+    // Admin Profile
+        Route::middleware('auth')->group(function () {
+        Route::get('/profile', [AdminController::class, 'AdminProfile'])->name('admin.profile');
+        Route::post('/profile/store', [AdminController::class, 'ProfileStore'])->name('profile.store');
+        Route::post('/admin/password/update', [AdminController::class, 'PasswordUpdate'])->name('admin.password.update');  
+    });
 
 
     // AdminClient Route All
-   Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/admin/client/{id}', [AdminClientController::class, 'Index'])
         ->whereNumber('id')
         ->name('admin.index');
@@ -139,25 +181,16 @@ require __DIR__.'/auth.php';
 });
 
 
-
-
-
-
-
-
-
-
-
-// User Management (Admin Only)
-    Route::prefix('admin/users')->middleware(['auth', 'role:admin', 'prevent-back'])->group(function () {
-    Route::get('/', [UserManagementController::class, 'index'])->name('users.index');
-    Route::get('/create', [UserManagementController::class, 'create'])->name('users.create');
-    Route::post('/store', [UserManagementController::class, 'store'])->name('users.store');
-    Route::get('/edit/{id}', [UserManagementController::class, 'edit'])->name('users.edit');
-    Route::put('/update/{id}', [UserManagementController::class, 'update'])->name('users.update');
-    Route::delete('/delete/{id}', [UserManagementController::class, 'destroy'])->name('users.delete');
-    Route::post('/toggle-status/{id}', [UserManagementController::class, 'toggleStatus'])->name('users.toggleStatus');
-});
+    // User Management (Admin Only)
+        Route::prefix('admin/users')->middleware(['auth', 'role:admin', 'prevent-back'])->group(function () {
+        Route::get('/', [UserManagementController::class, 'index'])->name('users.index');
+        Route::get('/create', [UserManagementController::class, 'create'])->name('users.create');
+        Route::post('/store', [UserManagementController::class, 'store'])->name('users.store');
+        Route::get('/edit/{id}', [UserManagementController::class, 'edit'])->name('users.edit');
+        Route::put('/update/{id}', [UserManagementController::class, 'update'])->name('users.update');
+        Route::delete('/delete/{id}', [UserManagementController::class, 'destroy'])->name('users.delete');
+        Route::post('/toggle-status/{id}', [UserManagementController::class, 'toggleStatus'])->name('users.toggleStatus');
+    });
 
 
 
@@ -174,40 +207,18 @@ require __DIR__.'/auth.php';
         Route::get('/report/daily', [OperationController::class, 'dailyReport'])->name('operations.report.daily');
     });
 
-    // User Route All
-   
 
-    Route::middleware(['auth', 'role:admin'])->prefix('admin/users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('users.index');
-    Route::get('/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/store', [UserController::class, 'store'])->name('users.store');
-    Route::get('/edit/{id}', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/update/{id}', [UserController::class, 'update'])->name('users.update');
+        // User Route All
+        Route::middleware(['auth', 'role:admin'])->prefix('admin/users')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::get('/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/store', [UserController::class, 'store'])->name('users.store');
+        Route::get('/edit/{id}', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/update/{id}', [UserController::class, 'update'])->name('users.update');
 
-    Route::patch('/toggle-status/{id}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-});
-
-
-
-
-
-
-
-    Route::middleware(['auth', 'role:admin,executive,social_worker'])->prefix('healthc-checkups')->group(function () {
-    Route::get('/', [HealthcHeckupController::class, 'index'])->name('healthc_heckups.index');
-    Route::post('/store', [HealthcHeckupController::class, 'store'])->name('healthc_heckups.store');
-    Route::get('/edit-json/{id}', [HealthcHeckupController::class, 'editJson'])->name('healthc_heckups.edit_json');
-    Route::put('/update/{id}', [HealthcHeckupController::class, 'update'])->name('healthc_heckups.update');
-    Route::delete('/delete/{id}', [HealthcHeckupController::class, 'destroy'])->name('healthc_heckups.delete');
-    Route::get('/report', [HealthcHeckupController::class, 'report'])->name('healthc_heckups.report');
-});
-
-
-
-
-
-
+        Route::patch('/toggle-status/{id}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 
 
 
@@ -324,6 +335,10 @@ require __DIR__.'/auth.php';
 
     // ===== ติดตามผล =====
       require __DIR__.'/frontend/followup.php';
+
+
+    // ===== ตรวจสุขภาพประจำปี =====
+      require __DIR__.'/frontend/healthcCheckup.php';
 
 
 

@@ -60,12 +60,14 @@
                     </a>
                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('client.edit', $client->id) }}"
-                                   class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
-                                    บันทึกข้อมูลทั่วไป
-                                </a>
-                            </li>
+                           @if(isset($client))
+<li>
+    <a href="{{ route('client.edit', $client->id) }}"
+       class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
+        บันทึกข้อมูลทั่วไป
+    </a>
+</li>
+@endif
                             <li>
                                 <a href="{{ route('client.report', $clientId) }}"
                                    class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">

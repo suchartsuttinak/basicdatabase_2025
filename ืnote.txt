@@ -2,8 +2,13 @@
 คุณสามารถใช้ Command Palette () แล้วพิมพ์ว่า
 	- กด Ctrl + Shift + P
         Windsurf: Chat with AI   
+----------------------------
+สรุปปัญหาที่คุณเจอ (อันนี้สำคัญมาก เผื่ออนาคต):
 
-
+❌ public/storage link เสีย / permission เพี้ยน → 403
+✅ ลบแล้วสร้างใหม่ → ใช้งานได้ปกติ
+        rmdir public\storage
+        php artisan storage:link
 
         -------------------------------------
         

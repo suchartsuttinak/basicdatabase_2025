@@ -499,10 +499,12 @@
                         <div class="report-meta-value">: {{ $latestRecord->education->education_name ?? '-' }}</div>
                     </div>
 
-                    <div class="report-meta-item">
-                        <div class="report-meta-label">ภาคเรียนล่าสุด</div>
-                        <div class="report-meta-value">: {{ $latestRecord->semester->semester_name ?? '-' }}</div>
-                    </div>
+                  <div class="report-meta-item">
+    <div class="report-meta-label">ภาคเรียนล่าสุด</div>
+    <div class="report-meta-value">
+        : {{ $latestRecord->semester_label ?? data_get($latestRecord, 'semester.semester_name', '-') }}
+    </div>
+</div>
 
                     <div class="report-meta-item">
                         <div class="report-meta-label">สถานศึกษาล่าสุด</div>

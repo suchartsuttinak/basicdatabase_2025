@@ -1,28 +1,11 @@
-<?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
+// ❌ ไม่ใช้แล้ว ระบบใช้ education_levels แทน
+public function up(): void
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::create('education', function (Blueprint $table) {
-            $table->id();
-            $table->string('education_name');
-            $table->timestamps();
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('education');
-    }
-};
+    // ❌ ปิดไปเลย
+    // Schema::create('education', function (Blueprint $table) {
+    //     $table->id();
+    //     $table->string('education_name');
+    //     $table->timestamps();
+    // });
+}

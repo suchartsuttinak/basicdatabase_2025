@@ -131,19 +131,17 @@ class VisitFamilyController extends Controller
     $visitFamily = VisitFamily::create($validated);
 
     // ✅ ลดขนาดไฟล์รูปตอนอัปโหลด
-     if ($request->hasFile('images')) {
-    $manager = new ImageManager(new Driver()); // ✅ ใช้ GD driver
+    if ($request->hasFile('images')) {
+    $manager = new ImageManager(new Driver());
 
     foreach ($request->file('images') as $file) {
         $image = $manager->read($file)
-            ->resize(1200, null, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            })
-            ->toJpeg(75); // ลดคุณภาพลงเหลือ 75%
+            ->scaleDown(width: 1200)
+            ->toJpeg(85);
 
         $filename = uniqid() . '.jpg';
         $path = 'visit_images/' . $filename;
+
         Storage::disk('public')->put($path, (string) $image);
 
         Image::create([
@@ -152,11 +150,10 @@ class VisitFamilyController extends Controller
             'mime_type'       => 'image/jpeg',
             'size'            => Storage::disk('public')->size($path),
             'visit_family_id' => $visitFamily->id,
-            'client_id'       => $client->id, // ✅ [แก้ไข]
+            'client_id'       => $visitFamily->client_id,
         ]);
     }
-
-        }
+}
 
     return redirect()->route('visitFamily.create', $client->id) // ✅ [แก้ไข]
                      ->with('success', 'บันทึกข้อมูลเรียบร้อย');
@@ -232,20 +229,29 @@ class VisitFamilyController extends Controller
 
         $visitFamily->update($validated);
 
-         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                $path = $file->store('visit_images', 'public');
+       if ($request->hasFile('images')) {
+    $manager = new ImageManager(new Driver());
 
-                Image::create([
-                    'file_path'       => $path,
-                    'file_name'       => $file->getClientOriginalName(),
-                    'mime_type'       => $file->getClientMimeType(),
-                    'size'            => $file->getSize(),
-                    'visit_family_id' => $visitFamily->id,
-                    'client_id'       => $visitFamily->client_id,
-                ]);
-            }
-        }
+    foreach ($request->file('images') as $file) {
+        $image = $manager->read($file)
+            ->cover(1200, 800)
+            ->toJpeg(85);
+
+        $filename = uniqid() . '.jpg';
+        $path = 'visit_images/' . $filename;
+
+        Storage::disk('public')->put($path, (string) $image);
+
+        Image::create([
+            'file_path'       => $path,
+            'file_name'       => $file->getClientOriginalName(),
+            'mime_type'       => 'image/jpeg',
+            'size'            => Storage::disk('public')->size($path),
+            'visit_family_id' => $visitFamily->id,
+            'client_id'       => $visitFamily->client_id,
+        ]);
+    }
+}
 
         return redirect()->route('vitsitFamily.edit', $id)
                          ->with('success', 'แก้ไขข้อมูลเรียบร้อย');

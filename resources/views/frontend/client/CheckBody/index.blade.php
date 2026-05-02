@@ -3,7 +3,9 @@
 @section('content')
 @php
     use App\Helpers\ThaiDateHelper;
+
     $isEdit = isset($checkbody) && $checkbody;
+    $hasCheckbodyRows = isset($checkbodies) && $checkbodies->count() > 0;
 @endphp
 
 <style>
@@ -11,15 +13,14 @@
         --primary-soft: #eef4ff;
         --border-soft: #e7ecf3;
         --text-muted-soft: #6c757d;
-        --success-soft: #edf9f1;
-        --warning-soft: #fff8e6;
         --card-radius: 18px;
     }
 
     .checkbody-page .page-header-card,
     .checkbody-page .form-card,
     .checkbody-page .table-card,
-    .checkbody-page .summary-card {
+    .checkbody-page .summary-card,
+    .checkbody-page .empty-card {
         border: 0;
         border-radius: var(--card-radius);
         box-shadow: 0 10px 30px rgba(26, 54, 93, .06);
@@ -30,17 +31,11 @@
         background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
     }
 
-    .checkbody-page .section-title {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-bottom: 0;
-        color: #1f2d3d;
-    }
-
     .checkbody-page .section-subtitle {
         color: var(--text-muted-soft);
         font-size: .875rem;
         margin-bottom: 0;
+        line-height: 1.7;
     }
 
     .checkbody-page .info-pill {
@@ -219,25 +214,39 @@
         font-weight: 700;
     }
 
-    .checkbody-page .empty-state {
-        border: 1px dashed #d9e2ef;
-        border-radius: 18px;
-        padding: 2rem 1rem;
+    .checkbody-page .empty-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+        padding: 3.25rem 1.25rem;
         text-align: center;
-        background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+        border: 1px solid #e7ecf3;
     }
 
-    .checkbody-page .empty-state .empty-icon {
-        width: 64px;
-        height: 64px;
+    .checkbody-page .empty-icon {
+        width: 86px;
+        height: 86px;
         margin: 0 auto 1rem;
-        border-radius: 18px;
-        display: flex;
+        border-radius: 50%;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         background: var(--primary-soft);
         color: #0d6efd;
-        font-size: 1.6rem;
+        font-size: 2.15rem;
+        box-shadow: 0 12px 28px rgba(13, 110, 253, .14);
+    }
+
+    .checkbody-page .empty-card h5 {
+        margin: 0 0 .5rem;
+        color: #1f2937;
+        font-size: 1.25rem;
+        font-weight: 800;
+    }
+
+    .checkbody-page .empty-card p {
+        max-width: 640px;
+        margin: 0 auto 1.35rem;
+        color: #64748b;
+        line-height: 1.8;
     }
 
     .checkbody-page .sticky-tools {
@@ -264,6 +273,20 @@
         .checkbody-page .table-card .card-header {
             padding: 1rem;
         }
+
+        .checkbody-page .empty-card {
+            padding: 2.5rem 1rem;
+        }
+
+        .checkbody-page .empty-icon {
+            width: 74px;
+            height: 74px;
+            font-size: 1.85rem;
+        }
+
+        .checkbody-page .sticky-tools .btn {
+            width: 100%;
+        }
     }
 </style>
 
@@ -275,7 +298,8 @@
                     <div class="d-flex flex-column gap-2">
                         <div>
                             <h4 class="mb-1 fw-bold">
-                                <i class="bi bi-heart-pulse me-2 text-primary"></i>บันทึกการตรวจสุขภาพเบื้องต้น
+                                <i class="bi bi-heart-pulse me-2 text-primary"></i>
+                                บันทึกการตรวจสุขภาพเบื้องต้น
                             </h4>
                             <p class="section-subtitle">
                                 จัดเก็บข้อมูลการตรวจร่างกาย พัฒนาการ และสุขภาพทั่วไปอย่างเป็นระบบ
@@ -297,11 +321,13 @@
                                 </span>
                             @endif
 
-                            <span class="info-pill">
-                                <i class="bi bi-clipboard2-pulse"></i>
-                                จำนวนบันทึก:
-                                <strong>{{ $checkbodies->count() }}</strong>
-                            </span>
+                            @if($hasCheckbodyRows)
+                                <span class="info-pill">
+                                    <i class="bi bi-clipboard2-pulse"></i>
+                                    จำนวนบันทึก:
+                                    <strong>{{ $checkbodies->count() }}</strong>
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -323,7 +349,8 @@
 
                         @if($isEdit)
                             <a href="{{ route('check_body.add', $client->id) }}" class="btn btn-outline-secondary btn-modern">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>ยกเลิกการแก้ไข
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                ยกเลิกการแก้ไข
                             </a>
                         @endif
                     </div>
@@ -332,51 +359,78 @@
         </div>
     </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">วันที่ตรวจล่าสุด</div>
-                    <div class="summary-value">
-                        {{ ThaiDateHelper::formatThaiShort(optional($checkbodies->first())->assessor_date) }}
+    @if($hasCheckbodyRows)
+        <div class="row g-3 mb-3">
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">วันที่ตรวจล่าสุด</div>
+                        <div class="summary-value">
+                            {{ ThaiDateHelper::formatThaiShort(optional($checkbodies->first())->assessor_date) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">สมวัย</div>
+                        <div class="summary-value">{{ $checkbodies->where('development', 'สมวัย')->count() }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">ไม่สมวัย</div>
+                        <div class="summary-value">{{ $checkbodies->where('development', 'ไม่สมวัย')->count() }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">สถานะหน้าฟอร์ม</div>
+                        <div class="summary-value">{{ $isEdit ? 'กำลังแก้ไขข้อมูล' : 'พร้อมเพิ่มรายการใหม่' }}</div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">สมวัย</div>
-                    <div class="summary-value">{{ $checkbodies->where('development', 'สมวัย')->count() }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">ไม่สมวัย</div>
-                    <div class="summary-value">{{ $checkbodies->where('development', 'ไม่สมวัย')->count() }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">สถานะหน้าฟอร์ม</div>
-                    <div class="summary-value">{{ $isEdit ? 'กำลังแก้ไขข้อมูล' : 'พร้อมเพิ่มรายการใหม่' }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    @endif
 
     <div class="collapse {{ $errors->any() || $isEdit ? 'show' : '' }}" id="checkBodyFormCollapse">
         @include('frontend.client.checkBody._form')
     </div>
 
-    @include('frontend.client.checkBody._table')
+    @if($hasCheckbodyRows)
+        @include('frontend.client.checkBody._table')
+    @else
+        <div class="empty-card mb-3">
+            <div class="empty-icon">
+                <i class="bi bi-clipboard2-heart"></i>
+            </div>
+
+            <h5>ยังไม่มีข้อมูลการตรวจสุขภาพเบื้องต้น</h5>
+
+            <p>
+                เมื่อยังไม่มีข้อมูล ระบบจะซ่อนการ์ดสรุปและตารางรายการไว้ก่อน
+                เพื่อให้หน้าจอดูสะอาด อ่านง่าย และไม่แสดงข้อมูลว่างโดยไม่จำเป็น
+            </p>
+
+            <button
+                type="button"
+                class="btn btn-primary btn-modern"
+                data-bs-toggle="collapse"
+                data-bs-target="#checkBodyFormCollapse"
+            >
+                <i class="bi bi-plus-circle me-1"></i>
+                เพิ่มผลการตรวจครั้งแรก
+            </button>
+        </div>
+    @endif
 </div>
 @endsection
 
@@ -458,6 +512,7 @@
             formCollapse.addEventListener('shown.bs.collapse', function () {
                 const icon = toggleBtn.querySelector('i');
                 const text = toggleBtn.querySelector('span');
+
                 if (icon) icon.className = 'bi bi-chevron-up me-1';
                 if (text && !@json($isEdit)) text.textContent = 'ซ่อนฟอร์ม';
             });
@@ -465,17 +520,20 @@
             formCollapse.addEventListener('hidden.bs.collapse', function () {
                 const icon = toggleBtn.querySelector('i');
                 const text = toggleBtn.querySelector('span');
+
                 if (icon) icon.className = 'bi bi-plus-circle me-1';
                 if (text && !@json($isEdit)) text.textContent = 'เพิ่มผลการตรวจ';
             });
         }
 
         const form = document.querySelector('#checkbody-form');
+
         if (form) {
             form.querySelectorAll('input, textarea, select').forEach(function (field) {
                 field.addEventListener('input', function () {
                     field.classList.remove('is-invalid');
                 });
+
                 field.addEventListener('change', function () {
                     field.classList.remove('is-invalid');
                 });

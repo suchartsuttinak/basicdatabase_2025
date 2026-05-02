@@ -206,10 +206,14 @@ class EducationRecordController extends Controller
     {
         $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
 
-        $educationRecords = EducationRecord::with('subjects','education','semester') // ✅ ดึง semester FK
-            ->where('client_id', $client_id)
-            ->orderBy('record_date', 'desc')
-            ->get();
+    $educationRecords = EducationRecord::with('subjects','education','semester')
+    ->leftJoin('semesters', 'education_records.semester_id', '=', 'semesters.id')
+    ->select('education_records.*', 'semesters.semester_name as semester_label')
+    ->where('education_records.client_id', $client_id)
+    ->orderBy('education_records.record_date', 'desc')
+    ->get();
+
+
 
         if ($educationRecords->isEmpty()) {
             return redirect()->route('education_record_add', ['client_id' => $client_id])
@@ -259,16 +263,17 @@ class EducationRecordController extends Controller
 public function EducationRecordReportById($id)
 {
     $record = EducationRecord::with(['subjects', 'education', 'semester', 'institution'])
-        ->where('id', $id)
+        ->leftJoin('semesters', 'education_records.semester_id', '=', 'semesters.id')
+        ->select('education_records.*', 'semesters.semester_name as semester_label')
+        ->where('education_records.id', $id)
         ->whereHas('client', function ($q) {
             $q->forUser(auth()->user());
         })
-        ->firstOrFail(); // ✅ จำกัดสิทธิ์เหมือนเมธอดอื่น
+        ->firstOrFail();
 
     $client = Client::forUser(auth()->user())
-        ->findOrFail($record->client_id); // ✅ จำกัดสิทธิ์เหมือนเดิม
+        ->findOrFail($record->client_id);
 
-    // ✅ ส่งเป็น collection 1 รายการ เพื่อใช้ view เดิมโดยไม่กระทบส่วนอื่น
     $educationRecords = collect([$record]);
 
     return view('frontend.client.education_record.education_record_report', compact(

@@ -4,25 +4,50 @@
 
 @section('content')
 <div class="container-fluid py-3 healthc-page">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <div>
-            <h3 class="mb-1">ข้อมูลการตรวจสุขภาพ</h3>
-            <div class="text-muted small">บันทึก / ค้นหา / แก้ไข / ลบ / ออกรายงาน</div>
+
+    @php
+        $hasRows = isset($healthcHeckups) && $healthcHeckups->count() > 0;
+
+        $hasFilter = request()->filled('keyword')
+            || request()->filled('client_id')
+            || request()->filled('date_from')
+            || request()->filled('date_to')
+            || request()->filled('checkup_result');
+
+        $showSection = $hasRows || $hasFilter;
+    @endphp
+
+    <div class="healthc-header mb-3">
+        <div class="healthc-header-left">
+            <div class="healthc-header-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+
+            <div>
+                <h3 class="healthc-title mb-1">ข้อมูลการตรวจสุขภาพประจำปี</h3>
+                <div class="healthc-subtitle">
+                    บันทึก / ค้นหา / แก้ไข / ลบ / ออกรายงาน
+                </div>
+            </div>
         </div>
 
-        <div class="d-flex flex-wrap gap-2">
+        <div class="healthc-header-right">
             <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                 <i class="bi bi-plus-circle"></i> เพิ่มข้อมูล
             </button>
 
-            <a href="{{ route('healthc_heckups.report', request()->query()) }}" target="_blank" class="btn btn-outline-secondary">
-                <i class="bi bi-printer"></i> รายงาน
-            </a>
+            @if($hasRows)
+                <a href="{{ route('healthc_heckups.report', request()->query()) }}"
+                   target="_blank"
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-printer"></i> รายงาน
+                </a>
+            @endif
         </div>
     </div>
 
     @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show">
+        <div class="alert alert-danger alert-dismissible fade show healthc-alert">
             <strong>พบข้อผิดพลาด</strong>
             <ul class="mb-0 mt-2 ps-3">
                 @foreach($errors->all() as $error)
@@ -33,152 +58,173 @@
         </div>
     @endif
 
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('healthc_heckups.index') }}">
-                <div class="row g-3">
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <label class="form-label">ค้นหาชื่อเด็ก / สถานพยาบาล / รายละเอียด</label>
-                        <input type="text" name="keyword" class="form-control" value="{{ request('keyword') }}" placeholder="พิมพ์คำค้นหา">
-                    </div>
+    @if($showSection)
+        <div class="card border-0 shadow-sm mb-3 healthc-filter-card">
+            <div class="card-body">
+                <form method="GET" action="{{ route('healthc_heckups.index') }}">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label">ค้นหาชื่อเด็ก / สถานพยาบาล / รายละเอียด</label>
+                            <input type="text" name="keyword" class="form-control" value="{{ request('keyword') }}" placeholder="พิมพ์คำค้นหา">
+                        </div>
 
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <label class="form-label">ผู้รับบริการ</label>
-                        <select name="client_id" class="form-select">
-                            <option value="">-- ทั้งหมด --</option>
-                            @foreach($clients as $client)
-                                <option value="{{ $client->id }}" {{ request('client_id') == $client->id ? 'selected' : '' }}>
-                                    {{ $client->fullname ?? (($client->first_name ?? '') . ' ' . ($client->last_name ?? '')) }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label">ผู้รับบริการ</label>
+                            <select name="client_id" class="form-select">
+                                <option value="">-- ทั้งหมด --</option>
+                                @foreach($clients as $client)
+                                    <option value="{{ $client->id }}" {{ request('client_id') == $client->id ? 'selected' : '' }}>
+                                        {{ $client->fullname ?? (($client->first_name ?? '') . ' ' . ($client->last_name ?? '')) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label">วันที่เริ่มต้น</label>
-                        <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
-                    </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label">วันที่เริ่มต้น</label>
+                            <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                        </div>
 
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label">วันที่สิ้นสุด</label>
-                        <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
-                    </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label">วันที่สิ้นสุด</label>
+                            <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                        </div>
 
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label">ผลการตรวจ</label>
-                        <select name="checkup_result" class="form-select">
-                            <option value="">-- ทั้งหมด --</option>
-                            <option value="normal" {{ request('checkup_result') === 'normal' ? 'selected' : '' }}>ปกติ</option>
-                            <option value="abnormal" {{ request('checkup_result') === 'abnormal' ? 'selected' : '' }}>ไม่ปกติ</option>
-                        </select>
-                    </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label">ผลการตรวจ</label>
+                            <select name="checkup_result" class="form-select">
+                                <option value="">-- ทั้งหมด --</option>
+                                <option value="normal" {{ request('checkup_result') === 'normal' ? 'selected' : '' }}>ปกติ</option>
+                                <option value="abnormal" {{ request('checkup_result') === 'abnormal' ? 'selected' : '' }}>ไม่ปกติ</option>
+                            </select>
+                        </div>
 
-                    <div class="col-12">
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-search"></i> ค้นหา
-                            </button>
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> ค้นหา
+                                </button>
 
-                            <a href="{{ route('healthc_heckups.index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-counterclockwise"></i> ล้างค่า
-                            </a>
+                                <a href="{{ route('healthc_heckups.index') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise"></i> ล้างค่า
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-center" style="width:70px;">ลำดับ</th>
-                            <th style="min-width:180px;">ชื่อ-สกุล</th>
-                            <th style="min-width:130px;">วันที่ตรวจ</th>
-                            <th style="min-width:180px;">สถานพยาบาล</th>
-                            <th style="min-width:120px;">ผลการตรวจ</th>
-                            <th style="min-width:220px;">รายละเอียด</th>
-                            <th style="min-width:120px;">เอกสาร</th>
-                            <th style="min-width:150px;">ผู้บันทึก</th>
-                            <th class="text-center" style="min-width:220px;">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($healthcHeckups as $index => $item)
-                            <tr>
-                                <td class="text-center">
-                                    {{ $healthcHeckups->firstItem() + $index }}
-                                </td>
-                                <td>
-                                    {{ $item->client->fullname ?? (($item->client->first_name ?? '') . ' ' . ($item->client->last_name ?? '')) }}
-                                </td>
-                                <td>
-                                    {{ optional($item->checkup_date)->format('d/m/Y') }}
-                                </td>
-                                <td>
-                                    {{ $item->hospital_name }}
-                                </td>
-                                <td>
-                                    @if($item->checkup_result === 'normal')
-                                        <span class="badge bg-success">ปกติ</span>
-                                    @else
-                                        <span class="badge bg-danger">ไม่ปกติ</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ $item->abnormal_detail ?: '-' }}
-                                </td>
-                                <td>
-                                    @if($item->medical_document)
-                                        <a href="{{ asset('storage/' . $item->medical_document) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-file-earmark-pdf"></i> เปิดไฟล์
-                                        </a>
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ $item->recorder->name ?? '-' }}
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex flex-wrap justify-content-center gap-1">
-                                        <button type="button"
-                                                class="btn btn-sm btn-warning"
-                                                onclick="openEditModal({{ $item->id }})">
-                                            <i class="bi bi-pencil-square"></i> แก้ไข
-                                        </button>
-
-                                        <form action="{{ route('healthc_heckups.delete', $item->id) }}"
-                                              method="POST"
-                                              class="d-inline js-delete-healthc-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="bi bi-trash"></i> ลบ
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูล</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                </form>
             </div>
-
-            @if($healthcHeckups->hasPages())
-                <div class="mt-3">
-                    {{ $healthcHeckups->links() }}
-                </div>
-            @endif
         </div>
-    </div>
+
+        <div class="card border-0 shadow-sm healthc-table-card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width:70px;">ลำดับ</th>
+                                <th style="min-width:180px;">ชื่อ-สกุล</th>
+                                <th style="min-width:130px;">วันที่ตรวจ</th>
+                                <th style="min-width:180px;">สถานพยาบาล</th>
+                                <th style="min-width:120px;">ผลการตรวจ</th>
+                                <th style="min-width:220px;">รายละเอียด</th>
+                                <th style="min-width:120px;">เอกสาร</th>
+                                <th style="min-width:150px;">ผู้บันทึก</th>
+                                <th class="text-center" style="min-width:220px;">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($healthcHeckups as $index => $item)
+                                <tr>
+                                    <td class="text-center">
+                                        {{ $healthcHeckups->firstItem() + $index }}
+                                    </td>
+                                    <td>
+                                        {{ $item->client->fullname ?? (($item->client->first_name ?? '') . ' ' . ($item->client->last_name ?? '')) }}
+                                    </td>
+                                    <td>
+                                        {{ optional($item->checkup_date)->format('d/m/Y') }}
+                                    </td>
+                                    <td>
+                                        {{ $item->hospital_name }}
+                                    </td>
+                                    <td>
+                                        @if($item->checkup_result === 'normal')
+                                            <span class="badge bg-success">ปกติ</span>
+                                        @else
+                                            <span class="badge bg-danger">ไม่ปกติ</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $item->abnormal_detail ?: '-' }}
+                                    </td>
+                                    <td>
+                                        @if($item->medical_document)
+                                            <a href="{{ asset('storage/' . $item->medical_document) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-file-earmark-pdf"></i> เปิดไฟล์
+                                            </a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $item->recorder->name ?? '-' }}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning"
+                                                    onclick="openEditModal({{ $item->id }})">
+                                                <i class="bi bi-pencil-square"></i> แก้ไข
+                                            </button>
+
+                                            <form action="{{ route('healthc_heckups.delete', $item->id) }}"
+                                                  method="POST"
+                                                  class="d-inline js-delete-healthc-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-trash"></i> ลบ
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูล</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($healthcHeckups->hasPages())
+                    <div class="mt-3">
+                        {{ $healthcHeckups->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    @else
+        <div class="healthc-empty-card">
+            <div class="healthc-empty-body">
+                <div class="healthc-empty-icon">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+
+                <h4>ยังไม่มีข้อมูลการตรวจสุขภาพ</h4>
+
+                <p>
+                    ระบบจะซ่อนปุ่มรายงาน ช่องค้นหา และตารางไว้ก่อน
+                    เพื่อให้หน้าจอดูสะอาด ใช้งานง่าย และไม่แสดงตารางว่างโดยไม่จำเป็น
+                </p>
+
+                <button type="button" class="btn btn-primary px-4" onclick="openCreateModal()">
+                    <i class="bi bi-plus-circle"></i> เพิ่มข้อมูลการตรวจสุขภาพ
+                </button>
+            </div>
+        </div>
+    @endif
 </div>
 
 {{-- Modal --}}
@@ -282,12 +328,112 @@
 </div>
 
 <style>
+.healthc-header{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:16px 18px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#ffffff 0%,#f7fbff 100%);
+    box-shadow:0 10px 30px rgba(0,0,0,0.06);
+}
+
+.healthc-header-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.healthc-header-icon{
+    width:54px;
+    height:54px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#e8f2ff;
+    color:#0d6efd;
+    font-size:26px;
+    box-shadow:0 6px 18px rgba(13,110,253,.18);
+    flex:0 0 auto;
+}
+
+.healthc-title{
+    font-size:20px;
+    font-weight:700;
+    color:#1f2937;
+}
+
+.healthc-subtitle{
+    font-size:13px;
+    color:#6b7280;
+}
+
+.healthc-header-right{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.healthc-alert{
+    border-radius:14px;
+}
+
+.healthc-filter-card,
+.healthc-table-card{
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.healthc-empty-card{
+    border-radius:22px;
+    background:linear-gradient(135deg,#ffffff 0%,#f8fbff 100%);
+    box-shadow:0 12px 32px rgba(15,23,42,.08);
+    border:0;
+}
+
+.healthc-empty-body{
+    text-align:center;
+    padding:56px 20px;
+}
+
+.healthc-empty-icon{
+    width:86px;
+    height:86px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:#eef6ff;
+    color:#0d6efd;
+    font-size:42px;
+    box-shadow:0 12px 28px rgba(13,110,253,.14);
+    margin-bottom:18px;
+}
+
+.healthc-empty-card h4{
+    font-size:22px;
+    font-weight:700;
+    color:#1f2937;
+    margin-bottom:10px;
+}
+
+.healthc-empty-card p{
+    max-width:600px;
+    margin:0 auto 24px;
+    color:#6b7280;
+    line-height:1.8;
+}
+
 .healthc-page .table td,
 .healthc-page .table th{
     font-size:14px;
 }
 
-.healthc-page .modal .form-label{
+.healthc-page .modal .form-label,
+.healthc-page .form-label{
     font-weight:600;
     margin-bottom:6px;
 }
@@ -386,6 +532,21 @@ body.healthc-modal-active .modal{
     z-index:2000 !important;
 }
 
+@media (max-width:768px){
+    .healthc-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .healthc-header-right{
+        width:100%;
+    }
+
+    .healthc-header-right .btn{
+        flex:1;
+    }
+}
+
 @media (max-width: 991.98px){
     .healthc-modal-dialog{
         width:calc(100% - 18px);
@@ -448,6 +609,45 @@ body.healthc-modal-active .modal{
 }
 
 @media (max-width: 575.98px){
+    .healthc-header{
+        padding:14px;
+        border-radius:16px;
+    }
+
+    .healthc-header-left{
+        align-items:flex-start;
+    }
+
+    .healthc-header-icon{
+        width:46px;
+        height:46px;
+        border-radius:14px;
+        font-size:22px;
+    }
+
+    .healthc-title{
+        font-size:18px;
+    }
+
+    .healthc-header-right .btn{
+        width:100%;
+        flex:1 1 100%;
+    }
+
+    .healthc-empty-body{
+        padding:42px 16px;
+    }
+
+    .healthc-empty-icon{
+        width:74px;
+        height:74px;
+        font-size:36px;
+    }
+
+    .healthc-empty-card h4{
+        font-size:19px;
+    }
+
     .healthc-modal-dialog{
         width:calc(100% - 8px);
         margin:4px auto;

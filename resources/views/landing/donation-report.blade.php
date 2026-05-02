@@ -1,31 +1,42 @@
 <section class="py-20 bg-white">
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-6 text-center">
 
-        {{-- Donation --}}
-        <div class="p-8 bg-gray-50 rounded-lg shadow hover:shadow-lg transition">
-            <h2 class="text-3xl font-bold text-primary mb-6">ร่วมสนับสนุนเรา</h2>
+      
+        {{-- Scholarship Support --}}
+<div class="p-8 bg-gray-50 rounded-lg shadow hover:shadow-lg transition">
+    <h2 class="text-3xl font-bold text-primary mb-6">
+        สนับสนุนทุนการศึกษาเด็ก
+    </h2>
 
-            <p class="text-gray-600 mb-8">
-                คุณสามารถช่วยสนับสนุนระบบนี้ได้ผ่านการบริจาค เพื่อให้เราพัฒนาต่อไป
-            </p>
+    <p class="text-gray-600 mb-8">
+        ร่วมเป็นส่วนหนึ่งในการสนับสนุนเด็กและเยาวชน ทั้งด้านทุนการศึกษา ชุดนักเรียน และอุปกรณ์การเรียน
+    </p>
 
-            <div class="bg-white p-6 rounded-lg shadow text-left mb-6">
-                <h3 class="text-xl font-semibold text-primary mb-4">
-                    ข้อมูลบัญชีสำหรับบริจาค
-                </h3>
+    <div class="bg-white p-6 rounded-lg shadow text-left mb-6">
+        <h3 class="text-xl font-semibold text-primary mb-4">
+            รูปแบบการสนับสนุน
+        </h3>
 
-                <ul class="space-y-2 text-gray-700">
-                    <li><strong>ธนาคาร:</strong> กสิกรไทย</li>
-                    <li><strong>ชื่อบัญชี:</strong> นายสมชาย ใจดี</li>
-                    <li><strong>เลขบัญชี:</strong> 123-4-56789-0</li>
-                </ul>
-            </div>
+        <ul class="space-y-2 text-gray-700">
+            <li>✅ ทุนการศึกษา</li>
+            <li>✅ ชุดนักเรียน</li>
+            <li>✅ อุปกรณ์การเรียน</li>
+        </ul>
+    </div>
 
-            <a href="#"
-               class="px-8 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-primary-dark block text-center">
-                บริจาคตอนนี้
-            </a>
-        </div>
+    <a href="{{ route('scholarship.create') }}"
+       class="px-8 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-primary-dark block text-center">
+        สนใจสนับสนุน
+    </a>
+</div>
+
+
+
+
+
+
+
+
 
         {{-- Report Issue --}}
         <div class="p-8 bg-gray-50 rounded-lg shadow hover:shadow-lg transition">

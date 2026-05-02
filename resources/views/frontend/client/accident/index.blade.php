@@ -3,17 +3,17 @@
 @section('content')
 @php
     use Carbon\Carbon;
+
     $isEdit = isset($accident) && $accident;
+    $hasAccidentRows = isset($accidents) && $accidents->count() > 0;
 @endphp
 
 <style>
-   .accident-page {
+.accident-page {
     --acc-primary: #2563eb;
     --acc-primary-soft: #eef4ff;
     --acc-border-soft: #e7ecf3;
     --acc-text-muted: #6c757d;
-    --acc-success-soft: #edf9f1;
-    --acc-danger-soft: #fff1f2;
     --acc-card-radius: 18px;
     --acc-shadow: 0 10px 30px rgba(26, 54, 93, .06);
     --acc-shadow-sm: 0 4px 12px rgba(15, 23, 42, .05);
@@ -22,7 +22,8 @@
 .accident-page .page-header-card,
 .accident-page .form-card,
 .accident-page .table-card,
-.accident-page .summary-card {
+.accident-page .summary-card,
+.accident-page .empty-card {
     border: 0;
     border-radius: var(--acc-card-radius);
     box-shadow: var(--acc-shadow);
@@ -30,23 +31,16 @@
     background: #fff;
 }
 
-.accident-page .page-header-card {
+.accident-page .page-header-card,
+.accident-page .empty-card {
     background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
-}
-
-.accident-page .accident-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0;
-    color: #1f2d3d;
-    line-height: 1.35;
 }
 
 .accident-page .accident-section-subtitle {
     color: var(--acc-text-muted);
     font-size: .875rem;
     margin-bottom: 0;
-    line-height: 1.5;
+    line-height: 1.7;
 }
 
 .accident-page .info-pill {
@@ -64,22 +58,19 @@
 }
 
 .accident-page .summary-card {
-    background: #fff;
     height: 100%;
 }
 
-.accident-page .accident-summary-label {
+.accident-page .summary-label {
     font-size: .78rem;
     color: var(--acc-text-muted);
     margin-bottom: .2rem;
-    line-height: 1.2;
 }
 
-.accident-page .accident-summary-value {
+.accident-page .summary-value {
     font-weight: 700;
     color: #1f2937;
     font-size: .95rem;
-    line-height: 1.35;
     word-break: break-word;
 }
 
@@ -100,7 +91,6 @@
     font-weight: 600;
     margin-bottom: .45rem;
     color: #334155;
-    line-height: 1.35;
 }
 
 .accident-page .accident-label .required {
@@ -240,25 +230,38 @@
     font-weight: 700;
 }
 
-.accident-page .empty-state {
-    border: 1px dashed #d9e2ef;
-    border-radius: 18px;
-    padding: 2rem 1rem;
+.accident-page .empty-card {
+    padding: 3.25rem 1.25rem;
     text-align: center;
-    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    border: 1px solid var(--acc-border-soft);
 }
 
-.accident-page .empty-state .empty-icon {
-    width: 64px;
-    height: 64px;
+.accident-page .empty-icon {
+    width: 86px;
+    height: 86px;
     margin: 0 auto 1rem;
-    border-radius: 18px;
-    display: flex;
+    border-radius: 50%;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     background: var(--acc-primary-soft);
     color: var(--acc-primary);
-    font-size: 1.6rem;
+    font-size: 2.15rem;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, .14);
+}
+
+.accident-page .empty-card h5 {
+    margin: 0 0 .5rem;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.accident-page .empty-card p {
+    max-width: 660px;
+    margin: 0 auto 1.35rem;
+    color: #64748b;
+    line-height: 1.8;
 }
 
 .accident-page .sticky-tools {
@@ -314,9 +317,14 @@
         width: 100%;
     }
 
-    .accident-page .table thead th,
-    .accident-page .table tbody td {
-        font-size: .84rem;
+    .accident-page .empty-card {
+        padding: 2.5rem 1rem;
+    }
+
+    .accident-page .empty-icon {
+        width: 74px;
+        height: 74px;
+        font-size: 1.85rem;
     }
 }
 
@@ -324,18 +332,9 @@
     .accident-page .page-header-card,
     .accident-page .form-card,
     .accident-page .table-card,
-    .accident-page .summary-card {
+    .accident-page .summary-card,
+    .accident-page .empty-card {
         border-radius: 14px;
-    }
-
-    .accident-page .empty-state {
-        padding: 1.5rem .9rem;
-    }
-
-    .accident-page .empty-state .empty-icon {
-        width: 56px;
-        height: 56px;
-        font-size: 1.4rem;
     }
 }
 </style>
@@ -348,9 +347,10 @@
                     <div class="d-flex flex-column gap-2">
                         <div>
                             <h4 class="mb-1 fw-bold">
-                                <i class="bi bi-shield-plus me-2 text-primary"></i>บันทึกข้อมูลการบาดเจ็บ
+                                <i class="bi bi-shield-plus me-2 text-primary"></i>
+                                บันทึกข้อมูลการบาดเจ็บ
                             </h4>
-                            <p class="section-subtitle">
+                            <p class="accident-section-subtitle">
                                 จัดเก็บประวัติการบาดเจ็บ การรักษา และการติดตามอาการอย่างเป็นระบบ
                             </p>
                         </div>
@@ -370,11 +370,13 @@
                                 </span>
                             @endif
 
-                            <span class="info-pill">
-                                <i class="bi bi-journal-medical"></i>
-                                จำนวนบันทึก:
-                                <strong>{{ $accidents->count() }}</strong>
-                            </span>
+                            @if($hasAccidentRows)
+                                <span class="info-pill">
+                                    <i class="bi bi-journal-medical"></i>
+                                    จำนวนบันทึก:
+                                    <strong>{{ $accidents->count() }}</strong>
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -396,7 +398,8 @@
 
                         @if($isEdit)
                             <a href="{{ route('accident.add', $client->id) }}" class="btn btn-outline-secondary btn-modern">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>ยกเลิกการแก้ไข
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                ยกเลิกการแก้ไข
                             </a>
                         @endif
                     </div>
@@ -405,51 +408,78 @@
         </div>
     </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">รายการล่าสุด</div>
-                    <div class="summary-value">
-                       {{ \App\Helpers\ThaiDateHelper::formatThaiShort(optional($accidents->first())->incident_date) }}
+    @if($hasAccidentRows)
+        <div class="row g-3 mb-3">
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">รายการล่าสุด</div>
+                        <div class="summary-value">
+                            {{ \App\Helpers\ThaiDateHelper::formatThaiShort(optional($accidents->first())->incident_date) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">จำนวนที่พบแพทย์</div>
+                        <div class="summary-value">{{ $accidents->where('treat_no', 'พบแพทย์')->count() }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">จำนวนที่ไม่พบแพทย์</div>
+                        <div class="summary-value">{{ $accidents->where('treat_no', 'ไม่พบแพทย์')->count() }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="summary-card card">
+                    <div class="card-body">
+                        <div class="summary-label">สถานะหน้าฟอร์ม</div>
+                        <div class="summary-value">{{ $isEdit ? 'กำลังแก้ไขข้อมูล' : 'พร้อมเพิ่มรายการใหม่' }}</div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">จำนวนที่พบแพทย์</div>
-                    <div class="summary-value">{{ $accidents->where('treat_no', 'พบแพทย์')->count() }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">จำนวนที่ไม่พบแพทย์</div>
-                    <div class="summary-value">{{ $accidents->where('treat_no', 'ไม่พบแพทย์')->count() }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl-3">
-            <div class="summary-card card">
-                <div class="card-body">
-                    <div class="summary-label">สถานะหน้าฟอร์ม</div>
-                    <div class="summary-value">{{ $isEdit ? 'กำลังแก้ไขข้อมูล' : 'พร้อมเพิ่มรายการใหม่' }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    @endif
 
     <div class="collapse {{ $errors->any() || $isEdit ? 'show' : '' }}" id="accidentFormCollapse">
         @include('frontend.client.accident._form')
     </div>
 
-    @include('frontend.client.accident._table')
+    @if($hasAccidentRows)
+        @include('frontend.client.accident._table')
+    @else
+        <div class="empty-card mb-3">
+            <div class="empty-icon">
+                <i class="bi bi-shield-plus"></i>
+            </div>
+
+            <h5>ยังไม่มีข้อมูลการบาดเจ็บ</h5>
+
+            <p>
+                เมื่อยังไม่มีข้อมูล ระบบจะซ่อนการ์ดสรุปและตารางรายการไว้ก่อน
+                เพื่อให้หน้าจอดูสะอาด อ่านง่าย และไม่แสดงข้อมูลว่างโดยไม่จำเป็น
+            </p>
+
+            <button
+                type="button"
+                class="btn btn-primary btn-modern"
+                data-bs-toggle="collapse"
+                data-bs-target="#accidentFormCollapse"
+            >
+                <i class="bi bi-plus-circle me-1"></i>
+                เพิ่มข้อมูลการบาดเจ็บครั้งแรก
+            </button>
+        </div>
+    @endif
 </div>
 @endsection
 
@@ -477,6 +507,7 @@
             formCollapse.addEventListener('shown.bs.collapse', function () {
                 const icon = toggleAccidentBtn.querySelector('i');
                 const text = toggleAccidentBtn.querySelector('span');
+
                 if (icon) icon.className = 'bi bi-chevron-up me-1';
                 if (text && !@json($isEdit)) text.textContent = 'ซ่อนฟอร์ม';
             });
@@ -484,17 +515,20 @@
             formCollapse.addEventListener('hidden.bs.collapse', function () {
                 const icon = toggleAccidentBtn.querySelector('i');
                 const text = toggleAccidentBtn.querySelector('span');
+
                 if (icon) icon.className = 'bi bi-plus-circle me-1';
                 if (text && !@json($isEdit)) text.textContent = 'เพิ่มข้อมูลการบาดเจ็บ';
             });
         }
 
         const form = document.querySelector('#accident-form');
+
         if (form) {
             form.querySelectorAll('input, textarea, select').forEach(function (field) {
                 field.addEventListener('input', function () {
                     field.classList.remove('is-invalid');
                 });
+
                 field.addEventListener('change', function () {
                     field.classList.remove('is-invalid');
                 });
