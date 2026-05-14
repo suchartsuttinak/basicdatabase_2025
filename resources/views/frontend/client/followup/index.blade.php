@@ -326,18 +326,18 @@
                 @endif
             </div>
 
+              @if($hasFollowupRows)
             <div class="followup-toolbar-right">
-                <div class="followup-note">
-                    ระบบนี้รองรับการเพิ่ม แก้ไข และพิมพ์รายงานจากข้อมูลจริงของผู้รับบริการรายนี้
-                </div>
-
+               
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'executive', 'social_worker']))
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFollowupModal">
                         <i class="bi bi-plus-circle me-1"></i>
                         เพิ่มข้อมูลติดตามผล
                     </button>
                 @endif
+                 
             </div>
+            @endif
         </div>
 
         @if($showDataSection)

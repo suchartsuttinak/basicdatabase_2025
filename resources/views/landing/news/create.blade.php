@@ -4,7 +4,6 @@
 <section class="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 py-8 sm:py-10 lg:py-12">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {{-- Header --}}
         <div class="mb-6 sm:mb-8">
             <div class="rounded-3xl border border-slate-200 bg-white/95 shadow-sm overflow-hidden">
                 <div class="px-5 py-6 sm:px-8 sm:py-8">
@@ -26,9 +25,6 @@
                         <div class="flex-shrink-0">
                             <a href="{{ route('client.show') }}"
                                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 hover:border-slate-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                                </svg>
                                 กลับหน้า Client
                             </a>
                         </div>
@@ -37,48 +33,28 @@
             </div>
         </div>
 
-        {{-- Success --}}
         @if(session('success'))
             <div class="mb-6">
-                <div class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-800 shadow-sm">
-                    <div class="mt-0.5 shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.707a1 1 0 00-1.414-1.414L9 10.172 7.707 8.879a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold">บันทึกข้อมูลสำเร็จ</h3>
-                        <p class="mt-1 text-sm">{{ session('success') }}</p>
-                    </div>
+                <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-800 shadow-sm">
+                    <h3 class="font-semibold">บันทึกข้อมูลสำเร็จ</h3>
+                    <p class="mt-1 text-sm">{{ session('success') }}</p>
                 </div>
             </div>
         @endif
 
-        {{-- Validation Errors --}}
         @if ($errors->any())
             <div class="mb-6">
                 <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-4 shadow-sm">
-                    <div class="flex items-start gap-3">
-                        <div class="mt-0.5 shrink-0 text-red-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8.707-3.707a1 1 0 011.414 0L11 6.586l.293-.293a1 1 0 111.414 1.414L12.414 8l.293.293a1 1 0 01-1.414 1.414L11 9.414l-.293.293a1 1 0 01-1.414-1.414L9.586 8l-.293-.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-
-                        <div class="min-w-0">
-                            <h3 class="font-semibold text-red-700">กรุณาตรวจสอบข้อมูล</h3>
-                            <ul class="mt-2 space-y-1 text-sm text-red-700 list-disc pl-5">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
+                    <h3 class="font-semibold text-red-700">กรุณาตรวจสอบข้อมูล</h3>
+                    <ul class="mt-2 space-y-1 text-sm text-red-700 list-disc pl-5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
         @endif
 
-        {{-- Form Card --}}
         <div class="rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 overflow-hidden">
             <div class="border-b border-slate-200 bg-slate-50/80 px-5 py-4 sm:px-8">
                 <h2 class="text-lg sm:text-xl font-semibold text-slate-800">
@@ -93,8 +69,6 @@
                 @csrf
 
                 <div class="space-y-6">
-
-                    {{-- Title --}}
                     <div>
                         <label for="title" class="mb-2 block text-sm font-semibold text-slate-700">
                             หัวข้อข่าว <span class="text-red-500">*</span>
@@ -110,7 +84,6 @@
                         >
                     </div>
 
-                    {{-- Description --}}
                     <div>
                         <label for="description" class="mb-2 block text-sm font-semibold text-slate-700">
                             รายละเอียดข่าว <span class="text-red-500">*</span>
@@ -125,7 +98,6 @@
                         >{{ old('description') }}</textarea>
                     </div>
 
-                    {{-- Image --}}
                     <div>
                         <label for="image" class="mb-2 block text-sm font-semibold text-slate-700">
                             รูปภาพประกอบ
@@ -136,41 +108,52 @@
                                 type="file"
                                 name="image"
                                 id="image"
+                                accept="image/*"
                                 class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-800 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-700"
                             >
+
                             <p class="mt-2 text-xs sm:text-sm text-slate-500">
-                                รองรับไฟล์รูปภาพสำหรับใช้ประกอบข่าวสารและกิจกรรม
+                                รองรับไฟล์ jpg, jpeg, png, webp และระบบจะบีบอัดรูปก่อนบันทึก
                             </p>
+
+                            <div class="mt-5">
+                                <div class="text-sm text-slate-500 mb-2">
+                                    ตัวอย่างรูปภาพ
+                                </div>
+
+                                <div class="w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                                    <img id="image-preview"
+                                         src=""
+                                         alt="preview"
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="hidden w-full h-56 object-cover">
+
+                                    <div id="image-preview-empty"
+                                         class="flex items-center justify-center h-56 text-slate-400 text-sm">
+                                        ยังไม่ได้เลือกรูปภาพ
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
-                {{-- Actions --}}
                 <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex flex-col sm:flex-row gap-3">
                         <a href="{{ route('client.show') }}"
                            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 hover:border-slate-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                            </svg>
                             กลับหน้า Client
                         </a>
 
                         <a href="{{ route('news.index') }}"
                            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:bg-slate-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5h12M9 12h12M9 19h12M5 5h.01M5 12h.01M5 19h.01" />
-                            </svg>
                             กลับไปหน้าข่าวทั้งหมด
                         </a>
                     </div>
 
                     <button type="submit"
                             class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
                         บันทึกข่าว
                     </button>
                 </div>
@@ -179,4 +162,54 @@
 
     </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('image');
+    const preview = document.getElementById('image-preview');
+    const empty = document.getElementById('image-preview-empty');
+
+    if (!input || !preview || !empty) return;
+
+    input.addEventListener('change', async function (event) {
+        preview.src = '';
+        preview.classList.add('hidden');
+        empty.style.display = 'flex';
+
+        const file = event.target.files[0];
+
+        if (!file || !file.type.startsWith('image/')) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            empty.style.display = 'none';
+        };
+
+        reader.readAsDataURL(file);
+
+        try {
+            const compressedFile = await imageCompression(file, {
+                maxSizeMB: 0.7,
+                maxWidthOrHeight: 1600,
+                useWebWorker: true,
+                fileType: 'image/jpeg',
+                initialQuality: 0.75,
+            });
+
+            const dt = new DataTransfer();
+            dt.items.add(compressedFile);
+            input.files = dt.files;
+        } catch (error) {
+            console.error('Image compression failed:', error);
+        }
+    });
+});
+</script>
 @endsection

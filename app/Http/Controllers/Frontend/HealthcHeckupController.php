@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\HealthcHeckup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class HealthcHeckupController extends Controller
@@ -94,9 +95,14 @@ class HealthcHeckupController extends Controller
 
         $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
+        $validated['client_id'] = $client->id;
+
         $filePath = null;
+
         if ($request->hasFile('medical_document')) {
-            $filePath = $request->file('medical_document')->store('healthc_heckups', 'public');
+            $filePath = $this->uploadMedicalDocument(
+                $request->file('medical_document')
+            );
         }
 
         HealthcHeckup::create([
@@ -132,8 +138,12 @@ class HealthcHeckupController extends Controller
             'hospital_name' => $item->hospital_name,
             'checkup_result' => $item->checkup_result,
             'abnormal_detail' => $item->abnormal_detail,
-            'medical_document_url' => $item->medical_document ? asset('storage/' . $item->medical_document) : null,
-            'medical_document_name' => $item->medical_document ? basename($item->medical_document) : null,
+            'medical_document_url' => $item->medical_document
+                ? asset($item->medical_document)
+                : null,
+            'medical_document_name' => $item->medical_document
+                ? basename($item->medical_document)
+                : null,
         ]);
     }
 
@@ -164,14 +174,17 @@ class HealthcHeckupController extends Controller
 
         $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
+        $validated['client_id'] = $client->id;
+
         $filePath = $item->medical_document;
 
         if ($request->hasFile('medical_document')) {
-            if ($item->medical_document && Storage::disk('public')->exists($item->medical_document)) {
-                Storage::disk('public')->delete($item->medical_document);
-            }
 
-            $filePath = $request->file('medical_document')->store('healthc_heckups', 'public');
+            $this->deleteMedicalDocument($item->medical_document);
+
+            $filePath = $this->uploadMedicalDocument(
+                $request->file('medical_document')
+            );
         }
 
         $item->update([
@@ -200,9 +213,7 @@ class HealthcHeckupController extends Controller
 
         $item = $this->findAuthorizedItem($id);
 
-        if ($item->medical_document && Storage::disk('public')->exists($item->medical_document)) {
-            Storage::disk('public')->delete($item->medical_document);
-        }
+        $this->deleteMedicalDocument($item->medical_document);
 
         $item->delete();
 
@@ -263,6 +274,41 @@ class HealthcHeckupController extends Controller
         $items = $query->get();
 
         return view('frontend.healthc_heckups.report', compact('items'));
+    }
+
+    private function uploadMedicalDocument($file): string
+    {
+        $folder = 'upload/healthc_heckups';
+
+        $destinationPath = public_path($folder);
+
+        if (!File::exists($destinationPath)) {
+            File::makeDirectory($destinationPath, 0755, true);
+        }
+
+        $filename = now()->format('YmdHis') . '_' . uniqid() . '.pdf';
+
+        $file->move($destinationPath, $filename);
+
+        return $folder . '/' . $filename;
+    }
+
+    private function deleteMedicalDocument(?string $filePath): void
+    {
+        if (empty($filePath)) {
+            return;
+        }
+
+        $publicPath = public_path($filePath);
+
+        if (File::exists($publicPath)) {
+            File::delete($publicPath);
+        }
+
+        // รองรับไฟล์เก่าใน storage/app/public
+        if (Storage::disk('public')->exists($filePath)) {
+            Storage::disk('public')->delete($filePath);
+        }
     }
 
     private function authorizeRole(): void

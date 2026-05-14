@@ -55,9 +55,9 @@ public function storeJobAgency(Request $request)
     'job_date' => [
         'required',
         'date',
-        Rule::unique('job_agencies')->where(fn($q) => 
-            $q->where('client_id', $request->client_id)
-        ),
+        Rule::unique('job_agencies')->where(function ($q) use ($request) {
+            return $q->where('client_id', $request->client_id);
+        }),
     ],
         'occupation_id' => 'required|exists:occupations,id',
         'position'      => 'required|string',
@@ -95,9 +95,16 @@ public function storeJobAgency(Request $request)
     // =========================
     // PATCH: กันยิง request เปลี่ยน client_id
     // =========================
-    Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+    $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-    $jobAgency = DB::transaction(fn() => JobAgency::create($validated));
+    // =========================
+    // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
+    // =========================
+    $validated['client_id'] = $client->id;
+
+    $jobAgency = DB::transaction(function () use ($validated) {
+        return JobAgency::create($validated);
+    });
 
     // ✅ ใช้ client_id เพราะ route รับ client_id
     return redirect()->route('job_agencies.show', $jobAgency->client_id)
@@ -108,7 +115,14 @@ public function storeJobAgency(Request $request)
      */
     public function updateJobAgency(Request $request, $id)
 {
-    $jobAgency = JobAgency::findOrFail($id);
+    // =========================
+    // PATCH: กันเดา URL มา update record ของ client ที่ไม่มีสิทธิ์ตั้งแต่ query แรก
+    // เดิม: $jobAgency = JobAgency::findOrFail($id);
+    // =========================
+    $jobAgency = JobAgency::whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id);
 
     // =========================
     // PATCH: กันเดา URL มา update record ของ client ที่ไม่มีสิทธิ์
@@ -120,7 +134,9 @@ public function storeJobAgency(Request $request)
             'required',
             'date',
             Rule::unique('job_agencies')
-                ->where(fn($query) => $query->where('client_id', $jobAgency->client_id))
+                ->where(function ($query) use ($jobAgency) {
+                    return $query->where('client_id', $jobAgency->client_id);
+                })
                 ->ignore($jobAgency->id),
         ],
         'occupation_id' => 'required|exists:occupations,id',
@@ -145,6 +161,12 @@ public function storeJobAgency(Request $request)
 
     // =========================
     // PATCH: กันเปลี่ยน client_id ไป client อื่น
+    // บังคับให้ใช้ client_id เดิมของ record นี้เท่านั้น
+    // =========================
+    $data['client_id'] = $jobAgency->client_id;
+
+    // =========================
+    // PATCH: ตรวจสิทธิ์ client_id หลังบังคับค่าแล้ว
     // =========================
     Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
@@ -162,7 +184,14 @@ public function storeJobAgency(Request $request)
      */
    public function deleteJobAgency($id)
 {
-    $jobAgency = JobAgency::findOrFail($id);
+    // =========================
+    // PATCH: กันเดา URL มาลบ record ของ client ที่ไม่มีสิทธิ์ตั้งแต่ query แรก
+    // เดิม: $jobAgency = JobAgency::findOrFail($id);
+    // =========================
+    $jobAgency = JobAgency::whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id);
 
     // =========================
     // PATCH: กันเดา URL มาลบ record ของ client ที่ไม่มีสิทธิ์

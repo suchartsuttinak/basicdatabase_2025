@@ -11,19 +11,126 @@ use App\Models\District;
 use App\Models\SubDistrict;
 use App\Models\Income;
 use App\Models\Image;
-// use Image;
-use Illuminate\Support\Facades\Storage;
-
-// use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
 class VisitFamilyController extends Controller
 {
-    // หน้าเพิ่มข้อมูลการเยี่ยมบ้าน (แสดงฟอร์ม)
+    // =====================================================
+// PATCH:
+// Save + Optimize Visit Family Images
+// สำหรับ Shared Hosting / Production
+// =====================================================
+protected function saveVisitImage($file, bool $cover = false): array
+{
+    $destinationPath = public_path('upload/visit_images');
+
+    // =====================================================
+    // PATCH:
+    // สร้างโฟลเดอร์อัตโนมัติ
+    // =====================================================
+    if (!File::exists($destinationPath)) {
+        File::makeDirectory($destinationPath, 0755, true);
+    }
+
+    // =====================================================
+    // PATCH:
+    // ตั้งชื่อไฟล์ใหม่
+    // =====================================================
+    $filename = Str::uuid()->toString() . '.jpg';
+
+    $relativePath = 'upload/visit_images/' . $filename;
+
+    // =====================================================
+    // PATCH:
+    // ใช้ Intervention Image
+    // =====================================================
+    $manager = new ImageManager(new Driver());
+
+    $image = $manager->read($file->getRealPath());
+
+    // =====================================================
+    // PATCH:
+    // หมุนภาพอัตโนมัติจากมือถือ
+    // =====================================================
+    $image = $image->orient();
+
+    // =====================================================
+    // PATCH:
+    // ลดขนาดภาพ
+    // =====================================================
+    if ($cover) {
+
+        // ================================================
+        // PATCH:
+        // รูปปก / replace image
+        // ================================================
+        $image->cover(1000, 700);
+
+    } else {
+
+        // ================================================
+        // PATCH:
+        // รูปทั่วไป
+        // ================================================
+        $image->scaleDown(width: 1000);
+    }
+
+    // =====================================================
+    // PATCH:
+    // บันทึกแบบ Progressive JPEG
+    // โหลดเร็วขึ้นบนเว็บ
+    // =====================================================
+    $encoded = $image->toJpeg(
+        quality: 70,
+        progressive: true
+    );
+
+    $encoded->save(public_path($relativePath));
+
+    // =====================================================
+    // PATCH:
+    // คืนค่าข้อมูลไฟล์
+    // =====================================================
+    return [
+        'path' => $relativePath,
+        'name' => $file->getClientOriginalName(),
+        'mime' => 'image/jpeg',
+        'size' => File::size(public_path($relativePath)),
+    ];
+}
+
+    protected function deleteVisitImage(?string $path): void
+    {
+        if (!$path) {
+            return;
+        }
+
+        $fullPath = str_starts_with($path, 'upload/')
+            ? public_path($path)
+            : public_path('storage/' . $path);
+
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
+
+    protected function visitImageUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        return str_starts_with($path, 'upload/')
+            ? asset($path)
+            : asset('storage/' . $path);
+    }
+
     public function AddvisitFamily($client_id)
     {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข] กันเดา URL
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $incomes = Income::all();
         $provinces = Province::all();
@@ -31,300 +138,307 @@ class VisitFamilyController extends Controller
         $districts = [];
         $sub_districts = [];
 
-        // ถ้ามีข้อมูลเดิมแล้ว ดึงมาแสดง
-        $visitFamily = VisitFamily::where('client_id', $client->id)->first(); // ✅ [แก้ไข]
+        $visitFamily = VisitFamily::where('client_id', $client->id)->first();
 
         if ($visitFamily) {
-        return redirect()
-            ->route('vitsitFamily.edit', $visitFamily->id)
-            ->with('warning', 'มีการบันทึกข้อมูลรายนี้แล้ว กรุณาแก้ไขข้อมูล');
-    }
+            return redirect()
+                ->route('vitsitFamily.edit', $visitFamily->id)
+                ->with('warning', 'มีการบันทึกข้อมูลรายนี้แล้ว กรุณาแก้ไขข้อมูล');
+        }
+
         return view('frontend.client.visitFamily.visitFamily_add', compact(
-            'provinces', 'districts', 'sub_districts', 'client_id', 'client', 'incomes', 'visitFamily'
+            'provinces',
+            'districts',
+            'sub_districts',
+            'client_id',
+            'client',
+            'incomes',
+            'visitFamily'
         ));
     }
 
-    // Ajax: ดึงอำเภอตามจังหวัด
     public function getDistricts($province_id)
     {
-
         $districts = District::where('province_id', $province_id)->get();
+
         return response()->json($districts);
     }
 
-    // Ajax: ดึงตำบลตามอำเภอ
     public function getSubdistricts($district_id)
     {
         $subdistricts = SubDistrict::where('district_id', $district_id)->get();
+
         return response()->json($subdistricts);
     }
 
-    // Ajax: ดึงรหัสไปรษณีย์ตามตำบล
     public function getZipcode($subdistrict_id)
     {
         $subdistrict = SubDistrict::find($subdistrict_id);
+
         return response()->json([
             'zipcode' => $subdistrict ? $subdistrict->zipcode : null
         ]);
     }
 
-    // บันทึกข้อมูลใหม่
     public function StoreVisitFamily(Request $request, $client_id)
     {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข] กัน POST ยิง client คนอื่น
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $validated = $request->validate([
-        'visit_date'      => 'required|date',
-        // 'count'           => 'nullable|integer',
-        'family_fname'    => 'required|string|max:255',
-        'family_age'      => 'nullable|integer',
-        'member'          => 'nullable|string|max:255',
-        'residence_status'=> 'nullable|string|max:100', // ✅ เพิ่มฟิลด์ใหม่
-        'address'         => 'nullable|string|max:255',
-        'moo'             => 'nullable|string|max:50',
-        'soi'             => 'nullable|string|max:50',
-        'road'            => 'nullable|string|max:255',
-        'village'         => 'nullable|string|max:255',
-        'province_id'     => 'required|integer',
-        'district_id'     => 'required|integer',
-        'sub_district_id' => 'required|integer',
-        'zipcode'         => 'required|string|max:10',
-        'phone'           => 'nullable|string|max:20',
-        'outside_address' => 'nullable|string',
-        'inside_address'  => 'nullable|string',
-        'environment'     => 'nullable|string',
-        'neighbor'        => 'nullable|string',
-        'member_relation' => 'nullable|string',
-        'income_id'       => 'nullable|integer',
-        'problem'         => 'nullable|string',
-        'need'            => 'nullable|string',
-        'diagnose'        => 'nullable|string',
-        'assistance'      => 'nullable|string',
-        'comment'         => 'nullable|string',
-        'modify'          => 'nullable|string',
-        'teacher'         => 'required|string',
-        'remark'          => 'nullable|string',
-        'images'          => 'nullable|array',
-        'images.*'        => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ],[
-        'visit_date.required'      => 'กรุณาระบุวันที่เยี่ยม',
-        'visit_date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
-        'family_fname.required'    => 'กรุณากรอกชื่อผู้ให้ข้อมูล',
-        'family_fname.max'         => 'ชื่อผู้ให้ข้อมูลต้องไม่เกิน 255 ตัวอักษร',
-        'family_age.integer'       => 'อายุต้องเป็นตัวเลข',
-        'province_id.required'     => 'กรุณาเลือกจังหวัด',
-        'district_id.required'     => 'กรุณาเลือกอำเภอ',
-        'sub_district_id.required' => 'กรุณาเลือกตำบล',
-        'zipcode.required'         => 'กรุณากรอกรหัสไปรษณีย์',
-        'zipcode.max'              => 'รหัสไปรษณีย์ต้องไม่เกิน 10 หลัก',
-        'teacher.required'         => 'กรุณาระบุผู้ที่เยี่ยมบ้าน',
-        'images.*.image'           => 'ไฟล์ต้องเป็นรูปภาพ',
-        'images.*.mimes'           => 'รูปภาพต้องเป็นไฟล์ชนิด jpg, jpeg หรือ png',
-        'images.*.max'             => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB',
-    ]);
-
-
-
-    $validated['client_id'] = $client->id; // ✅ [แก้ไข]
-    $validated['count'] = 1; // ✅ บังคับให้เป็น 1 ทุกครั้ง
-
-    $visitFamily = VisitFamily::create($validated);
-
-    // ✅ ลดขนาดไฟล์รูปตอนอัปโหลด
-    if ($request->hasFile('images')) {
-    $manager = new ImageManager(new Driver());
-
-    foreach ($request->file('images') as $file) {
-        $image = $manager->read($file)
-            ->scaleDown(width: 1200)
-            ->toJpeg(85);
-
-        $filename = uniqid() . '.jpg';
-        $path = 'visit_images/' . $filename;
-
-        Storage::disk('public')->put($path, (string) $image);
-
-        Image::create([
-            'file_path'       => $path,
-            'file_name'       => $file->getClientOriginalName(),
-            'mime_type'       => 'image/jpeg',
-            'size'            => Storage::disk('public')->size($path),
-            'visit_family_id' => $visitFamily->id,
-            'client_id'       => $visitFamily->client_id,
+            'visit_date'      => 'required|date',
+            'family_fname'    => 'required|string|max:255',
+            'family_age'      => 'nullable|integer',
+            'member'          => 'nullable|string|max:255',
+            'residence_status'=> 'nullable|string|max:100',
+            'address'         => 'nullable|string|max:255',
+            'moo'             => 'nullable|string|max:50',
+            'soi'             => 'nullable|string|max:50',
+            'road'            => 'nullable|string|max:255',
+            'village'         => 'nullable|string|max:255',
+            'province_id'     => 'required|integer',
+            'district_id'     => 'required|integer',
+            'sub_district_id' => 'required|integer',
+            'zipcode'         => 'required|string|max:10',
+            'phone'           => 'nullable|string|max:20',
+            'outside_address' => 'nullable|string',
+            'inside_address'  => 'nullable|string',
+            'environment'     => 'nullable|string',
+            'neighbor'        => 'nullable|string',
+            'member_relation' => 'nullable|string',
+            'income_id'       => 'nullable|integer',
+            'problem'         => 'nullable|string',
+            'need'            => 'nullable|string',
+            'diagnose'        => 'nullable|string',
+            'assistance'      => 'nullable|string',
+            'comment'         => 'nullable|string',
+            'modify'          => 'nullable|string',
+            'teacher'         => 'required|string',
+            'remark'          => 'nullable|string',
+            'images'          => 'nullable|array',
+            'images.*'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
+        ], [
+            'visit_date.required'      => 'กรุณาระบุวันที่เยี่ยม',
+            'visit_date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'family_fname.required'    => 'กรุณากรอกชื่อผู้ให้ข้อมูล',
+            'family_fname.max'         => 'ชื่อผู้ให้ข้อมูลต้องไม่เกิน 255 ตัวอักษร',
+            'family_age.integer'       => 'อายุต้องเป็นตัวเลข',
+            'province_id.required'     => 'กรุณาเลือกจังหวัด',
+            'district_id.required'     => 'กรุณาเลือกอำเภอ',
+            'sub_district_id.required' => 'กรุณาเลือกตำบล',
+            'zipcode.required'         => 'กรุณากรอกรหัสไปรษณีย์',
+            'zipcode.max'              => 'รหัสไปรษณีย์ต้องไม่เกิน 10 หลัก',
+            'teacher.required'         => 'กรุณาระบุผู้ที่เยี่ยมบ้าน',
+            'images.*.image'           => 'ไฟล์ต้องเป็นรูปภาพ',
+            'images.*.mimes'           => 'รูปภาพต้องเป็นไฟล์ชนิด jpg, jpeg, png หรือ webp',
+            'images.*.max'             => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 10MB',
         ]);
+
+        $validated['client_id'] = $client->id;
+        $validated['count'] = 1;
+
+        unset($validated['images']);
+
+        $visitFamily = VisitFamily::create($validated);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $saved = $this->saveVisitImage($file, false);
+
+                Image::create([
+                    'file_path'       => $saved['path'],
+                    'file_name'       => $saved['name'],
+                    'mime_type'       => $saved['mime'],
+                    'size'            => $saved['size'],
+                    'visit_family_id' => $visitFamily->id,
+                    'client_id'       => $visitFamily->client_id,
+                ]);
+            }
+        }
+
+        return redirect()->route('visitFamily.create', $client->id)
+            ->with('success', 'บันทึกข้อมูลเรียบร้อย');
     }
+
+  public function EditVisitFamily($id)
+{
+    $visitFamily = VisitFamily::where('id', $id)
+        ->whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+
+        // =====================================================
+        // PATCH:
+        // โหลดรูปภาพเดิมมาพร้อมข้อมูล visitFamily
+        // แก้ปัญหาหน้าแก้ไขไม่แสดงรูปที่เคยอัปโหลด
+        // =====================================================
+        ->with('images')
+        ->firstOrFail();
+
+    $client = Client::forUser(auth()->user())
+        ->findOrFail($visitFamily->client_id);
+
+    $incomes = Income::all();
+    $provinces = Province::all();
+
+    $districts = District::where('province_id', $visitFamily->province_id)->get();
+
+    $sub_districts = SubDistrict::where('district_id', $visitFamily->district_id)->get();
+
+    // =====================================================
+    // PATCH:
+    // ใช้ collection จาก relation ที่โหลดมาแล้ว
+    // =====================================================
+    $images = $visitFamily->images ?? collect();
+
+    return view('frontend.client.visitFamily.visitFamily_add', compact(
+        'provinces',
+        'districts',
+        'sub_districts',
+        'client',
+        'incomes',
+        'visitFamily',
+        'images'
+    ));
 }
 
-    return redirect()->route('visitFamily.create', $client->id) // ✅ [แก้ไข]
-                     ->with('success', 'บันทึกข้อมูลเรียบร้อย');
-
-    }
-    
-    // แสดงฟอร์มแก้ไขข้อมูล
-    public function EditVisitFamily($id)
-    {
-        $visitFamily = VisitFamily::where('id', $id)
-            ->whereHas('client', function ($q) {
-                $q->forUser(auth()->user());
-            })
-            ->firstOrFail(); // ✅ [แก้ไข]
-
-        $client = Client::forUser(auth()->user())->findOrFail($visitFamily->client_id); // ✅ [แก้ไข]
-
-        $incomes = Income::all();
-        $provinces = Province::all();
-        $districts = District::where('province_id', $visitFamily->province_id)->get();
-        $sub_districts = SubDistrict::where('district_id', $visitFamily->district_id)->get();
-
-         // ✅ ดึงรูปทั้งหมดที่เคยอัปโหลด
-        $images = $visitFamily->images ?? [];
-
-        return view('frontend.client.visitFamily.visitFamily_add', compact(
-            'provinces', 'districts', 'sub_districts', 'client', 'incomes', 'visitFamily', 'images'
-        ));
-    }
-
-    // อัปเดตข้อมูลเดิม
     public function UpdateVisitFamily(Request $request, $id)
     {
         $validated = $request->validate([
-        'visit_date'      => 'required|date',
-        'family_fname'    => 'required|string|max:255',
-        'family_age'      => 'nullable|integer',
-        'member'          => 'nullable|string|max:255',
-        'residence_status'=> 'nullable|string|max:100',
-        'address'         => 'nullable|string|max:255',
-        'moo'             => 'nullable|string|max:50',
-        'soi'             => 'nullable|string|max:50',
-        'road'            => 'nullable|string|max:255',
-        'village'         => 'nullable|string|max:255',
-        'province_id'     => 'required|integer',
-        'district_id'     => 'required|integer',
-        'sub_district_id' => 'required|integer',
-        'zipcode'         => 'required|string|max:10',
-        'phone'           => 'nullable|string|max:20',
-        'outside_address' => 'nullable|string',
-        'inside_address'  => 'nullable|string',
-        'environment'     => 'nullable|string',
-        'neighbor'        => 'nullable|string',
-        'member_relation' => 'nullable|string',
-        'income_id'       => 'nullable|integer',
-        'problem'         => 'nullable|string',
-        'need'            => 'nullable|string',
-        'diagnose'        => 'nullable|string',
-        'assistance'      => 'nullable|string',
-        'comment'         => 'nullable|string',
-        'modify'          => 'nullable|string',
-        'teacher'         => 'required|string',
-        'remark'          => 'nullable|string',
-        'images'          => 'nullable|array',
-        'images.*'        => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
+            'visit_date'      => 'required|date',
+            'family_fname'    => 'required|string|max:255',
+            'family_age'      => 'nullable|integer',
+            'member'          => 'nullable|string|max:255',
+            'residence_status'=> 'nullable|string|max:100',
+            'address'         => 'nullable|string|max:255',
+            'moo'             => 'nullable|string|max:50',
+            'soi'             => 'nullable|string|max:50',
+            'road'            => 'nullable|string|max:255',
+            'village'         => 'nullable|string|max:255',
+            'province_id'     => 'required|integer',
+            'district_id'     => 'required|integer',
+            'sub_district_id' => 'required|integer',
+            'zipcode'         => 'required|string|max:10',
+            'phone'           => 'nullable|string|max:20',
+            'outside_address' => 'nullable|string',
+            'inside_address'  => 'nullable|string',
+            'environment'     => 'nullable|string',
+            'neighbor'        => 'nullable|string',
+            'member_relation' => 'nullable|string',
+            'income_id'       => 'nullable|integer',
+            'problem'         => 'nullable|string',
+            'need'            => 'nullable|string',
+            'diagnose'        => 'nullable|string',
+            'assistance'      => 'nullable|string',
+            'comment'         => 'nullable|string',
+            'modify'          => 'nullable|string',
+            'teacher'         => 'required|string',
+            'remark'          => 'nullable|string',
+            'images'          => 'nullable|array',
+            'images.*'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
+        ]);
 
         $visitFamily = VisitFamily::where('id', $id)
             ->whereHas('client', function ($q) {
                 $q->forUser(auth()->user());
             })
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->firstOrFail();
+
+        $validated['client_id'] = $visitFamily->client_id;
+
+        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+
+        unset($validated['images']);
 
         $visitFamily->update($validated);
 
-       if ($request->hasFile('images')) {
-    $manager = new ImageManager(new Driver());
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $saved = $this->saveVisitImage($file, true);
 
-    foreach ($request->file('images') as $file) {
-        $image = $manager->read($file)
-            ->cover(1200, 800)
-            ->toJpeg(85);
-
-        $filename = uniqid() . '.jpg';
-        $path = 'visit_images/' . $filename;
-
-        Storage::disk('public')->put($path, (string) $image);
-
-        Image::create([
-            'file_path'       => $path,
-            'file_name'       => $file->getClientOriginalName(),
-            'mime_type'       => 'image/jpeg',
-            'size'            => Storage::disk('public')->size($path),
-            'visit_family_id' => $visitFamily->id,
-            'client_id'       => $visitFamily->client_id,
-        ]);
-    }
-}
+                Image::create([
+                    'file_path'       => $saved['path'],
+                    'file_name'       => $saved['name'],
+                    'mime_type'       => $saved['mime'],
+                    'size'            => $saved['size'],
+                    'visit_family_id' => $visitFamily->id,
+                    'client_id'       => $visitFamily->client_id,
+                ]);
+            }
+        }
 
         return redirect()->route('vitsitFamily.edit', $id)
-                         ->with('success', 'แก้ไขข้อมูลเรียบร้อย');
+            ->with('success', 'แก้ไขข้อมูลเรียบร้อย');
     }
 
-public function destroy($id)
-{
-   $image = Image::where('id', $id)
-        ->whereHas('visitFamily.client', function ($q) {
-            $q->forUser(auth()->user());
-        })
-        ->first(); // ✅ [แก้ไข]
+    public function destroy($id)
+    {
+        $image = Image::where('id', $id)
+            ->whereHas('visitFamily.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->first();
 
-    if (!$image) {
-        return response()->json(['error' => 'ไม่พบรูปภาพ'], 404);
-    }
-
-    if ($image->file_path && Storage::disk('public')->exists($image->file_path)) {
-        Storage::disk('public')->delete($image->file_path);
-    }
-
-    $image->delete();
-
-    return response()->json(['success' => true]);
-}
-
-public function replaceImage(Request $request, $id)
-{
-    $request->validate([
-        'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
-
-    $image = Image::where('id', $id)
-        ->whereHas('visitFamily.client', function ($q) {
-            $q->forUser(auth()->user());
-        })
-        ->first(); // ✅ [แก้ไข]
-
-    if (!$image) {
-        return response()->json(['error' => 'ไม่พบรูปภาพ'], 404);
-    }
-
-    Storage::disk('public')->delete($image->file_path);
-
-    $file = $request->file('image');
-    $path = $file->store('visit_images', 'public');
-
-    $image->update([
-        'file_path' => $path,
-        'file_name' => $file->getClientOriginalName(),
-        'mime_type' => $file->getClientMimeType(),
-        'size'      => $file->getSize(),
-    ]);
-
-    return response()->json(['success' => true, 'id' => $image->id, 'url' => asset('storage/'.$path)]);
-}
-
-        public function ReportVisitFamily($id)
-        {
-            $visitFamily = VisitFamily::with(['client', 'income', 'images'])
-                ->where('id', $id)
-                ->whereHas('client', function ($q) {
-                    $q->forUser(auth()->user());
-                })
-                ->firstOrFail();
-
-            $client = Client::forUser(auth()->user())
-                ->findOrFail($visitFamily->client_id);
-
-            return view('frontend.client.visitFamily.visitFamily_report', compact(
-                'visitFamily',
-                'client'
-            ));
+        if (!$image) {
+            return response()->json(['error' => 'ไม่พบรูปภาพ'], 404);
         }
 
+        $this->deleteVisitImage($image->file_path);
+
+        $image->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function replaceImage(Request $request, $id)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:10240',
+        ]);
+
+        $image = Image::where('id', $id)
+            ->whereHas('visitFamily.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->first();
+
+        if (!$image) {
+            return response()->json(['error' => 'ไม่พบรูปภาพ'], 404);
         }
+
+        $this->deleteVisitImage($image->file_path);
+
+        $file = $request->file('image');
+        $saved = $this->saveVisitImage($file, true);
+
+        $image->update([
+            'file_path' => $saved['path'],
+            'file_name' => $saved['name'],
+            'mime_type' => $saved['mime'],
+            'size'      => $saved['size'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'id'      => $image->id,
+            'url'     => $this->visitImageUrl($image->file_path),
+        ]);
+    }
+
+    public function ReportVisitFamily($id)
+    {
+        $visitFamily = VisitFamily::with(['client', 'income', 'images'])
+            ->where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail();
+
+        $client = Client::forUser(auth()->user())
+            ->findOrFail($visitFamily->client_id);
+
+        return view('frontend.client.visitFamily.visitFamily_report', compact(
+            'visitFamily',
+            'client'
+        ));
+    }
+}

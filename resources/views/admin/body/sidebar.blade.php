@@ -2,9 +2,11 @@
     $isProfileOpen = Request::routeIs('client.show') || Request::routeIs('client.show_refer');
 
     $isDashboardOpen =
-        Request::routeIs('issues.index') ||
-        Request::routeIs('news.create') ||
-        Request::routeIs('landing.about.index');
+    Request::routeIs('issues.index') ||
+    Request::routeIs('news.create') ||
+    Request::routeIs('landing.about.index') ||
+    Request::routeIs('scholarship.index') ||
+    Request::routeIs('scholarship.children.*');
 
     $isMasterMenu =
         Request::routeIs('institution.*') ||
@@ -253,15 +255,21 @@
                 </a>
             </li>
 
-            {{-- ✅ เพิ่มตรงนี้ --}}
-            @if(auth()->check() && auth()->user()->role === 'admin')
-            <li>
-                <a href="{{ route('scholarship.index') }}"
-                   class="tp-link {{ Request::routeIs('scholarship.index') ? 'active' : '' }}">
-                    ผู้สนับสนุนทุนการศึกษา
-                </a>
-            </li>
-            @endif
+           @if(auth()->check() && auth()->user()->role === 'admin')
+<li>
+    <a href="{{ route('scholarship.index') }}"
+       class="tp-link {{ Request::routeIs('scholarship.index') ? 'active' : '' }}">
+        ผู้สนับสนุนทุนการศึกษา
+    </a>
+</li>
+
+<li>
+    <a href="{{ route('scholarship.children.index') }}"
+       class="tp-link {{ Request::routeIs('scholarship.children.*') ? 'active' : '' }}">
+        ทุนการศึกษาเด็ก
+    </a>
+</li>
+@endif
 
         </ul>
     </div>

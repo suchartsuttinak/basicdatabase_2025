@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Landing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Scholarship;
+use App\Models\Scholarship;            // ✅ เพิ่มตัวนี้
 use App\Models\ScholarshipDonation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

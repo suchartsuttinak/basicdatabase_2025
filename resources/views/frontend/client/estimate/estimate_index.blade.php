@@ -249,6 +249,32 @@
         border-radius:10px;
     }
 
+      .estimate-photo-thumb{
+        width:110px;
+        height:110px;
+        overflow:hidden;
+        border-radius:12px;
+        flex-shrink:0;
+    }
+
+    .estimate-thumb-img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        border-radius:12px;
+        border:1px solid #dee2e6;
+        padding:0;
+        display:block;
+        background:#f8fafc;
+    }
+
+    @media(max-width:768px){
+        .estimate-photo-thumb{
+            width:90px;
+            height:90px;
+        }
+    }
+
     @media (max-width: 991.98px){
         .estimate-page .modal-dialog{
             max-width:none;
@@ -442,13 +468,21 @@
                                     <td>{{ $item->teacher ?: '-' }}</td>
                                     <td>{{ $item->remark ?: '-' }}</td>
                                     <td>
-                                        <div class="d-flex flex-wrap align-items-start gap-2">
+                                       <div class="d-flex flex-wrap align-items-start gap-2">
                                             @forelse($item->pictures as $pic)
+
+                                                @php
+                                                    $imageUrl = str_starts_with($pic->path, 'upload/')
+                                                        ? asset($pic->path)
+                                                        : asset('storage/' . $pic->path);
+                                                @endphp
+
                                                 <div class="estimate-photo-thumb">
-                                                    <img src="{{ asset('storage/'.$pic->path) }}"
-                                                         class="img-thumbnail"
-                                                         alt="estimate picture">
+                                                    <img src="{{ $imageUrl }}"
+                                                        class="img-thumbnail estimate-thumb-img"
+                                                        alt="estimate picture">
                                                 </div>
+
                                             @empty
                                                 <span class="text-muted">-</span>
                                             @endforelse
@@ -695,9 +729,28 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">เลือกรูปภาพ</label>
-                                    <input type="file" name="pictures[]" multiple class="form-control" id="pictures-input-add">
-                                </div>
+                                        <label class="form-label">เลือกรูปภาพ</label>
+
+                                        {{-- =====================================================
+                                            PATCH:
+                                            รองรับบีบอัดรูปก่อน upload
+                                            ลดเวลาบน shared hosting
+                                        ====================================================== --}}
+                                        <input type="file"
+                                            name="pictures[]"
+                                            multiple
+                                            accept="image/*"
+                                            class="form-control"
+                                            id="pictures-input-add">
+
+                                        {{-- =====================================================
+                                            PATCH:
+                                            พื้นที่แสดง Preview รูปตอนเพิ่มข้อมูล
+                                        ====================================================== --}}
+                                        <div id="preview-area-add"
+                                            class="d-flex flex-wrap gap-2 mt-3">
+                                        </div>
+                                    </div>
 
                                 <div class="col-12">
                                     <div id="preview-area-add" class="d-flex flex-wrap gap-2 mt-2"></div>
@@ -906,18 +959,33 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-12">
-                                    <label class="form-label">เลือกรูปภาพใหม่</label>
-                                    <input type="file"
-                                           name="pictures[]"
-                                           multiple
-                                           class="form-control @error('pictures') is-invalid @enderror"
-                                           id="pictures-input-edit">
-                                    @error('pictures')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                 <div class="col-12">
+                                        <label class="form-label">เลือกรูปภาพใหม่</label>
 
+                                        {{-- =====================================================
+                                            PATCH:
+                                            รองรับ Browser Compression ก่อน Upload
+                                            ลดเวลาอัปโหลดบน Shared Hosting
+                                        ====================================================== --}}
+                                        <input type="file"
+                                            name="pictures[]"
+                                            multiple
+                                            accept="image/*"
+                                            class="form-control @error('pictures') is-invalid @enderror"
+                                            id="pictures-input-edit">
+
+                                        @error('pictures')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+
+                                        {{-- =====================================================
+                                            PATCH:
+                                            พื้นที่แสดง Preview รูปใหม่ตอนแก้ไข
+                                        ====================================================== --}}
+                                        <div id="preview-area-edit"
+                                            class="d-flex flex-wrap gap-2 mt-3">
+                                        </div>
+                                    </div>
                                 <div class="col-12">
                                     <div id="preview-area-edit" class="d-flex flex-wrap gap-2 mt-2"></div>
                                 </div>
@@ -936,6 +1004,14 @@
 </div>
 
 @push('scripts')
+
+{{-- =====================================================
+     PATCH: Browser Image Compression
+     บีบอัดรูปก่อนส่งขึ้น Server
+     ช่วยลดเวลาอัปโหลดบน Host จริง
+===================================================== --}}
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
 <script>
 function toggleIncomeReason(section) {
     let radios = document.querySelectorAll(`.estimate-income-sufficiency-${section}`);
@@ -946,9 +1022,7 @@ function toggleIncomeReason(section) {
 
     let selected = '';
     radios.forEach(radio => {
-        if (radio.checked) {
-            selected = radio.value;
-        }
+        if (radio.checked) selected = radio.value;
     });
 
     if (selected === 'ไม่เพียงพอ') {
@@ -959,50 +1033,74 @@ function toggleIncomeReason(section) {
     }
 }
 
+/* =====================================================
+   PATCH:
+   Preview + Compress รูปก่อน Upload
+   ใช้ได้ทั้ง Add และ Edit
+===================================================== */
 function previewFiles(inputId, previewId) {
     const input = document.getElementById(inputId);
     const previewArea = document.getElementById(previewId);
+
     if (!input || !previewArea) return;
 
-    input.addEventListener('change', function(event) {
+    input.addEventListener('change', async function(event) {
         previewArea.innerHTML = "";
-        const files = event.target.files;
+
+        const originalFiles = Array.from(event.target.files || []);
         const dt = new DataTransfer();
 
-        Array.from(files).forEach((file, index) => {
-            if (file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const wrapper = document.createElement("div");
-                    wrapper.className = "position-relative border rounded shadow-sm d-inline-block me-2 mb-2 estimate-preview-item";
+        // =====================================================
+        // PATCH:
+        // แสดง preview ทันทีจากไฟล์ต้นฉบับก่อน
+        // ไม่ต้องรอ compression
+        // =====================================================
+        originalFiles.forEach(file => {
+            if (!file.type.startsWith("image/")) return;
 
-                    const img = document.createElement("img");
-                    img.src = e.target.result;
-                    img.className = "img-fluid rounded";
+            const reader = new FileReader();
 
-                    const btn = document.createElement("button");
-                    btn.type = "button";
-                    btn.textContent = "ลบ";
-                    btn.className = "btn btn-sm btn-danger position-absolute";
-                    btn.style.top = "4px";
-                    btn.style.right = "4px";
+            reader.onload = function(e) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "position-relative border rounded shadow-sm d-inline-block me-2 mb-2 estimate-preview-item";
+                wrapper.style.width = "90px";
 
-                    btn.addEventListener("click", function() {
-                        wrapper.remove();
-                        const newFiles = Array.from(files).filter((_, i) => i !== index);
-                        const newDt = new DataTransfer();
-                        newFiles.forEach(f => newDt.items.add(f));
-                        input.files = newDt.files;
-                    });
+                wrapper.innerHTML = `
+                    <img src="${e.target.result}"
+                         class="img-thumbnail"
+                         style="width:90px; height:90px; object-fit:cover;"
+                         loading="lazy"
+                         decoding="async">
+                `;
 
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(btn);
-                    previewArea.appendChild(wrapper);
-                };
-                reader.readAsDataURL(file);
+                previewArea.appendChild(wrapper);
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // =====================================================
+        // PATCH:
+        // บีบอัดไฟล์สำหรับ submit
+        // =====================================================
+        for (const file of originalFiles) {
+            if (!file.type.startsWith("image/")) continue;
+
+            try {
+                const compressedFile = await imageCompression(file, {
+                    maxSizeMB: 0.7,
+                    maxWidthOrHeight: 1600,
+                    useWebWorker: true,
+                    fileType: 'image/jpeg',
+                    initialQuality: 0.75,
+                });
+
+                dt.items.add(compressedFile);
+            } catch (error) {
+                console.error('Image compression failed:', error);
                 dt.items.add(file);
             }
-        });
+        }
 
         input.files = dt.files;
     });
@@ -1055,7 +1153,7 @@ function estimateEdit(id) {
                 data.pictures.forEach(function(pic) {
                     preview.append(`
                         <div class="position-relative d-inline-block me-1 mb-1" style="width:80px;">
-                            <img src="${pic.url}" class="img-thumbnail" style="width:80px; height:auto;">
+                            <img src="${pic.url}" class="img-thumbnail" style="width:80px; height:auto;" loading="lazy">
                             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
                                     onclick="removeOldPicture(${pic.id}, this)">ลบ</button>
                         </div>
@@ -1191,19 +1289,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (duplicate) {
                 let errorEl = this.parentElement.querySelector('.invalid-feedback');
+
                 if (!errorEl) {
                     errorEl = document.createElement('div');
                     errorEl.className = 'invalid-feedback';
                     this.parentElement.appendChild(errorEl);
                 }
+
                 errorEl.textContent = 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น';
                 errorEl.style.display = 'block';
                 this.classList.add('is-invalid');
+
                 if (updateBtn) updateBtn.disabled = true;
             } else {
                 const errorEl = this.parentElement.querySelector('.invalid-feedback');
+
                 if (errorEl) errorEl.style.display = 'none';
+
                 this.classList.remove('is-invalid');
+
                 if (updateBtn) updateBtn.disabled = false;
             }
         });
@@ -1215,6 +1319,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         modalEl.addEventListener('shown.bs.modal', function() {
             const modalBody = modalEl.querySelector('.modal-body');
+
             if (modalBody) {
                 modalBody.scrollTop = 0;
                 modalBody.style.overflowY = 'auto';

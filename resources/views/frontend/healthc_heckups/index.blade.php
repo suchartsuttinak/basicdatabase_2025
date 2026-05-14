@@ -31,19 +31,20 @@
             </div>
         </div>
 
+          @if($hasRows)
         <div class="healthc-header-right">
             <button type="button" class="btn btn-primary" onclick="openCreateModal()">
                 <i class="bi bi-plus-circle"></i> เพิ่มข้อมูล
             </button>
 
-            @if($hasRows)
+          
                 <a href="{{ route('healthc_heckups.report', request()->query()) }}"
                    target="_blank"
                    class="btn btn-outline-secondary">
                     <i class="bi bi-printer"></i> รายงาน
                 </a>
-            @endif
         </div>
+         @endif
     </div>
 
     @if($errors->any())
@@ -158,8 +159,10 @@
                                         {{ $item->abnormal_detail ?: '-' }}
                                     </td>
                                     <td>
-                                        @if($item->medical_document)
-                                            <a href="{{ asset('storage/' . $item->medical_document) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                      @if($item->medical_document)
+                                            <a href="{{ asset($item->medical_document) }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-file-earmark-pdf"></i> เปิดไฟล์
                                             </a>
                                         @else

@@ -166,15 +166,15 @@
         </div>
     </div>
 
+     @if($hasReferRows)
     <div class="rf-header-actions">
-        @if($hasReferRows)
+       
             <a href="{{ route('refers.report', $client->id) }}"
                class="rf-btn rf-btn-report">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>รายงาน</span>
             </a>
-        @endif
-
+       
         <button type="button"
                 class="rf-btn rf-btn-primary"
                 data-bs-toggle="modal"
@@ -183,4 +183,5 @@
             <span>เพิ่มข้อมูลจำหน่าย</span>
         </button>
     </div>
+     @endif
 </div>

@@ -418,14 +418,25 @@ body{
                     @if($estimate->pictures->isEmpty())
                         <div class="estimate-report-empty">ไม่มีรูปภาพประกอบ</div>
                     @else
-                        <div class="estimate-report-pictures">
+                      <div class="estimate-report-pictures">
                             @foreach($estimate->pictures as $index => $picture)
+
+                                @php
+                                    $imageUrl = str_starts_with($picture->path, 'upload/')
+                                        ? asset($picture->path)
+                                        : asset('storage/' . $picture->path);
+                                @endphp
+
                                 <div class="estimate-report-picture-item">
                                     <div class="estimate-report-picture-frame">
-                                        <img src="{{ asset('storage/' . $picture->path) }}" alt="รูปภาพประกอบ {{ $index + 1 }}">
+
+                                        <img src="{{ $imageUrl }}"
+                                            alt="รูปภาพประกอบ {{ $index + 1 }}">
+
                                         <div class="estimate-report-picture-caption">
                                             รูปภาพประกอบ {{ $index + 1 }}
                                         </div>
+
                                     </div>
                                 </div>
                             @endforeach

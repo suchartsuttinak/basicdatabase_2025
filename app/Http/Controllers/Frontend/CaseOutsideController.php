@@ -90,12 +90,11 @@ class CaseOutsideController extends Controller
 
     public function UpdateCaseOutside(Request $request, $id)
     {
-        $case = CaseOutside::findOrFail($id);
-
-        // =========================
-        // PATCH: กัน update record คนอื่น
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($case->client_id);
+       $case = CaseOutside::where('id', $id)
+        ->whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->firstOrFail();
 
         $validator = Validator::make($request->all(), [
             'date' => [
@@ -164,12 +163,11 @@ class CaseOutsideController extends Controller
 
     public function DeleteCaseOutside($id)
     {
-        $case = CaseOutside::findOrFail($id);
-
-        // =========================
-        // PATCH: กันลบ record คนอื่น
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($case->client_id);
+        $case = CaseOutside::where('id', $id)
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->firstOrFail();
 
         $client_id = $case->client_id;
 
@@ -177,9 +175,6 @@ class CaseOutsideController extends Controller
             $client_id = $case->client_id;
             $case->delete();
 
-            // =========================
-            // AUTO: เรียง count ใหม่ตามวันที่เสมอหลังลบ
-            // =========================
             $this->reindexCounts($client_id);
         });
 

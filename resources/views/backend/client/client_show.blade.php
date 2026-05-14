@@ -54,7 +54,7 @@
     .client-list-card .card-header {
         background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         border-bottom: 1px solid #eef2f7;
-        padding: 1rem 1rem;
+        padding: 1rem;
     }
 
     .client-list-card .card-title {
@@ -69,7 +69,6 @@
     }
 
     .client-table-wrap {
-        overflow-x: auto;
         width: 100%;
     }
 
@@ -99,18 +98,37 @@
         background: #fafcff;
     }
 
+    .client-link-image,
+    .client-link-name {
+        text-decoration: none;
+        color: inherit;
+        display: inline-block;
+        transition: all .2s ease;
+    }
+
     .client-avatar {
         width: 42px;
         height: 42px;
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid #e5e7eb;
+        transition: all .2s ease;
+    }
+
+    .client-link-image:hover .client-avatar {
+        transform: scale(1.04);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
     }
 
     .client-name {
         font-weight: 600;
         color: #111827;
         margin-bottom: 2px;
+        transition: color .2s ease;
+    }
+
+    .client-link-name:hover .client-name {
+        color: #0d6efd;
     }
 
     .client-subtext {
@@ -158,6 +176,7 @@
         border-radius: 10px;
         padding: 0;
         flex: 0 0 34px;
+        border: none;
     }
 
     .action-btn span {
@@ -165,25 +184,89 @@
         font-size: 18px;
     }
 
-    .dataTables_wrapper .dataTables_filter input {
+    .client-list-card .dataTables_wrapper {
+        width: 100%;
+    }
+
+    .client-list-card .dataTables_filter input {
         border: 1px solid #d1d5db;
         border-radius: 10px;
         padding: .35rem .65rem;
         margin-left: .4rem;
+        outline: none;
     }
 
-    .dataTables_wrapper .dataTables_length select {
+    .client-list-card .dataTables_filter input:focus {
+        border-color: #93c5fd;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+    }
+
+    .client-list-card .dataTables_length select {
         border: 1px solid #d1d5db;
         border-radius: 10px;
         padding: .2rem 1.8rem .2rem .5rem;
+        outline: none;
     }
 
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_paginate,
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter {
+    .client-list-card .dataTables_info,
+    .client-list-card .dataTables_paginate,
+    .client-list-card .dataTables_length,
+    .client-list-card .dataTables_filter {
         font-size: 13px;
         margin-top: .35rem;
+    }
+
+    .client-list-card .dataTables_scroll {
+        margin-top: .5rem;
+        margin-bottom: .75rem;
+    }
+
+    .client-list-card .dataTables_scrollBody {
+        border-bottom: 1px solid #eef2f7;
+    }
+
+    .client-list-card .dataTables_scrollHeadInner,
+    .client-list-card .dataTables_scrollHeadInner table {
+        width: 100% !important;
+    }
+
+    .client-list-card .dataTables_info {
+        padding-top: .75rem !important;
+        color: #64748b;
+    }
+
+    .client-list-card .dataTables_paginate {
+        padding-top: .55rem !important;
+    }
+
+    .client-list-card .dataTables_paginate .paginate_button {
+        border-radius: 9px !important;
+        margin: 0 2px !important;
+        padding: .28rem .65rem !important;
+        border: 1px solid transparent !important;
+        color: #475569 !important;
+        background: transparent !important;
+    }
+
+    .client-list-card .dataTables_paginate .paginate_button.current,
+    .client-list-card .dataTables_paginate .paginate_button.current:hover {
+        background: #4f6ef7 !important;
+        color: #ffffff !important;
+        border-color: #4f6ef7 !important;
+    }
+
+    .client-list-card .dataTables_paginate .paginate_button:hover {
+        background: #eef4ff !important;
+        color: #1d4f91 !important;
+        border-color: #dbeafe !important;
+    }
+
+    .client-list-card .dataTables_paginate .paginate_button.disabled,
+    .client-list-card .dataTables_paginate .paginate_button.disabled:hover {
+        color: #94a3b8 !important;
+        background: #f8fafc !important;
+        border-color: #e5e7eb !important;
+        cursor: not-allowed !important;
     }
 
     @media (max-width: 767.98px) {
@@ -226,13 +309,38 @@
             flex: 0 0 32px;
             border-radius: 9px;
         }
+
+        .client-list-card .dataTables_length,
+        .client-list-card .dataTables_filter,
+        .client-list-card .dataTables_info,
+        .client-list-card .dataTables_paginate {
+            width: 100%;
+            text-align: center !important;
+        }
+
+        .client-list-card .dataTables_filter {
+            margin-top: .65rem;
+        }
+
+        .client-list-card .dataTables_filter label {
+            width: 100%;
+        }
+
+        .client-list-card .dataTables_filter input {
+            width: 100%;
+            margin-left: 0;
+            margin-top: .35rem;
+        }
+
+        .client-list-card .dataTables_paginate {
+            margin-top: .35rem;
+        }
     }
 </style>
 
 <div class="content">
     <div class="container-fluid client-page">
 
-        {{-- Header --}}
         <div class="client-toolbar">
             <div class="client-toolbar-left">
                 <a href="{{ route('dashboard') }}" class="btn btn-primary client-btn">
@@ -247,12 +355,12 @@
             </div>
 
             @if(auth()->check() && auth()->user()->hasRole(['admin','manager']))
-            <div class="client-toolbar-right">
-                <a href="{{ route('client.add') }}" class="btn btn-success client-btn">
-                    <i data-feather="plus-circle"></i>
-                    <span>เพิ่มรายการ</span>
-                </a>
-            </div>
+                <div class="client-toolbar-right">
+                    <a href="{{ route('client.add') }}" class="btn btn-success client-btn">
+                        <i data-feather="plus-circle"></i>
+                        <span>เพิ่มรายการ</span>
+                    </a>
+                </div>
             @endif
         </div>
 
@@ -278,6 +386,7 @@
                                     <th class="action-cell">การจัดการ</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 @foreach ($clients as $key => $client)
                                     <tr>
@@ -288,20 +397,33 @@
                                                 $imagePath = public_path('upload/client_images/' . $client->image);
                                             @endphp
 
-                                            @if(!empty($client->image) && file_exists($imagePath))
-                                                <img src="{{ asset('upload/client_images/' . $client->image) }}"
-                                                     alt="client-image"
-                                                     class="client-avatar">
-                                            @else
-                                                <img src="{{ asset('upload/no_image.jpg') }}"
-                                                     alt="no-image"
-                                                     class="client-avatar">
-                                            @endif
+                                            <a href="{{ route('admin.index', $client->id) }}"
+                                               title="ดูข้อมูล"
+                                               class="client-link-image">
+                                                @if(!empty($client->image) && file_exists($imagePath))
+                                                    <img src="{{ asset('upload/client_images/' . $client->image) }}"
+                                                         alt="client-image"
+                                                         class="client-avatar">
+                                                @else
+                                                    <img src="{{ asset('upload/no_image.jpg') }}"
+                                                         alt="no-image"
+                                                         class="client-avatar">
+                                                @endif
+                                            </a>
                                         </td>
 
                                         <td>
-                                            <div class="client-name">{{ $client->full_name }}</div>
-                                            <div class="client-subtext">รหัสรายการ #{{ $client->id }}</div>
+                                            <a href="{{ route('admin.index', $client->id) }}"
+                                               title="ดูข้อมูล"
+                                               class="client-link-name">
+                                                <div class="client-name">
+                                                    {{ $client->full_name }}
+                                                </div>
+
+                                                <div class="client-subtext">
+                                                    เลขทะเบียน {{ $client->register_number ?? '-' }}
+                                                </div>
+                                            </a>
                                         </td>
 
                                         <td>{{ $client->arrival_date }}</td>
@@ -322,9 +444,13 @@
 
                                         <td>
                                             @if($client->release_status === 'show')
-                                                <span class="badge bg-success-subtle text-success status-badge">อยู่ในระบบ</span>
+                                                <span class="badge bg-success-subtle text-success status-badge">
+                                                    อยู่ในระบบ
+                                                </span>
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary status-badge">ไม่อยู่ในระบบ</span>
+                                                <span class="badge bg-secondary-subtle text-secondary status-badge">
+                                                    ไม่อยู่ในระบบ
+                                                </span>
                                             @endif
                                         </td>
 
@@ -343,12 +469,12 @@
                                                 </a>
 
                                                 @if(in_array(auth()->user()->role, ['admin', 'social_worker']))
-                                                    <a title="ลบ"
-                                                       href="{{ route('client.delete', $client->id) }}"
-                                                       class="btn btn-danger btn-sm action-btn"
-                                                       onclick="return confirm('ยืนยันการลบข้อมูล?')">
+                                                    <button type="button"
+                                                            title="ลบ"
+                                                            class="btn btn-danger btn-sm action-btn client-delete-btn"
+                                                            data-url="{{ route('client.delete', $client->id) }}">
                                                         <span class="mdi mdi-trash-can-outline mdi-18px"></span>
-                                                    </a>
+                                                    </button>
                                                 @endif
 
                                                 <a title="จำหน่าย"
@@ -376,33 +502,78 @@
 
 @endsection
 
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        $('#datatable').DataTable({
-            responsive: false,
-            autoWidth: false,
-            scrollX: true,
-            pageLength: 10,
-            order: [[0, 'asc']],
-            language: {
-                search: "ค้นหา:",
-                lengthMenu: "แสดง _MENU_ รายการ",
-                info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
-                infoEmpty: "ไม่มีข้อมูลให้แสดง",
-                paginate: {
-                    first: "หน้าแรก",
-                    last: "หน้าสุดท้าย",
-                    next: "ถัดไป",
-                    previous: "ก่อนหน้า"
-                },
-                zeroRecords: "ไม่พบข้อมูลที่ค้นหา"
+    @push('scripts')
+    <script>
+        $(document).ready(function() {
+            if ($('#datatable').length && $.fn.DataTable.isDataTable('#datatable')) {
+                $('#datatable').DataTable().destroy();
             }
-        });
 
-        if (window.feather) {
-            feather.replace();
-        }
-    });
-</script>
-@endpush
+            if ($('#datatable').length) {
+                $('#datatable').DataTable({
+                    responsive: false,
+                    autoWidth: false,
+                    scrollX: true,
+                    scrollCollapse: true,
+                    fixedHeader: false,
+                    pageLength: 10,
+                    order: [[0, 'asc']],
+                    language: {
+                        search: "ค้นหา:",
+                        lengthMenu: "แสดง _MENU_ รายการ",
+                        info: "แสดง _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ",
+                        infoEmpty: "ไม่มีข้อมูลให้แสดง",
+                        paginate: {
+                            first: "หน้าแรก",
+                            last: "หน้าสุดท้าย",
+                            next: "ถัดไป",
+                            previous: "ก่อนหน้า"
+                        },
+                        zeroRecords: "ไม่พบข้อมูลที่ค้นหา"
+                    },
+                    drawCallback: function() {
+                        $('.client-list-card .dataTables_paginate .paginate_button').addClass('btn-sm');
+                    }
+                });
+            }
+
+            if (window.feather) {
+                feather.replace();
+            }
+
+            $(document)
+                .off('click.clientDeleteBtn')
+                .on('click.clientDeleteBtn', '.client-delete-btn', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const deleteUrl = $(this).data('url');
+
+                    if (!deleteUrl) {
+                        return false;
+                    }
+
+                    Swal.fire({
+                        title: 'ยืนยันการลบข้อมูล?',
+                        text: 'หากลบแล้ว ข้อมูลนี้อาจไม่สามารถกู้คืนได้',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'ลบข้อมูล',
+                        cancelButtonText: 'ยกเลิก',
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        reverseButtons: true,
+                        focusCancel: true,
+                        allowOutsideClick: false,
+                        allowEscapeKey: true
+                    }).then(function(result) {
+                        if (result.isConfirmed === true) {
+                            window.location.href = deleteUrl;
+                        }
+                    });
+
+                    return false;
+                });
+        });
+    </script>
+    @endpush

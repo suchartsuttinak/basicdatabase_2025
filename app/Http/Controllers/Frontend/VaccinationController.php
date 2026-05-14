@@ -11,12 +11,8 @@ use Illuminate\Validation\Rule;
 
 class VaccinationController extends Controller
 {
-    // ✅ แสดงรายการวัคซีนของ client
     public function VaccineShow(Request $request, $client_id)
     {
-        // =========================
-        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
-        // =========================
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $request->validate([
@@ -41,7 +37,6 @@ class VaccinationController extends Controller
         return view('frontend.client.vaccine.vaccine_show', compact('client', 'vaccinations'));
     }
 
-    // ✅ บันทึกข้อมูลวัคซีนใหม่
     public function VaccineStore(Request $request)
     {
         $validated = $request->validate([
@@ -49,9 +44,9 @@ class VaccinationController extends Controller
             'date'         => [
                 'required',
                 'date',
-                Rule::unique('vaccinations')->where(fn($query) =>
-                    $query->where('client_id', $request->client_id)
-                ),
+                Rule::unique('vaccinations')->where(function ($query) use ($request) {
+                    return $query->where('client_id', $request->client_id);
+                }),
             ],
             'vaccine_name' => 'required|string|max:255',
             'hospital'     => 'nullable|string|max:255',
@@ -70,10 +65,8 @@ class VaccinationController extends Controller
             'remark.max'            => 'หมายเหตุต้องไม่เกิน 500 ตัวอักษร',
         ]);
 
-        // =========================
-        // PATCH: กันยิง request เปลี่ยน client_id
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+        $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+        $validated['client_id'] = $client->id;
 
         Vaccination::create($validated);
 
@@ -81,15 +74,12 @@ class VaccinationController extends Controller
                          ->with(['message' => 'บันทึกข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
 
-    // ✅ ดึงข้อมูลวัคซีนมาแก้ไข (ใช้กับ AJAX Modal)
     public function VaccineEdit($id)
     {
-        $vaccination = Vaccination::findOrFail($id);
-
-        // =========================
-        // PATCH: กันเดา URL เรียกข้อมูลของ client คนอื่น
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($vaccination->client_id);
+        $vaccination = Vaccination::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         return response()->json([
             'id'           => $vaccination->id,
@@ -102,15 +92,12 @@ class VaccinationController extends Controller
         ]);
     }
 
-    // ✅ อัปเดตข้อมูลวัคซีน
     public function VaccineUpdate(Request $request, $id)
     {
-        $vaccination = Vaccination::findOrFail($id);
-
-        // =========================
-        // PATCH: กันเดา URL มา update record คนอื่น
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($vaccination->client_id);
+        $vaccination = Vaccination::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'client_id'    => ['required', 'integer', 'exists:clients,id'],
@@ -118,7 +105,9 @@ class VaccinationController extends Controller
                 'required',
                 'date',
                 Rule::unique('vaccinations')
-                    ->where(fn($query) => $query->where('client_id', $request->client_id))
+                    ->where(function ($query) use ($vaccination) {
+                        return $query->where('client_id', $vaccination->client_id);
+                    })
                     ->ignore($vaccination->id, 'id'),
             ],
             'vaccine_name' => 'required|string|max:255',
@@ -147,9 +136,8 @@ class VaccinationController extends Controller
 
         $data = $validator->validated();
 
-        // =========================
-        // PATCH: กันเปลี่ยน client_id ไป client อื่น
-        // =========================
+        $data['client_id'] = $vaccination->client_id;
+
         Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
         $vaccination->update($data);
@@ -158,15 +146,12 @@ class VaccinationController extends Controller
                          ->with(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
 
-    // ✅ ลบข้อมูลวัคซีน
     public function VaccineDelete($id)
     {
-        $vaccination = Vaccination::findOrFail($id);
-
-        // =========================
-        // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($vaccination->client_id);
+        $vaccination = Vaccination::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         $client_id = $vaccination->client_id;
         $vaccination->delete();
@@ -175,12 +160,8 @@ class VaccinationController extends Controller
                          ->with(['message' => 'ลบข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
 
-    // ✅ หน้ารายงานวัคซีน
     public function VaccineReport(Request $request, $client_id)
     {
-        // =========================
-        // PATCH: กันเดา URL เข้าถึง client ที่ไม่มีสิทธิ์
-        // =========================
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $request->validate([

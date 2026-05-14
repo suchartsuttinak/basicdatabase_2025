@@ -332,29 +332,32 @@
                     </div>
                 </div>
 
-                <div class="col-lg-4">
-                    <div class="sticky-tools">
-                        <button
-                            type="button"
-                            class="btn btn-primary btn-modern"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#checkBodyFormCollapse"
-                            aria-expanded="{{ $errors->any() || $isEdit ? 'true' : 'false' }}"
-                            aria-controls="checkBodyFormCollapse"
-                            id="toggleCheckBodyBtn"
-                        >
-                            <i class="bi {{ $errors->any() || $isEdit ? 'bi-chevron-up' : 'bi-plus-circle' }} me-1"></i>
-                            <span>{{ $isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มผลการตรวจ' }}</span>
-                        </button>
+                    @if($checkbodies->count() || $isEdit || $errors->any())
+                        <div class="col-lg-4">
+                            <div class="sticky-tools">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary btn-modern"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#checkBodyFormCollapse"
+                                    aria-expanded="{{ $errors->any() || $isEdit ? 'true' : 'false' }}"
+                                    aria-controls="checkBodyFormCollapse"
+                                    id="toggleCheckBodyBtn"
+                                >
+                                    <i class="bi {{ $errors->any() || $isEdit ? 'bi-chevron-up' : 'bi-plus-circle' }} me-1"></i>
+                                    <span>{{ $isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มผลการตรวจ' }}</span>
+                                </button>
 
-                        @if($isEdit)
-                            <a href="{{ route('check_body.add', $client->id) }}" class="btn btn-outline-secondary btn-modern">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>
-                                ยกเลิกการแก้ไข
-                            </a>
-                        @endif
-                    </div>
-                </div>
+                                @if($isEdit)
+                                    <a href="{{ route('check_body.add', $client->id) }}"
+                                    class="btn btn-outline-secondary btn-modern">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                                        ยกเลิกการแก้ไข
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
             </div>
         </div>
     </div>

@@ -206,9 +206,9 @@
                                         </div>
 
                                         <div class="publicize-action-group">
-                                            <a href="{{ asset('storage/' . $item->file_path) }}"
-                                               target="_blank"
-                                               class="btn btn-outline-primary btn-sm">
+                                           <a href="{{ asset($item->file_path) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary btn-sm">
                                                 <i class="bi bi-file-earmark-pdf me-1"></i> เปิดไฟล์
                                             </a>
                                                  @if(auth()->check() && auth()->user()->role === 'admin')

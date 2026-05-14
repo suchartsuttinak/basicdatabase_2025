@@ -245,25 +245,31 @@ class FactfindingController extends Controller
         ]);
 
         // ✅ แก้จาก whereHas('client') เป็น whereIn(client_id, subquery)
-        $factFinding = Factfinding::where('id', $factfinding_id)
-            ->whereIn('client_id', Client::forUser(auth()->user())->select('id'))
-            ->firstOrFail();
+            $factFinding = Factfinding::where('id', $factfinding_id)
+                ->whereIn('client_id', Client::forUser(auth()->user())->select('id'))
+                ->firstOrFail();
 
-        $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+            // =========================
+            // PATCH: กันเปลี่ยน client_id จาก form (hidden field)
+            // ใช้ client_id จาก record เดิมเท่านั้น
+            // =========================
+            $validated['client_id'] = $factFinding->client_id;
 
-        $existing = Factfinding::where('client_id', $client->id)
-            ->where('id', '!=', $factFinding->id)
-            ->first();
+            $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-        if ($existing) {
-            return redirect()
-                ->route('factfinding.edit', $existing->id)
-                ->with('error', 'มีข้อมูลของผู้รับรายนี้อยู่แล้ว ท่านสามารถแก้ไขแทนการบันทึกใหม่ได้');
-        }
+            $existing = Factfinding::where('client_id', $client->id)
+                ->where('id', '!=', $factFinding->id)
+                ->first();
 
-        if ($validated['sick'] == 0) {
-            $validated['sick_detail'] = null;
-        }
+            if ($existing) {
+                return redirect()
+                    ->route('factfinding.edit', $existing->id)
+                    ->with('error', 'มีข้อมูลของผู้รับรายนี้อยู่แล้ว ท่านสามารถแก้ไขแทนการบันทึกใหม่ได้');
+            }
+
+            if ($validated['sick'] == 0) {
+                $validated['sick_detail'] = null;
+            }
 
             $payload = [
             'client_id'   => (int) $client->id,

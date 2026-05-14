@@ -80,7 +80,7 @@ class FamilyController extends Controller
                 'father.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
                 'father.age' => ['nullable', 'integer', 'min:0'],
                 'father.occupation' => ['nullable', 'string', 'max:255'],
-                'father.income' => ['nullable', 'string', 'max:255'],
+               'father.income' => ['nullable', 'numeric', 'min:0'],
                 'father.address_no' => ['nullable', 'string', 'max:255'],
                 'father.moo' => ['nullable', 'string', 'max:255'],
                 'father.soi' => ['nullable', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class FamilyController extends Controller
                 // 'mother.idcard' => ['nullable', 'string', 'max:20'],
                 'mother.age' => ['nullable', 'integer', 'min:0'],
                 'mother.occupation' => ['nullable', 'string', 'max:255'],
-                'mother.income' => ['nullable', 'string', 'max:255'],
+               'mother.income' => ['nullable', 'numeric', 'min:0'],
                 'mother.address_no' => ['nullable', 'string', 'max:255'],
                 'mother.moo' => ['nullable', 'string', 'max:255'],
                 'mother.soi' => ['nullable', 'string', 'max:255'],
@@ -115,7 +115,7 @@ class FamilyController extends Controller
                 'spouse.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
                 'spouse.age' => ['nullable', 'integer', 'min:0'],
                 'spouse.occupation' => ['nullable', 'string', 'max:255'],
-                'spouse.income' => ['nullable', 'string', 'max:255'],
+                'spouse.income' => ['nullable', 'numeric', 'min:0'],
                 'spouse.address_no' => ['nullable', 'string', 'max:255'],
                 'spouse.moo' => ['nullable', 'string', 'max:255'],
                 'spouse.soi' => ['nullable', 'string', 'max:255'],
@@ -133,7 +133,7 @@ class FamilyController extends Controller
                 'relative.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
                 'relative.age' => ['nullable', 'integer', 'min:0'],
                 'relative.occupation' => ['nullable', 'string', 'max:255'],
-                'relative.income' => ['nullable', 'string', 'max:255'],
+                'relative.income' => ['nullable', 'numeric', 'min:0'],
                 'relative.address_no' => ['nullable', 'string', 'max:255'],
                 'relative.moo' => ['nullable', 'string', 'max:255'],
                 'relative.soi' => ['nullable', 'string', 'max:255'],
@@ -146,10 +146,15 @@ class FamilyController extends Controller
                 'relative.phone' => ['nullable', 'string', 'max:20'],
             ]);
 
-            // ✅ [แก้ไข] กันการยิง client_id ของคนอื่น
+           // ✅ [แก้ไข] กันการยิง client_id ของคนอื่น
             $client = Client::forUser(auth()->user())
                 ->where('id', $validated['client_id'])
                 ->firstOrFail();
+
+            // =========================
+            // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
+            // =========================
+            $validated['client_id'] = $client->id;
 
             // ❗ ของเดิมคงไว้
             $clientId = $client->id;
@@ -246,7 +251,11 @@ class FamilyController extends Controller
             'idcard' => $data['idcard'] ?? null,
             'age' => $data['age'] ?? null,
             'occupation' => $data['occupation'] ?? null,
-            'income' => $data['income'] ?? null,
+
+           'income' => isset($data['income'])
+            ? preg_replace('/[^0-9.]/', '', (string) $data['income'])
+            : null,
+            
             'address_no' => $data['address_no'] ?? null,
             'moo' => $data['moo'] ?? null,
             'soi' => $data['soi'] ?? null,

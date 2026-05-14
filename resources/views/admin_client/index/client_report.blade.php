@@ -1111,17 +1111,20 @@
     </div>
 
     <div class="problem-title">สภาพปัญหา</div>
-    <div class="problem-list">
-        @if($client->problems->count() > 0)
-            @foreach($client->problems as $problem)
-                <div class="problem-item">
-                    <span class="checkbox">☑</span>{{ $problem->name }}
-                </div>
-            @endforeach
-        @else
-            <div class="problem-item">- ไม่มีข้อมูลปัญหา -</div>
-        @endif
-    </div>
+        <div class="problem-list">
+            @if(!empty($clientProblems) && $clientProblems->count() > 0)
+
+                @foreach($clientProblems as $problem)
+                    <div class="problem-item">
+                        <span class="checkbox">☑</span>
+                        {{ $problem->problem_name ?? $problem->name ?? '-' }}
+                    </div>
+                @endforeach
+
+            @else
+                <div class="problem-item">- ไม่มีข้อมูลปัญหา -</div>
+            @endif
+        </div>
 
     <div class="member-table-wrap">
         <div class="member-table-title">รายละเอียดสมาชิกครอบครัว</div>

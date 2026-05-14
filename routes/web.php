@@ -8,6 +8,7 @@ use App\Http\Controllers\Landing\AboutController;
 use App\Http\Controllers\Landing\IssueController;
 use App\Http\Controllers\Landing\LandingController;
 use App\Http\Controllers\Landing\NewsController;
+use App\Http\Controllers\Landing\ScholarshipChildController;
 use App\Http\Controllers\Landing\ScholarshipController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticsController;
@@ -16,7 +17,11 @@ use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
-        // ประมวลผล/สถิติ หน้า dashboard (จำกัดสิทธิ์)
+           // หน้า รายงานผู้ขอรับทุนการศึกษา (Public)
+        Route::get('/scholarship-children/public-report', [ScholarshipChildController::class, 'publicReport'])
+        ->name('scholarship.children.public_report');
+
+        // หน้า รายงานผู้ขอรับทุนการศึกษา (Admin)
         Route::middleware(['auth','role:admin,executive,social_worker'])->group(function () {
             Route::get('/dashboard', [StatisticsController::class, 'index'])->name('dashboard');
             Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
@@ -222,8 +227,6 @@ use Illuminate\Support\Facades\Route;
 
 
 
-
-
     //Backend Route All
 
     //บันทึกประวัติผู้รับบริการ
@@ -261,6 +264,12 @@ use Illuminate\Support\Facades\Route;
 
     //บันทึกรายการพ้นอุปการะ
     require __DIR__.'/backend/translate.php';
+
+
+    //บันทึกรายการผู้ขอรับการสนับสนุนทุนการศึกษา (หน้าสาธารณะ)
+    require __DIR__.'/backend/scholarshipChild.php';
+
+
 
 
 

@@ -9,8 +9,6 @@ use App\Models\Medical;
 use Illuminate\Support\Facades\Validator; // ✅ ใช้ namespace ที่ถูกต้อง
 use Illuminate\Validation\Rule;
 
-
-
 class MedicalController extends Controller
 {
     // แสดงฟอร์มเพิ่มข้อมูลใหม่
@@ -77,7 +75,12 @@ class MedicalController extends Controller
         // =========================
         // PATCH: กันยิง request เปลี่ยน client_id
         // =========================
-        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+        $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
+        // =========================
+        // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
+        // =========================
+        $data['client_id'] = $client->id;
 
         if ($data['refer'] === 'ไม่พบแพทย์') {
             $data['diagnosis'] = null;
@@ -91,14 +94,20 @@ class MedicalController extends Controller
             'alert-type' => 'success'
         ];
 
-
         return redirect()->back()->with($notification);
     }
 
     // โหลดข้อมูลสำหรับแก้ไข (JSON)
     public function editMedicalJson($id)
 {
-    $medical = Medical::findOrFail($id);
+    // =========================
+    // PATCH: กันเดา URL เรียก JSON ของ client คนอื่นตั้งแต่ query แรก
+    // เดิม: $medical = Medical::findOrFail($id);
+    // =========================
+    $medical = Medical::whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id);
 
     // =========================
     // PATCH: กันเดา URL เรียก JSON ของ client คนอื่น
@@ -123,7 +132,14 @@ class MedicalController extends Controller
 // ✅ อัปเดตข้อมูล
 public function MedicalUpdate(Request $request, $id)
 {
-    $medical = Medical::findOrFail($id);
+   // =========================
+   // PATCH: กันเดา URL มา update record คนอื่นตั้งแต่ query แรก
+   // เดิม: $medical = Medical::findOrFail($id);
+   // =========================
+   $medical = Medical::whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
     // =========================
     // PATCH: กันเดา URL มา update record คนอื่น
@@ -135,8 +151,8 @@ public function MedicalUpdate(Request $request, $id)
             'required',
             'date',
             Rule::unique('medicals')
-                ->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
+                ->where(function ($query) use ($medical) {
+                    return $query->where('client_id', $medical->client_id);
                 })
                 ->ignore($medical->id), // ✅ ยกเว้น record ที่กำลังแก้ไข
         ],
@@ -158,8 +174,6 @@ public function MedicalUpdate(Request $request, $id)
         'refer.required'        => 'กรุณาเลือกการส่งต่อ',
     ]);
 
-
-
     if ($validator->fails()) {
         return back()
             ->withErrors($validator)
@@ -174,6 +188,12 @@ public function MedicalUpdate(Request $request, $id)
 
     // =========================
     // PATCH: กันเปลี่ยน client_id ไป client อื่น
+    // บังคับให้ใช้ client_id เดิมของ record นี้เท่านั้น
+    // =========================
+    $data['client_id'] = $medical->client_id;
+
+    // =========================
+    // PATCH: ตรวจสิทธิ์ client_id หลังบังคับค่าแล้ว
     // =========================
     Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
@@ -183,7 +203,6 @@ public function MedicalUpdate(Request $request, $id)
     }
 
     $medical->update($data);
-
 
      $notification = [
             'message' => 'อัปเดตข้อมูลเรียบร้อย',
@@ -197,7 +216,14 @@ public function MedicalUpdate(Request $request, $id)
     // ลบข้อมูล
     public function MedicalDelete($id)
     {
-        $medical   = Medical::findOrFail($id);
+      // =========================
+      // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่นตั้งแต่ query แรก
+      // เดิม: $medical = Medical::findOrFail($id);
+      // =========================
+      $medical = Medical::whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
         // =========================
         // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น

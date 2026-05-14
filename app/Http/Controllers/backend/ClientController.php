@@ -24,6 +24,10 @@ use App\Models\Title;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ClientController extends Controller
 {
@@ -97,6 +101,71 @@ class ClientController extends Controller
             'คุณไม่มีสิทธิ์เข้าถึงบ้านนี้'
         );
     }
+
+
+
+   // =====================================================
+// PATCH:
+// Save + Optimize Client Image
+// สำหรับ Shared Hosting / Production
+// =====================================================
+protected function saveClientImage($file): string
+{
+    $destinationPath = public_path('upload/client_images');
+
+    // =====================================================
+    // PATCH:
+    // สร้างโฟลเดอร์อัตโนมัติ
+    // =====================================================
+    if (!File::exists($destinationPath)) {
+        File::makeDirectory($destinationPath, 0755, true);
+    }
+
+    // =====================================================
+    // PATCH:
+    // ตั้งชื่อไฟล์ใหม่
+    // =====================================================
+    $filename = Str::uuid()->toString() . '.jpg';
+
+    // =====================================================
+    // PATCH:
+    // ใช้ Intervention Image
+    // =====================================================
+    $manager = new ImageManager(new Driver());
+
+    $image = $manager->read($file->getRealPath());
+
+    // =====================================================
+    // PATCH:
+    // หมุนภาพอัตโนมัติจากมือถือ
+    // =====================================================
+    $image = $image->orient();
+
+    // =====================================================
+    // PATCH:
+    // ลดขนาดภาพ
+    // ป้องกัน Shared Hosting ทำงานหนัก
+    // =====================================================
+    $image->scaleDown(width: 1000);
+
+    // =====================================================
+    // PATCH:
+    // บันทึกแบบ Progressive JPEG
+    // โหลดเร็วขึ้นบนเว็บ
+    // =====================================================
+    $encoded = $image->toJpeg(
+        quality: 70,
+        progressive: true
+    );
+
+    $encoded->save($destinationPath . '/' . $filename);
+
+    // =====================================================
+    // PATCH:
+    // คืนชื่อไฟล์
+    // =====================================================
+    return $filename;
+}
 
     /**
      * หน้าแสดงรายการ client
@@ -322,7 +391,7 @@ class ClientController extends Controller
             'case_resident'   => 'required|in:Active,Inactive',
             'problems'        => 'nullable|array',
             'problems.*'      => 'integer',
-            'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+           'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'register_number.unique' => 'เลขทะเบียนนี้ถูกใช้แล้ว',
             'title_id.required'      => 'กรุณาเลือกคำนำหน้า',
@@ -390,12 +459,9 @@ class ClientController extends Controller
             }
         }
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('upload/client_images'), $filename);
-            $validated['image'] = $filename;
-        }
+            if ($request->hasFile('image')) {
+             $validated['image'] = $this->saveClientImage($request->file('image'));
+}
 
         $problems = $validated['problems'] ?? [];
         unset($validated['problems']);
@@ -585,8 +651,7 @@ class ClientController extends Controller
             'case_resident'   => 'required|in:Active,Inactive',
             'problems'        => 'nullable|array',
             'problems.*'      => 'integer',
-            'image'           => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ], [
+          'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'register_number.unique' => 'เลขทะเบียนนี้ถูกใช้แล้ว',
             'register_number.string' => 'เลขทะเบียนต้องเป็นตัวอักษร',
             'register_number.max'    => 'เลขทะเบียนต้องไม่เกิน 255 ตัวอักษร',
@@ -635,12 +700,9 @@ class ClientController extends Controller
             }
         }
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('upload/client_images'), $filename);
-            $validated['image'] = $filename;
-        }
+       if ($request->hasFile('image')) {
+    $validated['image'] = $this->saveClientImage($request->file('image'));
+}
 
         $problems = $validated['problems'] ?? [];
         unset($validated['problems']);

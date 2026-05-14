@@ -792,21 +792,43 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         </div>
 
-                     <div class="col-lg-2">
+                    <div class="col-lg-2">
                             <div class="photo-box text-center">
-                                <label class="form-label d-block text-center mb-2">ภาพถ่าย</label>
 
+                                <label class="form-label d-block text-center mb-2">
+                                    ภาพถ่าย
+                                </label>
+
+                                {{-- =====================================================
+                                    PATCH:
+                                    Lazy Load + Async Decode
+                                    ช่วยให้หน้าโหลดเร็วขึ้น
+                                ====================================================== --}}
                                 <img id="showImage"
-                                    src="{{ !empty($profileData->image) ? asset($profileData->image) : asset('upload/no_image.jpg') }}"
+                                    src="{{ !empty($profileData->image)
+                                            ? asset($profileData->image)
+                                            : asset('upload/no_image.jpg') }}"
                                     alt="image profile"
+                                    loading="lazy"
+                                    decoding="async"
                                     class="photo-preview d-block mx-auto">
 
-                                <input type="file" name="image" id="image" class="d-none" accept="image/*">
+                                {{-- =====================================================
+                                    PATCH:
+                                    รองรับ Browser Compression
+                                ====================================================== --}}
+                                <input type="file"
+                                    name="image"
+                                    id="image"
+                                    class="d-none"
+                                    accept="image/*">
 
                                 <button type="button"
-                                    class="btn btn-light btn-sm photo-btn mt-2"
-                                    onclick="document.getElementById('image').click()">
+                                        class="btn btn-light btn-sm photo-btn mt-2"
+                                        onclick="document.getElementById('image').click()">
+
                                     เลือกรูปภาพ
+
                                 </button>
                             </div>
                         </div>

@@ -24,6 +24,11 @@ return new class extends Migration
                 $table->unsignedBigInteger('client_id');
                 $table->timestamps();
 
+                $table->foreign('psycho_id')
+                    ->references('id')
+                    ->on('psychos')
+                    ->nullOnDelete();
+
                 $table->foreign('client_id')
                     ->references('id')
                     ->on('clients')

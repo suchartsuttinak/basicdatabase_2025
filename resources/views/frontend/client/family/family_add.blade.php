@@ -720,16 +720,24 @@
                                             @endif
                                         </div>
 
-                                        <div class="field-group span-12">
+                                     <div class="field-group span-12">
                                             <label for="{{ $prefix }}_income" class="form-label">รายได้</label>
-                                            <input
-                                                type="text"
-                                                name="{{ $prefix }}[income]"
-                                                id="{{ $prefix }}_income"
-                                                class="form-control {{ $errors->has($incomeField) ? 'is-invalid' : '' }}"
-                                                value="{{ old($incomeField, $person->income ?? '') }}"
-                                                autocomplete="off"
-                                            >
+
+                                            <div class="input-group">
+                                                <input
+                                                    type="number"
+                                                    name="{{ $prefix }}[income]"
+                                                    id="{{ $prefix }}_income"
+                                                    class="form-control {{ $errors->has($incomeField) ? 'is-invalid' : '' }}"
+                                                    value="{{ old($incomeField, $person->income ?? '') }}"
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="เช่น 12000"
+                                                    autocomplete="off"
+                                                >
+                                                <span class="input-group-text">บาท/เดือน</span>
+                                            </div>
+
                                             @if ($errors->has($incomeField))
                                                 <span class="field-error">{{ $errors->first($incomeField) }}</span>
                                             @endif

@@ -969,15 +969,27 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3 col-lg-2">
-                            <label class="form-label">อายุต่ำสุด</label>
-                            <input type="number" name="age_min" class="form-control" value="{{ $ageMin ?? 1 }}" min="1" max="99">
-                        </div>
+                   <div class="col-md-3 col-lg-2">
+                        <label class="form-label">อายุต่ำสุด</label>
 
-                        <div class="col-md-3 col-lg-2">
-                            <label class="form-label">อายุสูงสุด</label>
-                            <input type="number" name="age_max" class="form-control" value="{{ $ageMax ?? 99 }}" min="1" max="99">
-                        </div>
+                        <input type="number"
+                            name="age_min"
+                            class="form-control"
+                            value="{{ $ageMin ?? 0 }}"
+                            min="0"
+                            max="99">
+                    </div>
+
+                    <div class="col-md-3 col-lg-2">
+                        <label class="form-label">อายุสูงสุด</label>
+
+                        <input type="number"
+                            name="age_max"
+                            class="form-control"
+                            value="{{ $ageMax ?? 99 }}"
+                            min="0"
+                            max="99">
+                    </div>
 
                         <div class="col-md-6 col-lg-3">
                             <label class="form-label">สถานศึกษา</label>

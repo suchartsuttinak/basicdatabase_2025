@@ -22,7 +22,7 @@ class StatisticsController extends Controller
         $yearMax       = $request->input('year_max', null);
         $month         = $request->input('month', null);
         $gender        = $request->input('gender', null);
-        $ageMin        = $request->input('age_min', 1);
+        $ageMin        = $request->input('age_min', 0);
         $ageMax        = $request->input('age_max', 99);
         $education     = $request->input('education', null);
         $institutionId = $request->input('institution_id', null);
@@ -73,10 +73,10 @@ class StatisticsController extends Controller
             $query->where('gender', $gender);
         }
 
-        if ($ageMin && $ageMax) {
+      if ($ageMin !== null && $ageMax !== null) {
             $query->whereBetween('birth_date', [
-                now()->subYears($ageMax),
-                now()->subYears($ageMin)
+                now()->subYears((int) $ageMax)->startOfDay(),
+                now()->subYears((int) $ageMin)->endOfDay()
             ]);
         }
 

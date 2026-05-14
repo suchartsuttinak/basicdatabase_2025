@@ -512,42 +512,70 @@
                             @enderror
                         </div>
 
-                        {{-- เลือกรูป --}}
-                        <div class="mb-3">
-                            <label for="images" class="form-label">เลือกรูปภาพ</label>
-                            <input type="file"
-                                   name="images[]"
-                                   id="images"
-                                   class="form-control"
-                                   multiple
-                                   accept="image/*">
+                     {{-- =====================================================
+     PATCH:
+     Upload Visit Family Images
+===================================================== --}}
+<div class="mb-3">
+    <label for="images" class="form-label">เลือกรูปภาพ</label>
 
-                            <div id="preview" class="row mt-3 visit-family-preview"></div>
-                        </div>
+    <input type="file"
+           name="images[]"
+           id="images"
+           class="form-control"
+           multiple
+           accept="image/*">
 
-                        {{-- รูปที่เคยอัปโหลด --}}
-                        @if(isset($images) && $images->count() > 0)
-                            <div class="mb-3">
-                                <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
+    <div id="preview" class="row mt-3 visit-family-preview"></div>
+</div>
 
-                                <div class="row visit-family-gallery" id="image-gallery">
-                                    @foreach($images as $img)
-                                        <div class="col-6 col-md-4 col-xl-3 mb-3" id="image-{{ $img->id }}">
-                                            <div class="visit-family-image-card">
-                                                <img src="{{ asset('storage/'.$img->file_path) }}" alt="รูปเยี่ยมบ้าน">
+{{-- =====================================================
+     PATCH:
+     รูปที่เคยอัปโหลด
+     ใช้ relation จาก $visitFamily->images โดยตรง
+===================================================== --}}
+@php
+    $oldImages = isset($visitFamily) && $visitFamily->relationLoaded('images')
+        ? $visitFamily->images
+        : (isset($images) ? $images : collect());
+@endphp
 
-                                                <button type="button"
-                                                        class="btn btn-danger btn-sm visit-family-delete-btn delete-image"
-                                                        data-url="{{ route('image.destroy', $img->id) }}"
-                                                        data-id="{{ $img->id }}">
-                                                    ลบภาพ
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
+@if($oldImages->count() > 0)
+    <div class="mb-3">
+        <label class="form-label">รูปเยี่ยมบ้านที่เคยอัปโหลด</label>
+
+        <div class="row visit-family-gallery" id="image-gallery">
+            @foreach($oldImages as $img)
+                <div class="col-6 col-md-4 col-xl-3 mb-3" id="image-{{ $img->id }}">
+                    <div class="visit-family-image-card">
+                        @php
+                            $imageUrl = str_starts_with($img->file_path, 'upload/')
+                                ? asset($img->file_path)
+                                : asset('storage/' . $img->file_path);
+                        @endphp
+
+                        <img src="{{ $imageUrl }}"
+                             alt="รูปเยี่ยมบ้าน"
+                             loading="lazy"
+                             decoding="async">
+
+                        <button type="button"
+                                class="btn btn-danger btn-sm visit-family-delete-btn delete-image"
+                                data-url="{{ route('image.destroy', $img->id) }}"
+                                data-id="{{ $img->id }}">
+                            ลบภาพ
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
+                {{-- =====================================================
+                    PATCH:
+                    Browser Image Compression
+                    บีบอัดรูปก่อน Upload
+                ===================================================== --}}
 
                         <div class="d-flex flex-wrap gap-2 mt-3">
                             <button type="submit" class="btn btn-success">
@@ -639,6 +667,9 @@ $(function() {
 });
 </script>
 
+{{-- PATCH: Browser Image Compression --}}
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('images');
@@ -646,21 +677,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!input || !preview) return;
 
-    input.addEventListener('change', function () {
+    input.addEventListener('change', async function (event) {
         preview.innerHTML = '';
 
-        Array.from(this.files).forEach(file => {
+        const originalFiles = Array.from(event.target.files || []);
+        const dt = new DataTransfer();
+
+        // แสดง preview ทันทีจากไฟล์ต้นฉบับก่อน
+        originalFiles.forEach(function(file) {
             if (!file.type.startsWith('image/')) return;
 
             const reader = new FileReader();
 
-            reader.onload = e => {
+            reader.onload = function(e) {
                 const col = document.createElement('div');
                 col.className = 'col-6 col-md-4 col-xl-3 mb-3';
 
                 col.innerHTML = `
                     <div class="visit-family-image-card">
-                        <img src="${e.target.result}" alt="preview">
+                        <img src="${e.target.result}"
+                             alt="preview"
+                             loading="lazy"
+                             decoding="async">
                     </div>
                 `;
 
@@ -669,6 +707,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
             reader.readAsDataURL(file);
         });
+
+        // บีบอัดไฟล์สำหรับส่งขึ้น server
+        for (const file of originalFiles) {
+            if (!file.type.startsWith('image/')) continue;
+
+            try {
+                const compressedFile = await imageCompression(file, {
+                    maxSizeMB: 0.7,
+                    maxWidthOrHeight: 1600,
+                    useWebWorker: true,
+                    fileType: 'image/jpeg',
+                    initialQuality: 0.75,
+                });
+
+                dt.items.add(compressedFile);
+            } catch (error) {
+                console.error('Image compression failed:', error);
+                dt.items.add(file);
+            }
+        }
+
+        input.files = dt.files;
     });
 });
 </script>
@@ -679,20 +739,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     fields.forEach(field => {
         field.addEventListener("input", function() {
-            if (this.value.trim() !== "") {
-                clearError(this);
-            }
+            if (this.value.trim() !== "") clearError(this);
         });
 
         field.addEventListener("change", function() {
-            if (this.value.trim() !== "") {
-                clearError(this);
-            }
+            if (this.value.trim() !== "") clearError(this);
         });
 
-        if (field.value.trim() !== "") {
-            clearError(field);
-        }
+        if (field.value.trim() !== "") clearError(field);
     });
 
     function clearError(el) {
@@ -702,9 +756,7 @@ document.addEventListener("DOMContentLoaded", function() {
         feedbacks.forEach(fb => fb.style.display = "none");
 
         const labelStar = el.parentElement.querySelector("label .text-danger");
-        if (labelStar) {
-            labelStar.style.display = "none";
-        }
+        if (labelStar) labelStar.style.display = "none";
     }
 });
 </script>
@@ -767,3 +819,5 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 @endsection
+
+

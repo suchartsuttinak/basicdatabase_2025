@@ -17,18 +17,20 @@
                     <i class="bi bi-plus-circle"></i>
                     <span>เพิ่มข้อมูล</span>
                 </button>
+                    @if($caseoutsides->count())
 
-                <a href="{{ route('case_outside.filter', $client->id) }}"
-                class="btn btn-outline-primary co-btn">
-                    <i class="bi bi-funnel"></i>
-                    <span>ค้นหา / Filter</span>
-                </a>
+                    <a href="{{ route('case_outside.filter', $client->id) }}"
+                    class="btn btn-outline-primary co-btn">
+                        <i class="bi bi-funnel"></i>
+                        <span>ค้นหา / Filter</span>
+                    </a>
 
-                <a href="{{ route('case_outside.report', $client->id) }}"
-                target="_blank"
-                class="btn btn-success co-btn">
-                    <i class="bi bi-printer"></i>
-                    <span>รายงานทั้งหมด</span>
-                </a>
+                    <a href="{{ route('case_outside.report', $client->id) }}"
+                    target="_blank"
+                    class="btn btn-success co-btn">
+                        <i class="bi bi-printer"></i>
+                        <span>รายงานทั้งหมด</span>
+                    </a>
+                @endif
             </div>
         </div>

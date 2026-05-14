@@ -1,3 +1,9 @@
+@php
+    $hasFollowups = isset($followups) && $followups->count() > 0;
+@endphp
+
+@if($hasFollowups)
+
 <style>
     .sf-filter-card{
         border-radius:16px;
@@ -49,28 +55,28 @@
 
                 <div class="col-12 col-md-6 col-xl-3">
                     <label class="sf-filter-label">ตั้งแต่วันที่</label>
-                    <input type="date" name="start_date"
-                        class="form-control sf-filter-control"
-                        value="{{ request('start_date') }}">
+                    <input type="date"
+                           name="start_date"
+                           class="form-control sf-filter-control"
+                           value="{{ request('start_date') }}">
                 </div>
 
                 <div class="col-12 col-md-6 col-xl-3">
                     <label class="sf-filter-label">ถึงวันที่</label>
-                    <input type="date" name="end_date"
-                        class="form-control sf-filter-control"
-                        value="{{ request('end_date') }}">
+                    <input type="date"
+                           name="end_date"
+                           class="form-control sf-filter-control"
+                           value="{{ request('end_date') }}">
                 </div>
 
                 <div class="col-12 col-xl-6">
                     <div class="sf-filter-actions">
 
-                        {{-- ค้นหา --}}
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-search"></i>
                             ค้นหา
                         </button>
 
-                        {{-- รายงานรวม --}}
                         <a href="{{ route('school_followup.report.range', [
                                 'client_id' => $client->id,
                                 'start_date' => request('start_date'),
@@ -81,7 +87,6 @@
                             รายงานรวม
                         </a>
 
-                        {{-- ล้างค่า --}}
                         <a href="{{ route('school_followup_add', $client->id) }}"
                            class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-counterclockwise"></i>
@@ -96,3 +101,5 @@
 
     </div>
 </div>
+
+@endif

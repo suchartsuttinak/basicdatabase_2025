@@ -24,19 +24,34 @@
         </ul>
     </div>
 
+   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
     <a href="{{ route('scholarship.create') }}"
-       class="px-8 py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-primary-dark block text-center">
-        สนใจสนับสนุน
+       class="group px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600
+              text-white font-semibold text-center shadow-md
+              hover:shadow-xl hover:-translate-y-0.5
+              transition-all duration-300">
+
+        <div class="flex items-center justify-center gap-2">
+            <span>💙</span>
+            <span>สนใจสนับสนุน</span>
+        </div>
     </a>
+
+    <a href="{{ route('scholarship.children.public_report') }}"
+       class="group px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600
+              text-white font-semibold text-center shadow-md
+              hover:shadow-xl hover:-translate-y-0.5
+              transition-all duration-300">
+
+        <div class="flex items-center justify-center gap-2">
+            <span>🎓</span>
+            <span>ผู้ขอรับทุนภาคเรียนนี้</span>
+        </div>
+    </a>
+
 </div>
-
-
-
-
-
-
-
-
+</div>
 
         {{-- Report Issue --}}
         <div class="p-8 bg-gray-50 rounded-lg shadow hover:shadow-lg transition">

@@ -8,7 +8,7 @@ use App\Http\Requests\Client\Absent\UpdateAbsentRequest;
 use App\Models\Absent;
 use App\Models\Client;
 use App\Models\EducationRecord;
-use App\Models\Semester; // ✅ [เพิ่ม] ใช้ดึงชื่อภาคเรียนจาก semester_id โดยตรง
+use App\Models\Semester;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -19,12 +19,12 @@ class AbsentController extends Controller
 {
     public function AbsentAdd(Request $request, $client_id): View|RedirectResponse
     {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [แก้ไข]
-        $educationRecord = $this->getLatestEducationRecord($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+        $educationRecord = $this->getLatestEducationRecord($client->id);
 
         if (!$educationRecord) {
             return redirect()
-                ->route('education_record.add', $client_id)
+                ->route('education_record.add', $client->id)
                 ->with([
                     'message' => 'กรุณาเพิ่มข้อมูลการศึกษาเด็กก่อนบันทึกการขาดเรียน',
                     'alert-type' => 'warning',
@@ -40,7 +40,10 @@ class AbsentController extends Controller
             : null;
 
         $absentsQuery = Absent::with(['educationRecord.education', 'educationRecord.semester'])
-            ->where('client_id', $client_id);
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->where('client_id', $client->id);
 
         if ($startDate) {
             $absentsQuery->whereDate('absent_date', '>=', $startDate->toDateString());
@@ -55,19 +58,18 @@ class AbsentController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        // ✅ [เพิ่ม] เตรียมข้อมูลด้านซ้ายของ Modal หน้าเพิ่ม
         $schoolName = $educationRecord?->school_name ?? 'ไม่พบข้อมูล';
         $educationName = optional($educationRecord?->education)->education_name ?? 'ไม่พบข้อมูล';
-        $semesterName = $this->getSemesterNameByEducationRecord($educationRecord); // ✅ [เพิ่ม] ดึงภาคเรียนแบบเสถียร
+        $semesterName = $this->getSemesterNameByEducationRecord($educationRecord);
 
         return view('frontend.client.absent.absent_create', compact(
             'client',
             'educationRecord',
             'client_id',
             'absents',
-            'schoolName',      // ✅ [เพิ่ม]
-            'educationName',   // ✅ [เพิ่ม]
-            'semesterName'     // ✅ [เพิ่ม]
+            'schoolName',
+            'educationName',
+            'semesterName'
         ));
     }
 
@@ -75,16 +77,37 @@ class AbsentController extends Controller
     {
         $validated = $request->validated();
 
-        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+        $client = Client::forUser(auth()->user())
             ->where('id', $validated['client_id'])
             ->firstOrFail();
 
         if (empty($validated['education_record_id'])) {
-            $educationRecord = $this->getLatestEducationRecord($validated['client_id']);
+            $educationRecord = $this->getLatestEducationRecord($client->id);
             $validated['education_record_id'] = $educationRecord?->id;
         }
 
-        $validated['client_id'] = $client->id; // ✅ [แก้ไข]
+        $validated['client_id'] = $client->id;
+
+        // =========================
+        // PATCH: กันบันทึกการขาดเรียนซ้ำวันเดียวกันของเด็กคนเดิม
+        // =========================
+        $duplicate = Absent::where('client_id', $client->id)
+            ->whereDate('absent_date', $validated['absent_date'])
+            ->exists();
+
+        if ($duplicate) {
+            return redirect()
+                ->back()
+                ->withErrors([
+                    'absent_date' => 'ไม่สามารถบันทึกซ้ำได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                ])
+                ->withInput()
+                ->with([
+                    'message' => 'ไม่สามารถบันทึกซ้ำได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                    'alert-type' => 'error',
+                    'absent_modal' => 'create',
+                ]);
+        }
 
         Absent::create($validated);
 
@@ -103,11 +126,9 @@ class AbsentController extends Controller
                 ->whereHas('client', function ($q) {
                     $q->forUser(auth()->user());
                 })
-                ->findOrFail($id); // ✅ [แก้ไข]
+                ->findOrFail($id);
 
             $educationRecord = $absent->educationRecord;
-
-            // ✅ [แก้ไข] ดึงภาคเรียนจาก semester_id โดยตรง กัน relation ไม่มา
             $semesterName = $this->getSemesterNameByEducationRecord($educationRecord);
 
             return response()->json([
@@ -127,10 +148,9 @@ class AbsentController extends Controller
                     'operation' => $absent->operation,
                     'remark' => $absent->remark,
                     'teacher' => $absent->teacher,
-
                     'school_name' => $educationRecord?->school_name ?? 'ไม่พบข้อมูล',
                     'education_name' => optional($educationRecord?->education)->education_name ?? 'ไม่พบข้อมูล',
-                    'semester_name' => $semesterName, // ✅ [แก้ไข]
+                    'semester_name' => $semesterName,
                 ]
             ]);
         } catch (\Throwable $e) {
@@ -148,11 +168,45 @@ class AbsentController extends Controller
             ->whereHas('client', function ($q) {
                 $q->forUser(auth()->user());
             })
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->firstOrFail();
 
         $validated = $request->validated();
 
         $validated['education_record_id'] = $absent->education_record_id;
+        $validated['client_id'] = $absent->client_id;
+
+        // =========================
+        // PATCH: กันแก้ไขวันที่ไปซ้ำกับรายการอื่นของเด็กคนเดิม
+        // =========================
+        $duplicate = Absent::where('client_id', $absent->client_id)
+            ->whereDate('absent_date', $validated['absent_date'])
+            ->where('id', '!=', $absent->id)
+            ->exists();
+
+        if ($duplicate) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ไม่สามารถแก้ไขได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                    'errors' => [
+                        'absent_date' => ['ไม่สามารถแก้ไขได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว'],
+                    ],
+                ], 422);
+            }
+
+            return redirect()
+                ->back()
+                ->withErrors([
+                    'absent_date' => 'ไม่สามารถแก้ไขได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                ])
+                ->withInput()
+                ->with([
+                    'message' => 'ไม่สามารถแก้ไขได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                    'alert-type' => 'error',
+                    'edit_mode' => true,
+                    'edit_id' => $absent->id,
+                ]);
+        }
 
         $absent->update($validated);
 
@@ -178,7 +232,7 @@ class AbsentController extends Controller
             ->whereHas('client', function ($q) {
                 $q->forUser(auth()->user());
             })
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->firstOrFail();
 
         $clientId = $absent->client_id;
 
@@ -198,10 +252,9 @@ class AbsentController extends Controller
             ->whereHas('client', function ($q) {
                 $q->forUser(auth()->user());
             })
-            ->findOrFail($absent_id); // ✅ [แก้ไข]
+            ->findOrFail($absent_id);
 
-        $client = Client::forUser(auth()->user())->findOrFail($absent->client_id); // ✅ [แก้ไข]
-
+        $client = Client::forUser(auth()->user())->findOrFail($absent->client_id);
         $educationRecord = $absent->educationRecord;
 
         $age = $client->birth_date
@@ -214,16 +267,15 @@ class AbsentController extends Controller
             'absent' => $absent,
             'school_name' => $educationRecord?->school_name ?? 'ไม่พบข้อมูล',
             'education_name' => optional($educationRecord?->education)->education_name ?? 'ไม่พบข้อมูล',
-            'term' => $this->getSemesterNameByEducationRecord($educationRecord), // ✅ [แก้ไข]
+            'term' => $this->getSemesterNameByEducationRecord($educationRecord),
             'age' => $age,
         ]);
     }
 
     public function AbsentReportRange(Request $request, $client_id): View
     {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id); // ✅ [SECURITY]
-
-        $educationRecord = $this->getLatestEducationRecord($client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+        $educationRecord = $this->getLatestEducationRecord($client->id);
 
         $startDate = $request->filled('start_date')
             ? Carbon::parse($request->start_date)->startOfDay()
@@ -234,7 +286,10 @@ class AbsentController extends Controller
             : null;
 
         $query = Absent::with(['educationRecord.education', 'educationRecord.semester'])
-            ->where('client_id', $client_id);
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->where('client_id', $client->id);
 
         if ($startDate) {
             $query->whereDate('absent_date', '>=', $startDate->toDateString());
@@ -262,7 +317,7 @@ class AbsentController extends Controller
             'age' => $age,
             'school_name' => $educationRecord?->school_name ?? 'ไม่พบข้อมูล',
             'education_name' => optional($educationRecord?->education)->education_name ?? 'ไม่พบข้อมูล',
-            'term' => $this->getSemesterNameByEducationRecord($educationRecord), // ✅ [แก้ไข]
+            'term' => $this->getSemesterNameByEducationRecord($educationRecord),
         ]);
     }
 
@@ -279,7 +334,6 @@ class AbsentController extends Controller
             ->first();
     }
 
-    // ✅ [เพิ่ม] ใช้ซ้ำทุกจุดที่ต้องแสดงภาคเรียน เพื่อลดปัญหา relation ไม่มา
     private function getSemesterNameByEducationRecord($educationRecord): string
     {
         if (!$educationRecord || !$educationRecord->semester_id) {

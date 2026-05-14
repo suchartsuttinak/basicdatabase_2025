@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use App\Models\Publicize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -75,6 +76,7 @@ class PublicizeController extends Controller
     public function create()
     {
         $categories = Publicize::CATEGORIES;
+
         return view('backend.publicizes.create', compact('categories'));
     }
 
@@ -96,17 +98,14 @@ class PublicizeController extends Controller
             'file.max'             => 'ขนาดไฟล์ต้องไม่เกิน 10 MB',
         ]);
 
-        $folder = 'publicizes/' . $validated['category'];
         $file = $request->file('file');
-
-        $filename = now()->format('YmdHis') . '_' . uniqid() . '.pdf';
-        $path = $file->storeAs($folder, $filename, 'public');
+        $filePath = $this->uploadPublicizeFile($file, $validated['category']);
 
         Publicize::create([
             'recorded_at' => $validated['recorded_at'],
             'category'    => $validated['category'],
             'title'       => $validated['title'],
-            'file_path'   => $path,
+            'file_path'   => $filePath,
             'file_name'   => $file->getClientOriginalName(),
         ]);
 
@@ -118,6 +117,7 @@ class PublicizeController extends Controller
     public function edit(Publicize $publicize)
     {
         $categories = Publicize::CATEGORIES;
+
         return view('backend.publicizes.edit', compact('publicize', 'categories'));
     }
 
@@ -145,16 +145,10 @@ class PublicizeController extends Controller
         ];
 
         if ($request->hasFile('file')) {
-            if ($publicize->file_path && Storage::disk('public')->exists($publicize->file_path)) {
-                Storage::disk('public')->delete($publicize->file_path);
-            }
+            $this->deletePublicizeFile($publicize->file_path);
 
-            $folder = 'publicizes/' . $validated['category'];
             $file = $request->file('file');
-            $filename = now()->format('YmdHis') . '_' . uniqid() . '.pdf';
-            $path = $file->storeAs($folder, $filename, 'public');
-
-            $data['file_path'] = $path;
+            $data['file_path'] = $this->uploadPublicizeFile($file, $validated['category']);
             $data['file_name'] = $file->getClientOriginalName();
         }
 
@@ -169,14 +163,45 @@ class PublicizeController extends Controller
     {
         $category = $publicize->category;
 
-        if ($publicize->file_path && Storage::disk('public')->exists($publicize->file_path)) {
-            Storage::disk('public')->delete($publicize->file_path);
-        }
+        $this->deletePublicizeFile($publicize->file_path);
 
         $publicize->delete();
 
         return redirect()
             ->route('publicizes.index', ['category' => $category])
             ->with('success', 'ลบข้อมูลเรียบร้อยแล้ว');
+    }
+
+    private function uploadPublicizeFile($file, string $category): string
+    {
+        $folder = 'upload/publicizes/' . $category;
+        $destinationPath = public_path($folder);
+
+        if (!File::exists($destinationPath)) {
+            File::makeDirectory($destinationPath, 0755, true);
+        }
+
+        $filename = now()->format('YmdHis') . '_' . uniqid() . '.pdf';
+
+        $file->move($destinationPath, $filename);
+
+        return $folder . '/' . $filename;
+    }
+
+    private function deletePublicizeFile(?string $filePath): void
+    {
+        if (empty($filePath)) {
+            return;
+        }
+
+        $publicPath = public_path($filePath);
+
+        if (File::exists($publicPath)) {
+            File::delete($publicPath);
+        }
+
+        if (Storage::disk('public')->exists($filePath)) {
+            Storage::disk('public')->delete($filePath);
+        }
     }
 }

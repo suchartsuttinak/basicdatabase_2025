@@ -122,23 +122,31 @@ class MemberController extends Controller
         'members.*.remark' => 'nullable|string|max:255',
     ]);
 
-    // ✅ [แก้ไข] กันแก้ข้อมูล client คนอื่น
-    $client = Client::forUser(auth()->user())->findOrFail($id);
+        // ✅ [แก้ไข] กันแก้ข้อมูล client คนอื่น
+        $client = Client::forUser(auth()->user())->findOrFail($id);
 
-    // ✅ ลบสมาชิกเดิมออกก่อน แล้วเพิ่มใหม่ (ของเดิมคงไว้)
-    $client->members()->delete();
+        // =========================
+        // PATCH: กันเปลี่ยน client_id จาก form
+        // ใช้ client_id จาก URL ที่ผ่านสิทธิ์แล้วเท่านั้น
+        // =========================
+        $request->merge([
+            'client_id' => $client->id,
+        ]);
 
-    foreach ($request->members as $memberData) {
-        $client->members()->create($memberData);
+        // ✅ ลบสมาชิกเดิมออกก่อน แล้วเพิ่มใหม่ (ของเดิมคงไว้)
+        $client->members()->delete();
+
+        foreach ($request->members as $memberData) {
+            $client->members()->create($memberData);
+        }
+
+        $notification = [
+            'message' => 'แก้ไขข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()
+            ->route('member.show', $client->id)
+            ->with($notification);
     }
-
-    $notification = [
-        'message' => 'แก้ไขข้อมูลเรียบร้อย',
-        'alert-type' => 'success'
-    ];
-
-    return redirect()
-        ->route('member.show', $client->id)
-        ->with($notification);
-}
-}
+ }

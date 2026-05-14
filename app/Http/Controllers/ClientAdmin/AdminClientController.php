@@ -7,7 +7,7 @@ use App\Models\Accident;
 use App\Models\Client;
 use App\Models\Medical;
 use App\Models\Observe;
-use App\Models\Problem;
+// use App\Models\Problem;
 use App\Models\Psychiatric;
 use App\Models\Vaccination;
 use App\Models\Absent;
@@ -249,50 +249,51 @@ class AdminClientController extends Controller
         ));
     }
 
-    public function ClientReport($id)
-    {
-        $client = $this->findAuthorizedClient((int) $id, [
-            'problems',
-            'province',
-            'district',
-            'sub_district',
-            'national',
-            'religion',
-            'marital',
-            'occupation',
-            'income',
-            'education',
-            'contact',
-            'project',
-            'status',
-            'house',
-            'target',
-            'title',
-            'originProvince',
-            'originDistrict',
-            'originSubDistrict',
-            'members.education',
-            'members.occupation',
-            'members.income',
-            'father',
-            'mother',
-            'relative',
-            'spouse',
-        ]);
+            public function ClientReport($id)
+        {
+            $client = $this->findAuthorizedClient((int) $id, [
+                'problems',
+                'province',
+                'district',
+                'sub_district',
+                'national',
+                'religion',
+                'marital',
+                'occupation',
+                'income',
+                'education',
+                'contact',
+                'project',
+                'status',
+                'house',
+                'target',
+                'title',
+                'originProvince',
+                'originDistrict',
+                'originSubDistrict',
+                'members.education',
+                'members.occupation',
+                'members.income',
+                'father',
+                'mother',
+                'relative',
+                'spouse',
+            ]);
 
-        $factFinding = \App\Models\Factfinding::with([
-            'marital',
-            'documents',
-        ])->where('client_id', $client->id)->first();
+            $factFinding = \App\Models\Factfinding::with([
+                'marital',
+                'documents',
+            ])->where('client_id', $client->id)->first();
 
-        $problems = Problem::all();
+            // ✅ สภาพปัญหาของเด็กคนนี้เท่านั้น
+            $clientProblems = $client->problems ?? collect();
 
-        return view('admin_client.index.client_report', compact(
-            'client',
-            'problems',
-            'factFinding'
-        ));
-    }
+            return view('admin_client.index.client_report', compact(
+                'client',
+                'clientProblems',
+                'factFinding'
+            ));
+        }
 
     /**
      * [NEW]

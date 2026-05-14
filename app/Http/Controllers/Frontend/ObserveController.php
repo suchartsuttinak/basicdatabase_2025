@@ -23,7 +23,7 @@ class ObserveController extends Controller
 
         $misbehaviors = Misbehavior::all();
         $observes = Observe::with('followups')
-            ->where('client_id', $client_id)
+            ->where('client_id', $client->id)
             ->orderBy('date', 'desc')
             ->get();
         $observe = null;
@@ -69,7 +69,12 @@ class ObserveController extends Controller
     // =========================
     // PATCH: กันเปลี่ยน client_id
     // =========================
-    Client::forUser(auth()->user())->findOrFail($data['client_id']);
+    $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
+
+    // =========================
+    // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
+    // =========================
+    $data['client_id'] = $client->id;
 
     // =========================
     // PATCH: ผู้บันทึกใช้ชื่อ user ที่ login เท่านั้น
@@ -86,7 +91,15 @@ class ObserveController extends Controller
     // หน้าแก้ไข
     public function EditObserve($id)
     {
-        $observe = Observe::with('followups')->findOrFail($id);
+        // =========================
+        // PATCH: กันเข้าดู record คนอื่นตั้งแต่ query แรก
+        // เดิม: $observe = Observe::with('followups')->findOrFail($id);
+        // =========================
+        $observe = Observe::with('followups')
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
         // PATCH: กันเข้าดู record คนอื่น
@@ -105,7 +118,14 @@ class ObserveController extends Controller
     // อัปเดตข้อมูล
    public function UpdateObserve(Request $request, $id)
 {
-    $observe = Observe::findOrFail($id);
+    // =========================
+    // PATCH: กัน update record คนอื่นตั้งแต่ query แรก
+    // เดิม: $observe = Observe::findOrFail($id);
+    // =========================
+    $observe = Observe::whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id);
 
     // =========================
     // PATCH: กัน update record คนอื่น
@@ -116,8 +136,8 @@ class ObserveController extends Controller
         'date' => [
             'required',
             'date',
-            Rule::unique('observes')->where(function ($query) use ($request) {
-                return $query->where('client_id', $request->client_id);
+            Rule::unique('observes')->where(function ($query) use ($observe) {
+                return $query->where('client_id', $observe->client_id);
             })->ignore($id),
         ],
         'behavior'       => 'required|string',
@@ -133,6 +153,12 @@ class ObserveController extends Controller
 
     // =========================
     // PATCH: กันเปลี่ยน client_id
+    // บังคับให้ใช้ client_id เดิมของ record นี้เท่านั้น
+    // =========================
+    $data['client_id'] = $observe->client_id;
+
+    // =========================
+    // PATCH: ตรวจสิทธิ์ client_id หลังบังคับค่าแล้ว
     // =========================
     Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
@@ -151,7 +177,14 @@ class ObserveController extends Controller
     // ลบข้อมูล
     public function DeleteObserve($id)
     {
-        $observe = Observe::findOrFail($id);
+        // =========================
+        // PATCH: กันลบ record คนอื่นตั้งแต่ query แรก
+        // เดิม: $observe = Observe::findOrFail($id);
+        // =========================
+        $observe = Observe::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
         // PATCH: กันลบ record คนอื่น
@@ -181,7 +214,14 @@ class ObserveController extends Controller
             'followup_date.date'      => 'รูปแบบวันที่ติดตามไม่ถูกต้อง',
         ]);
 
-        $observe = Observe::findOrFail($data['observe_id']);
+        // =========================
+        // PATCH: กันเพิ่ม followup ของ client คนอื่นตั้งแต่ query แรก
+        // เดิม: $observe = Observe::findOrFail($data['observe_id']);
+        // =========================
+        $observe = Observe::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($data['observe_id']);
 
         // =========================
         // PATCH: กันเพิ่ม followup ของ client คนอื่น
@@ -215,7 +255,7 @@ class ObserveController extends Controller
         }
 
         ObserveFollowup::create([
-            'observe_id'      => $data['observe_id'],
+            'observe_id'      => $observe->id,
             'followup_date'   => $data['followup_date'],
             'followup_count'  => $nextFollowupCount,
             'followup_action' => $data['followup_action'] ?? null,
@@ -230,9 +270,18 @@ class ObserveController extends Controller
     // ลบการติดตามผล
     public function DeleteFollowup($id)
     {
-        $followup = ObserveFollowup::findOrFail($id);
+        // =========================
+        // PATCH: กันลบ followup ของ client คนอื่นตั้งแต่ query แรก
+        // เดิม:
+        // $followup = ObserveFollowup::findOrFail($id);
+        // $observe = Observe::findOrFail($followup->observe_id);
+        // =========================
+        $followup = ObserveFollowup::whereHas('observe.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
-        $observe = Observe::findOrFail($followup->observe_id);
+        $observe = $followup->observe;
 
         // =========================
         // PATCH: กันลบ followup ของ client คนอื่น
@@ -266,7 +315,15 @@ class ObserveController extends Controller
     // แก้ไขการติดตามผล
     public function EditFollowup($id)
     {
-        $followup = ObserveFollowup::findOrFail($id);
+        // =========================
+        // PATCH: กันเข้าดู followup คนอื่นตั้งแต่ query แรก
+        // เดิม: $followup = ObserveFollowup::findOrFail($id);
+        // =========================
+        $followup = ObserveFollowup::whereHas('observe.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
+
         $observe = $followup->observeRelation;
 
         if (!$observe) {
@@ -296,9 +353,18 @@ class ObserveController extends Controller
     // อัปเดตการติดตามผล
     public function UpdateFollowup(Request $request, $id)
     {
-        $followup = ObserveFollowup::findOrFail($id);
+        // =========================
+        // PATCH: กัน update followup คนอื่นตั้งแต่ query แรก
+        // เดิม:
+        // $followup = ObserveFollowup::findOrFail($id);
+        // $observe = Observe::findOrFail($followup->observe_id);
+        // =========================
+        $followup = ObserveFollowup::whereHas('observe.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
-        $observe = Observe::findOrFail($followup->observe_id);
+        $observe = $followup->observe;
 
         // =========================
         // PATCH: กัน update followup คนอื่น
@@ -369,6 +435,10 @@ class ObserveController extends Controller
 
     public function ReportObserve($id)
     {
+        // =========================
+        // PATCH: กันเข้าดู report ของ client คนอื่นตั้งแต่ query แรก
+        // เดิม: Observe::with([...])->findOrFail($id);
+        // =========================
         $observe = Observe::with([
             'client',
             'misbehavior',
@@ -376,7 +446,11 @@ class ObserveController extends Controller
                 $query->orderBy('followup_count', 'asc')
                       ->orderBy('followup_date', 'asc');
             }
-        ])->findOrFail($id);
+        ])
+        ->whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id);
 
         // =========================
         // PATCH: กันเข้าดู report ของ client คนอื่น

@@ -20,7 +20,7 @@ class EscapeController extends Controller
     $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
     $escapes = Escape::with(['retire','follows'])
-                     ->where('client_id', $client_id)
+                     ->where('client_id', $client->id) // PATCH: ใช้ client ที่ผ่านสิทธิ์แล้ว
                      ->get();
     $retires = Retire::all();
 
@@ -81,12 +81,21 @@ class EscapeController extends Controller
     // หน้า EditEscape (ฟอร์มแก้ไข)
     public function EditEscape($id)
     {
-        $escape = Escape::with(['client','retire','follows'])->findOrFail($id);
+        // =========================
+        // PATCH: กันเข้าดู record คนอื่นตั้งแต่ query แรก
+        // เดิม: $escape = Escape::with(['client','retire','follows'])->findOrFail($id);
+        // =========================
+        $escape = Escape::with(['client','retire','follows'])
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
-        // PATCH: กันเข้าดู record คนอื่น
+        // PATCH: ใช้ client จาก record ที่ผ่านสิทธิ์แล้ว
+        // เดิม: $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
         // =========================
-        $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
+        $client = $escape->client;
 
         $retires = Retire::all();
 
@@ -96,7 +105,22 @@ class EscapeController extends Controller
     // อัปเดต Escape ที่มีอยู่แล้ว
     public function UpdateEscape(Request $request, $id)
     {
-      $escape = Escape::findOrFail($id);
+      // =========================
+      // PATCH: กัน update record คนอื่นตั้งแต่ query แรก
+      // เดิม: $escape = Escape::findOrFail($id);
+      // =========================
+      $escape = Escape::whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->findOrFail($id);
+
+        // =========================
+        // PATCH: กันเปลี่ยน client_id จาก hidden field
+        // บังคับให้ client_id เป็นของ record เดิมเสมอ
+        // =========================
+        $request->merge([
+            'client_id' => $escape->client_id,
+        ]);
 
         // =========================
         // PATCH: กัน update record คนอื่น
@@ -139,7 +163,14 @@ class EscapeController extends Controller
 
     public function DeleteEscape($id)
 {
-        $escape = Escape::findOrFail($id);
+        // =========================
+        // PATCH: กันลบ record คนอื่นตั้งแต่ query แรก
+        // เดิม: $escape = Escape::findOrFail($id);
+        // =========================
+        $escape = Escape::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
         // PATCH: กันลบ record คนอื่น
@@ -156,12 +187,21 @@ class EscapeController extends Controller
 
     public function CopyEscape($id)
     {
-        $escape = Escape::with(['client','retire'])->findOrFail($id);
+        // =========================
+        // PATCH: กัน copy ข้อมูลของ client คนอื่นตั้งแต่ query แรก
+        // เดิม: $escape = Escape::with(['client','retire'])->findOrFail($id);
+        // =========================
+        $escape = Escape::with(['client','retire'])
+            ->whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
-        // PATCH: กัน copy ข้อมูลของ client คนอื่น
+        // PATCH: ใช้ client จาก record ที่ผ่านสิทธิ์แล้ว
+        // เดิม: $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
         // =========================
-        $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
+        $client = $escape->client;
 
         $retires = Retire::all();
         $mode = 'copy';
@@ -171,18 +211,27 @@ class EscapeController extends Controller
 
     public function ReportEscape($id)
 {
+    // =========================
+    // PATCH: กันเข้าดู report ของ client คนอื่นตั้งแต่ query แรก
+    // เดิม: Escape::with([...])->findOrFail($id);
+    // =========================
     $escape = Escape::with([
         'client',
         'retire',
         'follows' => function ($query) {
             $query->orderBy('count', 'asc')->orderBy('trace_date', 'asc');
         }
-    ])->findOrFail($id);
+    ])
+    ->whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
     // =========================
-    // PATCH: กันเข้าดู report ของ client คนอื่น
+    // PATCH: ใช้ client จาก record ที่ผ่านสิทธิ์แล้ว
+    // เดิม: $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
     // =========================
-    $client = Client::forUser(auth()->user())->findOrFail($escape->client_id);
+    $client = $escape->client;
 
     return view('frontend.client.escape.escape_report', compact('escape', 'client'));
 }

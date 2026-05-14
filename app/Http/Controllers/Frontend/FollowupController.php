@@ -11,12 +11,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class FollowupController extends Controller
 {
-    /**
-     * แสดงหน้ารายการติดตามผล + filter ช่วงวันที่
-     */
     public function index(Request $request, $client_id)
     {
-        // [SECURITY] เห็นเฉพาะ client ที่ user มีสิทธิ์
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $validator = Validator::make($request->all(), [
@@ -57,57 +53,56 @@ class FollowupController extends Controller
         ));
     }
 
-    /**
-     * บันทึกข้อมูลติดตามผล
-     */
-   public function store(Request $request, $client_id)
-{
-    $client = Client::forUser(auth()->user())->findOrFail($client_id);
+    public function store(Request $request, $client_id)
+    {
+        $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-    $this->authorizeManage();
+        $this->authorizeManage();
 
-    $validator = Validator::make($request->all(), [
-        'followup_date'      => 'required|date',
-        'assistance_detail'  => 'required|string',
-        'note'               => 'nullable|string',
-    ], [
-        'followup_date.required'     => 'กรุณาเลือกวันเดือนปี',
-        'followup_date.date'         => 'รูปแบบวันเดือนไม่ถูกต้อง',
-        'assistance_detail.required' => 'กรุณากรอกการช่วยเหลือและติดตามผล',
-    ]);
-
-    if ($validator->fails()) {
-        return redirect()->route('followup.index', $client->id)
-            ->withErrors($validator)
-            ->withInput()
-            ->with('followup_modal', 'create');
-    }
-
-    $data = $validator->validated();
-
-    try {
-        Followup::create([
-            'client_id'         => $client->id,
-            'followup_date'     => $data['followup_date'],
-            'assistance_detail' => $data['assistance_detail'],
-            'note'              => $data['note'] ?? null,
+        $validator = Validator::make($request->all(), [
+            'followup_date'      => 'required|date',
+            'assistance_detail'  => 'required|string',
+            'note'               => 'nullable|string',
+        ], [
+            'followup_date.required'     => 'กรุณาเลือกวันเดือนปี',
+            'followup_date.date'         => 'รูปแบบวันเดือนไม่ถูกต้อง',
+            'assistance_detail.required' => 'กรุณากรอกการช่วยเหลือและติดตามผล',
         ]);
-    } catch (\Throwable $e) {
+
+        if ($validator->fails()) {
+            return redirect()->route('followup.index', $client->id)
+                ->withErrors($validator)
+                ->withInput()
+                ->with('followup_modal', 'create');
+        }
+
+        $data = $validator->validated();
+
+        try {
+            Followup::create([
+                'client_id'         => $client->id,
+                'followup_date'     => $data['followup_date'],
+                'assistance_detail' => $data['assistance_detail'],
+                'note'              => $data['note'] ?? null,
+            ]);
+        } catch (\Throwable $e) {
+            return redirect()->route('followup.index', $client->id)
+                ->withInput()
+                ->with('followup_modal', 'create')
+                ->with('error', $e->getMessage());
+        }
+
         return redirect()->route('followup.index', $client->id)
-            ->withInput()
-            ->with('followup_modal', 'create')
-            ->with('error', $e->getMessage());
+            ->with('success', 'บันทึกข้อมูลติดตามผลเรียบร้อยแล้ว');
     }
 
-    return redirect()->route('followup.index', $client->id)
-        ->with('success', 'บันทึกข้อมูลติดตามผลเรียบร้อยแล้ว');
-}
-    /**
-     * แก้ไขข้อมูลติดตามผล
-     */
     public function update(Request $request, $id)
     {
-        $followup = Followup::findOrFail($id);
+        // PATCH: กันเดา URL ตั้งแต่ query แรก
+        $followup = Followup::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         $client = Client::forUser(auth()->user())->findOrFail($followup->client_id);
 
@@ -141,12 +136,13 @@ class FollowupController extends Controller
             ->with('success', 'แก้ไขข้อมูลติดตามผลเรียบร้อยแล้ว');
     }
 
-    /**
-     * ลบข้อมูลติดตามผล
-     */
     public function destroy($id)
     {
-        $followup = Followup::findOrFail($id);
+        // PATCH: กันเดา URL ตั้งแต่ query แรก
+        $followup = Followup::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         $client = Client::forUser(auth()->user())->findOrFail($followup->client_id);
 
@@ -158,11 +154,9 @@ class FollowupController extends Controller
             ->with('success', 'ลบข้อมูลติดตามผลเรียบร้อยแล้ว');
     }
 
-    /**
-     * รายงาน HTML + filter ช่วงวันที่
-     */
     public function report(Request $request, $client_id)
     {
+        // PATCH: report แบบช่วงวันที่ ต้องอิง client_id เดิม ไม่ใช้ $id
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
         $validator = Validator::make($request->all(), [
@@ -203,9 +197,6 @@ class FollowupController extends Controller
         ));
     }
 
-    /**
-     * Export PDF จริง + filter ช่วงวันที่
-     */
     public function exportPdf(Request $request, $client_id)
     {
         $client = Client::forUser(auth()->user())->findOrFail($client_id);
@@ -252,31 +243,28 @@ class FollowupController extends Controller
         return $pdf->download($filename);
     }
 
-    /**
-     * รายงาน HTML เฉพาะ 1 รายการ
-     */
-   /**
- * รายงาน HTML เฉพาะ 1 รายการ
- */
-public function reportItem($id)
-{
-    $followup = Followup::findOrFail($id);
+    public function reportItem($id)
+    {
+        // PATCH: กันเดา URL ตั้งแต่ query แรก
+        $followup = Followup::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
-    $client = Client::forUser(auth()->user())->findOrFail($followup->client_id);
+        $client = Client::forUser(auth()->user())->findOrFail($followup->client_id);
 
-    // แปลงเป็น collection เพื่อใช้กับ report.blade.php เดิม
-    $followups = collect([$followup]);
+        $followups = collect([$followup]);
 
-    $dateFrom = null;
-    $dateTo   = null;
+        $dateFrom = null;
+        $dateTo   = null;
 
-    return view('frontend.client.followup.report', compact(
-        'client',
-        'followups',
-        'dateFrom',
-        'dateTo'
-    ));
-}
+        return view('frontend.client.followup.report', compact(
+            'client',
+            'followups',
+            'dateFrom',
+            'dateTo'
+        ));
+    }
 
     private function authorizeManage(): void
     {

@@ -540,15 +540,29 @@ body{
                 </div>
             </div>
 
-            <div class="visit-report-section">
+          <div class="visit-report-section">
                 <h2 class="visit-report-section-title">ภาพประกอบการเยี่ยมบ้าน</h2>
 
-                @if(isset($visitFamily->images) && $visitFamily->images->count() > 0)
+                @if($visitFamily->images && $visitFamily->images->count() > 0)
                     <div class="visit-report-pictures">
                         @foreach($visitFamily->images as $index => $img)
+                            @php
+                                $path = $img->file_path;
+
+                                if (str_starts_with($path, 'upload/')) {
+                                    $imageUrl = asset($path);
+                                } elseif (str_starts_with($path, 'storage/')) {
+                                    $imageUrl = asset($path);
+                                } else {
+                                    $imageUrl = asset('storage/' . $path);
+                                }
+                            @endphp
+
                             <div class="visit-report-picture-item">
                                 <div class="visit-report-picture-frame">
-                                    <img src="{{ asset('storage/' . $img->file_path) }}" alt="รูปภาพประกอบ {{ $index + 1 }}">
+                                    <img src="{{ $imageUrl }}"
+                                        alt="รูปภาพประกอบ {{ $index + 1 }}">
+
                                     <div class="visit-report-picture-caption">
                                         รูปภาพประกอบ {{ $index + 1 }}
                                     </div>

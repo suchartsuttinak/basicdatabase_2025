@@ -381,8 +381,10 @@
                     </div>
                 </div>
 
+              @if($accidents->count() || $isEdit || $errors->any())
                 <div class="col-lg-4">
                     <div class="sticky-tools">
+
                         <button
                             type="button"
                             class="btn btn-primary btn-modern"
@@ -393,17 +395,23 @@
                             id="toggleAccidentBtn"
                         >
                             <i class="bi {{ $errors->any() || $isEdit ? 'bi-chevron-up' : 'bi-plus-circle' }} me-1"></i>
-                            <span>{{ $isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูลการบาดเจ็บ' }}</span>
+
+                            <span>
+                                {{ $isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูลการบาดเจ็บ' }}
+                            </span>
                         </button>
 
                         @if($isEdit)
-                            <a href="{{ route('accident.add', $client->id) }}" class="btn btn-outline-secondary btn-modern">
+                            <a href="{{ route('accident.add', $client->id) }}"
+                            class="btn btn-outline-secondary btn-modern">
                                 <i class="bi bi-arrow-counterclockwise me-1"></i>
                                 ยกเลิกการแก้ไข
                             </a>
                         @endif
+
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

@@ -660,7 +660,7 @@
                     <table class="table operation-table align-middle">
                         <thead>
                             <tr>
-                                <th class="text-center" style="width: 78px;">#</th>
+                                {{-- <th class="text-center" style="width: 78px;">#</th> --}}
                                 <th style="min-width: 140px;">วันที่</th>
                                 <th class="text-center" style="min-width: 110px;">ครั้งที่</th>
                                 <th style="min-width: 240px;">เรื่องที่ดำเนินงาน</th>
@@ -673,11 +673,11 @@
                         <tbody>
                             @forelse($operations as $key => $item)
                                 <tr>
-                                    <td class="text-center">
+                                    {{-- <td class="text-center">
                                         <span class="operation-id-badge">
                                             {{ $operations->firstItem() + $key }}
                                         </span>
-                                    </td>
+                                    </td> --}}
 
                                     <td>
                                         <div class="operation-date-text">

@@ -14,7 +14,14 @@ class EscapeFollowController extends Controller
     // เพิ่มการติดตามใหม่
     public function StoreFollow(Request $request, $escape_id)
     {
-        $escape = Escape::findOrFail($escape_id);
+        // =========================
+        // PATCH: กันเดา URL ตั้งแต่ query แรก
+        // เดิม: $escape = Escape::findOrFail($escape_id);
+        // =========================
+        $escape = Escape::whereHas('client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($escape_id);
 
         // =========================
         // PATCH: กันเข้าถึง client คนอื่น
@@ -32,15 +39,8 @@ class EscapeFollowController extends Controller
             'remark'      => 'nullable|string',
         ]);
 
-        // =========================
-        // AUTO: นับครั้งอัตโนมัติจากจำนวนปัจจุบัน + 1
-        // =========================
         $nextCount = EscapeFollow::where('escape_id', $escape_id)->count() + 1;
 
-        // =========================
-        // VALIDATE: วันที่ของครั้งใหม่ ต้อง "มากกว่า" วันที่ของครั้งล่าสุดเท่านั้น
-        // ห้ามซ้ำ และห้ามน้อยกว่า
-        // =========================
         $lastFollow = EscapeFollow::where('escape_id', $escape_id)
             ->orderByDesc('count')
             ->first();
@@ -74,12 +74,23 @@ class EscapeFollowController extends Controller
     // อัปเดตการติดตาม
     public function UpdateFollow(Request $request, $id)
     {
-        $follow = EscapeFollow::findOrFail($id);
+        // =========================
+        // PATCH: กันเดา URL ตั้งแต่ query แรก
+        // เดิม: $follow = EscapeFollow::findOrFail($id);
+        // =========================
+        $follow = EscapeFollow::whereHas('escape.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
-        // PATCH: กันแก้ข้อมูล client คนอื่น
+        // PATCH: ใช้ escape จาก relation ที่ผ่านสิทธิ์แล้ว
+        // เดิม:
+        // $escape = Escape::findOrFail($follow->escape_id);
+        // Client::forUser(...)->findOrFail(...)
         // =========================
-        $escape = Escape::findOrFail($follow->escape_id);
+        $escape = $follow->escape;
+
         Client::forUser(auth()->user())->findOrFail($escape->client_id);
 
         $data = $request->validate([
@@ -95,10 +106,6 @@ class EscapeFollowController extends Controller
 
         $newTraceDate = Carbon::parse($data['trace_date'])->startOfDay();
 
-        // =========================
-        // VALIDATE: ต้อง "มากกว่า" ครั้งก่อนหน้า
-        // ห้ามซ้ำ และห้ามน้อยกว่า
-        // =========================
         $prevFollow = EscapeFollow::where('escape_id', $follow->escape_id)
             ->where('count', '<', $follow->count)
             ->orderByDesc('count')
@@ -116,10 +123,6 @@ class EscapeFollowController extends Controller
             }
         }
 
-        // =========================
-        // VALIDATE: ต้อง "น้อยกว่า" ครั้งถัดไป
-        // ห้ามซ้ำ และห้ามมากกว่า
-        // =========================
         $nextFollow = EscapeFollow::where('escape_id', $follow->escape_id)
             ->where('count', '>', $follow->count)
             ->orderBy('count', 'asc')
@@ -137,9 +140,6 @@ class EscapeFollowController extends Controller
             }
         }
 
-        // =========================
-        // คงเลขครั้งเดิมไว้
-        // =========================
         $data['count'] = $follow->count;
 
         $follow->update($data);
@@ -155,22 +155,26 @@ class EscapeFollowController extends Controller
     // ลบการติดตาม
     public function DeleteFollow($id)
     {
-        $follow = EscapeFollow::findOrFail($id);
+        // =========================
+        // PATCH: กันเดา URL ตั้งแต่ query แรก
+        // เดิม: $follow = EscapeFollow::findOrFail($id);
+        // =========================
+        $follow = EscapeFollow::whereHas('escape.client', function ($q) {
+                $q->forUser(auth()->user());
+            })
+            ->findOrFail($id);
 
         // =========================
-        // PATCH: กันลบข้อมูล client คนอื่น
+        // PATCH: ใช้ escape จาก relation
         // =========================
-        $escape = Escape::findOrFail($follow->escape_id);
+        $escape = $follow->escape;
+
         Client::forUser(auth()->user())->findOrFail($escape->client_id);
 
         $escape_id = $follow->escape_id;
 
-        // ลบรายการที่เลือก
         $follow->delete();
 
-        // =========================
-        // AUTO: จัดลำดับ count ใหม่ให้ต่อเนื่องหลังลบ
-        // =========================
         $remainingFollows = EscapeFollow::where('escape_id', $escape_id)
             ->orderBy('count', 'asc')
             ->orderBy('trace_date', 'asc')

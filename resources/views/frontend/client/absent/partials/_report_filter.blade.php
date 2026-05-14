@@ -1,3 +1,5 @@
+
+@if(isset($absents) && $absents->count() > 0)
 <style>
     .absent-filter-card{
         border-radius: 18px;
@@ -220,3 +222,4 @@
 
     </div>
 </div>
+@endif

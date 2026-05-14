@@ -9,12 +9,87 @@ use App\Models\Client;
 use App\Models\Estimate;
 use App\Models\EstimatePicture;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class EstimateController extends Controller
 {
+   protected function saveEstimateImage($file): string
+{
+    $destinationPath = public_path('upload/estimate_pictures');
+
+    // =====================================================
+    // PATCH:
+    // สร้างโฟลเดอร์อัตโนมัติ
+    // =====================================================
+    if (!File::exists($destinationPath)) {
+        File::makeDirectory($destinationPath, 0755, true);
+    }
+
+    // =====================================================
+    // PATCH:
+    // ตั้งชื่อไฟล์ใหม่
+    // =====================================================
+    $filename = Str::uuid()->toString() . '.jpg';
+
+    // =====================================================
+    // PATCH:
+    // ใช้ Intervention Image
+    // =====================================================
+    $manager = new ImageManager(new Driver());
+
+    $image = $manager->read($file->getRealPath());
+
+    // =====================================================
+    // PATCH:
+    // หมุนภาพอัตโนมัติจากมือถือ
+    // =====================================================
+    $image = $image->orient();
+
+    // =====================================================
+    // PATCH:
+    // ลดขนาดภาพ
+    // ป้องกัน shared hosting ทำงานหนักเกิน
+    // =====================================================
+    $image->scaleDown(width: 1000);
+
+    // =====================================================
+    // PATCH:
+    // บันทึกแบบ progressive JPEG
+    // โหลดเร็วขึ้นบนเว็บ
+    // =====================================================
+    $encoded = $image->toJpeg(
+        quality: 70,
+        progressive: true
+    );
+
+    $encoded->save($destinationPath . '/' . $filename);
+
+    // =====================================================
+    // PATCH:
+    // คืน path
+    // =====================================================
+    return 'upload/estimate_pictures/' . $filename;
+}
+
+    protected function deleteEstimateImage(?string $path): void
+    {
+        if (!$path) {
+            return;
+        }
+
+        $fullPath = public_path($path);
+
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
+
     public function IndexEstimate($client_id)
     {
-        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+        $client = Client::forUser(auth()->user())
             ->with('estimates.pictures')
             ->findOrFail($client_id);
 
@@ -23,7 +98,7 @@ class EstimateController extends Controller
 
     public function ShowEstimate($client_id)
     {
-        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
+        $client = Client::forUser(auth()->user())
             ->with('estimates.pictures')
             ->findOrFail($client_id);
 
@@ -37,14 +112,13 @@ class EstimateController extends Controller
                 $q->forUser(auth()->user());
             })
             ->with('pictures')
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->firstOrFail();
 
         return response()->json($estimate);
     }
 
     public function StoreEstimate(Request $request)
     {
-        // ✅ [แก้ไข] กัน POST ยิง client คนอื่น
         $client = Client::forUser(auth()->user())
             ->where('id', $request->client_id)
             ->firstOrFail();
@@ -68,6 +142,10 @@ class EstimateController extends Controller
             'teacher'  => 'nullable|string|max:255',
             'remark'   => 'nullable|string',
             'client_id'=> 'required|exists:clients,id',
+
+            // PATCH: รองรับรูปใหญ่จากมือถือ แล้วค่อยบีบอัดเอง
+            'pictures'   => 'nullable|array',
+            'pictures.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
         ], [
             'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น',
             'date.required' => 'กรุณาเลือกวันที่',
@@ -78,6 +156,9 @@ class EstimateController extends Controller
             'housing_condition.in' => 'ค่าสภาพที่อยู่อาศัยไม่ถูกต้อง',
             'family_income.numeric' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องเป็นตัวเลข',
             'family_income.min' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องไม่น้อยกว่า 0',
+            'pictures.*.image' => 'ไฟล์ต้องเป็นรูปภาพ',
+            'pictures.*.mimes' => 'รูปภาพต้องเป็นไฟล์ jpeg, png, jpg หรือ webp',
+            'pictures.*.max' => 'รูปภาพต้องมีขนาดไม่เกิน 10MB',
         ]);
 
         if ($validator->fails()) {
@@ -88,16 +169,16 @@ class EstimateController extends Controller
         }
 
         $data = $validator->validated();
-        $data['client_id'] = $client->id; // ✅ [แก้ไข]
+        $data['client_id'] = $client->id;
 
-        // ✅ ถ้าเลือกเพียงพอ ไม่ต้องเก็บเหตุผล
+        unset($data['pictures']);
+
         if (($data['income_sufficiency'] ?? 'เพียงพอ') === 'เพียงพอ') {
             $data['income_reason'] = null;
         }
 
         $estimate = Estimate::create($data);
 
-        // ✅ นับครั้งอัตโนมัติใหม่ทั้งหมด เรียงตามวัน
         $estimates = Estimate::where('client_id', $estimate->client_id)
             ->orderBy('date', 'asc')
             ->orderBy('id', 'asc')
@@ -111,7 +192,7 @@ class EstimateController extends Controller
 
         if ($request->hasFile('pictures')) {
             foreach ($request->file('pictures') as $file) {
-                $path = $file->store('estimate_pictures', 'public');
+                $path = $this->saveEstimateImage($file);
                 $estimate->pictures()->create(['path' => $path]);
             }
         }
@@ -130,7 +211,7 @@ class EstimateController extends Controller
                 $q->forUser(auth()->user());
             })
             ->with('pictures')
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->firstOrFail();
 
         return response()->json([
             'id' => $estimate->id,
@@ -148,7 +229,7 @@ class EstimateController extends Controller
             'remark' => $estimate->remark,
             'pictures' => $estimate->pictures->map(fn($pic) => [
                 'id'  => $pic->id,
-                'url' => asset('storage/' . $pic->path),
+                'url' => asset($pic->path),
             ]),
         ]);
     }
@@ -159,7 +240,7 @@ class EstimateController extends Controller
             ->whereHas('client', function ($q) {
                 $q->forUser(auth()->user());
             })
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->firstOrFail();
 
         $validated = $request->validate([
             'date' => [
@@ -179,6 +260,12 @@ class EstimateController extends Controller
             'housing_condition' => 'nullable|in:ดี,พอใช้,ควรปรับปรุง',
             'teacher' => 'nullable|string|max:255',
             'remark' => 'nullable|string',
+
+            // PATCH: รองรับรูปใหญ่จากมือถือ แล้วค่อยบีบอัดเอง
+            'pictures'   => 'nullable|array',
+            'pictures.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
+            'remove_pictures' => 'nullable|array',
+            'remove_pictures.*' => 'integer',
         ], [
             'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น',
             'date.required' => 'กรุณาเลือกวันที่',
@@ -189,9 +276,13 @@ class EstimateController extends Controller
             'housing_condition.in' => 'ค่าสภาพที่อยู่อาศัยไม่ถูกต้อง',
             'family_income.numeric' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องเป็นตัวเลข',
             'family_income.min' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องไม่น้อยกว่า 0',
+            'pictures.*.image' => 'ไฟล์ต้องเป็นรูปภาพ',
+            'pictures.*.mimes' => 'รูปภาพต้องเป็นไฟล์ jpeg, png, jpg หรือ webp',
+            'pictures.*.max' => 'รูปภาพต้องมีขนาดไม่เกิน 10MB',
         ]);
 
-        // ✅ ถ้าเลือกเพียงพอ ไม่ต้องเก็บเหตุผล
+        unset($validated['pictures'], $validated['remove_pictures']);
+
         if (($validated['income_sufficiency'] ?? 'เพียงพอ') === 'เพียงพอ') {
             $validated['income_reason'] = null;
         }
@@ -200,9 +291,12 @@ class EstimateController extends Controller
 
         if ($request->has('remove_pictures')) {
             foreach ($request->remove_pictures as $picId) {
-                $pic = EstimatePicture::find($picId);
+                $pic = EstimatePicture::where('id', $picId)
+                    ->where('estimate_id', $estimate->id)
+                    ->first();
+
                 if ($pic) {
-                    \Storage::disk('public')->delete($pic->path);
+                    $this->deleteEstimateImage($pic->path);
                     $pic->delete();
                 }
             }
@@ -210,12 +304,11 @@ class EstimateController extends Controller
 
         if ($request->hasFile('pictures')) {
             foreach ($request->file('pictures') as $file) {
-                $path = $file->store('estimate_pictures', 'public');
+                $path = $this->saveEstimateImage($file);
                 $estimate->pictures()->create(['path' => $path]);
             }
         }
 
-        // ✅ นับครั้งอัตโนมัติใหม่ทั้งหมด เรียงตามวัน
         $estimates = Estimate::where('client_id', $estimate->client_id)
             ->orderBy('date', 'asc')
             ->orderBy('id', 'asc')
@@ -240,12 +333,18 @@ class EstimateController extends Controller
             ->whereHas('client', function ($q) {
                 $q->forUser(auth()->user());
             })
-            ->firstOrFail(); // ✅ [แก้ไข]
+            ->with('pictures')
+            ->firstOrFail();
 
         $client_id = $estimate->client_id;
+
+        foreach ($estimate->pictures as $pic) {
+            $this->deleteEstimateImage($pic->path);
+            $pic->delete();
+        }
+
         $estimate->delete();
 
-        // ✅ นับครั้งอัตโนมัติใหม่ทั้งหมด เรียงตามวัน
         $estimates = Estimate::where('client_id', $client_id)
             ->orderBy('date', 'asc')
             ->orderBy('id', 'asc')
@@ -266,12 +365,11 @@ class EstimateController extends Controller
 
     public function CheckDuplicate(Request $request)
     {
-        // ✅ [แก้ไข] ตรวจสิทธิ์ client ก่อน
         $client = Client::forUser(auth()->user())
             ->where('id', $request->client_id)
             ->firstOrFail();
 
-        $exists = Estimate::where('client_id', $client->id) // ✅ [แก้ไข]
+        $exists = Estimate::where('client_id', $client->id)
             ->where('date', $request->date)
             ->where('id', '!=', $request->id)
             ->exists();
@@ -279,7 +377,6 @@ class EstimateController extends Controller
         return response()->json(['duplicate' => $exists]);
     }
 
-    // ✅ เพิ่มหน้ารายงานรายรายการ
     public function ReportEstimate($id)
     {
         $estimate = Estimate::where('id', $id)
