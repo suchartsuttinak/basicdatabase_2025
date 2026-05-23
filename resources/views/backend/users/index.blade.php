@@ -1,409 +1,715 @@
 @extends('admin.admin_master')
+
 @section('admin')
-
-
-<div class="container-fluid py-3 user-page">
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <div>
-            <h2 class="mb-1 fw-bold user-page-title">จัดการผู้ใช้งานและกำหนดสิทธิ์</h2>
-            <div class="text-muted user-page-subtitle">บริหารบัญชีผู้ใช้งาน สิทธิ์การเข้าถึง และสถานะการใช้งานของระบบ</div>
+<div class="container-fluid py-4 user-manage-page">
+    <div class="ump-header-card">
+        <div class="ump-header-left">
+            <div class="ump-title-wrap">
+                <div class="ump-title-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <h4 class="ump-page-title mb-1">จัดการผู้ใช้งาน</h4>
+                    <div class="ump-page-subtitle">
+                        จัดการข้อมูลผู้ใช้ สิทธิ์การใช้งาน และบ้านที่รับผิดชอบ
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <a href="{{ route('users.create') }}" class="btn btn-primary user-main-btn">
-            <i class="bi bi-person-plus-fill me-1"></i> เพิ่มผู้ใช้งาน
-        </a>
+        <div class="ump-header-right">
+            <a href="{{ route('users.create') }}" class="btn ump-btn-primary">
+                <i class="bi bi-person-plus-fill"></i>
+                <span>เพิ่มผู้ใช้งาน</span>
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-success ump-alert shadow-sm border-0">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert alert-danger ump-alert shadow-sm border-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ session('error') }}
         </div>
     @endif
 
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="user-stat-card">
-                <div class="user-stat-icon bg-primary-subtle text-primary">
-                    <i class="bi bi-people-fill"></i>
+    <div class="ump-card">
+        <div class="ump-card-head">
+            <div class="ump-card-head-left">
+                <div class="ump-card-title">
+                    <i class="bi bi-list-ul"></i>
+                    <span>รายชื่อผู้ใช้งานทั้งหมด</span>
                 </div>
-                <div class="user-stat-number">{{ $stats['total'] }}</div>
-                <div class="user-stat-label">ผู้ใช้ทั้งหมด</div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="user-stat-card">
-                <div class="user-stat-icon bg-success-subtle text-success">
-                    <i class="bi bi-person-check-fill"></i>
-                </div>
-                <div class="user-stat-number">{{ $stats['active'] }}</div>
-                <div class="user-stat-label">กำลังใช้งาน</div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="user-stat-card">
-                <div class="user-stat-icon bg-danger-subtle text-danger">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <div class="user-stat-number">{{ $stats['admin'] }}</div>
-                <div class="user-stat-label">ผู้ดูแลระบบ</div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="user-stat-card">
-                <div class="user-stat-icon bg-warning-subtle text-warning">
-                    <i class="bi bi-briefcase-fill"></i>
-                </div>
-                <div class="user-stat-number">{{ $stats['executive'] }}</div>
-                <div class="user-stat-label">ผู้บริหาร</div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="user-stat-card">
-                <div class="user-stat-icon bg-info-subtle text-info">
-                    <i class="bi bi-heart-pulse-fill"></i>
-                </div>
-                <div class="user-stat-number">{{ $stats['social_worker'] }}</div>
-                <div class="user-stat-label">นักสังคมสงเคราะห์</div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-4 col-xl-2">
-            <div class="user-stat-card">
-                <div class="user-stat-icon bg-secondary-subtle text-secondary">
-                    <i class="bi bi-mortarboard-fill"></i>
-                </div>
-                <div class="user-stat-number">{{ $stats['teacher_caregiver'] }}</div>
-                <div class="user-stat-label">ครู/ผู้ดูแล</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card border-0 shadow-sm user-table-card">
-        <div class="card-header bg-white border-0 py-3 px-3 px-lg-4">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
-                    <h5 class="mb-1 fw-bold">รายการผู้ใช้งาน</h5>
-                    <div class="text-muted small">จัดการข้อมูลบัญชีผู้ใช้งานในระบบ</div>
-                </div>
-                <div class="small text-muted">
+                <div class="ump-card-subtitle">
                     จำนวน {{ $users->count() }} รายการ
                 </div>
             </div>
         </div>
 
-        <div class="card-body p-0">
-            <div class="user-table-wrap">
-                <div class="table-responsive">
-                    <table id="usersTable" class="table align-middle mb-0 user-modern-table">
-                        <thead>
+        <div class="ump-card-body">
+            <div class="ump-table-wrap">
+                <table id="usersTable" class="table align-middle mb-0 ump-table nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>ผู้ใช้งาน</th>
+                            <th>อีเมล</th>
+                            <th>สิทธิ์</th>
+                            <th>บ้านที่ดูแล</th>
+                            <th class="text-center">สถานะ</th>
+                            <th class="text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $key => $user)
                             <tr>
-                                <th style="width: 70px;">รูป</th>
-                                <th>ชื่อ</th>
-                                <th>อีเมล</th>
-                                <th>เบอร์โทร</th>
-                                <th>สิทธิ์</th>
-                                <th>สถานะ</th>
-                                <th>วันที่สร้าง</th>
-                                <th class="text-center" style="width: 220px;">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($users as $item)
-                                @php
-                                    $roleClass = match($item->role) {
-                                        'admin' => 'bg-danger-subtle text-danger border-danger-subtle',
-                                        'manager' => 'bg-primary-subtle text-primary border-primary-subtle',
-                                        'executive' => 'bg-warning-subtle text-warning border-warning-subtle',
-                                        'social_worker' => 'bg-success-subtle text-success border-success-subtle',
-                                        'teacher_caregiver' => 'bg-info-subtle text-info border-info-subtle',
-                                        default => 'bg-secondary-subtle text-secondary border-secondary-subtle',
-                                    };
-                                @endphp
+                                <td class="text-center fw-semibold">{{ $key + 1 }}</td>
 
-                                <tr>
-                                    <td>
-                                        <img src="{{ $item->photo_url }}" alt="user-photo" class="user-avatar-table">
-                                    </td>
-                                    <td>
-                                        <div class="fw-semibold text-dark">{{ $item->name }}</div>
-                                        <div class="small text-muted">ID: {{ $item->id }}</div>
-                                    </td>
-                                    <td>
-                                        <div class="text-break">{{ $item->email }}</div>
-                                    </td>
-                                    <td>{{ $item->phone ?? '-' }}</td>
-                                    <td>
-                                        <span class="badge rounded-pill px-3 py-2 border {{ $roleClass }}">
-                                            {{ $item->role_label }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if((string)$item->status === '1')
-                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2">
-                                                ใช้งาน
-                                            </span>
-                                        @else
-                                            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
-                                                ปิดใช้งาน
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{ optional($item->created_at)->format('d/m/Y') ?? '-' }}
-                                    </td>
-                                    <td>
-                                        <div class="user-action-group">
-                                            <a href="{{ route('users.edit', $item->id) }}" class="btn btn-sm btn-warning user-action-btn">
-                                                <i class="bi bi-pencil-square"></i>
-                                                <span>แก้ไข</span>
-                                            </a>
-
-                                            <form action="{{ route('users.toggleStatus', $item->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-info user-action-btn text-white"
-                                                    onclick="return confirm('ยืนยันการเปลี่ยนสถานะผู้ใช้งานนี้หรือไม่ ?')">
-                                                    <i class="bi bi-arrow-repeat"></i>
-                                                    <span>สถานะ</span>
-                                                </button>
-                                            </form>
-
-                                            <form action="{{ route('users.delete', $item->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger user-action-btn"
-                                                    onclick="return confirm('ยืนยันการลบผู้ใช้งานนี้หรือไม่ ?')">
-                                                    <i class="bi bi-trash"></i>
-                                                    <span>ลบ</span>
-                                                </button>
-                                            </form>
+                                <td>
+                                    <div class="ump-user-cell">
+                                        <img src="{{ $user->photo_url }}"
+                                             alt="user-photo"
+                                             class="ump-user-avatar">
+                                        <div class="ump-user-meta">
+                                            <div class="ump-user-name">{{ $user->name }}</div>
+                                            <div class="ump-user-id">ID: {{ $user->id }}</div>
                                         </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="ump-email">
+                                        {{ $user->email }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="ump-role-badge">
+                                        {{ $user->role_label ?? $user->role }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if($user->houses->count())
+                                        <div class="ump-house-list">
+                                            @foreach($user->houses as $house)
+                                                <span class="ump-house-badge">
+                                                    <i class="bi bi-house-door-fill"></i>
+                                                   <span>{{ $house->house_name ?? $house->name ?? 'บ้านเลขที่ '.$house->id }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="ump-empty-text">- ไม่ได้กำหนดบ้าน -</span>
+                                    @endif
+                                </td>
+
+                                <td class="text-center">
+                                    @if((string) $user->status === '1')
+                                        <span class="ump-status-badge ump-status-active">
+                                            ใช้งาน
+                                        </span>
+                                    @else
+                                        <span class="ump-status-badge ump-status-inactive">
+                                            ปิดใช้งาน
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="ump-action-group">
+                                        <a href="{{ route('users.edit', $user->id) }}"
+                                           class="btn ump-btn-action ump-btn-edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                            <span>แก้ไข</span>
+                                        </a>
+
+                                        <form action="{{ route('users.toggle-status', $user->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                    class="btn ump-btn-action ump-btn-status"
+                                                    onclick="return confirm('ยืนยันการเปลี่ยนสถานะผู้ใช้งานนี้?')">
+                                                <i class="bi bi-arrow-repeat"></i>
+                                                <span>สถานะ</span>
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="btn ump-btn-action ump-btn-delete"
+                                                    onclick="return confirm('ยืนยันการลบผู้ใช้งานนี้?')">
+                                                <i class="bi bi-trash3-fill"></i>
+                                                <span>ลบ</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7">
+                                    <div class="ump-empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <div class="ump-empty-title">ไม่พบข้อมูลผู้ใช้งาน</div>
+                                        <div class="ump-empty-subtitle">เริ่มต้นโดยการเพิ่มผู้ใช้งานใหม่เข้าสู่ระบบ</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-.user-page{
-    --user-primary: #2563eb;
-    --user-dark: #0f172a;
-    --user-muted: #64748b;
-    --user-border: #e2e8f0;
-    --user-soft: #f8fafc;
+/* =========================
+   Users Management Page Only
+   Scoped CSS: .user-manage-page / .ump-*
+========================= */
+.user-manage-page {
+    --ump-primary: #2563eb;
+    --ump-primary-soft: #eff6ff;
+    --ump-border: #e6edf5;
+    --ump-border-strong: #d9e2ec;
+    --ump-text: #0f172a;
+    --ump-muted: #64748b;
+    --ump-bg: #f8fbff;
+    --ump-white: #ffffff;
+    --ump-success-bg: #ecfdf3;
+    --ump-success-text: #15803d;
+    --ump-danger-bg: #fef2f2;
+    --ump-danger-text: #dc2626;
+    --ump-warning-bg: #fff7ed;
+    --ump-warning-text: #ea580c;
+    --ump-info-bg: #eff6ff;
+    --ump-info-text: #1d4ed8;
 }
 
-.user-page-title{
-    color: var(--user-dark);
-    font-size: 1.55rem;
-    letter-spacing: -.02em;
+.user-manage-page .ump-header-card,
+.user-manage-page .ump-card {
+    background: var(--ump-white);
+    border: 1px solid var(--ump-border);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
 }
 
-.user-page-subtitle{
-    font-size: .95rem;
+.user-manage-page .ump-header-card {
+    padding: 1.25rem 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.user-main-btn{
-    border-radius: 12px;
-    padding: .72rem 1rem;
-    font-weight: 600;
-    box-shadow: 0 10px 25px rgba(37,99,235,.18);
+.user-manage-page .ump-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.user-stat-card{
-    background: #fff;
-    border: 1px solid var(--user-border);
+.user-manage-page .ump-title-icon {
+    width: 58px;
+    height: 58px;
     border-radius: 18px;
-    padding: 1rem;
-    height: 100%;
-    box-shadow: 0 8px 24px rgba(15,23,42,.05);
-    transition: .2s ease;
-}
-
-.user-stat-card:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px rgba(15,23,42,.08);
-}
-
-.user-stat-icon{
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    margin-bottom: .8rem;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    font-size: 1.35rem;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.20);
+    flex: 0 0 auto;
 }
 
-.user-stat-number{
-    font-size: 1.5rem;
+.user-manage-page .ump-page-title {
+    color: var(--ump-text);
     font-weight: 800;
-    color: var(--user-dark);
-    line-height: 1;
-    margin-bottom: .35rem;
+    font-size: 1.35rem;
+    margin: 0;
 }
 
-.user-stat-label{
-    color: var(--user-muted);
-    font-size: .92rem;
-    font-weight: 500;
+.user-manage-page .ump-page-subtitle {
+    color: var(--ump-muted);
+    font-size: 0.95rem;
 }
 
-.user-table-card{
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.user-table-wrap{
-    padding: 0;
-}
-
-.user-modern-table{
-    min-width: 1100px;
-}
-
-.user-modern-table thead th{
-    background: #f8fafc;
-    color: #334155;
-    font-size: .87rem;
+.user-manage-page .ump-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    border: 0;
+    border-radius: 999px;
+    padding: .82rem 1.2rem;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
     font-weight: 700;
-    border-bottom: 1px solid var(--user-border);
-    padding: .95rem .9rem;
-    white-space: nowrap;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.20);
+    transition: transform .18s ease, box-shadow .18s ease;
 }
 
-.user-modern-table tbody td{
-    padding: .95rem .9rem;
-    border-bottom: 1px solid #eef2f7;
+.user-manage-page .ump-btn-primary:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.24);
+}
+
+.user-manage-page .ump-alert {
+    border-radius: 18px;
+    padding: .95rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-manage-page .ump-card-head {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--ump-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+
+.user-manage-page .ump-card-title {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-weight: 800;
+    color: var(--ump-text);
+}
+
+.user-manage-page .ump-card-title i {
+    color: var(--ump-primary);
+}
+
+.user-manage-page .ump-card-subtitle {
+    font-size: .88rem;
+    color: var(--ump-muted);
+    margin-top: .15rem;
+}
+
+.user-manage-page .ump-card-body {
+    padding: 1rem;
+}
+
+.user-manage-page .ump-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 18px;
+}
+
+.user-manage-page .ump-table {
+    min-width: 1100px;
+    margin-bottom: 0;
+}
+
+.user-manage-page .ump-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: .92rem;
+    font-weight: 800;
+    border-bottom: 1px solid #eaf0f6;
+    white-space: nowrap;
+    padding: 1rem .9rem;
     vertical-align: middle;
 }
 
-.user-modern-table tbody tr:hover{
+.user-manage-page .ump-table tbody td {
+    border-color: #eef2f7;
+    padding: 1rem .9rem;
+    vertical-align: middle;
+    background: #fff;
+}
+
+.user-manage-page .ump-table tbody tr:hover td {
     background: #fcfdff;
 }
 
-.user-avatar-table{
-    width: 46px;
-    height: 46px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 3px 10px rgba(15,23,42,.12);
-}
-
-.user-action-group{
+.user-manage-page .ump-user-cell {
     display: flex;
-    gap: .4rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: center;
+    gap: .85rem;
+    min-width: 220px;
 }
 
-.user-action-btn{
-    border-radius: 10px;
-    padding: .48rem .72rem;
-    font-weight: 600;
+.user-manage-page .ump-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+    background: #fff;
+    flex: 0 0 auto;
+}
+
+.user-manage-page .ump-user-name {
+    font-weight: 700;
+    color: var(--ump-text);
+    line-height: 1.2;
+}
+
+.user-manage-page .ump-user-id {
+    font-size: .82rem;
+    color: var(--ump-muted);
+    margin-top: .18rem;
+}
+
+.user-manage-page .ump-email {
+    color: #334155;
+    min-width: 180px;
+    word-break: break-word;
+}
+
+.user-manage-page .ump-role-badge {
     display: inline-flex;
     align-items: center;
-    gap: .35rem;
+    justify-content: center;
+    padding: .5rem .85rem;
+    border-radius: 999px;
+    border: 1px solid var(--ump-border-strong);
+    background: #fff;
+    color: #334155;
+    font-weight: 700;
+    font-size: .85rem;
     white-space: nowrap;
 }
 
-div.dataTables_wrapper div.dataTables_filter{
+.user-manage-page .ump-house-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+    min-width: 210px;
+}
+
+.user-manage-page .ump-house-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .38rem;
+    padding: .46rem .72rem;
+    border-radius: 999px;
+    background: var(--ump-primary-soft);
+    color: var(--ump-primary);
+    border: 1px solid #dbeafe;
+    font-weight: 700;
+    font-size: .83rem;
+    white-space: nowrap;
+}
+
+.user-manage-page .ump-empty-text {
+    color: var(--ump-muted);
+    font-size: .92rem;
+}
+
+.user-manage-page .ump-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    padding: .52rem .9rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: .84rem;
+    white-space: nowrap;
+}
+
+.user-manage-page .ump-status-active {
+    background: var(--ump-success-bg);
+    color: var(--ump-success-text);
+    border: 1px solid #bbf7d0;
+}
+
+.user-manage-page .ump-status-inactive {
+    background: var(--ump-danger-bg);
+    color: var(--ump-danger-text);
+    border: 1px solid #fecaca;
+}
+
+.user-manage-page .ump-action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+    justify-content: center;
+    min-width: 265px;
+}
+
+.user-manage-page .ump-btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    min-width: 84px;
+    padding: .58rem .85rem;
+    border-radius: 999px;
+    font-size: .84rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    transition: all .18s ease;
+    white-space: nowrap;
+}
+
+.user-manage-page .ump-btn-edit {
+    background: var(--ump-warning-bg);
+    color: var(--ump-warning-text);
+    border-color: #fed7aa;
+}
+
+.user-manage-page .ump-btn-edit:hover {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.user-manage-page .ump-btn-status {
+    background: var(--ump-info-bg);
+    color: var(--ump-info-text);
+    border-color: #bfdbfe;
+}
+
+.user-manage-page .ump-btn-status:hover {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.user-manage-page .ump-btn-delete {
+    background: var(--ump-danger-bg);
+    color: var(--ump-danger-text);
+    border-color: #fecaca;
+}
+
+.user-manage-page .ump-btn-delete:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.user-manage-page .ump-empty-state {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--ump-muted);
+}
+
+.user-manage-page .ump-empty-state i {
+    font-size: 2.4rem;
+    margin-bottom: .75rem;
+    color: #94a3b8;
+}
+
+.user-manage-page .ump-empty-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--ump-text);
+}
+
+.user-manage-page .ump-empty-subtitle {
+    font-size: .9rem;
+    margin-top: .25rem;
+}
+
+/* DataTables scoped */
+.user-manage-page div.dataTables_wrapper div.dataTables_length,
+.user-manage-page div.dataTables_wrapper div.dataTables_filter {
+    margin-bottom: .85rem;
+}
+
+.user-manage-page div.dataTables_wrapper div.dataTables_filter {
     text-align: right;
-    margin-bottom: 1rem;
-    padding: 0 1rem;
 }
 
-div.dataTables_wrapper div.dataTables_filter input{
-    margin-left: .5rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 12px;
-    padding: .45rem .75rem;
+.user-manage-page div.dataTables_wrapper div.dataTables_filter label,
+.user-manage-page div.dataTables_wrapper div.dataTables_length label {
+    font-weight: 700;
+    color: #475569;
+    font-size: .9rem;
+}
+
+.user-manage-page div.dataTables_wrapper div.dataTables_filter input {
+    border-radius: 999px !important;
+    border: 1px solid #dbe3ee !important;
+    padding: .5rem .9rem !important;
+    margin-left: .5rem !important;
     min-height: 40px;
+    box-shadow: none !important;
 }
 
-div.dataTables_wrapper div.dataTables_length{
-    padding: 1rem 1rem 0 1rem;
-}
-
-div.dataTables_wrapper div.dataTables_length select{
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: .35rem 2rem .35rem .75rem;
+.user-manage-page div.dataTables_wrapper div.dataTables_length select {
+    border-radius: 12px !important;
+    border: 1px solid #dbe3ee !important;
+    padding: .42rem 2rem .42rem .8rem !important;
     min-height: 40px;
+    box-shadow: none !important;
 }
 
-div.dataTables_wrapper div.dataTables_info{
-    padding: 1rem;
+.user-manage-page div.dataTables_wrapper div.dataTables_info {
     color: #64748b;
+    font-size: .9rem;
+    padding-top: 1rem;
 }
 
-div.dataTables_wrapper div.dataTables_paginate{
-    padding: .75rem 1rem 1rem 1rem;
+.user-manage-page div.dataTables_wrapper div.dataTables_paginate {
+    padding-top: .75rem;
 }
 
-div.dataTables_wrapper div.dataTables_paginate .paginate_button{
-    border-radius: 10px !important;
-    margin-left: .2rem;
+.user-manage-page div.dataTables_wrapper div.dataTables_paginate .paginate_button {
+    border-radius: 999px !important;
+    margin: 0 .12rem;
+    padding: .38rem .8rem !important;
 }
 
-@media (max-width: 991.98px){
-    .user-page-title{
-        font-size: 1.3rem;
+.user-manage-page .dataTables_scrollHeadInner,
+.user-manage-page .dataTables_scrollHeadInner table {
+    width: 100% !important;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .user-manage-page .ump-header-card {
+        padding: 1rem;
     }
 
-    .user-main-btn{
+    .user-manage-page .ump-card-head,
+    .user-manage-page .ump-card-body {
+        padding-left: .9rem;
+        padding-right: .9rem;
+    }
+
+    .user-manage-page .ump-page-title {
+        font-size: 1.18rem;
+    }
+
+    .user-manage-page .ump-title-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.15rem;
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .user-manage-page {
+        padding-left: .15rem;
+        padding-right: .15rem;
+    }
+
+    .user-manage-page .ump-header-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-manage-page .ump-title-wrap {
+        align-items: flex-start;
+    }
+
+    .user-manage-page .ump-header-right {
+        width: 100%;
+    }
+
+    .user-manage-page .ump-btn-primary {
         width: 100%;
         justify-content: center;
     }
-}
 
-@media (max-width: 767.98px){
-    div.dataTables_wrapper div.dataTables_filter,
-    div.dataTables_wrapper div.dataTables_length,
-    div.dataTables_wrapper div.dataTables_info,
-    div.dataTables_wrapper div.dataTables_paginate{
+    .user-manage-page .ump-card-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-manage-page div.dataTables_wrapper div.dataTables_filter,
+    .user-manage-page div.dataTables_wrapper div.dataTables_length,
+    .user-manage-page div.dataTables_wrapper div.dataTables_info,
+    .user-manage-page div.dataTables_wrapper div.dataTables_paginate {
         text-align: left !important;
     }
 
-    .user-action-group{
+    .user-manage-page div.dataTables_wrapper div.dataTables_filter input {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-top: .45rem !important;
+    }
+
+    .user-manage-page div.dataTables_wrapper div.dataTables_length select {
+        width: 100% !important;
+        margin-top: .45rem;
+    }
+
+    .user-manage-page .ump-table {
+        min-width: 980px;
+    }
+
+    .user-manage-page .ump-action-group {
         justify-content: flex-start;
     }
 }
-</style>
-@endsection
 
-@push('scripts')
+@media (max-width: 575.98px) {
+    .user-manage-page .ump-page-title {
+        font-size: 1.05rem;
+    }
+
+    .user-manage-page .ump-page-subtitle,
+    .user-manage-page .ump-card-subtitle {
+        font-size: .84rem;
+    }
+
+    .user-manage-page .ump-title-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+        border-radius: 14px;
+    }
+
+    .user-manage-page .ump-btn-primary {
+        padding: .78rem 1rem;
+        font-size: .92rem;
+    }
+
+    .user-manage-page .ump-card-head,
+    .user-manage-page .ump-card-body {
+        padding: .8rem;
+    }
+
+    .user-manage-page .ump-table thead th,
+    .user-manage-page .ump-table tbody td {
+        padding: .85rem .75rem;
+    }
+}
+</style>
+
 <script>
-    $(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof $ !== 'undefined' && $.fn.DataTable) {
+        if ($.fn.DataTable.isDataTable('#usersTable')) {
+            $('#usersTable').DataTable().destroy();
+        }
+
         $('#usersTable').DataTable({
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
             responsive: false,
             autoWidth: false,
+            scrollX: true,
             language: {
                 search: "ค้นหา:",
                 lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
                 info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
-                infoEmpty: "ไม่มีข้อมูล",
+                infoEmpty: "แสดง 0 ถึง 0 จาก 0 รายการ",
                 zeroRecords: "ไม่พบข้อมูลที่ค้นหา",
                 paginate: {
                     first: "แรก",
@@ -411,8 +717,12 @@ div.dataTables_wrapper div.dataTables_paginate .paginate_button{
                     next: "ถัดไป",
                     previous: "ก่อนหน้า"
                 }
-            }
+            },
+            columnDefs: [
+                { orderable: false, targets: [4, 6] }
+            ]
         });
-    });
+    }
+});
 </script>
-@endpush
+@endsection

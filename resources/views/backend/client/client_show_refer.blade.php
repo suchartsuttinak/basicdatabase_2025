@@ -24,6 +24,48 @@
             </div>
         </div>
 
+            @if(
+                !empty($canFilterProjects)
+                && isset($clients)
+                && $clients->isNotEmpty()
+            )
+                <div class="card mb-3">
+                    <div class="card-body">
+                    <form method="GET" action="{{ route('client.cases') }}">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-8 col-lg-6">
+                                    <label class="form-label fw-semibold">หน่วยงาน / โครงการ</label>
+                                    <select name="project_id" class="form-select">
+                                        <option value="all" {{ ($projectId ?? 'all') === 'all' ? 'selected' : '' }}>
+                                            ทั้งหมด
+                                        </option>
+
+                                        @foreach($projects as $project)
+                                            <option value="{{ $project->id }}"
+                                                {{ (string)($projectId ?? '') === (string)$project->id ? 'selected' : '' }}>
+                                                {{ $project->project_name ?? $project->name ?? '-' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 col-lg-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        กรองข้อมูล
+                                    </button>
+                                </div>
+
+                                <div class="col-md-4 col-lg-3">
+                                <a href="{{ route('client.cases') }}" class="btn btn-outline-secondary w-100">
+                                        ล้างตัวกรอง
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
         {{-- DataTable --}}
         <div class="row">
             <div class="col-12">

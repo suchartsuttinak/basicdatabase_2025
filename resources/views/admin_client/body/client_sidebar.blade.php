@@ -1,11 +1,27 @@
 @php
-    $clientId = $client->id ?? null;
+    $routeClient = request()->route('client')
+        ?? request()->route('client_id')
+        ?? request()->route('id')
+        ?? null;
+
+    $clientId = null;
+
+    if (isset($client) && is_object($client)) {
+        $clientId = $client->id;
+    } elseif (isset($client) && is_numeric($client)) {
+        $clientId = $client;
+    } elseif (is_object($routeClient)) {
+        $clientId = $routeClient->id ?? null;
+    } elseif (is_numeric($routeClient)) {
+        $clientId = $routeClient;
+    }
 
     $isProfileOpen =
-        Request::routeIs('client.show') ||
-        Request::routeIs('client.report') ||
-        Request::routeIs('client.edit') ||
-        Request::routeIs('issues.index');
+    Request::routeIs('client.show') ||
+    Request::routeIs('client.report') ||
+    Request::routeIs('client.edit') ||
+    Request::routeIs('case-activities.*') ||
+    Request::routeIs('issues.index');
 
     $isProcessOpen =
         Request::routeIs('factfinding.*') ||
@@ -29,6 +45,9 @@
         Request::routeIs('addictive.*') ||
         Request::routeIs('healthc_heckups.*');
 
+    $isBehaviorScreeningOpen =
+        Request::routeIs('behavior-screenings.*');
+
     $isBehaviorOpen =
         Request::routeIs('observe.*') ||
         Request::routeIs('escape.*');
@@ -40,6 +59,21 @@
         Request::routeIs('help_sessions.*') ||
         Request::routeIs('followup.*');
 @endphp
+
+<style>
+    .behavior-screening-main-link {
+        font-weight: 600;
+    }
+
+    .behavior-screening-main-link i {
+        color: #2563eb;
+        font-size: 17px;
+    }
+
+    .behavior-screening-main-link.active i {
+        color: inherit;
+    }
+</style>
 
 <div class="app-sidebar-menu">
     <div class="h-100" data-simplebar>
@@ -58,22 +92,31 @@
                         <span> บันทึกข้อมูลแรกเข้า </span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
-                           @if(isset($client))
-<li>
-    <a href="{{ route('client.edit', $client->id) }}"
-       class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
-        บันทึกข้อมูลทั่วไป
-    </a>
-</li>
-@endif
-                            <li>
-                                <a href="{{ route('client.report', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">
-                                    รายงานผู้รับบริการ
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a href="{{ route('client.edit', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('client.edit') ? 'active' : '' }}">
+                                        บันทึกข้อมูลทั่วไป
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('client.report', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('client.report') ? 'active' : '' }}">
+                                        รายงานผู้รับบริการ
+                                    </a>
+                                </li>
+
+                                <li>
+                                        <a href="{{ route('case-activities.index', $clientId) }}"
+                                        class="tp-link {{ Request::routeIs('case-activities.*') ? 'active' : '' }}">
+                                            ความเคลื่อนไหวผู้รับบริการ
+                                        </a>
+                                    </li>
+                            @endif
                         </ul>
                     </div>
                 </li>
@@ -89,44 +132,52 @@
                         <span> ข้อมูลผู้ใช้ </span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse {{ $isProcessOpen ? 'show' : '' }}" id="sidebarProcess">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('factfinding.add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('factfinding.*') ? 'active' : '' }}">
-                                    สอบข้อเท็จจริง
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('family.add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('family.*') ? 'active' : '' }}">
-                                    บันทึกครอบครัว
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('visitFamily.create', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('visitFamily.*') ? 'active' : '' }}">
-                                    เยี่ยมบ้านครอบครัว
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('member.create', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('member.*') ? 'active' : '' }}">
-                                    บันทึกสมาชิกครอบครัว
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('estimate.show', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('estimate.*') ? 'active' : '' }}">
-                                    ประเมินครอบครัว
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('client_files.index', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('client_files.*') ? 'active' : '' }}">
-                                    รายการไฟล์เอกสาร
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a href="{{ route('factfinding.add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('factfinding.*') ? 'active' : '' }}">
+                                        สอบข้อเท็จจริง
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('family.add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('family.*') ? 'active' : '' }}">
+                                        บันทึกครอบครัว
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('visitFamily.create', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('visitFamily.*') ? 'active' : '' }}">
+                                        เยี่ยมบ้านครอบครัว
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('member.create', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('member.*') ? 'active' : '' }}">
+                                        บันทึกสมาชิกครอบครัว
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('estimate.show', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('estimate.*') ? 'active' : '' }}">
+                                        ประเมินครอบครัว
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('client_files.index', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('client_files.*') ? 'active' : '' }}">
+                                        รายการไฟล์เอกสาร
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </li>
@@ -140,32 +191,38 @@
                         <span> ข้อมูลการศึกษา </span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse {{ $isEducationOpen ? 'show' : '' }}" id="sidebarEducation">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('education_record_add', ['client_id' => $clientId]) }}"
-                                   class="tp-link {{ Request::routeIs('education_record_add') ? 'active' : '' }}">
-                                    บันทึกผลการเรียน
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('education_record_show', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('education_record_show') ? 'active' : '' }}">
-                                    แสดงผลการเรียน
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('school_followup_add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('school_followup_*') ? 'active' : '' }}">
-                                    ติดตามการศึกษา
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('absent.add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('absent.*') ? 'active' : '' }}">
-                                    บันทึกการขาดเรียน
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a href="{{ route('education_record_add', ['client_id' => $clientId]) }}"
+                                       class="tp-link {{ Request::routeIs('education_record_add') ? 'active' : '' }}">
+                                        บันทึกผลการเรียน
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('education_record_show', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('education_record_show') ? 'active' : '' }}">
+                                        แสดงผลการเรียน
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('school_followup_add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('school_followup_*') ? 'active' : '' }}">
+                                        ติดตามการศึกษา
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('absent.add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('absent.*') ? 'active' : '' }}">
+                                        บันทึกการขาดเรียน
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </li>
@@ -179,44 +236,53 @@
                         <span> ข้อมูลสุขภาพ </span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse {{ $isHealthOpen ? 'show' : '' }}" id="sidebarHealth">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('accident.add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('accident.*') ? 'active' : '' }}">
-                                    บันทึกการบาดเจ็บ
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('check_body.add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('check_body.*') ? 'active' : '' }}">
-                                    ตรวจสุขภาพเบื้องต้น
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('medical.add', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('medical.*') ? 'active' : '' }}">
-                                    การรักษาพยาบาล
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('vaccine.index', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('vaccine.*') ? 'active' : '' }}">
-                                    ประวัติการรับวัคซีน
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('psychiatric.create', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('psychiatric.*') ? 'active' : '' }}">
-                                    การวินิจฉัยทางจิตเวช
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('addictive.create', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('addictive.*') ? 'active' : '' }}">
-                                    การตรวจสารเสพติด
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a href="{{ route('accident.add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('accident.*') ? 'active' : '' }}">
+                                        บันทึกการบาดเจ็บ
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('check_body.add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('check_body.*') ? 'active' : '' }}">
+                                        ตรวจสุขภาพเบื้องต้น
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('medical.add', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('medical.*') ? 'active' : '' }}">
+                                        การรักษาพยาบาล
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('vaccine.index', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('vaccine.*') ? 'active' : '' }}">
+                                        ประวัติการรับวัคซีน
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('psychiatric.create', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('psychiatric.*') ? 'active' : '' }}">
+                                        การวินิจฉัยทางจิตเวช
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('addictive.create', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('addictive.*') ? 'active' : '' }}">
+                                        การตรวจสารเสพติด
+                                    </a>
+                                </li>
+                            @endif
+
                             <li>
                                 <a href="{{ route('healthc_heckups.index') }}"
                                    class="tp-link {{ Request::routeIs('healthc_heckups.*') ? 'active' : '' }}">
@@ -226,6 +292,18 @@
                         </ul>
                     </div>
                 </li>
+
+                @if($clientId)
+                    <li class="menu-title mt-2">แบบประเมินพฤติกรรม</li>
+
+                    <li>
+                        <a href="{{ route('behavior-screenings.index', $clientId) }}"
+                           class="tp-link behavior-screening-main-link {{ $isBehaviorScreeningOpen ? 'active' : '' }}">
+                            <i class="bi bi-clipboard2-heart-fill me-2"></i>
+                            <span>แบบประเมินพัฒนาการ </span>
+                        </a>
+                    </li>
+                @endif
 
                 <li class="menu-title mt-2">ข้อมูลด้านพฤติกรรม</li>
 
@@ -238,20 +316,24 @@
                         <span> ข้อมูลด้านพฤติกรรม </span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse {{ $isBehaviorOpen ? 'show' : '' }}" id="sidebarBehavior">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('observe.create', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('observe.*') ? 'active' : '' }}">
-                                    บันทึกพฤติกรรม
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('escape.index', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('escape.*') ? 'active' : '' }}">
-                                    หนีออกจากบ้าน
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a href="{{ route('observe.create', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('observe.*') ? 'active' : '' }}">
+                                        บันทึกพฤติกรรม
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('escape.index', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('escape.*') ? 'active' : '' }}">
+                                        หนีออกจากบ้าน
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </li>
@@ -267,38 +349,45 @@
                         <span> สังคมสงเคราะห์ </span>
                         <span class="menu-arrow"></span>
                     </a>
+
                     <div class="collapse {{ $isSocialOpen ? 'show' : '' }}" id="sidebarSocial">
                         <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('case_outside.show', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('case_outside.*') ? 'active' : '' }}">
-                                    ติดตามเด็กที่อยู่ภายนอก
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('refers.index', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('refers.*') ? 'active' : '' }}">
-                                    รายการการจำหน่าย
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('job_agencies.show', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('job_agencies.*') ? 'active' : '' }}">
-                                    หางานให้ผู้รับบริการ
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('help_sessions.show', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('help_sessions.*') ? 'active' : '' }}">
-                                    รายการการช่วยเหลือ
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('followup.index', $clientId) }}"
-                                   class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
-                                    การติดตามผล
-                                </a>
-                            </li>
+                            @if($clientId)
+                                <li>
+                                    <a href="{{ route('case_outside.show', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('case_outside.*') ? 'active' : '' }}">
+                                        ติดตามเด็กที่อยู่ภายนอก
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('refers.index', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('refers.*') ? 'active' : '' }}">
+                                        รายการการจำหน่าย
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('job_agencies.show', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('job_agencies.*') ? 'active' : '' }}">
+                                        หางานให้ผู้รับบริการ
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('help_sessions.show', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('help_sessions.*') ? 'active' : '' }}">
+                                        รายการการช่วยเหลือ
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('followup.index', $clientId) }}"
+                                       class="tp-link {{ Request::routeIs('followup.*') ? 'active' : '' }}">
+                                        การติดตามผล
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </li>

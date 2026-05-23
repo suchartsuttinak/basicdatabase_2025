@@ -7,6 +7,7 @@ use App\Models\CheckBody;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\CaseActivity;
 
 class CheckBodyController extends Controller
 {
@@ -30,33 +31,50 @@ class CheckBodyController extends Controller
         ));
     }
 
-    public function CheckBodyStore(Request $request)
-    {
-        $validated = $this->validateCheckBody($request);
+  public function CheckBodyStore(Request $request)
+        {
+            $validated = $this->validateCheckBody($request);
 
-        // PATCH: กันแก้ client_id จาก request เพื่อบันทึกให้ client ที่ไม่มีสิทธิ์
-        Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+            // PATCH: กันแก้ client_id จาก request เพื่อบันทึกให้ client ที่ไม่มีสิทธิ์
+            Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-        if (($validated['development'] ?? null) === 'สมวัย') {
-            $validated['detail'] = null;
-        }
+            if (($validated['development'] ?? null) === 'สมวัย') {
+                $validated['detail'] = null;
+            }
 
-        if (($validated['development_type'] ?? null) !== 'เด็กกลุ่มพิเศษ') {
-            $validated['special_support_type'] = null;
-            $validated['special_support_other'] = null;
-        } elseif (($validated['special_support_type'] ?? null) !== 'อื่น ๆ') {
-            $validated['special_support_other'] = null;
-        }
+            if (($validated['development_type'] ?? null) !== 'เด็กกลุ่มพิเศษ') {
+                $validated['special_support_type'] = null;
+                $validated['special_support_other'] = null;
+            } elseif (($validated['special_support_type'] ?? null) !== 'อื่น ๆ') {
+                $validated['special_support_other'] = null;
+            }
 
-        CheckBody::create($validated);
+            $checkBody = CheckBody::create($validated);
 
-        return redirect()
-            ->route('check_body.add', $validated['client_id'])
-            ->with([
-                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success',
+                CaseActivity::where('client_id', $validated['client_id'])
+                ->where('module', 'check_body')
+                ->delete();
+
+                CaseActivity::record([
+                'client_id'   => $validated['client_id'],
+                'module'      => 'check_body',
+                'type'        => 'success',
+                'title'       => 'บันทึกการตรวจร่างกาย',
+                'description' => 'วันที่ตรวจ: ' . ($validated['assessor_date'] ?? '-') .
+                                ' | พัฒนาการ: ' . ($validated['development'] ?? '-') .
+                                ' | ประเภทพัฒนาการ: ' . ($validated['development_type'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-person-heart',
+                'url'         => route('check_body.add', $validated['client_id']),
             ]);
-    }
+
+            return redirect()
+                ->route('check_body.add', $validated['client_id'])
+                ->with([
+                    'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    'alert-type' => 'success',
+                ]);
+        }
 
     public function CheckBodyEdit($id)
     {
@@ -112,6 +130,23 @@ class CheckBodyController extends Controller
 
         $checkbody->update($validated);
 
+        CaseActivity::where('client_id', $checkbody->client_id)
+            ->where('module', 'check_body')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $checkbody->client_id,
+            'module'      => 'check_body',
+            'type'        => 'success',
+            'title'       => 'แก้ไขการตรวจร่างกาย',
+            'description' => 'วันที่ตรวจ: ' . ($validated['assessor_date'] ?? '-') .
+                            ' | พัฒนาการ: ' . ($validated['development'] ?? '-') .
+                            ' | ประเภทพัฒนาการ: ' . ($validated['development_type'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-person-heart',
+            'url'         => route('check_body.add', $checkbody->client_id),
+        ]);
+
         return redirect()
             ->route('check_body.add', $checkbody->client_id)
             ->with([
@@ -129,6 +164,10 @@ class CheckBodyController extends Controller
             ->findOrFail($id);
 
         $clientId = $checkbody->client_id;
+
+        CaseActivity::where('client_id', $clientId)
+            ->where('module', 'check_body')
+            ->delete();
 
         $checkbody->delete();
 

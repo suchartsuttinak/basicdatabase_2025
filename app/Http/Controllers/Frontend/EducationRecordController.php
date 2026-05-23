@@ -10,6 +10,7 @@ use App\Models\Semester;
 use Illuminate\Http\Request;
 use App\Models\EducationRecord;
 use App\Http\Controllers\Controller;
+use App\Models\CaseActivity;
 
 class EducationRecordController extends Controller
 {
@@ -30,82 +31,92 @@ class EducationRecordController extends Controller
         compact('client','subjects', 'semesters', 'educations'));
 }
 
-    public function EducationRecordStore(Request $request)
-    {
-       $validated = $request->validate([
-        'client_id'    => 'required|exists:clients,id',
-        'education_id' => 'required',
-        'semester_id'  => 'required|exists:semesters,id', // ✅ ใช้ FK
-        'school_name'  => 'required|string',
-        'record_date'  => 'required|date',
-        'grade_average'=> 'nullable|numeric',
-        'subjects'     => 'nullable|array',
-        'subjects.*.subject_id' => 'nullable|exists:subjects,id',
-        'subjects.*.score'      => 'nullable|numeric|min:0|max:100',
-        'subjects.*.grade'      => 'nullable|string',
-    ], [     
-        'education_id.required' => 'กรุณาเลือกระดับการศึกษา',
+   public function EducationRecordStore(Request $request)
+        {
+            $validated = $request->validate([
+                'client_id'    => 'required|exists:clients,id',
+                'education_id' => 'required',
+                'semester_id'  => 'required|exists:semesters,id',
+                'school_name'  => 'required|string',
+                'record_date'  => 'required|date',
+                'grade_average'=> 'nullable|numeric',
+                'subjects'     => 'nullable|array',
+                'subjects.*.subject_id' => 'nullable|exists:subjects,id',
+                'subjects.*.score'      => 'nullable|numeric|min:0|max:100',
+                'subjects.*.grade'      => 'nullable|string',
+            ], [
+                'education_id.required' => 'กรุณาเลือกระดับการศึกษา',
+                'semester_id.required'  => 'กรุณาเลือกภาคเรียน',
+                'semester_id.exists'    => 'ภาคเรียนที่เลือกไม่ถูกต้อง',
+                'school_name.required'  => 'กรุณากรอกชื่อสถานศึกษา',
+                'school_name.string'    => 'ชื่อสถานศึกษาต้องเป็นข้อความ',
+                'record_date.required'  => 'กรุณาเลือกวันที่บันทึก',
+                'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่',
+            ]);
 
-        'semester_id.required'  => 'กรุณาเลือกภาคเรียน',
-        'semester_id.exists'    => 'ภาคเรียนที่เลือกไม่ถูกต้อง',
+            $client = Client::forUser(auth()->user())
+                ->where('id', $validated['client_id'])
+                ->firstOrFail();
 
-        'school_name.required'  => 'กรุณากรอกชื่อสถานศึกษา',
-        'school_name.string'    => 'ชื่อสถานศึกษาต้องเป็นข้อความ',
+            // ✅ กันบันทึกซ้ำ
+            $existingRecord = EducationRecord::where('client_id', $client->id)
+                ->where('education_id', $validated['education_id'])
+                ->where('semester_id', $validated['semester_id'])
+                ->first();
 
-        'record_date.required'  => 'กรุณาเลือกวันที่บันทึก',
-        'record_date.date'      => 'วันที่บันทึกต้องอยู่ในรูปแบบวันที่',
-    ]);
-
-        $client = Client::forUser(auth()->user()) // ✅ [แก้ไข]
-            ->where('id', $validated['client_id'])
-            ->firstOrFail();
-
-        // ✅ กันบันทึกซ้ำ
-        $existingRecord = EducationRecord::where('client_id', $validated['client_id'])
-            ->where('education_id', $validated['education_id'])
-            ->where('semester_id', $validated['semester_id'])
-            ->first();
-
-        if ($existingRecord) {
-            return back()->with('error', 'มีการบันทึกผลการเรียนในภาคเรียนนี้แล้ว')->withInput();
-        }
-
-        $institution = Institution::firstOrCreate([
-            'institution_name' => $validated['school_name']
-        ]);
-
-        // ✅ กันเลือกวิชาซ้ำ
-        if (!empty($validated['subjects'])) {
-            $subjectIds = array_column($validated['subjects'], 'subject_id');
-            if (count($subjectIds) !== count(array_unique($subjectIds))) {
-                return back()->with('error', 'ไม่สามารถเลือกวิชาเดิมซ้ำในฟอร์มเดียวกันได้')->withInput();
+            if ($existingRecord) {
+                return back()->with('error', 'มีการบันทึกผลการเรียนในภาคเรียนนี้แล้ว')->withInput();
             }
-        }
 
-        $record = EducationRecord::create([
-            'client_id'     => $client->id, // ✅ [แก้ไข]
-            'education_id'  => $validated['education_id'],
-            'semester_id'   => $validated['semester_id'], // ✅ เก็บ FK
-            'school_name'   => $validated['school_name'],
-            'institution_id'=> $institution->id,
-            'record_date'   => $validated['record_date'],
-            'grade_average' => $validated['grade_average'] ?? null,
-        ]);
+            $institution = Institution::firstOrCreate([
+                'institution_name' => $validated['school_name']
+            ]);
 
-        if (!empty($validated['subjects'])) {
-            foreach ($validated['subjects'] as $data) {
-                if (!empty($data['subject_id'])) {
-                    $record->subjects()->attach($data['subject_id'], [
-                        'score' => $data['score'] ?? null,
-                        'grade' => $data['grade'] ?? null,
-                    ]);
+            // ✅ กันเลือกวิชาซ้ำ
+            if (!empty($validated['subjects'])) {
+                $subjectIds = array_filter(array_column($validated['subjects'], 'subject_id'));
+
+                if (count($subjectIds) !== count(array_unique($subjectIds))) {
+                    return back()->with('error', 'ไม่สามารถเลือกวิชาเดิมซ้ำในฟอร์มเดียวกันได้')->withInput();
                 }
             }
-        }
 
-        return redirect()->route('education_record_show', ['client_id' => $record->client_id]) // ✅ [แก้ไข]
-            ->with('success','บันทึกผลการเรียนเรียบร้อยแล้ว');
-    }
+            $record = EducationRecord::create([
+                'client_id'      => $client->id,
+                'education_id'   => $validated['education_id'],
+                'semester_id'    => $validated['semester_id'],
+                'school_name'    => $validated['school_name'],
+                'institution_id' => $institution->id,
+                'record_date'    => $validated['record_date'],
+                'grade_average'  => $validated['grade_average'] ?? null,
+            ]);
+
+            if (!empty($validated['subjects'])) {
+                foreach ($validated['subjects'] as $data) {
+                    if (!empty($data['subject_id'])) {
+                        $record->subjects()->attach($data['subject_id'], [
+                            'score' => $data['score'] ?? null,
+                            'grade' => $data['grade'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'education_record',
+                'type'        => 'success',
+                'title'       => 'บันทึกผลการเรียน',
+                'description' => 'บันทึกผลการเรียน สถานศึกษา: ' . ($validated['school_name'] ?? '-') .
+                                ' | เกรดเฉลี่ย: ' . ($validated['grade_average'] ?? '-'),
+                'occurred_at' => $validated['record_date'] ?? now(),
+                'icon'        => 'bi-mortarboard',
+                'url'         => route('education_record_show', ['client_id' => $client->id]),
+            ]);
+
+            return redirect()->route('education_record_show', ['client_id' => $record->client_id])
+                ->with('success', 'บันทึกผลการเรียนเรียบร้อยแล้ว');
+        }
 
    public function EducationRecordEdit($id)
 {

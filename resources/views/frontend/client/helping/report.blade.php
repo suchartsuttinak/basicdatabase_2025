@@ -196,58 +196,186 @@
         padding-top: 8px;
     }
 
-    @media (max-width: 991.98px){
-        .help-report-meta{
-            grid-template-columns: 1fr;
-        }
+   @page{
+    size:A4 landscape;
+    margin:10mm 14mm;
+}
+
+@media print{
+
+    html,
+    body{
+        width:297mm !important;
+        min-height:210mm !important;
+        margin:0 !important;
+        padding:0 !important;
+        background:#fff !important;
+        font-family:"TH Sarabun New","Sarabun",sans-serif !important;
+        overflow:visible !important;
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
     }
 
-    @media (max-width: 767.98px){
-        .help-report-box{
-            padding: 16px;
-        }
-
-        .help-report-title{
-            font-size: 1.15rem;
-        }
-
-        .help-report-actions{
-            width: 100%;
-        }
-
-        .help-report-actions .btn{
-            width: 100%;
-        }
-
-        .help-report-table{
-            min-width: 700px;
-        }
+    .navbar-custom,
+    .leftside-menu,
+    .page-title-box,
+    .footer,
+    .help-report-actions,
+    header,
+    footer{
+        display:none !important;
     }
 
-    @media print{
-        .navbar-custom,
-        .leftside-menu,
-        .page-title-box,
-        .footer,
-        .help-report-actions{
-            display: none !important;
-        }
-
-        .help-report-page{
-            padding: 0 !important;
-        }
-
-        .help-report-box{
-            border: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-
-        body{
-            background: #fff !important;
-        }
+    .help-report-page{
+        width:100% !important;
+        max-width:100% !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        background:#fff !important;
+        overflow:visible !important;
     }
+
+    .help-report-box{
+        width:100% !important;
+        max-width:100% !important;
+        min-height:auto !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        border:none !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#fff !important;
+        overflow:visible !important;
+        page-break-after:avoid !important;
+        break-after:avoid !important;
+    }
+
+    .help-report-header{
+        text-align:center !important;
+        border-bottom:1px solid #cbd5e1 !important;
+        padding:0 0 5px !important;
+        margin:0 0 6px !important;
+    }
+
+    .help-report-title{
+        font-size:20px !important;
+        font-weight:900 !important;
+        line-height:1.1 !important;
+        color:#0f172a !important;
+        margin:0 !important;
+    }
+
+    .help-report-subtitle{
+        font-size:11px !important;
+        color:#64748b !important;
+        margin-top:2px !important;
+        line-height:1.1 !important;
+        font-weight:600 !important;
+    }
+
+    .help-report-meta{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:flex-start !important;
+        flex-wrap:wrap !important;
+        gap:4px 22px !important;
+        margin:0 0 6px !important;
+        padding:0 0 5px 4px !important;
+        border-bottom:1px solid #dbe4f0 !important;
+    }
+
+    .help-report-meta > *{
+        border:none !important;
+        background:none !important;
+        box-shadow:none !important;
+        padding:0 !important;
+        margin:0 !important;
+        min-width:auto !important;
+        width:auto !important;
+        flex:none !important;
+        font-size:12.5px !important;
+        font-weight:800 !important;
+        color:#2563eb !important;
+        line-height:1.1 !important;
+    }
+
+    .help-report-table-wrap{
+        width:100% !important;
+        max-width:100% !important;
+        overflow:visible !important;
+        border:none !important;
+        border-radius:0 !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .help-report-table{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+        margin:0 !important;
+        table-layout:fixed !important;
+        border-collapse:collapse !important;
+        border-spacing:0 !important;
+        background:#fff !important;
+        page-break-inside:auto !important;
+    }
+
+    .help-report-table thead{
+        display:table-header-group !important;
+    }
+
+    .help-report-table tr{
+        page-break-inside:avoid !important;
+        break-inside:avoid !important;
+    }
+
+    .help-report-table thead th{
+        background:#eef4ff !important;
+        color:#0f172a !important;
+        border:1px solid #111827 !important;
+        text-align:center !important;
+        vertical-align:middle !important;
+        padding:3px 3px !important;
+        font-size:10px !important;
+        font-weight:900 !important;
+        line-height:1.08 !important;
+        white-space:normal !important;
+    }
+
+    .help-report-table tbody td,
+    .help-report-table tfoot td{
+        border:1px solid #111827 !important;
+        padding:3px 3px !important;
+        font-size:9.8px !important;
+        font-weight:600 !important;
+        color:#111827 !important;
+        line-height:1.08 !important;
+        vertical-align:middle !important;
+        white-space:normal !important;
+        word-break:break-word !important;
+        overflow-wrap:anywhere !important;
+        text-align:center !important;
+    }
+
+    .help-report-table tbody tr:nth-child(even){
+        background:#fcfdff !important;
+    }
+
+    .help-report-table tfoot td{
+        background:#f8fafc !important;
+        font-weight:900 !important;
+    }
+
+    .help-report-empty{
+        border:1px dashed #94a3b8 !important;
+        border-radius:0 !important;
+        padding:14px !important;
+        text-align:center !important;
+        color:#475569 !important;
+        font-size:12px !important;
+    }
+}
 </style>
 
 <div class="container-fluid help-report-page">

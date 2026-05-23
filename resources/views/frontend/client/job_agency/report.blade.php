@@ -53,31 +53,18 @@
             </div>
 
             <div class="jr-official-header">
-                <div class="jr-official-header-top">
-                    <div class="jr-official-kicker">เอกสารรายงาน</div>
-                    <div class="jr-official-code">JOB AGENCY REPORT</div>
-                </div>
+               
 
                 <h1 class="jr-official-title">รายงานการจัดหางาน</h1>
-                <p class="jr-official-subtitle">
-                    เอกสารสรุปข้อมูลการจัดหางานของผู้รับบริการ เพื่อใช้สำหรับตรวจสอบ ติดตาม และพิมพ์รายงานอย่างเป็นทางการ
-                </p>
+                
 
                 <div class="jr-official-meta">
                     <div class="jr-official-meta-row">
-                        <div class="jr-official-meta-label">ชื่อผู้รับบริการ</div>
+                       
                         <div class="jr-official-meta-value">{{ $client->fullname ?? $client->name ?? '-' }}</div>
                     </div>
 
-                    <div class="jr-official-meta-row">
-                        <div class="jr-official-meta-label">จำนวนรายการ</div>
-                        <div class="jr-official-meta-value">{{ number_format($jobAgencies->count()) }} รายการ</div>
-                    </div>
-
-                    <div class="jr-official-meta-row">
-                        <div class="jr-official-meta-label">วันที่พิมพ์รายงาน</div>
-                        <div class="jr-official-meta-value">{{ $printedAtThai }}</div>
-                    </div>
+                   
                 </div>
             </div>
 
@@ -386,128 +373,224 @@
         font-weight: 600;
     }
 
-    @media (max-width: 1199.98px){
-        .jr-official-shell{
-            width: min(97vw, 1200px);
-        }
+  @page{
+    size:A4 landscape;
+    margin:10mm 14mm;
+}
 
-        .jr-official-meta{
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+@media print{
+
+    html,
+    body{
+        width:297mm !important;
+        min-height:210mm !important;
+        margin:0 !important;
+        padding:0 !important;
+        background:#fff !important;
+        font-family:"TH Sarabun New","Sarabun",sans-serif !important;
+        overflow:visible !important;
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
     }
 
-    @media (max-width: 767.98px){
-        .jr-official-page{
-            padding: 10px 0 20px;
-        }
-
-        .jr-official-toolbar,
-        .jr-official-header,
-        .jr-official-body{
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-
-        .jr-official-toolbar{
-            gap: 10px;
-        }
-
-        .jr-official-toolbar .jr-official-btn{
-            width: 100%;
-        }
-
-        .jr-official-title{
-            font-size: 1.18rem;
-        }
-
-        .jr-official-meta{
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-
-        .jr-official-table{
-            min-width: 1080px;
-        }
-
-        .jr-official-signature{
-            grid-template-columns: 1fr;
-            gap: 22px;
-        }
+    .navbar-custom,
+    .leftside-menu,
+    .footer,
+    .topbar,
+    .page-title-box,
+    .jr-official-toolbar,
+    header,
+    footer{
+        display:none !important;
     }
 
-    @media print{
-        @page {
-            size: A4 landscape;
-            margin: 10mm 12mm;
-        }
-
-        html, body{
-            background: #fff !important;
-        }
-
-        .navbar-custom,
-        .leftside-menu,
-        .footer,
-        .topbar,
-        .page-title-box,
-        .jr-official-toolbar{
-            display: none !important;
-        }
-
-        .content-page,
-        .content,
-        .container-fluid{
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        .jr-official-page{
-            padding: 0 !important;
-        }
-
-        .jr-official-shell{
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-        }
-
-        .jr-official-card{
-            border: none !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-        }
-
-        .jr-official-header{
-            padding: 0 0 14px !important;
-        }
-
-        .jr-official-body{
-            padding: 0 !important;
-        }
-
-        .jr-official-table-wrap{
-            border-radius: 0 !important;
-            overflow: visible !important;
-        }
-
-        .jr-official-table{
-            min-width: 100% !important;
-        }
-
-        .jr-official-table thead th,
-        .jr-official-table tbody td{
-            font-size: 12px !important;
-            padding: 8px 7px !important;
-        }
-
-        .jr-official-signature{
-            margin-top: 20px !important;
-            gap: 28px !important;
-        }
-
-        .jr-official-sign-line{
-            margin-top: 28px !important;
-        }
+    .content-page,
+    .content,
+    .container-fluid{
+        width:100% !important;
+        max-width:100% !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        overflow:visible !important;
+        background:#fff !important;
     }
+
+    .jr-official-page{
+        width:100% !important;
+        max-width:100% !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        overflow:visible !important;
+        background:#fff !important;
+    }
+
+    .jr-official-shell{
+        width:100% !important;
+        max-width:100% !important;
+        min-height:auto !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        overflow:visible !important;
+        page-break-after:avoid !important;
+        break-after:avoid !important;
+    }
+
+    .jr-official-card{
+        border:none !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        overflow:visible !important;
+        background:#fff !important;
+    }
+
+    .jr-official-header{
+        text-align:center !important;
+        padding:0 0 6px !important;
+        margin:0 0 6px !important;
+        border-bottom:1px solid #cbd5e1 !important;
+    }
+
+    .jr-official-title{
+        font-size:20px !important;
+        font-weight:900 !important;
+        line-height:1.1 !important;
+        color:#0f172a !important;
+        margin:0 !important;
+    }
+
+    .jr-official-subtitle{
+        font-size:11px !important;
+        color:#64748b !important;
+        margin-top:2px !important;
+        line-height:1.1 !important;
+        font-weight:600 !important;
+    }
+
+    .jr-official-body{
+        padding:0 !important;
+        margin:0 !important;
+    }
+
+    .jr-official-meta{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:flex-start !important;
+        flex-wrap:wrap !important;
+        gap:4px 22px !important;
+        margin:0 0 6px !important;
+        padding:0 0 5px 4px !important;
+        border-bottom:1px solid #dbe4f0 !important;
+    }
+
+    .jr-official-meta > *{
+        border:none !important;
+        background:none !important;
+        box-shadow:none !important;
+        padding:0 !important;
+        margin:0 !important;
+        min-width:auto !important;
+        width:auto !important;
+        flex:none !important;
+        font-size:12.5px !important;
+        font-weight:800 !important;
+        color:#2563eb !important;
+        line-height:1.1 !important;
+    }
+
+    .jr-official-table-wrap{
+        width:100% !important;
+        max-width:100% !important;
+        overflow:visible !important;
+        border:none !important;
+        border-radius:0 !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .jr-official-table{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+        margin:0 !important;
+        table-layout:fixed !important;
+        border-collapse:collapse !important;
+        border-spacing:0 !important;
+        background:#fff !important;
+        page-break-inside:auto !important;
+    }
+
+    .jr-official-table thead{
+        display:table-header-group !important;
+    }
+
+    .jr-official-table tr{
+        page-break-inside:avoid !important;
+        break-inside:avoid !important;
+    }
+
+    .jr-official-table thead th{
+        background:#eef4ff !important;
+        color:#0f172a !important;
+        border:1px solid #111827 !important;
+        text-align:center !important;
+        vertical-align:middle !important;
+        padding:3px 3px !important;
+        font-size:10px !important;
+        font-weight:900 !important;
+        line-height:1.08 !important;
+        white-space:normal !important;
+    }
+
+    .jr-official-table tbody td,
+    .jr-official-table tfoot td{
+        border:1px solid #111827 !important;
+        padding:3px 3px !important;
+        font-size:9.8px !important;
+        font-weight:600 !important;
+        color:#111827 !important;
+        line-height:1.08 !important;
+        vertical-align:middle !important;
+        white-space:normal !important;
+        word-break:break-word !important;
+        overflow-wrap:anywhere !important;
+        text-align:center !important;
+    }
+
+    .jr-official-table tbody tr:nth-child(even){
+        background:#fcfdff !important;
+    }
+
+    .jr-official-table tfoot td{
+        background:#f8fafc !important;
+        font-weight:900 !important;
+    }
+
+    .jr-official-signature{
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:20px !important;
+        margin-top:16px !important;
+        page-break-inside:avoid !important;
+        break-inside:avoid !important;
+    }
+
+    .jr-official-signature *{
+        font-size:11px !important;
+        line-height:1.15 !important;
+    }
+
+    .jr-official-sign-line{
+        margin-top:18px !important;
+    }
+
+    .jr-official-empty{
+        border:1px dashed #94a3b8 !important;
+        border-radius:0 !important;
+        padding:14px !important;
+        text-align:center !important;
+        color:#475569 !important;
+        font-size:12px !important;
+    }
+}
 </style>
 @endsection

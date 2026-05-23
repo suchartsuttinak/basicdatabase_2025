@@ -81,6 +81,29 @@
                         @enderror
                     </div>
 
+                    <div class="col-lg-6">
+                            <label class="form-label fw-semibold">หน่วยงาน/โครงการ</label>
+
+                            <select name="project_id" class="form-select form-control-modern">
+                                <option value="">-- ไม่กำหนดหน่วยงาน --</option>
+
+                                @foreach($projects as $project)
+                                    <option value="{{ $project->id }}"
+                                        {{ old('project_id') == $project->id ? 'selected' : '' }}>
+                                        {{ $project->project_name ?? $project->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            @error('project_id')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+
+                         <div class="text-muted small">
+                                ใช้จำกัดเพิ่มเติมตามบ้านที่ดูแล ภายใต้หน่วยงาน/โครงการที่เลือก
+                            </div>
+                        </div>
+
                     <div class="col-12">
                         <div class="house-box">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
@@ -89,7 +112,9 @@
                                         <i class="bi bi-house-check-fill text-primary me-2"></i>
                                         เลือกบ้านที่ดูแล
                                     </div>
-                                    <div class="text-muted small">ผู้ใช้งานจะเห็นเฉพาะข้อมูลของบ้านที่ถูกเลือก</div>
+                                 <div class="text-muted small">
+    ใช้จำกัดเพิ่มเติมตามบ้านที่ดูแล ภายใต้หน่วยงาน/โครงการที่เลือก
+</div>
                                 </div>
 
                                 <div class="form-check m-0">

@@ -4,125 +4,99 @@ namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Operation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Facades\DB;
 
 class OperationController extends Controller
 {
-  /**
-     * แสดงรายการ
-     */
     public function index(Request $request)
     {
         $user = auth()->user();
 
+        $this->reorderAllSequences();
+
         $query = Operation::with('user');
 
-        // admin เห็นทั้งหมด / user ทั่วไปเห็นเฉพาะของตนเอง
         if (!$user->isAdmin()) {
             $query->where('user_id', $user->id);
         }
 
-        // ค้นหา
-        if ($request->filled('keyword')) {
+       if ($request->filled('keyword')) {
             $keyword = trim($request->keyword);
 
             $query->where(function ($q) use ($keyword) {
                 $q->where('subject', 'like', "%{$keyword}%")
-                  ->orWhere('result', 'like', "%{$keyword}%")
-                  ->orWhere('remark', 'like', "%{$keyword}%");
+                    ->orWhere('result', 'like', "%{$keyword}%")
+                    ->orWhere('remark', 'like', "%{$keyword}%")
+                    ->orWhereHas('user', function ($userQuery) use ($keyword) {
+                        $userQuery->where('name', 'like', "%{$keyword}%")
+                            ->orWhere('email', 'like', "%{$keyword}%");
+                    });
             });
         }
 
-        // กรองวันที่
-        if ($request->filled('date')) {
-            $query->whereDate('operation_date', $request->date);
+        if ($request->filled('start_date')) {
+            $query->whereDate('operation_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('operation_date', '<=', $request->end_date);
         }
 
         $operations = $query
             ->orderByDesc('operation_date')
-            ->orderByDesc('sequence_no')
+            ->orderBy('sequence_no')
             ->paginate(10)
             ->withQueryString();
 
         return view('backend.operations.index', compact('operations'));
     }
 
-    /**
-     * ฟอร์มเพิ่มข้อมูล
-     */
     public function create()
     {
         return view('backend.operations.create');
     }
 
-    /**
-     * บันทึกข้อมูล
-     */
-   public function store(Request $request)
-{
-    $user = auth()->user();
+    public function store(Request $request)
+    {
+        $user = auth()->user();
 
-    $validated = $request->validate([
-        'operation_date' => ['required', 'date'],
-        'subject'        => ['required', 'string', 'max:500'],
-        'result'         => ['nullable', 'string'],
-        'remark'         => ['nullable', 'string'],
-    ], [
-        'operation_date.required' => 'กรุณาระบุวันที่',
-        'operation_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
-        'subject.required'        => 'กรุณาระบุเรื่องที่ดำเนินงาน',
-        'subject.max'             => 'เรื่องที่ดำเนินงานต้องไม่เกิน 500 ตัวอักษร',
-    ]);
+        $validated = $request->validate([
+            'operation_date' => ['required', 'date'],
+            'subject'        => ['required', 'string', 'max:500'],
+            'result'         => ['nullable', 'string'],
+            'remark'         => ['nullable', 'string'],
+        ], [
+            'operation_date.required' => 'กรุณาระบุวันที่',
+            'operation_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+            'subject.required'        => 'กรุณาระบุเรื่องที่ดำเนินงาน',
+            'subject.max'             => 'เรื่องที่ดำเนินงานต้องไม่เกิน 500 ตัวอักษร',
+        ]);
 
-    $selectedDate = \Carbon\Carbon::parse($validated['operation_date'])->startOfDay();
-    $today = now()->startOfDay();
-    $yesterday = now()->subDay()->startOfDay();
+        $this->validateOperationDateByRole($validated['operation_date']);
 
-    // ห้ามเลือกวันอนาคตทุก role
-    if ($selectedDate->gt($today)) {
-        return back()
-            ->withErrors(['operation_date' => 'ไม่สามารถเลือกวันที่เกินกว่าวันปัจจุบันได้'])
-            ->withInput();
+        DB::transaction(function () use ($validated, $user) {
+            $operation = Operation::create([
+                'user_id'        => $user->id,
+                'operation_date' => $validated['operation_date'],
+                'sequence_no'    => 1,
+                'subject'        => $validated['subject'],
+                'result'         => $validated['result'] ?? null,
+                'remark'         => $validated['remark'] ?? null,
+            ]);
+
+            $this->reorderSequenceByUserAndYear(
+                $operation->user_id,
+                Carbon::parse($operation->operation_date)->year
+            );
+        });
+
+        return redirect()
+            ->route('operations.index')
+            ->with('success', 'บันทึกรายงานการปฏิบัติงานเรียบร้อยแล้ว');
     }
 
-    // user ทั่วไปย้อนหลังได้ไม่เกิน 1 วัน
-    // admin เลือกย้อนหลังได้ทุกวัน
-    if (!$user->isAdmin() && $selectedDate->lt($yesterday)) {
-        return back()
-            ->withErrors(['operation_date' => 'ไม่สามารถบันทึกย้อนหลังเกิน 1 วันได้'])
-            ->withInput();
-    }
-
-    // รันเลขครั้งที่ตามปีของวันที่ปฏิบัติงาน
-    // เช่น ปี 2569/2026 เริ่ม 1,2,3... พอขึ้นปีใหม่เริ่ม 1 ใหม่
-    $operationYear = \Carbon\Carbon::parse($validated['operation_date'])->year;
-
-    $lastSequenceNo = Operation::whereYear('operation_date', $operationYear)
-        ->max('sequence_no');
-
-    $newSequenceNo = ($lastSequenceNo ?? 0) + 1;
-
-    $operation = Operation::create([
-        'user_id'         => $user->id,
-        'operation_date'  => $validated['operation_date'],
-        'sequence_no'     => $newSequenceNo,
-        'subject'         => $validated['subject'],
-        'result'          => $validated['result'] ?? null,
-        'remark'          => $validated['remark'] ?? null,
-    ]);
-
-    $this->reorderSequenceByYear($operationYear);
-
-    return redirect()
-        ->route('operations.index')
-        ->with('success', 'บันทึกรายงานการปฏิบัติงานเรียบร้อยแล้ว');
-}
-
-    /**
-     * ฟอร์มแก้ไข
-     */
     public function edit($id)
     {
         $operation = Operation::with('user')->findOrFail($id);
@@ -132,10 +106,7 @@ class OperationController extends Controller
         return view('backend.operations.edit', compact('operation'));
     }
 
-    /**
-     * อัปเดตข้อมูล
-     */
-       public function update(Request $request, $id)
+   public function update(Request $request, $id)
 {
     $operation = Operation::findOrFail($id);
 
@@ -143,13 +114,16 @@ class OperationController extends Controller
 
     $user = auth()->user();
 
-    $oldYear = \Carbon\Carbon::parse($operation->operation_date)->year;
+    $oldUserId = $operation->user_id;
+    $oldYear = Carbon::parse($operation->operation_date)->year;
 
     $validated = $request->validate([
-        'operation_date' => ['required', 'date'],
-        'subject'        => ['required', 'string', 'max:500'],
-        'result'         => ['nullable', 'string'],
-        'remark'         => ['nullable', 'string'],
+        'operation_date' => $user->isAdmin()
+            ? ['required', 'date']
+            : ['nullable'],
+        'subject' => ['required', 'string', 'max:500'],
+        'result'  => ['nullable', 'string'],
+        'remark'  => ['nullable', 'string'],
     ], [
         'operation_date.required' => 'กรุณาระบุวันที่',
         'operation_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
@@ -157,60 +131,95 @@ class OperationController extends Controller
         'subject.max'             => 'เรื่องที่ดำเนินงานต้องไม่เกิน 500 ตัวอักษร',
     ]);
 
-    $selectedDate = \Carbon\Carbon::parse($validated['operation_date'])->startOfDay();
-    $today = now()->startOfDay();
-    $yesterday = now()->subDay()->startOfDay();
-
-    if ($selectedDate->gt($today)) {
-        return back()
-            ->withErrors(['operation_date' => 'ไม่สามารถเลือกวันที่เกินกว่าวันปัจจุบันได้'])
-            ->withInput();
+    if ($user->isAdmin()) {
+        $this->validateOperationDateByRole($validated['operation_date']);
     }
 
-    if (!$user->isAdmin() && $selectedDate->lt($yesterday)) {
-        return back()
-            ->withErrors(['operation_date' => 'ไม่สามารถบันทึกย้อนหลังเกิน 1 วันได้'])
-            ->withInput();
-    }
+    DB::transaction(function () use ($operation, $validated, $oldUserId, $oldYear, $user) {
+        $updateData = [
+            'subject' => $validated['subject'],
+            'result'  => $validated['result'] ?? null,
+            'remark'  => $validated['remark'] ?? null,
+        ];
 
-    $operation->update([
-        'operation_date' => $validated['operation_date'],
-        'subject'        => $validated['subject'],
-        'result'         => $validated['result'] ?? null,
-        'remark'         => $validated['remark'] ?? null,
-    ]);
+        if ($user->isAdmin()) {
+            $updateData['operation_date'] = $validated['operation_date'];
+        }
 
-    $newYear = \Carbon\Carbon::parse($validated['operation_date'])->year;
+        $operation->update($updateData);
 
-    $this->reorderSequenceByYear($oldYear);
+        $newYear = Carbon::parse($operation->operation_date)->year;
 
-    if ($newYear !== $oldYear) {
-        $this->reorderSequenceByYear($newYear);
-    }
+        $this->reorderSequenceByUserAndYear($oldUserId, $oldYear);
+        $this->reorderSequenceByUserAndYear($operation->user_id, $newYear);
+    });
 
     return redirect()
         ->route('operations.index')
         ->with('success', 'อัปเดตรายงานการปฏิบัติงานเรียบร้อยแล้ว');
 }
-    /**
-     * ลบข้อมูล
-     */
+
     public function destroy($id)
     {
         $operation = Operation::findOrFail($id);
 
         $this->authorizeOperation($operation);
 
-        $operation->delete();
+        $userId = $operation->user_id;
+        $year = Carbon::parse($operation->operation_date)->year;
+
+        DB::transaction(function () use ($operation, $userId, $year) {
+            $operation->delete();
+            $this->reorderSequenceByUserAndYear($userId, $year);
+        });
 
         return redirect()
             ->route('operations.index')
             ->with('success', 'ลบรายการเรียบร้อยแล้ว');
     }
 
-    /**
-     * ตรวจสอบสิทธิ์
-     */
+   public function dailyReport(Request $request)
+    {
+        $authUser = auth()->user();
+
+        $this->reorderAllSequences();
+
+        $query = Operation::with('user');
+
+        if (!$authUser->isAdmin()) {
+            $query->where('user_id', $authUser->id);
+        }
+
+        if ($request->filled('keyword')) {
+            $keyword = trim($request->keyword);
+
+            $query->where(function ($q) use ($keyword) {
+                $q->where('subject', 'like', "%{$keyword}%")
+                    ->orWhere('result', 'like', "%{$keyword}%")
+                    ->orWhere('remark', 'like', "%{$keyword}%")
+                    ->orWhereHas('user', function ($userQuery) use ($keyword) {
+                        $userQuery->where('name', 'like', "%{$keyword}%")
+                            ->orWhere('email', 'like', "%{$keyword}%");
+                    });
+            });
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('operation_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('operation_date', '<=', $request->end_date);
+        }
+
+        $operations = $query
+            ->orderByDesc('operation_date')
+            ->orderBy('sequence_no')
+            ->get();
+
+        return view('backend.operations.report_daily', compact('operations'));
+    }
+
     private function authorizeOperation(Operation $operation): void
     {
         $user = auth()->user();
@@ -220,60 +229,24 @@ class OperationController extends Controller
         }
     }
 
-    /**
- * รายงานการปฏิบัติงานรายวัน
- */
-    public function dailyReport(Request $request)
+    private function reorderAllSequences(): void
     {
-        $authUser = auth()->user();
+        $groups = Operation::selectRaw('user_id, YEAR(operation_date) as operation_year')
+            ->groupBy('user_id', DB::raw('YEAR(operation_date)'))
+            ->get();
 
-        $query = Operation::with('user');
-
-        // user ทั่วไปเห็นเฉพาะของตัวเอง
-        if (!$authUser->isAdmin()) {
-            $query->where('user_id', $authUser->id);
-        } else {
-            // admin เลือกดูเฉพาะคนได้
-            if ($request->filled('user_id')) {
-                $query->where('user_id', $request->user_id);
-            }
+        foreach ($groups as $group) {
+            $this->reorderSequenceByUserAndYear(
+                (int) $group->user_id,
+                (int) $group->operation_year
+            );
         }
-
-        // กรองช่วงวันที่
-        if ($request->filled('start_date')) {
-            $query->whereDate('operation_date', '>=', $request->start_date);
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('operation_date', '<=', $request->end_date);
-        }
-
-        // ✅ เรียงให้ถูกต้อง:
-        // วันที่ -> ผู้ดำเนินงาน -> ครั้งที่
-        $query->join('users', 'operations.user_id', '=', 'users.id')
-            ->select('operations.*')
-            ->orderByDesc('operations.operation_date')
-            ->orderBy('users.name')
-            ->orderBy('operations.sequence_no');
-
-        $operations = $query->get();
-
-        // จัดกลุ่มตามวัน
-        $groupedOperations = $operations->groupBy(function ($item) {
-            return $item->operation_date->format('Y-m-d');
-        });
-
-        $users = collect();
-        if ($authUser->isAdmin()) {
-            $users = \App\Models\User::orderBy('name')->get();
-        }
-
-        return view('backend.operations.report_daily', compact('groupedOperations', 'users'));
     }
 
-    private function reorderSequenceByYear(int $year): void
+    private function reorderSequenceByUserAndYear(int $userId, int $year): void
     {
-        $items = Operation::whereYear('operation_date', $year)
+        $items = Operation::where('user_id', $userId)
+            ->whereYear('operation_date', $year)
             ->orderBy('operation_date')
             ->orderBy('id')
             ->get();
@@ -281,9 +254,9 @@ class OperationController extends Controller
         $sequence = 1;
 
         foreach ($items as $item) {
-            $item->update([
-                'sequence_no' => $sequence,
-            ]);
+            if ((int) $item->sequence_no !== $sequence) {
+                $item->update(['sequence_no' => $sequence]);
+            }
 
             $sequence++;
         }
@@ -297,19 +270,16 @@ class OperationController extends Controller
         $today = now()->startOfDay();
         $yesterday = now()->subDay()->startOfDay();
 
-        // ห้ามเลือกวันอนาคตทุก role
         if ($selectedDate->gt($today)) {
             abort(422, 'ไม่สามารถเลือกวันที่เกินกว่าวันปัจจุบันได้');
         }
 
-        // admin เลือกย้อนหลังได้ทุกวัน
         if ($user->isAdmin()) {
             return;
         }
 
-        // user ทั่วไป เลือกได้เฉพาะวันนี้ หรือย้อนหลังได้ไม่เกิน 1 วัน
         if ($selectedDate->lt($yesterday)) {
             abort(422, 'ไม่สามารถบันทึกย้อนหลังเกิน 1 วันได้');
         }
     }
- }
+}

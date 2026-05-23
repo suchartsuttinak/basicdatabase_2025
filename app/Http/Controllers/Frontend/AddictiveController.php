@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use App\Models\CaseActivity;
 
 class AddictiveController extends Controller
 {
@@ -30,95 +31,106 @@ class AddictiveController extends Controller
     }
 
     // บันทึกข้อมูลใหม่
-    public function StoreAddictive(Request $request)
-    {
-        $data = $request->validate([
-            'date'       => [
-                'required',
-                'date',
-                Rule::unique('addictives')->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
-                }),
-            ],
-            'exam'       => 'required|in:0,1',
-            'refer'      => 'nullable|in:1,2',
-            'record'     => 'nullable|string',
-            'recorder'   => 'required|string|max:255',
-            'client_id'  => 'required|exists:clients,id',
-        ], [
-            'date.required'      => 'กรุณาระบุวันที่ตรวจ',
-            'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'date.unique'        => 'วันที่นี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
-            'exam.required'      => 'กรุณาเลือกผลการตรวจ',
-            'exam.in'            => 'ค่าที่เลือกไม่ถูกต้อง',
-            'refer.in'           => 'ค่าการส่งต่อไม่ถูกต้อง',
-            'record.string'      => 'บันทึกผลต้องเป็นข้อความ',
-            'recorder.required'  => 'กรุณาระบุชื่อผู้ตรวจ',
-            'recorder.string'    => 'ชื่อผู้ตรวจต้องเป็นข้อความ',
-            'recorder.max'       => 'ชื่อผู้ตรวจต้องไม่เกิน 255 ตัวอักษร',
-            'client_id.required' => 'ไม่พบรหัสผู้รับบริการ',
-            'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
-        ]);
+   public function StoreAddictive(Request $request)
+        {
+            $data = $request->validate([
+                'date'       => [
+                    'required',
+                    'date',
+                    Rule::unique('addictives')->where(function ($query) use ($request) {
+                        return $query->where('client_id', $request->client_id);
+                    }),
+                ],
+                'exam'       => 'required|in:0,1',
+                'refer'      => 'nullable|in:1,2',
+                'record'     => 'nullable|string',
+                'recorder'   => 'required|string|max:255',
+                'client_id'  => 'required|exists:clients,id',
+            ], [
+                'date.required'      => 'กรุณาระบุวันที่ตรวจ',
+                'date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+                'date.unique'        => 'วันที่นี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
+                'exam.required'      => 'กรุณาเลือกผลการตรวจ',
+                'exam.in'            => 'ค่าที่เลือกไม่ถูกต้อง',
+                'refer.in'           => 'ค่าการส่งต่อไม่ถูกต้อง',
+                'record.string'      => 'บันทึกผลต้องเป็นข้อความ',
+                'recorder.required'  => 'กรุณาระบุชื่อผู้ตรวจ',
+                'recorder.string'    => 'ชื่อผู้ตรวจต้องเป็นข้อความ',
+                'recorder.max'       => 'ชื่อผู้ตรวจต้องไม่เกิน 255 ตัวอักษร',
+                'client_id.required' => 'ไม่พบรหัสผู้รับบริการ',
+                'client_id.exists'   => 'รหัสผู้รับบริการไม่ถูกต้อง',
+            ]);
 
-        // =========================
-        // PATCH: กันยิง request เปลี่ยน client_id
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            $data['client_id'] = $client->id;
 
-        // นับจำนวนครั้งล่าสุด
-        $latestCount = Addictive::where('client_id', $data['client_id'])->max('count') ?? 0;
-        $nextCount = $latestCount + 1;
+            $latestCount = Addictive::where('client_id', $client->id)->max('count') ?? 0;
+            $nextCount = $latestCount + 1;
 
-        // ตรวจสอบว่ามี count นี้อยู่แล้วหรือไม่
-        $exists = Addictive::where('client_id', $data['client_id'])
-            ->where('count', $nextCount)
-            ->exists();
+            $exists = Addictive::where('client_id', $client->id)
+                ->where('count', $nextCount)
+                ->exists();
 
-        if ($exists) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
+            if ($exists) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)',
+                        'errors' => []
+                    ]);
+                }
+
+                return redirect()->back()->withInput()->with([
                     'message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)',
-                    'errors' => []
+                    'alert-type' => 'error'
                 ]);
             }
 
-            return redirect()->back()->withInput()->with([
-                'message' => 'ไม่สามารถบันทึกข้อมูลซ้ำได้ (ครั้งที่ ' . $nextCount . ' มีอยู่แล้ว)',
-                'alert-type' => 'error'
+            $this->validateDateOrderByCount(
+                clientId: $client->id,
+                currentCount: $nextCount,
+                inputDate: $data['date']
+            );
+
+            $data['count'] = $nextCount;
+
+            if ($data['exam'] == 0) {
+                $data['refer'] = null;
+            }
+
+            $addictive = Addictive::create($data);
+
+                CaseActivity::where('client_id', $client->id)
+                ->where('module', 'addictive')
+                ->delete();
+
+                CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'addictive',
+                'type'        => ($data['exam'] == 1) ? 'warning' : 'success',
+                'title'       => 'บันทึกการตรวจสารเสพติด',
+                'description' => 'วันที่ตรวจ: ' . ($data['date'] ?? '-') .
+                                ' | ครั้งที่ ' . ($addictive->count ?? '-') .
+                                ' | ผลตรวจ: ' . (($data['exam'] == 1) ? 'พบสารเสพติด' : 'ไม่พบสารเสพติด') .
+                                ' | ผู้ตรวจ: ' . ($data['recorder'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-clipboard2-pulse',
+                'url'         => route('addictive.create', $client->id),
             ]);
-        }
 
-        // =========================
-        // PATCH: ครั้งใหม่ต้องมีวันที่มากกว่าครั้งก่อนหน้าเสมอ
-        // =========================
-        $this->validateDateOrderByCount(
-            clientId: $data['client_id'],
-            currentCount: $nextCount,
-            inputDate: $data['date']
-        );
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    'data' => $addictive
+                ]);
+            }
 
-        $data['count'] = $nextCount;
-
-        if ($data['exam'] == 0) {
-            $data['refer'] = null;
-        }
-
-        $addictive = Addictive::create($data);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
+            return redirect()->back()->with([
                 'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                'data' => $addictive
+                'alert-type' => 'success'
             ]);
         }
-
-        return redirect()->back()->with([
-            'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-            'alert-type' => 'success'
-        ]);
-    }
 
     // โหลดข้อมูลเดิมสำหรับแก้ไข (JSON)
     public function EditAddictiveJson($id)
@@ -200,6 +212,24 @@ class AddictiveController extends Controller
 
         $addictive->update($data);
 
+        CaseActivity::where('client_id', $addictive->client_id)
+            ->where('module', 'addictive')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $addictive->client_id,
+            'module'      => 'addictive',
+            'type'        => ($data['exam'] == 1) ? 'warning' : 'success',
+            'title'       => 'แก้ไขการตรวจสารเสพติด',
+            'description' => 'วันที่ตรวจ: ' . ($data['date'] ?? '-') .
+                            ' | ครั้งที่ ' . ($addictive->count ?? '-') .
+                            ' | ผลตรวจ: ' . (($data['exam'] == 1) ? 'พบสารเสพติด' : 'ไม่พบสารเสพติด') .
+                            ' | ผู้ตรวจ: ' . ($data['recorder'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-clipboard2-pulse',
+            'url'         => route('addictive.create', $addictive->client_id),
+        ]);
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -228,6 +258,10 @@ class AddictiveController extends Controller
 
         // เก็บ count เดิมไว้ก่อนลบ
         $deletedCount = $addictive->count;
+
+        CaseActivity::where('client_id', $clientId)
+        ->where('module', 'addictive')
+        ->delete();
 
         $addictive->delete();
 

@@ -18,15 +18,16 @@ class Publicize extends Model
         'recorded_at' => 'date',
     ];
 
-    public const CATEGORIES = [
-        'project'   => 'โครงการ',
-        'law'       => 'กฎหมาย',
-        'book'      => 'หนังสือสั่งการ',
-        'policy'    => 'นโยบาย',
-        'mou'       => 'บันทึกข้อตกลง',
-        'form'      => 'แบบฟอร์ม',
-        'manual'    => 'คู่มือ',
-    ];
+  public const CATEGORIES = [
+    'project'           => 'โครงการ',
+    'law'               => 'กฎหมาย',
+    'nationality_law'   => 'การทะเบียนราษฎร/สัญชาติ',
+    'book'              => 'หนังสือสั่งการ',
+    'policy'            => 'นโยบาย',
+    'mou'               => 'บันทึกข้อตกลง',
+    'form'              => 'แบบฟอร์ม',
+    'manual'            => 'คู่มือ',
+];
 
     public function getCategoryLabelAttribute(): string
     {

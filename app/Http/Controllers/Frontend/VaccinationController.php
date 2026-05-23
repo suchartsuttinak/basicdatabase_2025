@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Models\CaseActivity;
 
 class VaccinationController extends Controller
 {
@@ -37,42 +38,65 @@ class VaccinationController extends Controller
         return view('frontend.client.vaccine.vaccine_show', compact('client', 'vaccinations'));
     }
 
-    public function VaccineStore(Request $request)
-    {
-        $validated = $request->validate([
-            'client_id'    => ['required', 'integer', 'exists:clients,id'],
-            'date'         => [
-                'required',
-                'date',
-                Rule::unique('vaccinations')->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
-                }),
-            ],
-            'vaccine_name' => 'required|string|max:255',
-            'hospital'     => 'nullable|string|max:255',
-            'recorder'     => 'nullable|string|max:255',
-            'remark'       => 'nullable|string|max:500',
-        ], [
-            'client_id.required'    => 'กรุณาระบุรหัสผู้รับบริการ',
-            'client_id.exists'      => 'รหัสผู้รับบริการไม่ถูกต้อง',
-            'date.required'         => 'กรุณากรอกวันที่รับวัคซีน',
-            'date.date'             => 'วันที่รับวัคซีนไม่ถูกต้อง',
-            'date.unique'           => 'เด็กคนนี้มีการบันทึกวันที่รับวัคซีนนี้แล้ว',
-            'vaccine_name.required' => 'กรุณากรอกชนิดวัคซีน',
-            'vaccine_name.max'      => 'ชนิดวัคซีนต้องไม่เกิน 255 ตัวอักษร',
-            'hospital.max'          => 'ชื่อสถานพยาบาลต้องไม่เกิน 255 ตัวอักษร',
-            'recorder.max'          => 'ชื่อเจ้าหน้าที่ต้องไม่เกิน 255 ตัวอักษร',
-            'remark.max'            => 'หมายเหตุต้องไม่เกิน 500 ตัวอักษร',
-        ]);
+  public function VaccineStore(Request $request)
+        {
+            $validated = $request->validate([
+                'client_id'    => ['required', 'integer', 'exists:clients,id'],
+                'date'         => [
+                    'required',
+                    'date',
+                    Rule::unique('vaccinations')->where(function ($query) use ($request) {
+                        return $query->where('client_id', $request->client_id);
+                    }),
+                ],
+                'vaccine_name' => 'required|string|max:255',
+                'hospital'     => 'nullable|string|max:255',
+                'recorder'     => 'nullable|string|max:255',
+                'remark'       => 'nullable|string|max:500',
+            ], [
+                'client_id.required'    => 'กรุณาระบุรหัสผู้รับบริการ',
+                'client_id.exists'      => 'รหัสผู้รับบริการไม่ถูกต้อง',
+                'date.required'         => 'กรุณากรอกวันที่รับวัคซีน',
+                'date.date'             => 'วันที่รับวัคซีนไม่ถูกต้อง',
+                'date.unique'           => 'เด็กคนนี้มีการบันทึกวันที่รับวัคซีนนี้แล้ว',
+                'vaccine_name.required' => 'กรุณากรอกชนิดวัคซีน',
+                'vaccine_name.max'      => 'ชนิดวัคซีนต้องไม่เกิน 255 ตัวอักษร',
+                'hospital.max'          => 'ชื่อสถานพยาบาลต้องไม่เกิน 255 ตัวอักษร',
+                'recorder.max'          => 'ชื่อเจ้าหน้าที่ต้องไม่เกิน 255 ตัวอักษร',
+                'remark.max'            => 'หมายเหตุต้องไม่เกิน 500 ตัวอักษร',
+            ]);
 
-        $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
-        $validated['client_id'] = $client->id;
+            $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+            $validated['client_id'] = $client->id;
 
-        Vaccination::create($validated);
+            $vaccination = Vaccination::create($validated);
 
-        return redirect()->route('vaccine.index', ['client_id' => $validated['client_id']])
-                         ->with(['message' => 'บันทึกข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
-    }
+            CaseActivity::where('client_id', $client->id)
+                ->where('module', 'vaccine')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'vaccine',
+                'type'        => 'success',
+                'title'       => 'บันทึกประวัติการรับวัคซีน',
+                'description' =>
+                    'วันที่รับวัคซีน: ' . ($validated['date'] ?? '-') .
+                    ' | ชนิดวัคซีน: ' . ($validated['vaccine_name'] ?? '-') .
+                    ' | สถานพยาบาล: ' . ($validated['hospital'] ?? '-'),
+
+                'occurred_at' => now(),
+
+                'icon'        => 'bi-shield-plus',
+
+                'url'         => route('vaccine.index', [
+                    'client_id' => $client->id
+                ]),
+            ]);
+
+            return redirect()->route('vaccine.index', ['client_id' => $validated['client_id']])
+                            ->with(['message' => 'บันทึกข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+        }
 
     public function VaccineEdit($id)
     {
@@ -142,6 +166,29 @@ class VaccinationController extends Controller
 
         $vaccination->update($data);
 
+        CaseActivity::where('client_id', $vaccination->client_id)
+            ->where('module', 'vaccine')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $vaccination->client_id,
+            'module'      => 'vaccine',
+            'type'        => 'success',
+            'title'       => 'แก้ไขประวัติการรับวัคซีน',
+            'description' =>
+                'วันที่รับวัคซีน: ' . ($data['date'] ?? '-') .
+                ' | ชนิดวัคซีน: ' . ($data['vaccine_name'] ?? '-') .
+                ' | สถานพยาบาล: ' . ($data['hospital'] ?? '-'),
+
+            'occurred_at' => now(),
+
+            'icon'        => 'bi-shield-plus',
+
+            'url'         => route('vaccine.index', [
+                'client_id' => $vaccination->client_id
+            ]),
+        ]);
+
         return redirect()->route('vaccine.index', ['client_id' => $vaccination->client_id])
                          ->with(['message' => 'แก้ไขข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
     }
@@ -154,11 +201,16 @@ class VaccinationController extends Controller
             ->findOrFail($id);
 
         $client_id = $vaccination->client_id;
-        $vaccination->delete();
 
-        return redirect()->route('vaccine.index', ['client_id' => $client_id])
-                         ->with(['message' => 'ลบข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
-    }
+        CaseActivity::where('client_id', $vaccination->client_id)
+            ->where('module', 'vaccine')
+            ->delete();
+
+            $vaccination->delete();
+
+            return redirect()->route('vaccine.index', ['client_id' => $client_id])
+                ->with(['message' => 'ลบข้อมูลเรียบร้อยแล้ว', 'alert-type' => 'success']);
+        }
 
     public function VaccineReport(Request $request, $client_id)
     {

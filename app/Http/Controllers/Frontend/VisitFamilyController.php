@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Models\CaseActivity;
 
 class VisitFamilyController extends Controller
 {
@@ -180,85 +181,101 @@ protected function saveVisitImage($file, bool $cover = false): array
         ]);
     }
 
-    public function StoreVisitFamily(Request $request, $client_id)
-    {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+   public function StoreVisitFamily(Request $request, $client_id)
+        {
+            $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-        $validated = $request->validate([
-            'visit_date'      => 'required|date',
-            'family_fname'    => 'required|string|max:255',
-            'family_age'      => 'nullable|integer',
-            'member'          => 'nullable|string|max:255',
-            'residence_status'=> 'nullable|string|max:100',
-            'address'         => 'nullable|string|max:255',
-            'moo'             => 'nullable|string|max:50',
-            'soi'             => 'nullable|string|max:50',
-            'road'            => 'nullable|string|max:255',
-            'village'         => 'nullable|string|max:255',
-            'province_id'     => 'required|integer',
-            'district_id'     => 'required|integer',
-            'sub_district_id' => 'required|integer',
-            'zipcode'         => 'required|string|max:10',
-            'phone'           => 'nullable|string|max:20',
-            'outside_address' => 'nullable|string',
-            'inside_address'  => 'nullable|string',
-            'environment'     => 'nullable|string',
-            'neighbor'        => 'nullable|string',
-            'member_relation' => 'nullable|string',
-            'income_id'       => 'nullable|integer',
-            'problem'         => 'nullable|string',
-            'need'            => 'nullable|string',
-            'diagnose'        => 'nullable|string',
-            'assistance'      => 'nullable|string',
-            'comment'         => 'nullable|string',
-            'modify'          => 'nullable|string',
-            'teacher'         => 'required|string',
-            'remark'          => 'nullable|string',
-            'images'          => 'nullable|array',
-            'images.*'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
-        ], [
-            'visit_date.required'      => 'กรุณาระบุวันที่เยี่ยม',
-            'visit_date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'family_fname.required'    => 'กรุณากรอกชื่อผู้ให้ข้อมูล',
-            'family_fname.max'         => 'ชื่อผู้ให้ข้อมูลต้องไม่เกิน 255 ตัวอักษร',
-            'family_age.integer'       => 'อายุต้องเป็นตัวเลข',
-            'province_id.required'     => 'กรุณาเลือกจังหวัด',
-            'district_id.required'     => 'กรุณาเลือกอำเภอ',
-            'sub_district_id.required' => 'กรุณาเลือกตำบล',
-            'zipcode.required'         => 'กรุณากรอกรหัสไปรษณีย์',
-            'zipcode.max'              => 'รหัสไปรษณีย์ต้องไม่เกิน 10 หลัก',
-            'teacher.required'         => 'กรุณาระบุผู้ที่เยี่ยมบ้าน',
-            'images.*.image'           => 'ไฟล์ต้องเป็นรูปภาพ',
-            'images.*.mimes'           => 'รูปภาพต้องเป็นไฟล์ชนิด jpg, jpeg, png หรือ webp',
-            'images.*.max'             => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 10MB',
-        ]);
+            $validated = $request->validate([
+                'visit_date'      => 'required|date',
+                'family_fname'    => 'required|string|max:255',
+                'family_age'      => 'nullable|integer',
+                'member'          => 'nullable|string|max:255',
+                'residence_status'=> 'nullable|string|max:100',
+                'address'         => 'nullable|string|max:255',
+                'moo'             => 'nullable|string|max:50',
+                'soi'             => 'nullable|string|max:50',
+                'road'            => 'nullable|string|max:255',
+                'village'         => 'nullable|string|max:255',
+                'province_id'     => 'required|integer',
+                'district_id'     => 'required|integer',
+                'sub_district_id' => 'required|integer',
+                'zipcode'         => 'required|string|max:10',
+                'phone'           => 'nullable|string|max:20',
+                'outside_address' => 'nullable|string',
+                'inside_address'  => 'nullable|string',
+                'environment'     => 'nullable|string',
+                'neighbor'        => 'nullable|string',
+                'member_relation' => 'nullable|string',
+                'income_id'       => 'nullable|integer',
+                'problem'         => 'nullable|string',
+                'need'            => 'nullable|string',
+                'diagnose'        => 'nullable|string',
+                'assistance'      => 'nullable|string',
+                'comment'         => 'nullable|string',
+                'modify'          => 'nullable|string',
+                'teacher'         => 'required|string',
+                'remark'          => 'nullable|string',
+                'images'          => 'nullable|array',
+                'images.*'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240',
+            ], [
+                'visit_date.required'      => 'กรุณาระบุวันที่เยี่ยม',
+                'visit_date.date'          => 'รูปแบบวันที่ไม่ถูกต้อง',
+                'family_fname.required'    => 'กรุณากรอกชื่อผู้ให้ข้อมูล',
+                'family_fname.max'         => 'ชื่อผู้ให้ข้อมูลต้องไม่เกิน 255 ตัวอักษร',
+                'family_age.integer'       => 'อายุต้องเป็นตัวเลข',
+                'province_id.required'     => 'กรุณาเลือกจังหวัด',
+                'district_id.required'     => 'กรุณาเลือกอำเภอ',
+                'sub_district_id.required' => 'กรุณาเลือกตำบล',
+                'zipcode.required'         => 'กรุณากรอกรหัสไปรษณีย์',
+                'zipcode.max'              => 'รหัสไปรษณีย์ต้องไม่เกิน 10 หลัก',
+                'teacher.required'         => 'กรุณาระบุผู้ที่เยี่ยมบ้าน',
+                'images.*.image'           => 'ไฟล์ต้องเป็นรูปภาพ',
+                'images.*.mimes'           => 'รูปภาพต้องเป็นไฟล์ชนิด jpg, jpeg, png หรือ webp',
+                'images.*.max'             => 'ขนาดไฟล์รูปภาพต้องไม่เกิน 10MB',
+            ]);
 
-        $validated['client_id'] = $client->id;
-        $validated['count'] = 1;
+            $validated['client_id'] = $client->id;
+            $validated['count'] = 1;
 
-        unset($validated['images']);
+            unset($validated['images']);
 
-        $visitFamily = VisitFamily::create($validated);
+            $visitFamily = VisitFamily::create($validated);
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                $saved = $this->saveVisitImage($file, false);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $file) {
+                    $saved = $this->saveVisitImage($file, false);
 
-                Image::create([
-                    'file_path'       => $saved['path'],
-                    'file_name'       => $saved['name'],
-                    'mime_type'       => $saved['mime'],
-                    'size'            => $saved['size'],
-                    'visit_family_id' => $visitFamily->id,
-                    'client_id'       => $visitFamily->client_id,
-                ]);
+                    Image::create([
+                        'file_path'       => $saved['path'],
+                        'file_name'       => $saved['name'],
+                        'mime_type'       => $saved['mime'],
+                        'size'            => $saved['size'],
+                        'visit_family_id' => $visitFamily->id,
+                        'client_id'       => $visitFamily->client_id,
+                    ]);
+                }
             }
+
+                CaseActivity::where('client_id', $client->id)
+                ->where('module', 'visit_family')
+                ->delete();
+
+                CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'visit_family',
+                'type'        => 'success',
+                'title'       => 'บันทึกการเยี่ยมบ้านครอบครัว',
+                'description' => 'วันที่เยี่ยม: ' . ($validated['visit_date'] ?? '-') .
+                                ' / ผู้ให้ข้อมูล: ' . ($validated['family_fname'] ?? '-') .
+                                ' / ผู้เยี่ยม: ' . ($validated['teacher'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-house-heart',
+                'url'         => route('vitsitFamily.edit', $visitFamily->id),
+            ]);
+
+            return redirect()->route('visitFamily.create', $client->id)
+                ->with('success', 'บันทึกข้อมูลเรียบร้อย');
         }
-
-        return redirect()->route('visitFamily.create', $client->id)
-            ->with('success', 'บันทึกข้อมูลเรียบร้อย');
-    }
-
   public function EditVisitFamily($id)
 {
     $visitFamily = VisitFamily::where('id', $id)
@@ -365,6 +382,23 @@ protected function saveVisitImage($file, bool $cover = false): array
                 ]);
             }
         }
+
+                CaseActivity::where('client_id', $visitFamily->client_id)
+                    ->where('module', 'visit_family')
+                    ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $visitFamily->client_id,
+                    'module'      => 'visit_family',
+                    'type'        => 'success',
+                    'title'       => 'แก้ไขข้อมูลการเยี่ยมบ้านครอบครัว',
+                    'description' => 'วันที่เยี่ยม: ' . ($validated['visit_date'] ?? '-') .
+                                    ' / ผู้ให้ข้อมูล: ' . ($validated['family_fname'] ?? '-') .
+                                    ' / ผู้เยี่ยม: ' . ($validated['teacher'] ?? '-'),
+                    'occurred_at' => now(),
+                    'icon'        => 'bi-house-heart',
+                    'url'         => route('vitsitFamily.edit', $visitFamily->id),
+                ]);
 
         return redirect()->route('vitsitFamily.edit', $id)
             ->with('success', 'แก้ไขข้อมูลเรียบร้อย');

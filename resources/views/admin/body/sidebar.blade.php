@@ -1,12 +1,36 @@
 @php
-    $isProfileOpen = Request::routeIs('client.show') || Request::routeIs('client.show_refer');
+    $routeClient = request()->route('client')
+        ?? request()->route('client_id')
+        ?? request()->route('id')
+        ?? null;
+
+    $sidebarClientId = null;
+
+    if (isset($client) && is_object($client)) {
+        $sidebarClientId = $client->id;
+    } elseif (isset($client) && is_numeric($client)) {
+        $sidebarClientId = $client;
+    } elseif (is_object($routeClient)) {
+        $sidebarClientId = $routeClient->id ?? null;
+    } elseif (is_numeric($routeClient)) {
+        $sidebarClientId = $routeClient;
+    }
+
+    $isProfileOpen =
+        Request::routeIs('client.show') ||
+        Request::routeIs('client.cases') ||
+        Request::routeIs('client.transfers') ||
+        Request::routeIs('client.transfer.*') ||
+        Request::routeIs('client-house-transfers.*');
+
+  
 
     $isDashboardOpen =
-    Request::routeIs('issues.index') ||
-    Request::routeIs('news.create') ||
-    Request::routeIs('landing.about.index') ||
-    Request::routeIs('scholarship.index') ||
-    Request::routeIs('scholarship.children.*');
+        Request::routeIs('issues.index') ||
+        Request::routeIs('news.create') ||
+        Request::routeIs('landing.about.index') ||
+        Request::routeIs('scholarship.index') ||
+        Request::routeIs('scholarship.children.*');
 
     $isMasterMenu =
         Request::routeIs('institution.*') ||
@@ -165,6 +189,8 @@
     }
 </style>
 
+    
+
 <div class="app-sidebar-menu sidebar-arrow-fix" id="stableMasterSidebar">
     <div class="h-100" data-simplebar>
         <div id="sidebar-menu">
@@ -196,27 +222,52 @@
                         <span class="menu-arrow menu-arrow-custom"></span>
                     </a>
 
-                    <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
+                     <div class="collapse {{ $isProfileOpen ? 'show' : '' }}" id="sidebarProfile">
                         <ul class="nav-second-level">
-                            <li>
+
+                           <li>
                                 <a href="{{ route('client.show') }}"
-                                   class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
+                                class="tp-link {{ Request::routeIs('client.show') ? 'active' : '' }}">
+                                    <i class="bi bi-people-fill me-2"></i>
                                     ทะเบียนผู้รับบริการ
                                 </a>
                             </li>
-
+                          
                             @if(auth()->check() && auth()->user()->role === 'admin')
+
                                 <li>
-                                    <a href="{{ route('client.show_refer') }}"
-                                       class="tp-link {{ Request::routeIs('client.show_refer') ? 'active' : '' }}">
-                                        ทะเบียนผู้รับบริการทั้งหมด
+                                    <a href="{{ route('client.cases') }}"
+                                    class="tp-link {{ Request::routeIs('client.cases') ? 'active' : '' }}">
+                                        <i class="bi bi-database-fill me-2"></i>
+                                        ทะเบียนกลางเคสทั้งหมด
                                     </a>
                                 </li>
+
+                                <li>
+                                    <a href="{{ route('client.transfers') }}"
+                                    class="tp-link {{ Request::routeIs('client.transfers') || Request::routeIs('client.transfer.*') ? 'active' : '' }}">
+                                        <i class="bi bi-arrow-left-right me-2"></i>
+                                        ย้ายโปรเจ็คต์
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('client-house-transfers.index') }}"
+                                    class="tp-link {{ Request::routeIs('client-house-transfers.*') ? 'active' : '' }}">
+                                        <i class="bi bi-house-door-fill me-2"></i>
+                                        ย้ายสถานที่พักพิง
+                                    </a>
+                                </li>
+
                             @endif
+
                         </ul>
                     </div>
                 </li>
 
+
+
+               
                 {{-- =========================
                     Dashboard
                 ========================== --}}
@@ -255,25 +306,25 @@
                 </a>
             </li>
 
-           @if(auth()->check() && auth()->user()->role === 'admin')
-<li>
-    <a href="{{ route('scholarship.index') }}"
-       class="tp-link {{ Request::routeIs('scholarship.index') ? 'active' : '' }}">
-        ผู้สนับสนุนทุนการศึกษา
-    </a>
-</li>
+                @if(auth()->check() && auth()->user()->role === 'admin')
+                    <li>
+                        <a href="{{ route('scholarship.index') }}"
+                        class="tp-link {{ Request::routeIs('scholarship.index') ? 'active' : '' }}">
+                            ผู้สนับสนุนทุนการศึกษา
+                        </a>
+                    </li>
 
-<li>
-    <a href="{{ route('scholarship.children.index') }}"
-       class="tp-link {{ Request::routeIs('scholarship.children.*') ? 'active' : '' }}">
-        ทุนการศึกษาเด็ก
-    </a>
-</li>
-@endif
+                    <li>
+                        <a href="{{ route('scholarship.children.index') }}"
+                        class="tp-link {{ Request::routeIs('scholarship.children.*') ? 'active' : '' }}">
+                            ทุนการศึกษาเด็ก
+                        </a>
+                    </li>
+                    @endif
 
-        </ul>
-    </div>
-</li>
+                            </ul>
+                        </div>
+                    </li>
                 {{-- =========================
                     ข้อมูลอ้างอิง
                 ========================== --}}

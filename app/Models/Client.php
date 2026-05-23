@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use App\Models\ClientTransfer;
 
 class Client extends Model
 {
@@ -88,9 +89,16 @@ class Client extends Model
         return $this->belongsTo(SubDistrict::class, 'sub_district_id');
     }
 
+    // บ้านปัจจุบัน
     public function house()
     {
         return $this->belongsTo(House::class, 'house_id');
+    }
+
+    // ประวัติการย้ายบ้าน
+    public function houseTransfers()
+    {
+        return $this->hasMany(ClientHouseTransfer::class, 'client_id');
     }
 
     public function project()
@@ -277,46 +285,51 @@ class Client extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeForUser(Builder $query, $user): Builder
-    {
-        if (!$user) {
-            return $query->whereRaw('1 = 0');
-        }
-
-        // admin เห็นทั้งหมด
-        if (
-            (method_exists($user, 'isAdmin') && $user->isAdmin()) ||
-            (($user->role ?? null) === 'admin')
-        ) {
-            return $query;
-        }
-
-        // โหลด relation บ้านของ user ถ้ายังไม่ได้โหลด
-        if (method_exists($user, 'loadMissing')) {
-            $user->loadMissing('houses');
-        }
-
-        // กรณี user มี relation houses() แบบหลายบ้าน
-        if (isset($user->houses) && $user->houses && $user->houses->isNotEmpty()) {
-            $houseIds = $user->houses->pluck('id')->map(fn ($id) => (int) $id)->toArray();
-
-            if (empty($houseIds)) {
-                return $query->whereRaw('1 = 0');
-            }
-
-            return $query->whereIn('house_id', $houseIds);
-        }
-
-        // fallback กรณี user ผูกบ้านเดียวด้วย house_id
-        if (!empty($user->house_id)) {
-            return $query->where('house_id', (int) $user->house_id);
-        }
-
-        // ไม่มีบ้าน = ไม่เห็นข้อมูล
+  public function scopeForUser(Builder $query, $user): Builder
+{
+    if (!$user) {
         return $query->whereRaw('1 = 0');
     }
 
+    // admin / executive เห็นทั้งหมด
+    if (
+        (method_exists($user, 'isAdmin') && $user->isAdmin()) ||
+        (method_exists($user, 'isExecutive') && $user->isExecutive()) ||
+        in_array(($user->role ?? null), ['admin', 'executive'], true)
+    ) {
+        return $query;
+    }
 
+    if (method_exists($user, 'loadMissing')) {
+        $user->loadMissing('houses');
+    }
+
+    // มีสิทธิ์ตามบ้าน
+    if (isset($user->houses) && $user->houses && $user->houses->isNotEmpty()) {
+
+        $houseIds = $user->houses
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return $query->whereIn('house_id', $houseIds);
+    }
+
+    // fallback บ้านเดี่ยว
+    if (!empty($user->house_id)) {
+        return $query->where('house_id', (int) $user->house_id);
+    }
+
+    // กรณีมี project_id แต่ไม่มีบ้าน
+    if (!empty($user->project_id)) {
+        return $query->where('project_id', (int) $user->project_id);
+    }
+
+    // ไม่มีสิทธิ์ใดเลย
+    return $query->whereRaw('1 = 0');
+}
 
         // ความสัมพันธ์กับ Followup (ติดตามผล)
     public function followups()
@@ -327,5 +340,16 @@ class Client extends Model
 public function healthcHeckups()
 {
     return $this->hasMany(\App\Models\HealthcHeckup::class, 'client_id');
+}
+
+public function transfers()
+{
+    return $this->hasMany(ClientTransfer::class);
+}
+
+  // ความสัมพันธ์กับ BehaviorScreening (คัดกรองพฤติกรรม)
+public function behaviorScreenings()
+{
+    return $this->hasMany(\App\Models\BehaviorScreening::class);
 }
 }

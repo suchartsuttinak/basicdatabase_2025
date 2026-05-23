@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\House;
 use App\Models\Operation;
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,6 +28,7 @@ class User extends Authenticatable
     public const ROLE_EXECUTIVE = 'executive';
     public const ROLE_SOCIAL_WORKER = 'social_worker';
     public const ROLE_TEACHER_CAREGIVER = 'teacher_caregiver';
+    public const ROLE_NURSE = 'nurse';
     public const ROLE_GENERAL_USER = 'general_user';
 
     protected function casts(): array
@@ -45,6 +47,7 @@ class User extends Authenticatable
             self::ROLE_EXECUTIVE => 'ผู้บริหาร',
             self::ROLE_SOCIAL_WORKER => 'นักสังคมสงเคราะห์',
             self::ROLE_TEACHER_CAREGIVER => 'ครู/ผู้ดูแล',
+            self::ROLE_NURSE => 'พยาบาล',
             self::ROLE_GENERAL_USER => 'ผู้ใช้ทั่วไป',
         ];
     }
@@ -94,6 +97,11 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_TEACHER_CAREGIVER;
     }
+
+   public function isNurse(): bool
+{
+    return $this->role === self::ROLE_NURSE;
+}
 
     public function isGeneralUser(): bool
     {
@@ -198,6 +206,11 @@ class User extends Authenticatable
 
         return $this->houses->isNotEmpty();
     }
+
+    public function project()
+{
+    return $this->belongsTo(Project::class);
+}
 
     public function healthcHeckups()
 {

@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\Escape;
 use App\Models\EscapeFollow;
 use Carbon\Carbon;
+use App\Models\CaseActivity;
 
 class EscapeFollowController extends Controller
 {
@@ -61,7 +62,24 @@ class EscapeFollowController extends Controller
         $data['escape_id'] = $escape->id;
         $data['count']     = $nextCount;
 
-        EscapeFollow::create($data);
+       $follow = EscapeFollow::create($data);
+
+                CaseActivity::where('client_id', $escape->client_id)
+                    ->where('module', 'escape')
+                    ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $escape->client_id,
+                    'module'      => 'escape',
+                    'type'        => 'warning',
+                    'title'       => 'บันทึกการติดตามการออก/หลบหนี',
+                    'description' => 'ติดตามครั้งที่ ' . ($follow->count ?? '-') .
+                                    ' | วันที่ติดตาม: ' . ($data['trace_date'] ?? '-') .
+                                    ' | รายละเอียด: ' . ($data['detail'] ?? '-'),
+                    'occurred_at' => now(),
+                    'icon'        => 'bi-person-check',
+                    'url'         => route('escape.edit', $escape->id),
+                ]);
 
         return redirect()
             ->route('escape.edit', $escape->id)
@@ -144,6 +162,23 @@ class EscapeFollowController extends Controller
 
         $follow->update($data);
 
+        CaseActivity::where('client_id', $escape->client_id)
+            ->where('module', 'escape')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $escape->client_id,
+            'module'      => 'escape',
+            'type'        => 'warning',
+            'title'       => 'แก้ไขการติดตามการออก/หลบหนี',
+            'description' => 'ติดตามครั้งที่ ' . ($follow->count ?? '-') .
+                            ' | วันที่ติดตาม: ' . ($data['trace_date'] ?? '-') .
+                            ' | รายละเอียด: ' . ($data['detail'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-person-check',
+            'url'         => route('escape.edit', $escape->id),
+        ]);
+
         return redirect()
             ->route('escape.edit', $follow->escape_id)
             ->with([
@@ -153,44 +188,41 @@ class EscapeFollowController extends Controller
     }
 
     // ลบการติดตาม
-    public function DeleteFollow($id)
-    {
-        // =========================
-        // PATCH: กันเดา URL ตั้งแต่ query แรก
-        // เดิม: $follow = EscapeFollow::findOrFail($id);
-        // =========================
-        $follow = EscapeFollow::whereHas('escape.client', function ($q) {
-                $q->forUser(auth()->user());
-            })
-            ->findOrFail($id);
+        public function DeleteFollow($id)
+        {
+            $follow = EscapeFollow::whereHas('escape.client', function ($q) {
+                    $q->forUser(auth()->user());
+                })
+                ->findOrFail($id);
 
-        // =========================
-        // PATCH: ใช้ escape จาก relation
-        // =========================
-        $escape = $follow->escape;
+            $escape = $follow->escape;
 
-        Client::forUser(auth()->user())->findOrFail($escape->client_id);
+            Client::forUser(auth()->user())->findOrFail($escape->client_id);
 
-        $escape_id = $follow->escape_id;
+            $escape_id = $follow->escape_id;
 
-        $follow->delete();
+            CaseActivity::where('client_id', $escape->client_id)
+                ->where('module', 'escape')
+                ->delete();
 
-        $remainingFollows = EscapeFollow::where('escape_id', $escape_id)
-            ->orderBy('count', 'asc')
-            ->orderBy('trace_date', 'asc')
-            ->get();
+            $follow->delete();
 
-        foreach ($remainingFollows as $index => $item) {
-            $item->update([
-                'count' => $index + 1
-            ]);
+            $remainingFollows = EscapeFollow::where('escape_id', $escape_id)
+                ->orderBy('count', 'asc')
+                ->orderBy('trace_date', 'asc')
+                ->get();
+
+            foreach ($remainingFollows as $index => $item) {
+                $item->update([
+                    'count' => $index + 1
+                ]);
+            }
+
+            return redirect()
+                ->route('escape.edit', $escape_id)
+                ->with([
+                    'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
+                    'alert-type' => 'success'
+                ]);
         }
-
-        return redirect()
-            ->route('escape.edit', $escape_id)
-            ->with([
-                'message' => 'ลบข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success'
-            ]);
     }
-}

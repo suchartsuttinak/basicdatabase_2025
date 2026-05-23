@@ -697,37 +697,73 @@ document.addEventListener('DOMContentLoaded', function () {
                                     @enderror
                                 </div>
 
-                                <div class="col-md-4">
-                                    <label for="project_id" class="form-label">หน่วยงาน <span class="required-star">*</span></label>
-                                    <select name="project_id" id="project_id"
-                                        class="form-select @error('project_id') is-invalid @enderror">
-                                        <option value="">--เลือก--</option>
-                                        @foreach ($projects as $item)
-                                            <option value="{{ $item->id }}" {{ old('project_id') == $item->id ? 'selected' : '' }}>
-                                                {{ $item->project_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('project_id')
-                                        <small class="text-danger error-message" id="error-project_id">{{ $message }}</small>
-                                    @enderror
-                                </div>
+                               <div class="col-md-4">
+    <label for="project_id" class="form-label">
+        หน่วยงาน <span class="required-star">*</span>
+    </label>
 
-                                <div class="col-md-4">
-                                    <label for="house_id" class="form-label">สถานที่พักอาศัย <span class="required-star">*</span></label>
-                                    <select name="house_id" id="house_id"
-                                        class="form-select @error('house_id') is-invalid @enderror">
-                                        <option value="">--เลือก--</option>
-                                        @foreach ($houses as $item)
-                                            <option value="{{ $item->id }}" {{ old('house_id') == $item->id ? 'selected' : '' }}>
-                                                {{ $item->house_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('house_id')
-                                        <small class="text-danger error-message" id="error-house_id">{{ $message }}</small>
-                                    @enderror
-                                </div>
+    @if(auth()->user()->isAdmin() || auth()->user()->isExecutive())
+        <select name="project_id" id="project_id"
+            class="form-select @error('project_id') is-invalid @enderror">
+            <option value="">--เลือก--</option>
+
+            @foreach ($projects as $item)
+                <option value="{{ $item->id }}"
+                    {{ old('project_id') == $item->id ? 'selected' : '' }}>
+                    {{ $item->project_name }}
+                </option>
+            @endforeach
+        </select>
+    @else
+        <input type="hidden" name="project_id" value="{{ auth()->user()->project_id }}">
+
+        <input type="text"
+            class="form-control"
+            value="{{ auth()->user()->project->project_name ?? '-' }}"
+            readonly>
+    @endif
+
+    @error('project_id')
+        <small class="text-danger error-message" id="error-project_id">
+            {{ $message }}
+        </small>
+    @enderror
+</div>
+
+                             <div class="col-md-4">
+    <label for="house_id" class="form-label">
+        สถานที่พักอาศัย <span class="required-star">*</span>
+    </label>
+
+    <select name="house_id" id="house_id"
+        class="form-select @error('house_id') is-invalid @enderror">
+
+        <option value="">--เลือก--</option>
+
+        @php
+            $authUser = auth()->user();
+
+            $availableHouses = (
+                $authUser->isAdmin() || $authUser->isExecutive()
+            )
+                ? $houses
+                : $houses->whereIn('id', $authUser->accessibleHouseIds());
+        @endphp
+
+        @foreach ($availableHouses as $item)
+            <option value="{{ $item->id }}"
+                {{ old('house_id') == $item->id ? 'selected' : '' }}>
+                {{ $item->house_name }}
+            </option>
+        @endforeach
+    </select>
+
+    @error('house_id')
+        <small class="text-danger error-message" id="error-house_id">
+            {{ $message }}
+        </small>
+    @enderror
+</div>
 
                                 <div class="col-md-4">
                                     <label for="status_id" class="form-label">สถานะผู้เข้ารับ <span class="required-star">*</span></label>

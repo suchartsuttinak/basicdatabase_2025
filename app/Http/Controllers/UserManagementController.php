@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\Project;
+use App\Models\House;
 
 class UserManagementController extends Controller
 {
@@ -24,11 +26,21 @@ class UserManagementController extends Controller
         return view('backend.users.index', compact('users', 'stats'));
     }
 
-    public function create()
+     public function create()
     {
         $roles = User::roleOptions();
-        return view('backend.users.create', compact('roles'));
+
+        $projects = Project::orderBy('project_name')->get();
+
+        $houses = House::orderBy('house_name')->get();
+
+        return view('backend.users.create', compact(
+            'roles',
+            'projects',
+            'houses'
+        ));
     }
+
 
     public function store(Request $request)
     {
@@ -40,6 +52,9 @@ class UserManagementController extends Controller
             'address' => ['nullable', 'string'],
             'role' => ['required', Rule::in(array_keys(User::roleOptions()))],
             'status' => ['required', Rule::in(['0', '1'])],
+            'project_id' => ['nullable', 'exists:projects,id'],
+            'house_ids' => ['nullable', 'array'],
+            'house_ids.*' => ['integer', 'exists:houses,id'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'name.required' => 'กรุณากรอกชื่อผู้ใช้งาน',
@@ -58,7 +73,7 @@ class UserManagementController extends Controller
             $request->file('photo')->move(public_path('upload/user_images'), $photoName);
         }
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
@@ -67,18 +82,31 @@ class UserManagementController extends Controller
             'photo' => $photoName,
             'role' => $request->role,
             'status' => $request->status,
+            'project_id' => $request->project_id,
         ]);
+
+        $user->houses()->sync($request->input('house_ids', []));
 
         return redirect()->route('users.index')->with('success', 'เพิ่มผู้ใช้งานเรียบร้อยแล้ว');
     }
 
-    public function edit($id)
-    {
-        $user = User::findOrFail($id);
-        $roles = User::roleOptions();
 
-        return view('backend.users.edit', compact('user', 'roles'));
-    }
+
+        public function edit($id)
+        {
+            $user = User::with('houses')->findOrFail($id);
+
+            $roles = User::roleOptions();
+            $projects = Project::orderBy('project_name')->get();
+            $houses = House::orderBy('house_name')->get();
+
+            return view('backend.users.edit', compact(
+                'user',
+                'roles',
+                'projects',
+                'houses'
+            ));
+        }
 
     public function update(Request $request, $id)
     {
@@ -92,6 +120,9 @@ class UserManagementController extends Controller
             'address' => ['nullable', 'string'],
             'role' => ['required', Rule::in(array_keys(User::roleOptions()))],
             'status' => ['required', Rule::in(['0', '1'])],
+            'project_id' => ['nullable', 'exists:projects,id'],
+            'house_ids' => ['nullable', 'array'],
+            'house_ids.*' => ['integer', 'exists:houses,id'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'name.required' => 'กรุณากรอกชื่อผู้ใช้งาน',
@@ -109,21 +140,23 @@ class UserManagementController extends Controller
             $request->file('photo')->move(public_path('upload/user_images'), $photoName);
         }
 
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'photo' => $photoName,
-            'role' => $request->role,
-            'status' => $request->status,
-        ];
+       $data = [
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'address' => $request->address,
+        'photo' => $photoName,
+        'role' => $request->role,
+        'status' => $request->status,
+        'project_id' => $request->project_id,
+    ];
 
         if ($request->filled('password')) {
             $data['password'] = $request->password;
         }
 
         $user->update($data);
+        $user->houses()->sync($request->input('house_ids', []));
 
         return redirect()->route('users.index')->with('success', 'อัปเดตข้อมูลผู้ใช้งานเรียบร้อยแล้ว');
     }

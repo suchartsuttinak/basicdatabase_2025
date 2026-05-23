@@ -201,62 +201,158 @@
         padding-top: 8px;
     }
 
-    @media (max-width: 991.98px){
-        .addictive-report-meta{
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+   @page{
+    size: A4 landscape;
+    margin: 8mm 10mm;
+}
+
+@page{
+    size: A4 landscape;
+    margin: 10mm 14mm;
+}
+
+@media print{
+    html,
+    body{
+        width: 297mm !important;
+        min-height: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
-    @media (max-width: 767.98px){
-        .addictive-report-box{
-            padding: 16px;
-        }
-
-        .addictive-report-title{
-            font-size: 1.15rem;
-        }
-
-        .addictive-report-meta{
-            grid-template-columns: 1fr;
-        }
-
-        .addictive-report-actions{
-            width: 100%;
-        }
-
-        .addictive-report-actions .btn{
-            width: 100%;
-        }
-
-        .addictive-report-table{
-            min-width: 960px;
-        }
+    .navbar-custom,
+    .leftside-menu,
+    .page-title-box,
+    .footer,
+    .addictive-report-actions,
+    header,
+    footer{
+        display: none !important;
     }
 
-    @media print{
-        .navbar-custom,
-        .leftside-menu,
-        .page-title-box,
-        .footer,
-        .addictive-report-actions{
-            display: none !important;
-        }
-
-        .addictive-report-page{
-            padding: 0 !important;
-        }
-
-        .addictive-report-box{
-            border: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-        }
-
-        body{
-            background: #fff !important;
-        }
+    .addictive-report-page{
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        background: #fff !important;
+        overflow: visible !important;
     }
+
+    .addictive-report-box{
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        overflow: visible !important;
+        page-break-after: avoid !important;
+    }
+
+    .addictive-report-header{
+        text-align: center !important;
+        margin: 0 0 6px !important;
+        padding: 0 0 5px !important;
+        border-bottom: 1px solid #cbd5e1 !important;
+    }
+
+    .addictive-report-title{
+        margin: 0 !important;
+        font-size: 20px !important;
+        font-weight: 900 !important;
+        line-height: 1.1 !important;
+        color: #0f172a !important;
+    }
+
+    .addictive-report-subtitle{
+        margin-top: 2px !important;
+        font-size: 11px !important;
+        line-height: 1.1 !important;
+        color: #64748b !important;
+    }
+
+    .addictive-report-meta{
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px 22px !important;
+        margin: 0 0 6px !important;
+        padding: 0 0 5px !important;
+        border-bottom: 1px solid #dbe4f0 !important;
+    }
+
+    .addictive-report-meta > *{
+        border: none !important;
+        background: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-width: auto !important;
+        width: auto !important;
+        flex: none !important;
+        font-size: 12.5px !important;
+        font-weight: 800 !important;
+        line-height: 1.1 !important;
+        color: #0f172a !important;
+    }
+
+    .addictive-report-table-wrap{
+        width: 100% !important;
+        overflow: visible !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+
+    .addictive-report-table{
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+        margin: 0 !important;
+    }
+
+    .addictive-report-table th,
+    .addictive-report-table td{
+        border: 1px solid #111827 !important;
+        padding: 3px 4px !important;
+        font-size: 10.5px !important;
+        line-height: 1.1 !important;
+        vertical-align: middle !important;
+        text-align: center !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .addictive-report-table thead th{
+        background: #eef4ff !important;
+        font-weight: 900 !important;
+        color: #0f172a !important;
+    }
+
+    .addictive-report-signature,
+    .report-signature{
+        margin-top: 18px !important;
+        padding-top: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .addictive-report-signature * ,
+    .report-signature *{
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+    }
+}
 </style>
 
 <div class="container-fluid addictive-report-page">

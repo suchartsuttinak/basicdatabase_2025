@@ -27,15 +27,34 @@
                 @method('PUT')
 
                 <div class="row g-4">
-                    <div class="col-lg-4">
-                        <label class="form-label fw-semibold">วันที่ <span class="text-danger">*</span></label>
-                        <input type="date" name="operation_date"
-                               value="{{ old('operation_date', $operation->operation_date?->format('Y-m-d')) }}"
-                               class="form-control rounded-3 @error('operation_date') is-invalid @enderror">
-                        @error('operation_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                  <div class="col-lg-4">
+            <label class="form-label fw-semibold">
+                วันที่
+                <span class="text-danger">*</span>
+            </label>
+
+            <input
+                type="date"
+                name="operation_date"
+                value="{{ old('operation_date', $operation->operation_date?->format('Y-m-d')) }}"
+                class="form-control rounded-3 @error('operation_date') is-invalid @enderror"
+
+                {{ auth()->user()->isAdmin() ? '' : 'readonly disabled' }}
+            >
+
+            @if(!auth()->user()->isAdmin())
+                <small class="text-muted d-block mt-1">
+                    <i class="bi bi-lock-fill me-1"></i>
+                    เฉพาะผู้ดูแลระบบเท่านั้นที่สามารถแก้ไขวันที่ได้
+                </small>
+            @endif
+
+            @error('operation_date')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
 
                     <div class="col-lg-4">
                         <label class="form-label fw-semibold">ครั้งที่ <span class="text-danger">*</span></label>

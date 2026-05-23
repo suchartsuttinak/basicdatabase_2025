@@ -29,15 +29,18 @@
 
         <div class="publicize-hero__actions">
            <a href="{{ route('client.show') }}"
-   class="btn btn-outline-secondary publicize-head-btn">
-    <i class="bi bi-house-door me-1"></i>
-    <span>หน้าผู้รับบริการ</span>
-</a>
+                class="btn btn-outline-secondary publicize-head-btn">
+                    <i class="bi bi-house-door me-1"></i>
+                    <span>หน้าผู้รับบริการ</span>
+                </a>
 
-            <a href="{{ route('publicizes.create') }}" class="btn btn-primary publicize-head-btn">
-                <i class="bi bi-plus-circle me-1"></i>
-                <span>เพิ่มข้อมูลประชาสัมพันธ์</span>
-            </a>
+                        @if($publicizes->count())
+                    <a href="{{ route('publicizes.create') }}" 
+                    class="btn btn-primary publicize-head-btn">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        <span>เพิ่มข้อมูล</span>
+                    </a>
+                @endif
         </div>
     </div>
 
@@ -167,72 +170,60 @@
                 <div class="card-body p-0">
                     @if($publicizes->count())
                         <div class="publicize-list">
-                            @foreach($publicizes as $item)
-                                <div class="publicize-item border-bottom">
-                                    <div class="publicize-item__body">
-                                        <div class="publicize-item__main">
-                                            <div class="mb-2 d-flex flex-wrap align-items-center gap-2">
-                                                <span class="badge publicize-badge px-3 py-2">
-                                                    {{ $item->category_label }}
-                                                </span>
+                          @foreach($publicizes as $index => $item)
+    <div class="publicize-item border-bottom">
+        <div class="publicize-item__body">
 
-                                                <span class="badge bg-light text-dark px-3 py-2">
-                                                    <i class="bi bi-calendar3 me-1"></i>
-                                                    {{ optional($item->recorded_at)->year + 543 }}
-                                                </span>
-                                            </div>
+            {{-- ลำดับ --}}
+            <div class="publicize-item__no">
+                {{ $index + 1 }}
+            </div>
 
-                                            <h6 class="mb-2 fw-bold publicize-title">
-                                                {{ $item->title }}
-                                            </h6>
+            {{-- ชื่อเอกสาร --}}
+            <div class="publicize-item__main">
+                <a href="{{ asset($item->file_path) }}"
+                   target="_blank"
+                   class="publicize-file-link">
+                    <span class="publicize-pdf-icon">
+                        PDF
+                    </span>
+                    <span class="publicize-file-title">
+                        {{ $item->title }}
+                    </span>
+                </a>
+            </div>
 
-                                            <div class="publicize-meta">
-                                                <div class="publicize-meta__item">
-                                                    <i class="bi bi-calendar-date"></i>
-                                                    <span>
-                                                        วันที่บันทึก:
-                                                        {{ optional($item->recorded_at)->format('d/m/') }}{{ optional($item->recorded_at)->year + 543 }}
-                                                    </span>
-                                                </div>
+            {{-- วันที่เผยแพร่ --}}
+            <div class="publicize-item__date">
+                {{ optional($item->recorded_at)->format('d/m/') }}{{ optional($item->recorded_at)->year + 543 }}
+            </div>
 
-                                                <div class="publicize-meta__item">
-                                                    <i class="bi bi-file-earmark-pdf"></i>
-                                                    <span>
-                                                        ไฟล์:
-                                                        {{ $item->file_name ?? basename($item->file_path) }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
+            {{-- admin actions --}}
+            @if(auth()->check() && auth()->user()->role === 'admin')
+                <div class="publicize-admin-actions">
+                    <a href="{{ route('publicizes.edit', $item->id) }}"
+                       class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
 
-                                        <div class="publicize-action-group">
-                                           <a href="{{ asset($item->file_path) }}"
-                                            target="_blank"
-                                            class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-file-earmark-pdf me-1"></i> เปิดไฟล์
-                                            </a>
-                                                 @if(auth()->check() && auth()->user()->role === 'admin')
-                                            <a href="{{ route('publicizes.edit', $item->id) }}"
-                                               class="btn btn-outline-warning btn-sm">
-                                                <i class="bi bi-pencil-square me-1"></i> แก้ไข
-                                            </a>
+                    <form action="{{ route('publicizes.destroy', $item->id) }}"
+                          method="POST"
+                          class="delete-publicize-form d-inline">
+                        @csrf
+                        @method('DELETE')
 
-                                            <form action="{{ route('publicizes.destroy', $item->id) }}"
-                                                  method="POST"
-                                                  class="delete-publicize-form d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="btn btn-outline-danger btn-sm delete-publicize-btn"
-                                                        data-title="{{ $item->title }}">
-                                                    <i class="bi bi-trash me-1"></i> ลบ
-                                                </button>
-                                            </form>
-                                                @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                        <button type="submit"
+                                class="btn btn-outline-danger btn-sm delete-publicize-btn"
+                                data-title="{{ $item->title }}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            @endif
+
+        </div>
+    </div>
+@endforeach
                         </div>
                     @else
                         <div class="publicize-empty-state">
@@ -259,351 +250,430 @@
     </div>
 </div>
 
-<style>
-.publicize-page{
-    --publicize-primary: #0d6efd;
-    --publicize-primary-soft: rgba(13, 110, 253, 0.10);
-    --publicize-border: #e9eef5;
-    --publicize-text-soft: #6c757d;
-    --publicize-bg-soft: #f8fafc;
-    --publicize-radius: 18px;
-    --publicize-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-}
+    <style>
+    .publicize-page{
+        --publicize-primary: #0d6efd;
+        --publicize-primary-soft: rgba(13, 110, 253, 0.10);
+        --publicize-border: #e9eef5;
+        --publicize-text-soft: #6c757d;
+        --publicize-bg-soft: #f8fafc;
+        --publicize-radius: 18px;
+        --publicize-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
 
-.publicize-page .publicize-hero{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 18px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
-    border: 1px solid var(--publicize-border);
-    border-radius: 20px;
-    box-shadow: var(--publicize-shadow);
-}
-
-.publicize-page .publicize-hero__top{
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-}
-
-.publicize-page .publicize-hero__title{
-    font-size: 1.45rem;
-    line-height: 1.2;
-}
-
-.publicize-page .publicize-hero__subtitle{
-    font-size: 0.95rem;
-}
-
-.publicize-page .publicize-hero__actions{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.publicize-page .publicize-icon-btn{
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    border: 1px solid var(--publicize-border);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-}
-
-.publicize-page .publicize-icon-btn:hover{
-    background: #f3f6fa;
-}
-
-.publicize-page .publicize-head-btn{
-    min-height: 42px;
-    padding: 0.6rem 1rem;
-    border-radius: 12px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-}
-
-.publicize-page .publicize-sidebar,
-.publicize-page .publicize-content{
-    border-radius: var(--publicize-radius);
-    overflow: hidden;
-    border: 1px solid var(--publicize-border);
-    box-shadow: var(--publicize-shadow);
-    background: #fff;
-}
-
-.publicize-page .publicize-card-header{
-    padding: 1rem 1.2rem;
-    background: #fff;
-    border-bottom: 1px solid var(--publicize-border);
-}
-
-.publicize-page .publicize-filter-box{
-    padding: 1rem 1rem 0.9rem;
-    border-bottom: 1px solid var(--publicize-border);
-    background: #fcfdff;
-}
-
-.publicize-page .publicize-filter-row{
-    display: flex;
-    gap: 8px;
-}
-
-.publicize-page .publicize-filter-form .form-select,
-.publicize-page .publicize-filter-form .btn{
-    min-height: 40px;
-}
-
-.publicize-page .publicize-reset-btn{
-    font-weight: 500;
-}
-
-.publicize-page .publicize-category-list .list-group-item{
-    border: 0;
-    border-radius: 0;
-    padding: 14px 18px;
-    font-weight: 500;
-    transition: all .2s ease;
-}
-
-.publicize-page .publicize-category-list .list-group-item:hover{
-    background: var(--publicize-bg-soft);
-}
-
-.publicize-page .publicize-category-list .list-group-item.active{
-    background: var(--publicize-primary);
-    color: #fff;
-}
-
-.publicize-page .publicize-content-head{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-}
-
-.publicize-page .publicize-count-badge{
-    background: var(--publicize-bg-soft);
-    color: #334155;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-.publicize-page .publicize-list{
-    background: #fff;
-}
-
-.publicize-page .publicize-item:last-child{
-    border-bottom: 0 !important;
-}
-
-.publicize-page .publicize-item{
-    transition: background .2s ease;
-}
-
-.publicize-page .publicize-item:hover{
-    background: #fbfdff;
-}
-
-.publicize-page .publicize-item__body{
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 18px;
-    flex-wrap: wrap;
-    padding: 18px;
-}
-
-.publicize-page .publicize-item__main{
-    flex: 1 1 420px;
-    min-width: 0;
-}
-
-.publicize-page .publicize-badge{
-    background: var(--publicize-primary-soft);
-    color: var(--publicize-primary);
-    font-weight: 700;
-}
-
-.publicize-page .publicize-title{
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #0f172a;
-}
-
-.publicize-page .publicize-meta{
-    display: grid;
-    gap: 8px;
-}
-
-.publicize-page .publicize-meta__item{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--publicize-text-soft);
-    font-size: 0.92rem;
-    line-height: 1.5;
-}
-
-.publicize-page .publicize-meta__item i{
-    color: var(--publicize-primary);
-    flex: 0 0 auto;
-}
-
-.publicize-page .publicize-action-group{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-.publicize-page .publicize-action-group .btn{
-    white-space: nowrap;
-    min-height: 38px;
-    border-radius: 10px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-}
-
-.publicize-page .publicize-alert{
-    border-radius: 14px;
-    padding: 0.9rem 1rem;
-}
-
-.publicize-page .publicize-empty-state{
-    padding: 3.5rem 1rem;
-    text-align: center;
-}
-
-.publicize-page .publicize-empty-state__icon{
-    width: 76px;
-    height: 76px;
-    margin: 0 auto 16px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--publicize-primary-soft);
-    color: var(--publicize-primary);
-    font-size: 2rem;
-}
-
-@media (max-width: 1199.98px){
     .publicize-page .publicize-hero{
-        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding: 18px 20px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+        border: 1px solid var(--publicize-border);
+        border-radius: 20px;
+        box-shadow: var(--publicize-shadow);
     }
-}
 
-@media (max-width: 991.98px){
-    .publicize-page .row{
-        --bs-gutter-y: 1rem;
-    }
-
-    .publicize-page .publicize-action-group{
-        width: 100%;
-        justify-content: flex-start;
-    }
-}
-
-@media (max-width: 767.98px){
     .publicize-page .publicize-hero__top{
+        display: flex;
         align-items: flex-start;
+        gap: 14px;
     }
 
     .publicize-page .publicize-hero__title{
-        font-size: 1.2rem;
+        font-size: 1.45rem;
+        line-height: 1.2;
     }
 
-    .publicize-page .publicize-filter-row{
-        flex-direction: column;
-    }
-
-    .publicize-page .publicize-filter-row .btn,
-    .publicize-page .publicize-filter-row .form-select{
-        width: 100%;
-    }
-}
-
-@media (max-width: 575.98px){
-    .publicize-page .publicize-hero{
-        padding: 14px;
-        border-radius: 16px;
+    .publicize-page .publicize-hero__subtitle{
+        font-size: 0.95rem;
     }
 
     .publicize-page .publicize-hero__actions{
-        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
-    .publicize-page .publicize-hero__actions .btn{
-        flex: 1 1 100%;
+    .publicize-page .publicize-icon-btn{
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        border: 1px solid var(--publicize-border);
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
+        flex: 0 0 auto;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .publicize-page .publicize-icon-btn:hover{
+        background: #f3f6fa;
+    }
+
+    .publicize-page .publicize-head-btn{
+        min-height: 42px;
+        padding: 0.6rem 1rem;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .publicize-page .publicize-sidebar,
+    .publicize-page .publicize-content{
+        border-radius: var(--publicize-radius);
+        overflow: hidden;
+        border: 1px solid var(--publicize-border);
+        box-shadow: var(--publicize-shadow);
+        background: #fff;
+    }
+
+    .publicize-page .publicize-card-header{
+        padding: 1rem 1.2rem;
+        background: #fff;
+        border-bottom: 1px solid var(--publicize-border);
+    }
+
+    .publicize-page .publicize-filter-box{
+        padding: 1rem 1rem 0.9rem;
+        border-bottom: 1px solid var(--publicize-border);
+        background: #fcfdff;
+    }
+
+    .publicize-page .publicize-filter-row{
+        display: flex;
+        gap: 8px;
+    }
+
+    .publicize-page .publicize-filter-form .form-select,
+    .publicize-page .publicize-filter-form .btn{
+        min-height: 40px;
+    }
+
+    .publicize-page .publicize-reset-btn{
+        font-weight: 500;
+    }
+
+    .publicize-page .publicize-category-list .list-group-item{
+        border: 0;
+        border-radius: 0;
+        padding: 14px 18px;
+        font-weight: 500;
+        transition: all .2s ease;
+    }
+
+    .publicize-page .publicize-category-list .list-group-item:hover{
+        background: var(--publicize-bg-soft);
+    }
+
+    .publicize-page .publicize-category-list .list-group-item.active{
+        background: var(--publicize-primary);
+        color: #fff;
+    }
+
+    .publicize-page .publicize-content-head{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .publicize-page .publicize-count-badge{
+        background: var(--publicize-bg-soft);
+        color: #334155;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .publicize-page .publicize-list{
+        background:#fff;
+    }
+
+    /* =========================
+    TABLE-LIKE LIST
+    ========================= */
+    .publicize-page .publicize-item{
+        border-bottom:1px solid #e5eaf0 !important;
+        transition:background .15s ease;
+    }
+
+    .publicize-page .publicize-item:hover{
+        background:#f8fbff;
+    }
+
+    .publicize-page .publicize-item:last-child{
+        border-bottom:0 !important;
     }
 
     .publicize-page .publicize-item__body{
-        padding: 14px;
+        display:grid;
+        grid-template-columns: 46px minmax(0, 1fr) 150px auto;
+        align-items:center;
+        gap:10px;
+        padding:9px 16px;
+        min-height:44px;
     }
 
-    .publicize-page .publicize-action-group{
-        width: 100%;
+    /* ลำดับ */
+    .publicize-page .publicize-item__no{
+        color:#64748b;
+        font-weight:600;
+        font-size:.95rem;
     }
 
-    .publicize-page .publicize-action-group .btn,
-    .publicize-page .publicize-action-group form{
-        width: 100%;
+    /* ชื่อไฟล์ */
+    .publicize-page .publicize-file-link{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        max-width:100%;
+        color:#0d6efd;
+        font-size:.98rem;
+        font-weight:700;
+        line-height:1.35;
+        text-decoration:none;
     }
 
-    .publicize-page .publicize-action-group .btn{
-        justify-content: center;
+    .publicize-page .publicize-file-link:hover{
+        color:#0b5ed7;
+        text-decoration:underline;
     }
+
+    .publicize-page .publicize-file-title{
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+
+    /* ไอคอน PDF แบบเล็กเหมือนตาราง */
+    .publicize-page .publicize-pdf-icon{
+        width:22px;
+        height:16px;
+        flex:0 0 22px;
+        border-radius:2px;
+        background:#dc3545;
+        color:#fff;
+        font-size:7px;
+        line-height:16px;
+        text-align:center;
+        font-weight:800;
+        letter-spacing:-.2px;
+        box-shadow:0 1px 2px rgba(15,23,42,.15);
+    }
+
+    /* วันที่ */
+    .publicize-page .publicize-item__date{
+        color:#64748b;
+        font-size:.95rem;
+        font-weight:600;
+        white-space:nowrap;
+    }
+
+    /* ปุ่ม admin */
+    .publicize-page .publicize-admin-actions{
+        display:flex;
+        align-items:center;
+        justify-content:flex-end;
+        gap:6px;
+    }
+
+    .publicize-page .publicize-admin-actions .btn{
+        width:32px;
+        height:32px;
+        padding:0;
+        border-radius:8px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    /* =========================
+   EMPTY STATE
+========================= */
+.publicize-page .publicize-empty-state{
+    min-height:320px;
+    padding:48px 20px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
 }
-</style>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const deleteForms = document.querySelectorAll('.delete-publicize-form');
+.publicize-page .publicize-empty-state__icon{
+    width:74px;
+    height:74px;
+    margin-bottom:18px;
 
-    deleteForms.forEach(function (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-            const button = form.querySelector('.delete-publicize-btn');
-            const title = button?.getAttribute('data-title') || 'รายการนี้';
+    background:#f1f5ff;
+    color:#0d6efd;
 
-            Swal.fire({
-                title: 'ยืนยันการลบ?',
-                html: `คุณต้องการลบ <b>${title}</b> ใช่หรือไม่`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'ใช่, ลบเลย',
-                cancelButtonText: 'ยกเลิก',
-                reverseButtons: true,
-                focusCancel: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
+    font-size:2rem;
+}
+
+.publicize-page .publicize-empty-state .fw-bold{
+    font-size:1.08rem;
+    color:#0f172a;
+}
+
+.publicize-page .publicize-empty-state .text-muted{
+    max-width:420px;
+    margin:auto;
+    line-height:1.6;
+}
+
+.publicize-page .publicize-empty-state .d-flex{
+    margin-top:12px;
+}
+
+
+    /* =========================
+    MOBILE
+    ========================= */
+    @media (max-width: 767.98px){
+        .publicize-page .publicize-item__body{
+            grid-template-columns: 34px minmax(0, 1fr);
+            gap:8px;
+            padding:10px 12px;
+        }
+
+        .publicize-page .publicize-item__date{
+            grid-column:2 / -1;
+            font-size:.82rem;
+        }
+
+        .publicize-page .publicize-admin-actions{
+            grid-column:2 / -1;
+            justify-content:flex-start;
+        }
+
+        .publicize-page .publicize-file-title{
+            white-space:normal;
+        }
+    }
+
+        .publicize-page .publicize-action-group .btn,
+        .publicize-page .publicize-action-group form{
+            width:100%;
+        }
+    }
+
+    @media (max-width: 1199.98px){
+        .publicize-page .publicize-hero{
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 991.98px){
+        .publicize-page .row{
+            --bs-gutter-y: 1rem;
+        }
+
+        .publicize-page .publicize-action-group{
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 767.98px){
+        .publicize-page .publicize-hero__top{
+            align-items: flex-start;
+        }
+
+        .publicize-page .publicize-hero__title{
+            font-size: 1.2rem;
+        }
+
+        .publicize-page .publicize-filter-row{
+            flex-direction: column;
+        }
+
+        .publicize-page .publicize-filter-row .btn,
+        .publicize-page .publicize-filter-row .form-select{
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 575.98px){
+        .publicize-page .publicize-hero{
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .publicize-page .publicize-hero__actions{
+            width: 100%;
+        }
+
+        .publicize-page .publicize-hero__actions .btn{
+            flex: 1 1 100%;
+            justify-content: center;
+        }
+
+        .publicize-page .publicize-item__body{
+            padding: 14px;
+        }
+
+        .publicize-page .publicize-action-group{
+            width: 100%;
+        }
+
+        .publicize-page .publicize-action-group .btn,
+        .publicize-page .publicize-action-group form{
+            width: 100%;
+        }
+
+        .publicize-page .publicize-action-group .btn{
+            justify-content: center;
+        }
+    }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteForms = document.querySelectorAll('.delete-publicize-form');
+
+        deleteForms.forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const button = form.querySelector('.delete-publicize-btn');
+                const title = button?.getAttribute('data-title') || 'รายการนี้';
+
+                Swal.fire({
+                    title: 'ยืนยันการลบ?',
+                    html: `คุณต้องการลบ <b>${title}</b> ใช่หรือไม่`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'ใช่, ลบเลย',
+                    cancelButtonText: 'ยกเลิก',
+                    reverseButtons: true,
+                    focusCancel: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
     });
-});
-</script>
+    </script>
 
-@endsection
+    @endsection
 
 
 

@@ -564,20 +564,84 @@
     </a>
 </div>
 
-        <div class="col-xl-4 col-md-6">
-            <div class="card service-card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="service-icon bg-secondary-subtle text-secondary">
-                        <i class="bi bi-gear-fill"></i>
-                    </div>
-                    <h5 class="service-title">จัดการข้อมูล</h5>
-                    <p class="service-text">แก้ไข ปรับปรุง และดูแลข้อมูลผู้รับบริการให้ถูกต้องและเป็นปัจจุบันอยู่เสมอ</p>
-                    <a href="javascript:void(0)" class="service-link">
-                        เข้าสู่เมนู <i class="bi bi-arrow-right-short"></i>
-                    </a>
+       <div class="col-xl-4 col-md-6">
+    <a href="{{ route('case-activities.index', $client->id) }}"
+       class="service-card-link">
+
+        <div class="card service-card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+
+                <div class="service-icon bg-secondary-subtle text-secondary">
+                    <i class="bi bi-clock-history"></i>
                 </div>
+
+                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-2">
+
+                    <h5 class="service-title mb-0">
+                        ความเคลื่อนไหวผู้รับบริการ
+                    </h5>
+
+                    @if(($activitiesCount ?? 0) > 0)
+                        <span class="service-mini-badge">
+                            ล่าสุด
+                        </span>
+                    @endif
+
+                </div>
+
+                <p class="service-text mb-2">
+                    ติดตามกิจกรรม การบันทึกข้อมูล และความเคลื่อนไหวต่าง ๆ ของผู้รับบริการแบบ Timeline
+                </p>
+
+                <div class="service-meta-list mb-3">
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">
+                            จำนวนกิจกรรม
+                        </span>
+
+                        <span class="service-meta-value">
+                            {{ $activitiesCount ?? 0 }}
+                        </span>
+                    </div>
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">
+                            ประเภทล่าสุด
+                        </span>
+
+                        <span class="service-meta-value">
+                            {{ $latestActivityType ?? '-' }}
+                        </span>
+                    </div>
+
+                    <div class="service-meta-item">
+                        <span class="service-meta-label">
+                            วันที่ล่าสุด
+                        </span>
+
+                        <span class="service-meta-value">
+                            @if(!empty($latestActivityDate))
+                                {{ \Carbon\Carbon::parse($latestActivityDate)->locale('th')->translatedFormat('d F') }}
+                                {{ \Carbon\Carbon::parse($latestActivityDate)->year + 543 }}
+                            @else
+                                -
+                            @endif
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="service-link">
+                    เปิดดูข้อมูล
+                    <i class="bi bi-arrow-right-short"></i>
+                </div>
+
             </div>
         </div>
+
+    </a>
+</div>
     </div>
 </div>
 

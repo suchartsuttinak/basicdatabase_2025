@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Accident;
+use App\Models\CaseActivity;
 
 class AccidentController extends Controller
 {
@@ -39,6 +40,23 @@ class AccidentController extends Controller
         }
 
         Accident::create($validated);
+
+            CaseActivity::where('client_id', $validated['client_id'])
+            ->where('module', 'accident')
+            ->delete();
+
+            CaseActivity::record([
+            'client_id'   => $validated['client_id'],
+            'module'      => 'accident',
+            'type'        => 'warning',
+            'title'       => 'บันทึกการบาดเจ็บ',
+            'description' => 'วันที่เกิดเหตุ: ' . ($validated['incident_date'] ?? '-') .
+                            ' | สถานที่: ' . ($validated['location'] ?? '-') .
+                            ' | การรักษา: ' . ($validated['treat_no'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-bandaid',
+            'url'         => route('accident.add', $validated['client_id']),
+        ]);
 
         return redirect()
             ->route('accident.add', $validated['client_id'])
@@ -89,6 +107,23 @@ class AccidentController extends Controller
 
         $accident->update($validated);
 
+                CaseActivity::where('client_id', $accident->client_id)
+                ->where('module', 'accident')
+                ->delete();
+
+                CaseActivity::record([
+                'client_id'   => $accident->client_id,
+                'module'      => 'accident',
+                'type'        => 'warning',
+                'title'       => 'แก้ไขการบาดเจ็บ',
+                'description' => 'วันที่เกิดเหตุ: ' . ($validated['incident_date'] ?? '-') .
+                                ' | สถานที่: ' . ($validated['location'] ?? '-') .
+                                ' | การรักษา: ' . ($validated['treat_no'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-bandaid',
+                'url'         => route('accident.add', $accident->client_id),
+            ]);
+
         return redirect()
             ->route('accident.add', $accident->client_id)
             ->with([
@@ -106,6 +141,11 @@ class AccidentController extends Controller
             ->firstOrFail();
 
         $clientId = $accident->client_id;
+
+        CaseActivity::where('client_id', $clientId)
+            ->where('module', 'accident')
+            ->delete();
+
         $accident->delete();
 
         return redirect()

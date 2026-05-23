@@ -1,3 +1,34 @@
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+
+
+
+
+เข้าเว็บนี้นะ https://kaduab.com
+
+สิทธิ์ admin
+user : admin@gmail.com
+password : 11111111
+
+-------------------------------
+สิทธิ์ นักสังค
+user : socialworker@gmail.com
+password : 1111111111
+---------------------------------
+ระบบอยู่ระหว่่างการพัฒนา ยังไม่มีข้อมูลกรอกลงไปนะครับ
+สามารถกำหนดสิทธิ์ผู้ใช้เองได้ สำหรับ  admin
+กำหนดให้เห็นเด็กเฉพาะบ้านของตนเอง หรือเห็นทั้งหมด
+เช่น ครูเอ เห็น บ้าน 1 ครูบี เห็น 2
+แล้วแต่กำหนด และมีอะไรอีกมาก ข่อนข้างจะซับซ้อนอยู่ครัับ 
+สรุปโปรแกรมดำนวยความสะดวกการทำงานได้มากเลยที่เเดียว
+สามารรถบอกเตือนเด็กที่ต้องพบแพทย  เด็กขาดเรียยนวันนี้ เด็กป่วยวันนี้ และอื่นๆ
+***มีกระบวนทางสังคมสงเคราะห์ จิตวิทยา และระบเฝ้าระวังปัญหาเด็กอยู่ในตัว
+
+สรุป นุ่น ลองเล่นดูนะ 
+
 
 คุณสามารถใช้ Command Palette () แล้วพิมพ์ว่า
 	- กด Ctrl + Shift + P
@@ -11,6 +42,52 @@
         php artisan storage:link
 
         -------------------------------------
+
+        ตัวอย่างเพิ่มตาราง 
+        --------
+        php artisan make:migration add_project_id_to_users_table
+        ----------<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+
+            // กันสร้างซ้ำ
+            if (!Schema::hasColumn('users', 'project_id')) {
+
+                $table->unsignedBigInteger('project_id')
+                    ->nullable()
+                    ->after('status');
+
+                $table->foreign('project_id')
+                    ->references('id')
+                    ->on('projects')
+                    ->nullOnDelete();
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+
+            if (Schema::hasColumn('users', 'project_id')) {
+
+                $table->dropForeign(['project_id']);
+                $table->dropColumn('project_id');
+            }
+        });
+    }
+};
+---------------------------------
+php artisan migrate
+---------------------------------------------------------------------------------------
 
         
 คำสั่ง
@@ -796,3 +873,20 @@ Livewire ชน JS
 5. ทดสอบ upload จริง
 
 พักผ่อนก่อนครับ 👍
+-----------------------------------------
+ต่อจากนี้ระบบคุณสามารถต่อยอดได้อีกเยอะ เช่น:
+
+Dashboard Timeline ล่าสุด
+แจ้งเตือนเหตุการณ์สำคัญ
+สรุปความเสี่ยงเด็ก
+AI Summary เคส
+Export PDF ทางราชการ
+Case Audit ระดับองค์กร
+Multi-organization timeline
+ระบบฟื้นฟู/ติดตามหลังจำหน่าย
+
+ตอนนี้ฐานระบบแข็งแรงมากแล้วครับ 👏
+
+
+
+มาไล่แก้ activity module อื่นต่อ

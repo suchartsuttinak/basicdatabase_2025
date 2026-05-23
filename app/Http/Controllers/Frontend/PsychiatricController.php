@@ -8,6 +8,7 @@ use App\Models\Psychiatric;
 use App\Models\Psycho;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\CaseActivity;
 
 class PsychiatricController extends Controller
 {
@@ -64,67 +65,88 @@ class PsychiatricController extends Controller
 
     // บันทึกข้อมูลใหม่
     public function StorePsychiatric(Request $request)
-    {
-        $data = $request->validate([
-            'sent_date'   => [
-                'required',
-                'date',
-                Rule::unique('psychiatrics')->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
-                }),
-            ],
-            'hotpital'    => 'required|string|max:255',
-            'psycho_id'   => 'required|exists:psychos,id',
-            'diagnose'    => 'nullable|string',
-            'appoin_date' => 'nullable|date',
-            'drug_no'     => 'required|in:yes,no',
-            'drug_name'   => 'nullable|string|max:255',
-            'disa_no'     => 'required|in:yes,no',
-            'client_id'   => 'required|exists:clients,id',
-        ], [
-            'sent_date.required'   => 'กรุณาระบุวันที่ส่ง',
-            'sent_date.date'       => 'รูปแบบวันที่ส่งไม่ถูกต้อง',
-            'sent_date.unique'     => 'วันที่ส่งนี้ถูกใช้แล้วสำหรับผู้รับบริการคนนี้',
-            'hotpital.required'    => 'กรุณาระบุชื่อโรงพยาบาล',
-            'hotpital.string'      => 'ชื่อโรงพยาบาลต้องเป็นข้อความ',
-            'hotpital.max'         => 'ชื่อโรงพยาบาลต้องไม่เกิน 255 ตัวอักษร',
-            'psycho_id.required'   => 'กรุณาเลือกนักจิตวิทยา',
-            'psycho_id.exists'     => 'นักจิตวิทยาที่เลือกไม่ถูกต้อง',
-            'diagnose.string'      => 'การวินิจฉัยต้องเป็นข้อความ',
-            'appoin_date.date'     => 'รูปแบบวันที่นัดหมายไม่ถูกต้อง',
-            'drug_no.required'     => 'กรุณาระบุการใช้ยา',
-            'drug_no.in'           => 'การใช้ยาต้องเป็น yes หรือ no เท่านั้น',
-            'drug_name.string'     => 'ชื่อยาต้องเป็นข้อความ',
-            'drug_name.max'        => 'ชื่อยาต้องไม่เกิน 255 ตัวอักษร',
-            'disa_no.required'     => 'กรุณาระบุความพิการ',
-            'disa_no.in'           => 'ความพิการต้องเป็น yes หรือ no เท่านั้น',
-            'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
-            'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
+        {
+            $data = $request->validate([
+                'sent_date'   => [
+                    'required',
+                    'date',
+                    Rule::unique('psychiatrics')->where(function ($query) use ($request) {
+                        return $query->where('client_id', $request->client_id);
+                    }),
+                ],
+                'hotpital'    => 'required|string|max:255',
+                'psycho_id'   => 'required|exists:psychos,id',
+                'diagnose'    => 'nullable|string',
+                'appoin_date' => 'nullable|date',
+                'drug_no'     => 'required|in:yes,no',
+                'drug_name'   => 'nullable|string|max:255',
+                'disa_no'     => 'required|in:yes,no',
+                'client_id'   => 'required|exists:clients,id',
+            ], [
+                'sent_date.required'   => 'กรุณาระบุวันที่ส่ง',
+                'sent_date.date'       => 'รูปแบบวันที่ส่งไม่ถูกต้อง',
+                'sent_date.unique'     => 'วันที่ส่งนี้ถูกใช้แล้วสำหรับผู้รับบริการคนนี้',
+                'hotpital.required'    => 'กรุณาระบุชื่อโรงพยาบาล',
+                'hotpital.string'      => 'ชื่อโรงพยาบาลต้องเป็นข้อความ',
+                'hotpital.max'         => 'ชื่อโรงพยาบาลต้องไม่เกิน 255 ตัวอักษร',
+                'psycho_id.required'   => 'กรุณาเลือกนักจิตวิทยา',
+                'psycho_id.exists'     => 'นักจิตวิทยาที่เลือกไม่ถูกต้อง',
+                'diagnose.string'      => 'การวินิจฉัยต้องเป็นข้อความ',
+                'appoin_date.date'     => 'รูปแบบวันที่นัดหมายไม่ถูกต้อง',
+                'drug_no.required'     => 'กรุณาระบุการใช้ยา',
+                'drug_no.in'           => 'การใช้ยาต้องเป็น yes หรือ no เท่านั้น',
+                'drug_name.string'     => 'ชื่อยาต้องเป็นข้อความ',
+                'drug_name.max'        => 'ชื่อยาต้องไม่เกิน 255 ตัวอักษร',
+                'disa_no.required'     => 'กรุณาระบุความพิการ',
+                'disa_no.in'           => 'ความพิการต้องเป็น yes หรือ no เท่านั้น',
+                'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
+                'client_id.exists'     => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
+            ]);
+
+            // =========================
+            // PATCH: กันยิง request เปลี่ยน client_id
+            // =========================
+            $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            $data['client_id'] = $client->id;
+
+            if ($data['drug_no'] === 'no') {
+                $data['drug_name'] = null;
+            }
+
+            $psychiatric = Psychiatric::create($data);
+
+           CaseActivity::where('client_id', $client->id)
+            ->where('module', 'psychiatric')
+            ->delete();
+
+            CaseActivity::record([
+            'client_id'   => $client->id,
+            'module'      => 'psychiatric',
+            'type'        => 'success',
+            'title'       => 'บันทึกการวินิจฉัยทางจิตเวช',
+            'description' => 'วันที่ส่งตรวจ: ' . ($data['sent_date'] ?? '-') .
+                            ' | ส่งตรวจที่: ' . ($data['hotpital'] ?? '-') .
+                            ' | การใช้ยา: ' . (($data['drug_no'] ?? 'no') === 'yes' ? 'มี' : 'ไม่มี'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-hospital',
+            'url'         => route('psychiatric.create', $client->id),
         ]);
 
-        // =========================
-        // PATCH: กันยิง request เปลี่ยน client_id
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            $notification = [
+                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                'alert-type' => 'success'
+            ];
 
-        if ($data['drug_no'] === 'no') {
-            $data['drug_name'] = null;
+            return redirect()->back()->with($notification);
         }
-
-        Psychiatric::create($data);
-
-        $notification = [
-            'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-            'alert-type' => 'success'
-        ];
-
-        return redirect()->back()->with($notification);
-    }
 
     // แก้ไขข้อมูล (โหลดฟอร์มพร้อมข้อมูลเดิม)
     public function EditPsychiatricJson($id)
     {
-        $psychiatric = Psychiatric::findOrFail($id);
+      $psychiatric = Psychiatric::whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
         // =========================
         // PATCH: กันเดา URL เรียก JSON ของ client คนอื่น
@@ -148,7 +170,10 @@ class PsychiatricController extends Controller
     // อัปเดตข้อมูล
     public function UpdatePsychiatric(Request $request, $id)
     {
-        $psychiatric = Psychiatric::findOrFail($id);
+       $psychiatric = Psychiatric::whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
         // =========================
         // PATCH: กันเดา URL มา update record คนอื่น
@@ -209,6 +234,23 @@ class PsychiatricController extends Controller
 
         $psychiatric->update($data);
 
+        CaseActivity::where('client_id', $psychiatric->client_id)
+            ->where('module', 'psychiatric')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $psychiatric->client_id,
+            'module'      => 'psychiatric',
+            'type'        => 'success',
+            'title'       => 'แก้ไขการวินิจฉัยทางจิตเวช',
+            'description' => 'วันที่ส่งตรวจ: ' . ($data['sent_date'] ?? '-') .
+                            ' | ส่งตรวจที่: ' . ($data['hotpital'] ?? '-') .
+                            ' | การใช้ยา: ' . (($data['drug_no'] ?? 'no') === 'yes' ? 'มี' : 'ไม่มี'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-hospital',
+            'url'         => route('psychiatric.create', $psychiatric->client_id),
+        ]);
+
         $notification = [
             'message' => 'อัปเดตข้อมูลเรียบร้อยแล้ว',
             'alert-type' => 'success'
@@ -221,7 +263,10 @@ class PsychiatricController extends Controller
     // ลบข้อมูล
     public function DeletePsychiatric($id)
     {
-        $psychiatric = Psychiatric::findOrFail($id);
+       $psychiatric = Psychiatric::whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);  
 
         // =========================
         // PATCH: กันเดา URL มาลบข้อมูลของ client คนอื่น
@@ -229,6 +274,11 @@ class PsychiatricController extends Controller
         Client::forUser(auth()->user())->findOrFail($psychiatric->client_id);
 
         $clientId = $psychiatric->client_id;
+
+        CaseActivity::where('client_id', $clientId)
+            ->where('module', 'psychiatric')
+            ->delete();
+
         $psychiatric->delete();
 
         $notification = [

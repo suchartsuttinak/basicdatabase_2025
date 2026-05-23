@@ -7,6 +7,7 @@ use App\Models\ClientFile;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\CaseActivity;
 
 class ClientFileController extends Controller
 {
@@ -36,37 +37,52 @@ class ClientFileController extends Controller
         return view('frontend.client.client_files.create', compact('client', 'fileTypes'));
     }
 
-    public function store(Request $request, $client_id)
-    {
-        $client = Client::forUser(auth()->user())->findOrFail($client_id);
+   public function store(Request $request, $client_id)
+        {
+            $client = Client::forUser(auth()->user())->findOrFail($client_id);
 
-        $request->validate([
-            'file_type' => 'required|string',
-            'file' => 'required|mimes:pdf|max:20480',
-        ], [
-            'file_type.required' => 'กรุณาเลือกประเภทเอกสาร',
-            'file.required'      => 'กรุณาเลือกไฟล์เอกสาร PDF',
-            'file.mimes'         => 'อนุญาตให้อัปโหลดเฉพาะไฟล์ PDF เท่านั้น',
-            'file.max'           => 'ขนาดไฟล์ต้องไม่เกิน 20 MB',
-        ]);
+            $request->validate([
+                'file_type' => 'required|string',
+                'file' => 'required|mimes:pdf|max:20480',
+            ], [
+                'file_type.required' => 'กรุณาเลือกประเภทเอกสาร',
+                'file.required'      => 'กรุณาเลือกไฟล์เอกสาร PDF',
+                'file.mimes'         => 'อนุญาตให้อัปโหลดเฉพาะไฟล์ PDF เท่านั้น',
+                'file.max'           => 'ขนาดไฟล์ต้องไม่เกิน 20 MB',
+            ]);
 
-        $uploadedFile = $request->file('file');
-        $originalName = $uploadedFile->getClientOriginalName();
+            $uploadedFile = $request->file('file');
+            $originalName = $uploadedFile->getClientOriginalName();
 
-        $path = $uploadedFile->store("clients/{$client->id}/{$request->file_type}", 'public');
+            $path = $uploadedFile->store("clients/{$client->id}/{$request->file_type}", 'public');
 
-        ClientFile::create([
-            'client_id'   => $client->id,
-            'file_type'   => $request->file_type,
-            'file_name'   => $originalName,
-            'file_path'   => $path,
-            'uploaded_at' => now(),
-        ]);
+            ClientFile::create([
+                'client_id'   => $client->id,
+                'file_type'   => $request->file_type,
+                'file_name'   => $originalName,
+                'file_path'   => $path,
+                'uploaded_at' => now(),
+            ]);
 
-        return redirect()
-            ->route('client_files.index', $client->id)
-            ->with('success', 'อัปโหลดเอกสารเรียบร้อยแล้ว');
-    }
+                CaseActivity::where('client_id', $client->id)
+                    ->where('module', 'client_file')
+                    ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $client->id,
+                    'module'      => 'client_file',
+                    'type'        => 'success',
+                    'title'       => 'อัปโหลดเอกสารผู้รับบริการ',
+                    'description' => 'อัปโหลดเอกสารประเภท: ' . $request->file_type . ' | ชื่อไฟล์: ' . $originalName,
+                    'occurred_at' => now(),
+                    'icon'        => 'bi-file-earmark-pdf',
+                    'url'         => route('client_files.index', $client->id),
+                ]);
+
+            return redirect()
+                ->route('client_files.index', $client->id)
+                ->with('success', 'อัปโหลดเอกสารเรียบร้อยแล้ว');
+        }
 
     public function view($client_id, $fileId)
     {
@@ -135,6 +151,10 @@ class ClientFileController extends Controller
         if ($file->file_path && Storage::disk('public')->exists($file->file_path)) {
             Storage::disk('public')->delete($file->file_path);
         }
+
+        CaseActivity::where('client_id', $client->id)
+        ->where('module', 'client_file')
+        ->delete();
 
         $file->delete();
 

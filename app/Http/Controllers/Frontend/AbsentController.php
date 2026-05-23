@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\CaseActivity;
 
 class AbsentController extends Controller
 {
@@ -73,51 +74,68 @@ class AbsentController extends Controller
         ));
     }
 
-    public function AbsentStore(StoreAbsentRequest $request): RedirectResponse
-    {
-        $validated = $request->validated();
+   public function AbsentStore(StoreAbsentRequest $request): RedirectResponse
+        {
+            $validated = $request->validated();
 
-        $client = Client::forUser(auth()->user())
-            ->where('id', $validated['client_id'])
-            ->firstOrFail();
+            $client = Client::forUser(auth()->user())
+                ->where('id', $validated['client_id'])
+                ->firstOrFail();
 
-        if (empty($validated['education_record_id'])) {
-            $educationRecord = $this->getLatestEducationRecord($client->id);
-            $validated['education_record_id'] = $educationRecord?->id;
-        }
+            if (empty($validated['education_record_id'])) {
+                $educationRecord = $this->getLatestEducationRecord($client->id);
+                $validated['education_record_id'] = $educationRecord?->id;
+            }
 
-        $validated['client_id'] = $client->id;
+            $validated['client_id'] = $client->id;
 
-        // =========================
-        // PATCH: กันบันทึกการขาดเรียนซ้ำวันเดียวกันของเด็กคนเดิม
-        // =========================
-        $duplicate = Absent::where('client_id', $client->id)
-            ->whereDate('absent_date', $validated['absent_date'])
-            ->exists();
+            // =========================
+            // PATCH: กันบันทึกการขาดเรียนซ้ำวันเดียวกันของเด็กคนเดิม
+            // =========================
+            $duplicate = Absent::where('client_id', $client->id)
+                ->whereDate('absent_date', $validated['absent_date'])
+                ->exists();
 
-        if ($duplicate) {
+            if ($duplicate) {
+                return redirect()
+                    ->back()
+                    ->withErrors([
+                        'absent_date' => 'ไม่สามารถบันทึกซ้ำได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                    ])
+                    ->withInput()
+                    ->with([
+                        'message' => 'ไม่สามารถบันทึกซ้ำได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
+                        'alert-type' => 'error',
+                        'absent_modal' => 'create',
+                    ]);
+            }
+
+            $absent = Absent::create($validated);
+
+           CaseActivity::where('client_id', $client->id)
+            ->where('module', 'absent')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $client->id,
+            'module'      => 'absent',
+            'type'        => 'warning',
+            'title'       => 'บันทึกการขาดเรียน',
+            'description' => 'วันที่ขาดเรียน: ' . ($validated['absent_date'] ?? '-') .
+                            ' | สาเหตุ: ' . ($validated['cause'] ?? '-') .
+                            ' | การดำเนินการ: ' . ($validated['operation'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-calendar-x',
+            'url'         => route('absent.add', $client->id),
+        ]);
+
             return redirect()
-                ->back()
-                ->withErrors([
-                    'absent_date' => 'ไม่สามารถบันทึกซ้ำได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
-                ])
-                ->withInput()
+                ->route('absent.add', $validated['client_id'])
                 ->with([
-                    'message' => 'ไม่สามารถบันทึกซ้ำได้ เด็กคนนี้มีข้อมูลขาดเรียนในวันที่นี้แล้ว',
-                    'alert-type' => 'error',
-                    'absent_modal' => 'create',
+                    'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
+                    'alert-type' => 'success'
                 ]);
         }
-
-        Absent::create($validated);
-
-        return redirect()
-            ->route('absent.add', $validated['client_id'])
-            ->with([
-                'message' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
-                'alert-type' => 'success'
-            ]);
-    }
 
     public function AbsentEdit($id): JsonResponse
     {
@@ -210,6 +228,23 @@ class AbsentController extends Controller
 
         $absent->update($validated);
 
+            CaseActivity::where('client_id', $absent->client_id)
+            ->where('module', 'absent')
+            ->delete();
+
+            CaseActivity::record([
+            'client_id'   => $absent->client_id,
+            'module'      => 'absent',
+            'type'        => 'warning',
+            'title'       => 'แก้ไขข้อมูลการขาดเรียน',
+            'description' => 'วันที่ขาดเรียน: ' . ($validated['absent_date'] ?? '-') .
+                            ' | สาเหตุ: ' . ($validated['cause'] ?? '-') .
+                            ' | การดำเนินการ: ' . ($validated['operation'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-calendar-x',
+            'url'         => route('absent.add', $absent->client_id),
+        ]);
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -234,7 +269,11 @@ class AbsentController extends Controller
             })
             ->firstOrFail();
 
-        $clientId = $absent->client_id;
+       $clientId = $absent->client_id;
+
+        CaseActivity::where('client_id', $clientId)
+            ->where('module', 'absent')
+            ->delete();
 
         $absent->delete();
 

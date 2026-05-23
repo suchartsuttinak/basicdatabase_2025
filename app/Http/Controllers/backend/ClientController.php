@@ -25,9 +25,11 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Models\CaseActivity;
 
 class ClientController extends Controller
 {
@@ -42,37 +44,35 @@ class ClientController extends Controller
     /**
      * ดึงรายการบ้านที่ user มีสิทธิ์
      */
-    protected function getAuthorizedHouseIds(): array
-    {
-        $user = auth()->user();
+   protected function getAuthorizedHouseIds(): array
+{
+    $user = auth()->user();
 
-        if (!$user) {
-            return [];
-        }
-
-        // admin เห็นได้ทั้งหมด
-        if (
-            (method_exists($user, 'isAdmin') && $user->isAdmin()) ||
-            (($user->role ?? null) === 'admin')
-        ) {
-            return House::pluck('id')->map(fn ($id) => (int) $id)->toArray();
-        }
-
-        // กรณีมีหลายบ้านผ่าน relation houses()
-        if (method_exists($user, 'houses')) {
-            return $user->houses()
-                ->pluck('houses.id')
-                ->map(fn ($id) => (int) $id)
-                ->toArray();
-        }
-
-        // fallback กรณี user มี house_id เดียว
-        if (!empty($user->house_id)) {
-            return [(int) $user->house_id];
-        }
-
+    if (!$user) {
         return [];
     }
+
+    if (
+        (method_exists($user, 'isAdmin') && $user->isAdmin()) ||
+        (method_exists($user, 'isExecutive') && $user->isExecutive()) ||
+        in_array(($user->role ?? null), ['admin', 'executive'], true)
+    ) {
+        return House::pluck('id')->map(fn ($id) => (int) $id)->toArray();
+    }
+
+    if (method_exists($user, 'houses')) {
+        return $user->houses()
+            ->pluck('houses.id')
+            ->map(fn ($id) => (int) $id)
+            ->toArray();
+    }
+
+    if (!empty($user->house_id)) {
+        return [(int) $user->house_id];
+    }
+
+    return [];
+}
 
     /**
      * ดึงบ้านตามสิทธิ์เพื่อใช้ในฟอร์ม
@@ -170,34 +170,40 @@ protected function saveClientImage($file): string
     /**
      * หน้าแสดงรายการ client
      */
-   public function ClientShow()
-{
-    $clients = Client::forUser(auth()->user())
-        ->with('problems')
-        ->where(function ($query) {
-            $query
-                // =========================
-                // PATCH: ผู้ที่อยู่ในระบบปกติ
-                // =========================
-                ->where('release_status', 'show')
+            public function ClientShow(Request $request)
+            {
+                $projectId = $request->input('project_id');
 
-                // =========================
-                // PATCH: ผู้ที่รออนุมัติจำหน่ายจริง
-                // ต้องเป็น pending_refer และต้องมี refer ที่ยัง pending
-                // เพื่อกันไม่ให้ข้อมูลที่จำหน่ายแล้วกลับมาแสดง
-                // =========================
-                ->orWhere(function ($subQuery) {
-                    $subQuery->where('release_status', 'pending_refer')
-                        ->whereHas('refers', function ($referQuery) {
-                            $referQuery->where('approve_status', 'pending');
-                        });
-                });
-        })
-        ->latest()
-        ->get();
+                $clientsQuery = Client::forUser(auth()->user())
+                    ->with(['problems', 'project'])
+                    ->where(function ($query) {
+                        $query
+                            ->where('release_status', 'show')
+                            ->orWhere(function ($subQuery) {
+                                $subQuery->where('release_status', 'pending_refer')
+                                    ->whereHas('refers', function ($referQuery) {
+                                        $referQuery->where('approve_status', 'pending');
+                                    });
+                            });
+                    });
 
-    return view('backend.client.client_show', compact('clients'));
-}
+                // PATCH: กรองหน่วยงาน / โครงการ เฉพาะเมื่อมีการเลือก
+                if (!empty($projectId) && $projectId !== 'all') {
+                    $clientsQuery->where('project_id', $projectId);
+                }
+
+                $clients = $clientsQuery
+                    ->latest()
+                    ->get();
+
+                $projects = Project::orderBy('project_name')->get();
+
+                return view('backend.client.client_show', compact(
+                    'clients',
+                    'projects',
+                    'projectId'
+                ));
+            }
 
     /**
      * หน้าแสดงรายละเอียด client สำหรับ route เช่น /admin/client/{id}
@@ -420,6 +426,8 @@ protected function saveClientImage($file): string
             'image.max'              => 'รูปภาพต้องมีขนาดไม่เกิน 2MB',
         ]);
 
+        $validated = $this->forceAuthorizedProject($validated);
+
         // กันการส่ง house_id ปลอม
         $this->ensureAuthorizedHouseId($validated['house_id']);
 
@@ -463,16 +471,41 @@ protected function saveClientImage($file): string
              $validated['image'] = $this->saveClientImage($request->file('image'));
 }
 
-        $problems = $validated['problems'] ?? [];
-        unset($validated['problems']);
+            $problems = $validated['problems'] ?? [];
+            unset($validated['problems']);
 
-        $validated['release_status'] = 'show';
+            $validated['release_status'] = 'show';
 
-        $client = Client::create($validated);
+            $client = Client::create($validated);
 
-        if (!empty($problems)) {
-            $client->problems()->attach($problems);
-        }
+            if (!empty($problems)) {
+                $client->problems()->attach($problems);
+            }
+
+            ////บันทึกกิจกรรมการรับผู้รับบริการเข้าสู่ระบบ
+        CaseActivity::record([
+            'client_id'   => $client->id,
+
+            'module'      => 'client',
+
+            'type'        => 'success',
+
+            'title'       => 'รับผู้รับบริการเข้าสู่ระบบ',
+
+            'description' =>
+                'ชื่อ: ' . $client->first_name . ' ' . $client->last_name .
+                ' | เลขทะเบียน: ' . ($client->register_number ?? '-') .
+                ' | วันที่เข้ารับบริการ: ' . ($validated['arrival_date'] ?? '-'),
+
+            // ใช้เวลาปัจจุบันจริง
+            'occurred_at' => now('Asia/Bangkok'),
+
+            'icon'        => 'bi-person-plus',
+
+            'url'         => route('admin.index', $client->id),
+        ]);
+
+
 
         return redirect()
             ->route('client.edit', $client->id)
@@ -661,6 +694,8 @@ protected function saveClientImage($file): string
             'case_resident.in'       => 'สถานะการอยู่อาศัยต้องเป็น Active หรือ Inactive เท่านั้น',
         ]);
 
+        $validated = $this->forceAuthorizedProject($validated);
+
         // กันการเปลี่ยน house_id ไปบ้านที่ไม่มีสิทธิ์
         $this->ensureAuthorizedHouseId($validated['house_id']);
 
@@ -700,9 +735,9 @@ protected function saveClientImage($file): string
             }
         }
 
-       if ($request->hasFile('image')) {
-    $validated['image'] = $this->saveClientImage($request->file('image'));
-}
+        if ($request->hasFile('image')) {
+                $validated['image'] = $this->saveClientImage($request->file('image'));
+            }
 
         $problems = $validated['problems'] ?? [];
         unset($validated['problems']);
@@ -712,48 +747,156 @@ protected function saveClientImage($file): string
         $client->update($validated);
         $client->problems()->sync($problems);
 
+        CaseActivity::where('client_id', $client->id)
+            ->where('module', 'client')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $client->id,
+            'module'      => 'client',
+            'type'        => 'success',
+            'title'       => 'แก้ไขข้อมูลผู้รับบริการ',
+            'description' => 'ชื่อ: ' . $client->first_name . ' ' . $client->last_name .
+                            ' | เลขทะเบียน: ' . ($client->register_number ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-person-check',
+            'url'         => route('client.edit', $client->id),
+        ]);
+
         return redirect()->back()->with('success', 'แก้ไขข้อมูลเรียบร้อยแล้ว');
     }
 
-    public function ClientDelete($id)
-{
-    // อนุญาตเฉพาะ admin
-    if (auth()->user()->role !== 'admin') {
-        abort(403, 'คุณไม่มีสิทธิ์ลบข้อมูล');
-    }
-
-    $client = $this->findAuthorizedClient($id);
-
-    $client->update(['release_status' => 'refer']);
-
-    return redirect()->route('client.show')->with([
-        'message' => 'เปลี่ยนสถานะเป็น refer เรียบร้อยแล้ว',
-        'alert-type' => 'success',
-    ]);
-}
-
-    public function ClientShowRefer()
+    protected function forceAuthorizedProject(array $validated): array
     {
-        $clients = Client::forUser(auth()->user())
-            ->with('problems')
-            ->whereIn('release_status', ['show', 'refer'])
-            ->latest()
-            ->get();
+        $user = auth()->user();
 
-        return view('backend.client.client_show_refer', compact('clients'));
-    }
-
-    public function changeStatus($id)
-    {
-        $client = $this->findAuthorizedClient($id);
-
-        if ($client->release_status === 'refer') {
-            $client->release_status = 'show';
-            $client->save();
+        if (!$user) {
+            abort(403, 'กรุณาเข้าสู่ระบบ');
         }
 
-        return redirect()->back()
-            ->with('success', 'ปรับสถานะเรียบร้อยแล้ว')
-            ->with('alert', 'สถานะถูกเปลี่ยนจาก Refer เป็น Show');
+        if (
+            (method_exists($user, 'isAdmin') && $user->isAdmin()) ||
+            (method_exists($user, 'isExecutive') && $user->isExecutive()) ||
+            in_array(($user->role ?? null), ['admin', 'executive'], true)
+        ) {
+            return $validated;
+        }
+
+        if (empty($user->project_id)) {
+            abort(403, 'บัญชีของคุณยังไม่ได้กำหนดหน่วยงาน');
+        }
+
+        $validated['project_id'] = (int) $user->project_id;
+
+        return $validated;
     }
+
+        public function ClientDelete($id)
+    {
+        // อนุญาตเฉพาะ admin
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'คุณไม่มีสิทธิ์ลบข้อมูล');
+        }
+
+        $client = $this->findAuthorizedClient($id);
+
+        $client->update(['release_status' => 'refer']);
+
+        return redirect()->route('client.show')->with([
+            'message' => 'เปลี่ยนสถานะเป็น refer เรียบร้อยแล้ว',
+            'alert-type' => 'success',
+        ]);
+    }
+
+  public function ClientShowRefer(Request $request)
+{
+    $user = auth()->user();
+
+    $projectId = $request->input('project_id', 'all');
+
+    $canFilterProjects = in_array(($user->role ?? null), ['admin', 'executive'], true);
+
+    if ($canFilterProjects) {
+        $filterProjectIds = (!empty($projectId) && $projectId !== 'all')
+            ? [(int) $projectId]
+            : [];
+    } else {
+        $filterProjectIds = [];
+
+        if (method_exists($user, 'projects')) {
+            $filterProjectIds = $user->projects()
+                ->pluck('projects.id')
+                ->map(fn ($id) => (int) $id)
+                ->toArray();
+        }
+
+        if (empty($filterProjectIds) && !empty($user->project_id)) {
+            $filterProjectIds = [(int) $user->project_id];
+        }
+    }
+
+    $query = Client::with([
+            'problems',
+            'project',
+        ])
+        ->whereIn('release_status', [
+            'show',
+            'refer',
+            'pending_refer',
+            'active',
+        ]);
+
+    /*
+     * PATCH:
+     * กรองเด็กที่ "เคยอยู่" ในหน่วยงาน
+     * - อยู่ปัจจุบันใน project_id นั้น
+     * - หรือเคยถูกย้ายออกจากหน่วยงานนั้น
+     * - หรือเคยถูกย้ายเข้าไปหน่วยงานนั้น
+     */
+    if (!empty($filterProjectIds)) {
+        $query->where(function ($q) use ($filterProjectIds) {
+            $q->whereIn('project_id', $filterProjectIds)
+                ->orWhereExists(function ($transferQuery) use ($filterProjectIds) {
+                    $transferQuery->select(DB::raw(1))
+                        ->from('client_transfers')
+                        ->whereColumn('client_transfers.client_id', 'clients.id')
+                        ->where(function ($transferProjectQuery) use ($filterProjectIds) {
+                            $transferProjectQuery
+                                ->whereIn('from_project_id', $filterProjectIds)
+                                ->orWhereIn('to_project_id', $filterProjectIds);
+                        });
+                });
+        });
+    } elseif (!$canFilterProjects) {
+        $query->whereRaw('1 = 0');
+    }
+
+    $clients = $query
+        ->latest('clients.created_at')
+        ->get();
+
+    $projects = $canFilterProjects
+        ? Project::orderBy('project_name')->get()
+        : collect();
+
+    return view('backend.client.client_show_refer', compact(
+        'clients',
+        'projects',
+        'projectId',
+        'canFilterProjects'
+    ));
 }
+        public function changeStatus($id)
+        {
+            $client = $this->findAuthorizedClient($id);
+
+            if ($client->release_status === 'refer') {
+                $client->release_status = 'show';
+                $client->save();
+            }
+
+            return redirect()->back()
+                ->with('success', 'ปรับสถานะเรียบร้อยแล้ว')
+                ->with('alert', 'สถานะถูกเปลี่ยนจาก Refer เป็น Show');
+        }
+    }

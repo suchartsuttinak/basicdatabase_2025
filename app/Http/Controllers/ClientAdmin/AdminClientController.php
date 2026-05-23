@@ -13,6 +13,7 @@ use App\Models\Vaccination;
 use App\Models\Absent;
 use App\Models\SchoolFollowup;
 use App\Models\CaseOutside;
+use App\Models\CaseActivity;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
@@ -22,44 +23,16 @@ class AdminClientController extends Controller
     /**
      * ดึง client ที่ user มีสิทธิ์เท่านั้น
      */
-    protected function findAuthorizedClient(int $id, array $with = []): Client
-    {
-        $user = auth()->user();
+  protected function findAuthorizedClient(int $id, array $with = []): Client
+{
+    $query = Client::forUser(auth()->user());
 
-        $query = Client::query();
-
-        if (!empty($with)) {
-            $query->with($with);
-        }
-
-        $client = $query->findOrFail($id);
-
-        // admin เห็นได้ทั้งหมด
-        if ($user && $user->isAdmin()) {
-            return $client;
-        }
-
-        if (!$user) {
-            abort(403, 'กรุณาเข้าสู่ระบบ');
-        }
-
-        $user->loadMissing('houses');
-
-        $allowedHouseIds = $user->houses
-            ->pluck('id')
-            ->map(fn ($houseId) => (int) $houseId)
-            ->unique()
-            ->values()
-            ->toArray();
-
-        abort_unless(
-            !empty($allowedHouseIds) && in_array((int) $client->house_id, $allowedHouseIds, true),
-            403,
-            'คุณไม่มีสิทธิ์เข้าถึงข้อมูลผู้รับบริการรายนี้'
-        );
-
-        return $client;
+    if (!empty($with)) {
+        $query->with($with);
     }
+
+    return $query->findOrFail($id);
+}
 
     public function Index($id)
     {
@@ -187,7 +160,48 @@ class AdminClientController extends Controller
         $healthLatestTreatmentDate = $healthSummary['latestTreatmentDate'];
 
         // =========================
+
+            // =========================
+// Case Activities
+// =========================
+$latestActivity = CaseActivity::where('client_id', $client->id)
+    ->latest('occurred_at')
+    ->latest('id')
+    ->first();
+
+$activitiesCount = CaseActivity::where('client_id', $client->id)
+    ->count();
+
+$moduleLabels = [
+    'client'           => 'ผู้รับบริการ',
+    'education_record' => 'บันทึกการศึกษา',
+    'psychiatric'      => 'พบจิตแพทย์',
+    'medical'          => 'พบแพทย์',
+    'vaccine'          => 'วัคซีน',
+    'observe'          => 'สังเกตพฤติกรรม',
+    'addictive'        => 'พฤติกรรมเสพติด',
+    'escape'           => 'หนีออกจากสถานสงเคราะห์',
+    'school_followup'  => 'ติดตามการเรียน',
+    'help_session'     => 'การช่วยเหลือ',
+    'job_agency'       => 'จัดหางาน',
+    'refer'            => 'จำหน่าย / ส่งต่อ',
+    'absent'           => 'ขาดเรียน',
+    'operation'        => 'กิจกรรมประจำวัน',
+    'estimate'         => 'แบบประเมิน',
+    'health_checkup'   => 'ตรวจสุขภาพ',
+    'accident'         => 'อุบัติเหตุ',
+];
+
+$latestActivityType = !empty($latestActivity?->module)
+    ? ($moduleLabels[$latestActivity->module] ?? $latestActivity->module)
+    : 'ไม่มีข้อมูล';
+
+$latestActivityDate = $latestActivity?->occurred_at;
+
+
         // Publicizes
+
+
         // =========================
         $publicizeQuery = \App\Models\Publicize::query();
 
@@ -245,7 +259,10 @@ class AdminClientController extends Controller
             'publicizeLatestCategory',
             'filesCount',
             'fileLatestType',
-            'fileLatestDate'
+            'fileLatestDate',
+            'activitiesCount',
+            'latestActivityType',
+            'latestActivityDate'
         ));
     }
 

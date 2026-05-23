@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use App\Models\CaseActivity;
 
 class HealthcHeckupController extends Controller
 {
@@ -73,55 +74,71 @@ class HealthcHeckupController extends Controller
     /**
      * บันทึกข้อมูลใหม่
      */
-    public function store(Request $request)
-    {
-        $this->authorizeRole();
+ public function store(Request $request)
+        {
+            $this->authorizeRole();
 
-        $validated = $request->validate([
-            'client_id' => 'required|integer|exists:clients,id',
-            'checkup_date' => 'required|date',
-            'hospital_name' => 'required|string|max:255',
-            'checkup_result' => 'required|in:normal,abnormal',
-            'abnormal_detail' => 'nullable|string',
-            'medical_document' => 'nullable|file|mimes:pdf|max:5120',
-        ], [
-            'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
-            'checkup_date.required' => 'กรุณาระบุวันที่ตรวจ',
-            'hospital_name.required' => 'กรุณาระบุสถานพยาบาล',
-            'checkup_result.required' => 'กรุณาเลือกผลการตรวจ',
-            'medical_document.mimes' => 'ไฟล์เอกสารต้องเป็น PDF เท่านั้น',
-            'medical_document.max' => 'ไฟล์เอกสารต้องมีขนาดไม่เกิน 5 MB',
-        ]);
+            $validated = $request->validate([
+                'client_id' => 'required|integer|exists:clients,id',
+                'checkup_date' => 'required|date',
+                'hospital_name' => 'required|string|max:255',
+                'checkup_result' => 'required|in:normal,abnormal',
+                'abnormal_detail' => 'nullable|string',
+                'medical_document' => 'nullable|file|mimes:pdf|max:5120',
+            ], [
+                'client_id.required' => 'กรุณาเลือกผู้รับบริการ',
+                'checkup_date.required' => 'กรุณาระบุวันที่ตรวจ',
+                'hospital_name.required' => 'กรุณาระบุสถานพยาบาล',
+                'checkup_result.required' => 'กรุณาเลือกผลการตรวจ',
+                'medical_document.mimes' => 'ไฟล์เอกสารต้องเป็น PDF เท่านั้น',
+                'medical_document.max' => 'ไฟล์เอกสารต้องมีขนาดไม่เกิน 5 MB',
+            ]);
 
-        $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+            $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-        $validated['client_id'] = $client->id;
+            $validated['client_id'] = $client->id;
 
-        $filePath = null;
+            $filePath = null;
 
-        if ($request->hasFile('medical_document')) {
-            $filePath = $this->uploadMedicalDocument(
-                $request->file('medical_document')
-            );
+            if ($request->hasFile('medical_document')) {
+                $filePath = $this->uploadMedicalDocument(
+                    $request->file('medical_document')
+                );
+            }
+
+            $healthcHeckup = HealthcHeckup::create([
+                'client_id' => $client->id,
+                'checkup_date' => $validated['checkup_date'],
+                'hospital_name' => $validated['hospital_name'],
+                'checkup_result' => $validated['checkup_result'],
+                'abnormal_detail' => $validated['checkup_result'] === 'abnormal'
+                    ? $validated['abnormal_detail']
+                    : null,
+                'medical_document' => $filePath,
+                'recorded_by' => Auth::id(),
+            ]);
+
+           CaseActivity::where('client_id', $client->id)
+                ->where('module', 'healthc_heckup')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'healthc_heckup',
+                'type'        => $validated['checkup_result'] === 'abnormal' ? 'warning' : 'success',
+                'title'       => 'บันทึกการตรวจสุขภาพประจำปี',
+                'description' => 'วันที่ตรวจ: ' . ($validated['checkup_date'] ?? '-') .
+                                ' | สถานพยาบาล: ' . ($validated['hospital_name'] ?? '-') .
+                                ' | ผลตรวจ: ' . ($validated['checkup_result'] === 'abnormal' ? 'ผิดปกติ' : 'ปกติ'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-clipboard2-heart',
+                'url'         => route('healthc_heckups.index'),
+            ]);
+
+            return redirect()
+                ->route('healthc_heckups.index')
+                ->with('success', 'บันทึกข้อมูลการตรวจสุขภาพเรียบร้อยแล้ว');
         }
-
-        HealthcHeckup::create([
-            'client_id' => $client->id,
-            'checkup_date' => $validated['checkup_date'],
-            'hospital_name' => $validated['hospital_name'],
-            'checkup_result' => $validated['checkup_result'],
-            'abnormal_detail' => $validated['checkup_result'] === 'abnormal'
-                ? $validated['abnormal_detail']
-                : null,
-            'medical_document' => $filePath,
-            'recorded_by' => Auth::id(),
-        ]);
-
-        return redirect()
-            ->route('healthc_heckups.index')
-            ->with('success', 'บันทึกข้อมูลการตรวจสุขภาพเรียบร้อยแล้ว');
-    }
-
     /**
      * ดึงข้อมูลสำหรับแก้ไข (JSON)
      */
@@ -199,6 +216,23 @@ class HealthcHeckupController extends Controller
             'recorded_by' => Auth::id(),
         ]);
 
+        CaseActivity::where('client_id', $client->id)
+            ->where('module', 'healthc_heckup')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $client->id,
+            'module'      => 'healthc_heckup',
+            'type'        => $validated['checkup_result'] === 'abnormal' ? 'warning' : 'success',
+            'title'       => 'แก้ไขการตรวจสุขภาพประจำปี',
+            'description' => 'วันที่ตรวจ: ' . ($validated['checkup_date'] ?? '-') .
+                            ' | สถานพยาบาล: ' . ($validated['hospital_name'] ?? '-') .
+                            ' | ผลตรวจ: ' . ($validated['checkup_result'] === 'abnormal' ? 'ผิดปกติ' : 'ปกติ'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-clipboard2-heart',
+            'url'         => route('healthc_heckups.index'),
+        ]);
+
         return redirect()
             ->route('healthc_heckups.index')
             ->with('success', 'แก้ไขข้อมูลการตรวจสุขภาพเรียบร้อยแล้ว');
@@ -214,6 +248,10 @@ class HealthcHeckupController extends Controller
         $item = $this->findAuthorizedItem($id);
 
         $this->deleteMedicalDocument($item->medical_document);
+
+        CaseActivity::where('client_id', $item->client_id)
+        ->where('module', 'healthc_heckup')
+        ->delete();
 
         $item->delete();
 

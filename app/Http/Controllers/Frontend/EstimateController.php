@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Models\CaseActivity;
 
 class EstimateController extends Controller
 {
@@ -117,92 +118,109 @@ class EstimateController extends Controller
         return response()->json($estimate);
     }
 
-    public function StoreEstimate(Request $request)
-    {
-        $client = Client::forUser(auth()->user())
-            ->where('id', $request->client_id)
-            ->firstOrFail();
+   public function StoreEstimate(Request $request)
+        {
+            $client = Client::forUser(auth()->user())
+                ->where('id', $request->client_id)
+                ->firstOrFail();
 
-        $validator = Validator::make($request->all(), [
-            'date' => [
-                'required',
-                'date',
-                Rule::unique('estimates')->where(function ($query) use ($request) {
-                    return $query->where('client_id', $request->client_id);
-                }),
-            ],
-            'follo_no' => 'required',
-            'results'  => 'nullable|string',
-            'family_income' => 'nullable|numeric|min:0',
-            'guardian_job' => 'nullable|string|max:255',
-            'income_sufficiency' => 'required|in:เพียงพอ,ไม่เพียงพอ',
-            'income_reason' => 'nullable|string',
-            'debt' => 'nullable|string',
-            'housing_condition' => 'nullable|in:ดี,พอใช้,ควรปรับปรุง',
-            'teacher'  => 'nullable|string|max:255',
-            'remark'   => 'nullable|string',
-            'client_id'=> 'required|exists:clients,id',
+            $validator = Validator::make($request->all(), [
+                'date' => [
+                    'required',
+                    'date',
+                    Rule::unique('estimates')->where(function ($query) use ($request) {
+                        return $query->where('client_id', $request->client_id);
+                    }),
+                ],
+                'follo_no' => 'required',
+                'results'  => 'nullable|string',
+                'family_income' => 'nullable|numeric|min:0',
+                'guardian_job' => 'nullable|string|max:255',
+                'income_sufficiency' => 'required|in:เพียงพอ,ไม่เพียงพอ',
+                'income_reason' => 'nullable|string',
+                'debt' => 'nullable|string',
+                'housing_condition' => 'nullable|in:ดี,พอใช้,ควรปรับปรุง',
+                'teacher'  => 'nullable|string|max:255',
+                'remark'   => 'nullable|string',
+                'client_id'=> 'required|exists:clients,id',
 
-            // PATCH: รองรับรูปใหญ่จากมือถือ แล้วค่อยบีบอัดเอง
-            'pictures'   => 'nullable|array',
-            'pictures.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
-        ], [
-            'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น',
-            'date.required' => 'กรุณาเลือกวันที่',
-            'date.date' => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'follo_no.required' => 'กรุณาเลือกการดำเนินงาน',
-            'income_sufficiency.required' => 'กรุณาเลือกความเพียงพอของรายได้',
-            'income_sufficiency.in' => 'ค่าความเพียงพอของรายได้ไม่ถูกต้อง',
-            'housing_condition.in' => 'ค่าสภาพที่อยู่อาศัยไม่ถูกต้อง',
-            'family_income.numeric' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องเป็นตัวเลข',
-            'family_income.min' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องไม่น้อยกว่า 0',
-            'pictures.*.image' => 'ไฟล์ต้องเป็นรูปภาพ',
-            'pictures.*.mimes' => 'รูปภาพต้องเป็นไฟล์ jpeg, png, jpg หรือ webp',
-            'pictures.*.max' => 'รูปภาพต้องมีขนาดไม่เกิน 10MB',
-        ]);
-
-        if ($validator->fails()) {
-            return back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('form', 'add-estimate');
-        }
-
-        $data = $validator->validated();
-        $data['client_id'] = $client->id;
-
-        unset($data['pictures']);
-
-        if (($data['income_sufficiency'] ?? 'เพียงพอ') === 'เพียงพอ') {
-            $data['income_reason'] = null;
-        }
-
-        $estimate = Estimate::create($data);
-
-        $estimates = Estimate::where('client_id', $estimate->client_id)
-            ->orderBy('date', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        $counter = 1;
-        foreach ($estimates as $item) {
-            $item->update(['count' => $counter]);
-            $counter++;
-        }
-
-        if ($request->hasFile('pictures')) {
-            foreach ($request->file('pictures') as $file) {
-                $path = $this->saveEstimateImage($file);
-                $estimate->pictures()->create(['path' => $path]);
-            }
-        }
-
-        return redirect()->route('estimate.show', $estimate->client_id)
-            ->with([
-                'message'    => 'บันทึกข้อมูลเรียบร้อย',
-                'alert-type' => 'success'
+                // PATCH: รองรับรูปใหญ่จากมือถือ แล้วค่อยบีบอัดเอง
+                'pictures'   => 'nullable|array',
+                'pictures.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
+            ], [
+                'date.unique' => 'วันที่นี้ถูกบันทึกไว้แล้ว กรุณาเลือกวันอื่น',
+                'date.required' => 'กรุณาเลือกวันที่',
+                'date.date' => 'รูปแบบวันที่ไม่ถูกต้อง',
+                'follo_no.required' => 'กรุณาเลือกการดำเนินงาน',
+                'income_sufficiency.required' => 'กรุณาเลือกความเพียงพอของรายได้',
+                'income_sufficiency.in' => 'ค่าความเพียงพอของรายได้ไม่ถูกต้อง',
+                'housing_condition.in' => 'ค่าสภาพที่อยู่อาศัยไม่ถูกต้อง',
+                'family_income.numeric' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องเป็นตัวเลข',
+                'family_income.min' => 'รายได้ครอบครัวเฉลี่ย/เดือนต้องไม่น้อยกว่า 0',
+                'pictures.*.image' => 'ไฟล์ต้องเป็นรูปภาพ',
+                'pictures.*.mimes' => 'รูปภาพต้องเป็นไฟล์ jpeg, png, jpg หรือ webp',
+                'pictures.*.max' => 'รูปภาพต้องมีขนาดไม่เกิน 10MB',
             ]);
-    }
+
+            if ($validator->fails()) {
+                return back()
+                    ->withErrors($validator)
+                    ->withInput()
+                    ->with('form', 'add-estimate');
+            }
+
+            $data = $validator->validated();
+            $data['client_id'] = $client->id;
+
+            unset($data['pictures']);
+
+            if (($data['income_sufficiency'] ?? 'เพียงพอ') === 'เพียงพอ') {
+                $data['income_reason'] = null;
+            }
+
+            $estimate = Estimate::create($data);
+
+            $estimates = Estimate::where('client_id', $estimate->client_id)
+                ->orderBy('date', 'asc')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            $counter = 1;
+            foreach ($estimates as $item) {
+                $item->update(['count' => $counter]);
+                $counter++;
+            }
+
+            if ($request->hasFile('pictures')) {
+                foreach ($request->file('pictures') as $file) {
+                    $path = $this->saveEstimateImage($file);
+                    $estimate->pictures()->create(['path' => $path]);
+                }
+            }
+
+              CaseActivity::where('client_id', $client->id)
+                ->where('module', 'estimate')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'estimate',
+                'type'        => 'success',
+                'title'       => 'บันทึกการประเมินครอบครัว',
+                'description' => 'วันที่ประเมิน: ' . ($data['date'] ?? '-') .
+                                ' / ครั้งที่ ' . ($estimate->count ?? '-') .
+                                ' / ผลการประเมิน: ' . ($data['results'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-clipboard-data',
+                'url'         => route('estimate.show', $client->id),
+            ]);
+
+            return redirect()->route('estimate.show', $estimate->client_id)
+                ->with([
+                    'message'    => 'บันทึกข้อมูลเรียบร้อย',
+                    'alert-type' => 'success'
+                ]);
+        }
 
     public function EditEstimate($id)
     {
@@ -320,6 +338,23 @@ class EstimateController extends Controller
             $counter++;
         }
 
+              CaseActivity::where('client_id', $estimate->client_id)
+                ->where('module', 'estimate')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $estimate->client_id,
+                'module'      => 'estimate',
+                'type'        => 'success',
+                'title'       => 'แก้ไขการประเมินครอบครัว',
+                'description' => 'วันที่ประเมิน: ' . ($validated['date'] ?? '-') .
+                                ' / ครั้งที่ ' . ($estimate->count ?? '-') .
+                                ' / ผลการประเมิน: ' . ($validated['results'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-clipboard-data',
+                'url'         => route('estimate.show', $estimate->client_id),
+            ]);
+
         return redirect()->route('estimate.show', $estimate->client_id)
             ->with([
                 'message' => 'แก้ไขข้อมูลเรียบร้อย',
@@ -327,41 +362,46 @@ class EstimateController extends Controller
             ]);
     }
 
-    public function DeleteEstimate($id)
-    {
-        $estimate = Estimate::where('id', $id)
-            ->whereHas('client', function ($q) {
-                $q->forUser(auth()->user());
-            })
-            ->with('pictures')
-            ->firstOrFail();
+  public function DeleteEstimate($id)
+{
+    $estimate = Estimate::where('id', $id)
+        ->whereHas('client', function ($q) {
+            $q->forUser(auth()->user());
+        })
+        ->with('pictures')
+        ->firstOrFail();
 
-        $client_id = $estimate->client_id;
+    $client_id = $estimate->client_id;
 
-        foreach ($estimate->pictures as $pic) {
-            $this->deleteEstimateImage($pic->path);
-            $pic->delete();
-        }
+    // ✅ ลบ activity ของ estimate ออกจาก feed ก่อน
+    CaseActivity::where('client_id', $client_id)
+        ->where('module', 'estimate')
+        ->delete();
 
-        $estimate->delete();
-
-        $estimates = Estimate::where('client_id', $client_id)
-            ->orderBy('date', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        $counter = 1;
-        foreach ($estimates as $item) {
-            $item->update(['count' => $counter]);
-            $counter++;
-        }
-
-        return redirect()->route('estimate.show', $client_id)
-            ->with([
-                'message' => 'ลบข้อมูลเรียบร้อย',
-                'alert-type' => 'success'
-            ]);
+    foreach ($estimate->pictures as $pic) {
+        $this->deleteEstimateImage($pic->path);
+        $pic->delete();
     }
+
+    $estimate->delete();
+
+    $estimates = Estimate::where('client_id', $client_id)
+        ->orderBy('date', 'asc')
+        ->orderBy('id', 'asc')
+        ->get();
+
+    $counter = 1;
+    foreach ($estimates as $item) {
+        $item->update(['count' => $counter]);
+        $counter++;
+    }
+
+    return redirect()->route('estimate.show', $client_id)
+        ->with([
+            'message' => 'ลบข้อมูลเรียบร้อย',
+            'alert-type' => 'success'
+        ]);
+}
 
     public function CheckDuplicate(Request $request)
     {

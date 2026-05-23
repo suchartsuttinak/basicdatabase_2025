@@ -8,6 +8,7 @@ use App\Models\Refer;
 use App\Models\Client;
 use App\Models\Translate;
 use Illuminate\Support\Str;
+use App\Models\CaseActivity;
 
 class ReferController extends Controller
 {
@@ -141,7 +142,7 @@ class ReferController extends Controller
         }
 
         // ✅ บันทึก refer
-        Refer::create($validated);
+         $refer = Refer::create($validated);
 
         // =========================
         // PATCH: เปลี่ยนสถานะ client ตามสิทธิ์ผู้บันทึก
@@ -151,6 +152,34 @@ class ReferController extends Controller
         $client->update([
             'release_status' => $canAutoApprove ? 'refer' : 'pending_refer'
         ]);
+
+            CaseActivity::where('client_id', $client->id)
+            ->where('module', 'refer')
+            ->delete();
+
+            CaseActivity::record([
+            'client_id'   => $client->id,
+            'module'      => 'refer',
+            'type'        => $canAutoApprove ? 'danger' : 'warning',
+
+            'title'       => $canAutoApprove
+                ? 'อนุมัติการจำหน่ายผู้รับบริการ'
+                : 'ส่งคำขอจำหน่ายผู้รับบริการ',
+
+            'description' =>
+                'ผลคณะกรรมการ: ' . ($validated['committee_result'] ?? '-') .
+                ' | ปลายทาง: ' . ($validated['destination'] ?? '-') .
+                ' | ผู้นำส่ง: ' . ($validated['teacher'] ?? '-'),
+
+           'occurred_at' => now(),
+
+            'icon'        => $canAutoApprove
+                ? 'bi-box-arrow-right'
+                : 'bi-hourglass-split',
+
+            'url'         => route('refers.index', $client->id),
+        ]);
+
 
         return redirect()->route('refers.index', $client->id)->with([
             'message'    => $canAutoApprove
@@ -165,7 +194,11 @@ class ReferController extends Controller
      */
     public function approve($id)
     {
-        $refer = Refer::with('client')->findOrFail($id);
+       $refer = Refer::with('client')
+    ->whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
         if (!$refer->client) {
             return $this->errorResponse('ไม่พบข้อมูล client ที่เกี่ยวข้อง', 404);
@@ -222,6 +255,22 @@ class ReferController extends Controller
             'release_status' => 'refer'
         ]);
 
+        CaseActivity::where('client_id', $client->id)
+        ->where('module', 'refer')
+        ->delete();
+
+        CaseActivity::record([
+        'client_id'   => $client->id,
+        'module'      => 'refer',
+        'type'        => 'danger',
+        'title'       => 'อนุมัติการจำหน่ายผู้รับบริการ',
+        'description' => 'ผู้อนุมัติ: ' . (auth()->user()->name ?? '-') .
+                        ' | วันที่อนุมัติ: ' . now()->format('d/m/Y H:i'),
+        'occurred_at' => now(),
+        'icon'        => 'bi-check-circle',
+        'url'         => route('refers.index', $client->id),
+    ]);
+
         return redirect()->route('refers.index', $client->id)->with([
             'message'    => 'อนุมัติการจำหน่ายเรียบร้อยแล้ว',
             'alert-type' => 'success',
@@ -233,7 +282,11 @@ class ReferController extends Controller
      */
     public function restore($id)
     {
-        $refer = Refer::with('client')->findOrFail($id);
+       $refer = Refer::with('client')
+    ->whereHas('client', function ($q) {
+        $q->forUser(auth()->user());
+    })
+    ->findOrFail($id);
 
         if (!$refer->client) {
             return $this->errorResponse('ไม่พบข้อมูล client ที่เกี่ยวข้อง', 404);
@@ -274,6 +327,21 @@ class ReferController extends Controller
         $client->update([
             'release_status' => 'show'
         ]);
+
+        CaseActivity::where('client_id', $client->id)
+        ->where('module', 'refer')
+        ->delete();
+
+        CaseActivity::record([
+        'client_id'   => $client->id,
+        'module'      => 'refer',
+        'type'        => 'success',
+        'title'       => 'คืนสถานะผู้รับบริการกลับเข้าสู่ระบบ',
+        'description' => 'ยกเลิกสถานะการจำหน่าย และคืนผู้รับบริการกลับมาแสดงในระบบ',
+        'occurred_at' => now(),
+        'icon'        => 'bi-arrow-counterclockwise',
+        'url'         => route('refers.index', $client->id),
+    ]);
 
         if (request()->ajax()) {
             return response()->json(['message' => 'Restore สำเร็จ']);

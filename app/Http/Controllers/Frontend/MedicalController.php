@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\Medical;
 use Illuminate\Support\Facades\Validator; // ✅ ใช้ namespace ที่ถูกต้อง
 use Illuminate\Validation\Rule;
+use App\Models\CaseActivity;
 
 class MedicalController extends Controller
 {
@@ -44,58 +45,75 @@ class MedicalController extends Controller
 }
 
     // บันทึกข้อมูลใหม่
-    public function MedicalStore(Request $request)
-    {
-        $data = $request->validate([
-        'medical_date' => [
-            'required',
-            'date',
-            Rule::unique('medicals')->where(function ($query) use ($request) {
-                return $query->where('client_id', $request->client_id);
-            }),
-        ],
-        'disease_name' => 'required|string|max:255',
-        'illness'      => 'required|string',
-        'treatment'    => 'nullable|string',
-        'refer'        => 'required|in:พบแพทย์,ไม่พบแพทย์',
-        'diagnosis'    => 'nullable|string',
-        'appt_date'    => 'nullable|date',
-        'teacher'      => 'nullable|string|max:255',
-        'remark'       => 'nullable|string',
-        'client_id'    => 'required|exists:clients,id',
-    ], [
-        'medical_date.required' => 'กรุณาระบุวันที่รักษา',
-        'medical_date.date'     => 'วันที่รักษาไม่ถูกต้อง',
-        'medical_date.unique'   => 'มีการบันทึกวันที่รักษานี้แล้ว',
-        'disease_name.required' => 'กรุณาระบุชื่อโรค',
-        'illness.required'      => 'กรุณาระบุอาการเจ็บป่วย',
-        'refer.required'        => 'กรุณาเลือกการส่งต่อ',
-    ]);
+  public function MedicalStore(Request $request)
+        {
+            $data = $request->validate([
+                'medical_date' => [
+                    'required',
+                    'date',
+                    Rule::unique('medicals')->where(function ($query) use ($request) {
+                        return $query->where('client_id', $request->client_id);
+                    }),
+                ],
+                'disease_name' => 'required|string|max:255',
+                'illness'      => 'required|string',
+                'treatment'    => 'nullable|string',
+                'refer'        => 'required|in:พบแพทย์,ไม่พบแพทย์',
+                'diagnosis'    => 'nullable|string',
+                'appt_date'    => 'nullable|date',
+                'teacher'      => 'nullable|string|max:255',
+                'remark'       => 'nullable|string',
+                'client_id'    => 'required|exists:clients,id',
+            ], [
+                'medical_date.required' => 'กรุณาระบุวันที่รักษา',
+                'medical_date.date'     => 'วันที่รักษาไม่ถูกต้อง',
+                'medical_date.unique'   => 'มีการบันทึกวันที่รักษานี้แล้ว',
+                'disease_name.required' => 'กรุณาระบุชื่อโรค',
+                'illness.required'      => 'กรุณาระบุอาการเจ็บป่วย',
+                'refer.required'        => 'กรุณาเลือกการส่งต่อ',
+            ]);
 
-        // =========================
-        // PATCH: กันยิง request เปลี่ยน client_id
-        // =========================
-        $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            // =========================
+            // PATCH: กันยิง request เปลี่ยน client_id
+            // =========================
+            $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
 
-        // =========================
-        // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
-        // =========================
-        $data['client_id'] = $client->id;
+            // =========================
+            // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
+            // =========================
+            $data['client_id'] = $client->id;
 
-        if ($data['refer'] === 'ไม่พบแพทย์') {
-            $data['diagnosis'] = null;
-            $data['appt_date'] = null;
+            if ($data['refer'] === 'ไม่พบแพทย์') {
+                $data['diagnosis'] = null;
+                $data['appt_date'] = null;
+            }
+
+            $medical = Medical::create($data);
+
+           CaseActivity::where('client_id', $client->id)
+                ->where('module', 'medical')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'medical',
+                'type'        => 'success',
+                'title'       => 'บันทึกการรักษาพยาบาล',
+                'description' => 'วันที่รักษา: ' . ($data['medical_date'] ?? '-') .
+                                ' | โรค/อาการ: ' . ($data['disease_name'] ?? '-') .
+                                ' | การส่งต่อ: ' . ($data['refer'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-heart-pulse',
+                'url'         => route('medical.add', $client->id),
+            ]);
+
+            $notification = [
+                'message' => 'บันทึกข้อมูลเรียบร้อย',
+                'alert-type' => 'success'
+            ];
+
+            return redirect()->back()->with($notification);
         }
-
-        Medical::create($data);
-
-         $notification = [
-            'message' => 'บันทึกข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
-        return redirect()->back()->with($notification);
-    }
 
     // โหลดข้อมูลสำหรับแก้ไข (JSON)
     public function editMedicalJson($id)
@@ -204,6 +222,23 @@ public function MedicalUpdate(Request $request, $id)
 
     $medical->update($data);
 
+    CaseActivity::where('client_id', $medical->client_id)
+    ->where('module', 'medical')
+    ->delete();
+
+    CaseActivity::record([
+        'client_id'   => $medical->client_id,
+        'module'      => 'medical',
+        'type'        => 'success',
+        'title'       => 'แก้ไขการรักษาพยาบาล',
+        'description' => 'วันที่รักษา: ' . ($data['medical_date'] ?? '-') .
+                        ' | โรค/อาการ: ' . ($data['disease_name'] ?? '-') .
+                        ' | การส่งต่อ: ' . ($data['refer'] ?? '-'),
+        'occurred_at' => now(),
+        'icon'        => 'bi-heart-pulse',
+        'url'         => route('medical.add', $medical->client_id),
+    ]);
+
      $notification = [
             'message' => 'อัปเดตข้อมูลเรียบร้อย',
             'alert-type' => 'success'
@@ -231,6 +266,11 @@ public function MedicalUpdate(Request $request, $id)
         Client::forUser(auth()->user())->findOrFail($medical->client_id);
 
         $clientId  = $medical->client_id;
+
+        CaseActivity::where('client_id', $clientId)
+        ->where('module', 'medical')
+        ->delete();
+        
         $medical->delete();
 
         return redirect()->route('medical.add', $clientId)

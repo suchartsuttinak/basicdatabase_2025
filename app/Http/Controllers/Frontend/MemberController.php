@@ -9,6 +9,7 @@ use App\Models\Education;
 use App\Models\Occupation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\CaseActivity;
 
 class MemberController extends Controller
 {
@@ -50,49 +51,66 @@ class MemberController extends Controller
         return view('frontend.client.member.member_show', compact('client', 'members'));
     }
 
-    public function StoreMember(Request $request)
-    {
-        $request->validate([
-            'client_id' => 'required|integer|exists:clients,id',
-            'members' => 'required|array',
-            'members.*.fullname' => 'required|string|max:255',
-            'members.*.member_age' => 'required|integer|min:0',
-            'members.*.education_id' => 'required|integer',
-            'members.*.relationship' => 'required|string|max:100',
-            'members.*.occupation_id' => 'required|integer',
-            'members.*.income_id' => 'required|integer',
-            'members.*.remark' => 'nullable|string|max:255',
-        ]);
-
-        // ✅ [แก้ไข] กัน POST ยิง client คนอื่น
-        $client = Client::forUser(auth()->user())
-            ->where('id', $request->client_id)
-            ->firstOrFail();
-
-        $client_id = $client->id; // ✅ [แก้ไข]
-
-        foreach ($request->members as $memberData) {
-            Member::create([
-                'client_id'     => $client_id,
-                'fullname'      => $memberData['fullname'],
-                'member_age'    => $memberData['member_age'],
-                'education_id'  => $memberData['education_id'],
-                'relationship'  => $memberData['relationship'],
-                'occupation_id' => $memberData['occupation_id'],
-                'income_id'     => $memberData['income_id'],
-                'remark'        => $memberData['remark'] ?? null,
+   public function StoreMember(Request $request)
+        {
+            $request->validate([
+                'client_id' => 'required|integer|exists:clients,id',
+                'members' => 'required|array',
+                'members.*.fullname' => 'required|string|max:255',
+                'members.*.member_age' => 'required|integer|min:0',
+                'members.*.education_id' => 'required|integer',
+                'members.*.relationship' => 'required|string|max:100',
+                'members.*.occupation_id' => 'required|integer',
+                'members.*.income_id' => 'required|integer',
+                'members.*.remark' => 'nullable|string|max:255',
             ]);
+
+            // ✅ [แก้ไข] กัน POST ยิง client คนอื่น
+            $client = Client::forUser(auth()->user())
+                ->where('id', $request->client_id)
+                ->firstOrFail();
+
+            $client_id = $client->id; // ✅ [แก้ไข]
+
+            foreach ($request->members as $memberData) {
+                Member::create([
+                    'client_id'     => $client_id,
+                    'fullname'      => $memberData['fullname'],
+                    'member_age'    => $memberData['member_age'],
+                    'education_id'  => $memberData['education_id'],
+                    'relationship'  => $memberData['relationship'],
+                    'occupation_id' => $memberData['occupation_id'],
+                    'income_id'     => $memberData['income_id'],
+                    'remark'        => $memberData['remark'] ?? null,
+                ]);
+            }
+
+                $memberCount = count($request->members ?? []);
+
+                CaseActivity::where('client_id', $client->id)
+                    ->where('module', 'member')
+                    ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $client->id,
+                    'module'      => 'member',
+                    'type'        => 'success',
+                    'title'       => 'บันทึกสมาชิกในครอบครัว',
+                    'description' => 'เพิ่มข้อมูลสมาชิกในครอบครัว จำนวน ' . $memberCount . ' คน',
+                    'occurred_at' => now(),
+                    'icon'        => 'bi-person-lines-fill',
+                    'url'         => route('member.show', $client->id),
+                ]);
+
+            $notification = [
+                'message' => 'บันทึกข้อมูลเรียบร้อย',
+                'alert-type' => 'success'
+            ];
+
+            return redirect()
+                ->route('member.show', $client_id)
+                ->with($notification);
         }
-
-        $notification = [
-            'message' => 'บันทึกข้อมูลเรียบร้อย',
-            'alert-type' => 'success'
-        ];
-
-        return redirect()
-            ->route('member.show', $client_id)
-            ->with($notification);
-    }
 
     public function EditMember($id)
     {
@@ -139,6 +157,23 @@ class MemberController extends Controller
         foreach ($request->members as $memberData) {
             $client->members()->create($memberData);
         }
+
+            $memberCount = count($request->members ?? []);
+
+            CaseActivity::where('client_id', $client->id)
+                ->where('module', 'member')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'member',
+                'type'        => 'success',
+                'title'       => 'แก้ไขข้อมูลสมาชิกในครอบครัว',
+                'description' => 'แก้ไขข้อมูลสมาชิกในครอบครัว จำนวน ' . $memberCount . ' คน',
+                'occurred_at' => now(),
+                'icon'        => 'bi-person-lines-fill',
+                'url'         => route('member.show', $client->id),
+            ]);
 
         $notification = [
             'message' => 'แก้ไขข้อมูลเรียบร้อย',

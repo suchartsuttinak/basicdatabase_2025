@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use App\Models\CaseActivity;
 
 class JobAgencyController extends Controller
 {
@@ -50,66 +51,83 @@ class JobAgencyController extends Controller
     ));
 }
 public function storeJobAgency(Request $request)
-{
-    $validated = $request->validate([
-    'job_date' => [
-        'required',
-        'date',
-        Rule::unique('job_agencies')->where(function ($q) use ($request) {
-            return $q->where('client_id', $request->client_id);
-        }),
-    ],
-        'occupation_id' => 'required|exists:occupations,id',
-        'position'      => 'required|string',
-        'income'        => 'required|numeric',
-        'company'       => 'required|string',
-        'coordinator'   => 'required|string',
-        'remark'        => 'nullable|string',
-        'client_id'     => 'required|exists:clients,id',
-    ], [
-        'job_date.required'     => 'กรุณากรอกวันที่เริ่มงาน',
-        'job_date.date'         => 'รูปแบบวันที่ไม่ถูกต้อง',
-        'job_date.unique'       => 'วันที่เริ่มงานนี้มีอยู่แล้ว ห้ามซ้ำ',
+        {
+            $validated = $request->validate([
+                'job_date' => [
+                    'required',
+                    'date',
+                    Rule::unique('job_agencies')->where(function ($q) use ($request) {
+                        return $q->where('client_id', $request->client_id);
+                    }),
+                ],
+                'occupation_id' => 'required|exists:occupations,id',
+                'position'      => 'required|string',
+                'income'        => 'required|numeric',
+                'company'       => 'required|string',
+                'coordinator'   => 'required|string',
+                'remark'        => 'nullable|string',
+                'client_id'     => 'required|exists:clients,id',
+            ], [
+                'job_date.required'     => 'กรุณากรอกวันที่เริ่มงาน',
+                'job_date.date'         => 'รูปแบบวันที่ไม่ถูกต้อง',
+                'job_date.unique'       => 'วันที่เริ่มงานนี้มีอยู่แล้ว ห้ามซ้ำ',
 
-        'occupation_id.required'=> 'กรุณาเลือกอาชีพ',
-        'occupation_id.exists'  => 'อาชีพที่เลือกไม่ถูกต้อง',
+                'occupation_id.required'=> 'กรุณาเลือกอาชีพ',
+                'occupation_id.exists'  => 'อาชีพที่เลือกไม่ถูกต้อง',
 
-        'position.required'     => 'กรุณากรอกตำแหน่งงาน',
-        'position.string'       => 'ตำแหน่งงานต้องเป็นข้อความ',
+                'position.required'     => 'กรุณากรอกตำแหน่งงาน',
+                'position.string'       => 'ตำแหน่งงานต้องเป็นข้อความ',
 
-        'income.required'       => 'กรุณากรอกรายได้',
-        'income.numeric'        => 'รายได้ต้องเป็นตัวเลข',
+                'income.required'       => 'กรุณากรอกรายได้',
+                'income.numeric'        => 'รายได้ต้องเป็นตัวเลข',
 
-        'company.required'      => 'กรุณากรอกชื่อบริษัท',
-        'company.string'        => 'ชื่อบริษัทต้องเป็นข้อความ',
+                'company.required'      => 'กรุณากรอกชื่อบริษัท',
+                'company.string'        => 'ชื่อบริษัทต้องเป็นข้อความ',
 
-        'coordinator.required'  => 'กรุณากรอกชื่อผู้ประสานงาน',
-        'coordinator.string'    => 'ชื่อผู้ประสานงานต้องเป็นข้อความ',
+                'coordinator.required'  => 'กรุณากรอกชื่อผู้ประสานงาน',
+                'coordinator.string'    => 'ชื่อผู้ประสานงานต้องเป็นข้อความ',
 
-        'remark.string'         => 'หมายเหตุต้องเป็นข้อความ',
+                'remark.string'         => 'หมายเหตุต้องเป็นข้อความ',
 
-        'client_id.required'    => 'กรุณาเลือกผู้รับบริการ',
-        'client_id.exists'      => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
-    ]);
+                'client_id.required'    => 'กรุณาเลือกผู้รับบริการ',
+                'client_id.exists'      => 'ผู้รับบริการที่เลือกไม่ถูกต้อง',
+            ]);
 
-    // =========================
-    // PATCH: กันยิง request เปลี่ยน client_id
-    // =========================
-    $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
+            // =========================
+            // PATCH: กันยิง request เปลี่ยน client_id
+            // =========================
+            $client = Client::forUser(auth()->user())->findOrFail($validated['client_id']);
 
-    // =========================
-    // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
-    // =========================
-    $validated['client_id'] = $client->id;
+            // =========================
+            // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
+            // =========================
+            $validated['client_id'] = $client->id;
 
-    $jobAgency = DB::transaction(function () use ($validated) {
-        return JobAgency::create($validated);
-    });
+            $jobAgency = DB::transaction(function () use ($validated) {
+                return JobAgency::create($validated);
+            });
 
-    // ✅ ใช้ client_id เพราะ route รับ client_id
-    return redirect()->route('job_agencies.show', $jobAgency->client_id)
-        ->with('success', 'บันทึกข้อมูลเรียบร้อย');
-}
+            CaseActivity::where('client_id', $client->id)
+                ->where('module', 'job_agency')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'job_agency',
+                'type'        => 'success',
+                'title'       => 'บันทึกการจัดหางาน',
+                'description' => 'วันที่เริ่มงาน: ' . ($validated['job_date'] ?? '-') .
+                                ' | ตำแหน่งงาน: ' . ($validated['position'] ?? '-') .
+                                ' | บริษัท: ' . ($validated['company'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-briefcase',
+                'url'         => route('job_agencies.show', $client->id),
+            ]);
+
+            // ✅ ใช้ client_id เพราะ route รับ client_id
+            return redirect()->route('job_agencies.show', $jobAgency->client_id)
+                ->with('success', 'บันทึกข้อมูลเรียบร้อย');
+        }
     /**
      * อัปเดตข้อมูล
      */
@@ -174,6 +192,23 @@ public function storeJobAgency(Request $request)
         $jobAgency->update($data);
     });
 
+    CaseActivity::where('client_id', $jobAgency->client_id)
+    ->where('module', 'job_agency')
+    ->delete();
+
+    CaseActivity::record([
+        'client_id'   => $jobAgency->client_id,
+        'module'      => 'job_agency',
+        'type'        => 'success',
+        'title'       => 'แก้ไขการจัดหางาน',
+        'description' => 'วันที่เริ่มงาน: ' . ($data['job_date'] ?? '-') .
+                        ' | ตำแหน่งงาน: ' . ($data['position'] ?? '-') .
+                        ' | บริษัท: ' . ($data['company'] ?? '-'),
+        'occurred_at' => now(),
+        'icon'        => 'bi-briefcase',
+        'url'         => route('job_agencies.show', $jobAgency->client_id),
+    ]);
+
     return redirect()
         ->route('job_agencies.show', $jobAgency->client_id)
         ->with('success', 'แก้ไขข้อมูลเรียบร้อย');
@@ -201,12 +236,16 @@ public function storeJobAgency(Request $request)
     $client_id = $jobAgency->client_id;
 
     DB::transaction(function () use ($jobAgency) {
+        CaseActivity::where('client_id', $jobAgency->client_id)
+            ->where('module', 'job_agency')
+            ->delete();
+
         $jobAgency->delete();
     });
 
- return redirect()->route('job_agencies.show', $client_id)
-    ->with('success', 'ลบข้อมูลเรียบร้อย');
-}
+    return redirect()->route('job_agencies.show', $client_id)
+        ->with('success', 'ลบข้อมูลเรียบร้อย');
+    }
  
 
 public function reportJobAgency(Request $request, $client_id)

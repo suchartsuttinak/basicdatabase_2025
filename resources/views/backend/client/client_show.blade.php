@@ -1,6 +1,7 @@
 @extends('admin.admin_master')
 @section('admin')
 
+
 <style>
     .client-page {
         padding-top: .5rem;
@@ -354,7 +355,7 @@
                 </div>
             </div>
 
-            @if(auth()->check() && auth()->user()->hasRole(['admin','manager']))
+           @if(auth()->check() && auth()->user()->hasRole(['admin','executive','social_worker']))
                 <div class="client-toolbar-right">
                     <a href="{{ route('client.add') }}" class="btn btn-success client-btn">
                         <i data-feather="plus-circle"></i>
@@ -363,6 +364,55 @@
                 </div>
             @endif
         </div>
+
+
+
+            @if(
+                auth()->check()
+                && in_array(auth()->user()->role, ['admin', 'executive'], true)
+                && isset($clients)
+                && $clients->isNotEmpty()
+            )
+                <div class="card client-list-card mb-3">
+                    <div class="card-body">
+                        <form method="GET" action="{{ route('client.show') }}">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-8 col-lg-6">
+                                    <label class="form-label fw-semibold">หน่วยงาน / โครงการ</label>
+                                    <select name="project_id" class="form-select">
+                                        <option value="">-- ไม่กำหนดหน่วยงาน --</option>
+                                        <option value="all" {{ ($projectId ?? '') === 'all' ? 'selected' : '' }}>
+                                            ทั้งหมด
+                                        </option>
+
+                                        @foreach($projects as $project)
+                                            <option value="{{ $project->id }}"
+                                                {{ (string)($projectId ?? '') === (string)$project->id ? 'selected' : '' }}>
+                                                {{ $project->project_name ?? $project->name ?? '-' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 col-lg-3">
+                                    <button type="submit" class="btn btn-primary client-btn w-100 justify-content-center">
+                                        <i data-feather="filter"></i>
+                                        <span>กรองข้อมูล</span>
+                                    </button>
+                                </div>
+
+                                <div class="col-md-4 col-lg-3">
+                                    <a href="{{ route('client.show') }}" class="btn btn-outline-secondary client-btn w-100 justify-content-center">
+                                        <i data-feather="refresh-ccw"></i>
+                                        <span>ล้างตัวกรอง</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
 
         <div class="card client-list-card">
             <div class="card-header">
@@ -477,11 +527,19 @@
                                                     </button>
                                                 @endif
 
-                                                <a title="จำหน่าย"
-                                                   href="{{ route('refers.index', $client->id) }}"
-                                                   class="btn btn-warning btn-sm action-btn">
-                                                    <span class="mdi mdi-arrow-right-bold mdi-18px"></span>
+                                           <a title="จำหน่าย"
+                                                href="{{ route('refers.index', $client->id) }}"
+                                                class="btn btn-secondary btn-sm action-btn">
+                                                    <span class="mdi mdi-file-export-outline mdi-18px"></span>
                                                 </a>
+
+                                                @if(auth()->user()->role === 'admin')
+                                                    <a title="ย้ายเคส"
+                                                    href="{{ route('client.transfer.create', $client->id) }}"
+                                                    class="btn btn-warning btn-sm action-btn">
+                                                        <span class="mdi mdi-arrow-right-bold mdi-18px"></span>
+                                                    </a>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

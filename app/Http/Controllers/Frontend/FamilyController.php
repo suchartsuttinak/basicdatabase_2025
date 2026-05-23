@@ -14,6 +14,7 @@ use App\Models\Spouse;
 use App\Models\Relative;
 use Illuminate\Validation\ValidationException;
 use Throwable;
+use App\Models\CaseActivity;
 
 class FamilyController extends Controller
 {
@@ -67,164 +68,148 @@ class FamilyController extends Controller
         ]);
     }
 
-    public function FamilyStore(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'client_id' => ['required', 'integer', 'exists:clients,id'],
-                'active_tab' => ['nullable', 'string', 'max:50'],
+        public function FamilyStore(Request $request)
+        {
+            try {
+                $validated = $request->validate([
+                    'client_id' => ['required', 'integer', 'exists:clients,id'],
+                    'active_tab' => ['nullable', 'string', 'max:50'],
 
-                'father.fname' => ['nullable', 'string', 'max:255'],
-                'father.lname' => ['nullable', 'string', 'max:255'],
-                // 'father.idcard' => ['nullable', 'string', 'max:20'],
-                'father.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
-                'father.age' => ['nullable', 'integer', 'min:0'],
-                'father.occupation' => ['nullable', 'string', 'max:255'],
-               'father.income' => ['nullable', 'numeric', 'min:0'],
-                'father.address_no' => ['nullable', 'string', 'max:255'],
-                'father.moo' => ['nullable', 'string', 'max:255'],
-                'father.soi' => ['nullable', 'string', 'max:255'],
-                'father.road' => ['nullable', 'string', 'max:255'],
-                'father.village' => ['nullable', 'string', 'max:255'],
-                'father.province_id' => ['nullable', 'integer'],
-                'father.district_id' => ['nullable', 'integer'],
-                'father.sub_district_id' => ['nullable', 'integer'],
-                'father.zipcode' => ['nullable', 'string', 'max:20'],
-                'father.phone' => ['nullable', 'string', 'max:20'],
+                    'father.fname' => ['nullable', 'string', 'max:255'],
+                    'father.lname' => ['nullable', 'string', 'max:255'],
+                    'father.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
+                    'father.age' => ['nullable', 'integer', 'min:0'],
+                    'father.occupation' => ['nullable', 'string', 'max:255'],
+                    'father.income' => ['nullable'],
+                    'father.address_no' => ['nullable', 'string', 'max:255'],
+                    'father.moo' => ['nullable', 'string', 'max:255'],
+                    'father.soi' => ['nullable', 'string', 'max:255'],
+                    'father.road' => ['nullable', 'string', 'max:255'],
+                    'father.village' => ['nullable', 'string', 'max:255'],
+                    'father.province_id' => ['nullable', 'integer'],
+                    'father.district_id' => ['nullable', 'integer'],
+                    'father.sub_district_id' => ['nullable', 'integer'],
+                    'father.zipcode' => ['nullable', 'string', 'max:20'],
+                    'father.phone' => ['nullable', 'string', 'max:20'],
 
-                'mother.fname' => ['nullable', 'string', 'max:255'],
-                'mother.lname' => ['nullable', 'string', 'max:255'],
-                // 'mother.idcard' => ['nullable', 'string', 'max:20'],
-                'mother.age' => ['nullable', 'integer', 'min:0'],
-                'mother.occupation' => ['nullable', 'string', 'max:255'],
-               'mother.income' => ['nullable', 'numeric', 'min:0'],
-                'mother.address_no' => ['nullable', 'string', 'max:255'],
-                'mother.moo' => ['nullable', 'string', 'max:255'],
-                'mother.soi' => ['nullable', 'string', 'max:255'],
-                'mother.road' => ['nullable', 'string', 'max:255'],
-                'mother.village' => ['nullable', 'string', 'max:255'],
-                'mother.province_id' => ['nullable', 'integer'],
-                'mother.district_id' => ['nullable', 'integer'],
-                'mother.sub_district_id' => ['nullable', 'integer'],
-                'mother.zipcode' => ['nullable', 'string', 'max:20'],
-                'mother.phone' => ['nullable', 'string', 'max:20'],
+                    'mother.fname' => ['nullable', 'string', 'max:255'],
+                    'mother.lname' => ['nullable', 'string', 'max:255'],
+                    'mother.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
+                    'mother.age' => ['nullable', 'integer', 'min:0'],
+                    'mother.occupation' => ['nullable', 'string', 'max:255'],
+                    'mother.income' => ['nullable'],
+                    'mother.address_no' => ['nullable', 'string', 'max:255'],
+                    'mother.moo' => ['nullable', 'string', 'max:255'],
+                    'mother.soi' => ['nullable', 'string', 'max:255'],
+                    'mother.road' => ['nullable', 'string', 'max:255'],
+                    'mother.village' => ['nullable', 'string', 'max:255'],
+                    'mother.province_id' => ['nullable', 'integer'],
+                    'mother.district_id' => ['nullable', 'integer'],
+                    'mother.sub_district_id' => ['nullable', 'integer'],
+                    'mother.zipcode' => ['nullable', 'string', 'max:20'],
+                    'mother.phone' => ['nullable', 'string', 'max:20'],
 
-                'spouse.fname' => ['nullable', 'string', 'max:255'],
-                'spouse.lname' => ['nullable', 'string', 'max:255'],
-                // 'spouse.idcard' => ['nullable', 'string', 'max:20'],
-                'spouse.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
-                'spouse.age' => ['nullable', 'integer', 'min:0'],
-                'spouse.occupation' => ['nullable', 'string', 'max:255'],
-                'spouse.income' => ['nullable', 'numeric', 'min:0'],
-                'spouse.address_no' => ['nullable', 'string', 'max:255'],
-                'spouse.moo' => ['nullable', 'string', 'max:255'],
-                'spouse.soi' => ['nullable', 'string', 'max:255'],
-                'spouse.road' => ['nullable', 'string', 'max:255'],
-                'spouse.village' => ['nullable', 'string', 'max:255'],
-                'spouse.province_id' => ['nullable', 'integer'],
-                'spouse.district_id' => ['nullable', 'integer'],
-                'spouse.sub_district_id' => ['nullable', 'integer'],
-                'spouse.zipcode' => ['nullable', 'string', 'max:20'],
-                'spouse.phone' => ['nullable', 'string', 'max:20'],
+                    'spouse.fname' => ['nullable', 'string', 'max:255'],
+                    'spouse.lname' => ['nullable', 'string', 'max:255'],
+                    'spouse.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
+                    'spouse.age' => ['nullable', 'integer', 'min:0'],
+                    'spouse.occupation' => ['nullable', 'string', 'max:255'],
+                    'spouse.income' => ['nullable'],
+                    'spouse.address_no' => ['nullable', 'string', 'max:255'],
+                    'spouse.moo' => ['nullable', 'string', 'max:255'],
+                    'spouse.soi' => ['nullable', 'string', 'max:255'],
+                    'spouse.road' => ['nullable', 'string', 'max:255'],
+                    'spouse.village' => ['nullable', 'string', 'max:255'],
+                    'spouse.province_id' => ['nullable', 'integer'],
+                    'spouse.district_id' => ['nullable', 'integer'],
+                    'spouse.sub_district_id' => ['nullable', 'integer'],
+                    'spouse.zipcode' => ['nullable', 'string', 'max:20'],
+                    'spouse.phone' => ['nullable', 'string', 'max:20'],
 
-                'relative.fname' => ['nullable', 'string', 'max:255'],
-                'relative.lname' => ['nullable', 'string', 'max:255'],
-                // 'relative.idcard' => ['nullable', 'string', 'max:20'],
-                'relative.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
-                'relative.age' => ['nullable', 'integer', 'min:0'],
-                'relative.occupation' => ['nullable', 'string', 'max:255'],
-                'relative.income' => ['nullable', 'numeric', 'min:0'],
-                'relative.address_no' => ['nullable', 'string', 'max:255'],
-                'relative.moo' => ['nullable', 'string', 'max:255'],
-                'relative.soi' => ['nullable', 'string', 'max:255'],
-                'relative.road' => ['nullable', 'string', 'max:255'],
-                'relative.village' => ['nullable', 'string', 'max:255'],
-                'relative.province_id' => ['nullable', 'integer'],
-                'relative.district_id' => ['nullable', 'integer'],
-                'relative.sub_district_id' => ['nullable', 'integer'],
-                'relative.zipcode' => ['nullable', 'string', 'max:20'],
-                'relative.phone' => ['nullable', 'string', 'max:20'],
-            ]);
-
-           // ✅ [แก้ไข] กันการยิง client_id ของคนอื่น
-            $client = Client::forUser(auth()->user())
-                ->where('id', $validated['client_id'])
-                ->firstOrFail();
-
-            // =========================
-            // PATCH: บังคับ client_id จากสิทธิ์ที่ตรวจแล้ว
-            // =========================
-            $validated['client_id'] = $client->id;
-
-            // ❗ ของเดิมคงไว้
-            $clientId = $client->id;
-            $activeTab = $validated['active_tab'] ?? 'father-tab';
-
-            $this->saveFamilyGroup(
-                Father::class,
-                $clientId,
-                $validated['father'] ?? []
-            );
-
-            $this->saveFamilyGroup(
-                Mother::class,
-                $clientId,
-                $validated['mother'] ?? []
-            );
-
-            $this->saveFamilyGroup(
-                Spouse::class,
-                $clientId,
-                $validated['spouse'] ?? []
-            );
-
-            $this->saveFamilyGroup(
-                Relative::class,
-                $clientId,
-                $validated['relative'] ?? []
-            );
-
-            // ❗ ของเดิมคงไว้ 100%
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'บันทึกข้อมูลครอบครัวเรียบร้อยแล้ว',
-                    'active_tab' => $activeTab,
+                    'relative.fname' => ['nullable', 'string', 'max:255'],
+                    'relative.lname' => ['nullable', 'string', 'max:255'],
+                    'relative.idcard' => ['nullable', 'regex:/^[0-9]{1}-[0-9]{4}-[0-9]{5}-[0-9]{2}-[0-9]{1}$/'],
+                    'relative.age' => ['nullable', 'integer', 'min:0'],
+                    'relative.occupation' => ['nullable', 'string', 'max:255'],
+                    'relative.income' => ['nullable'],
+                    'relative.address_no' => ['nullable', 'string', 'max:255'],
+                    'relative.moo' => ['nullable', 'string', 'max:255'],
+                    'relative.soi' => ['nullable', 'string', 'max:255'],
+                    'relative.road' => ['nullable', 'string', 'max:255'],
+                    'relative.village' => ['nullable', 'string', 'max:255'],
+                    'relative.province_id' => ['nullable', 'integer'],
+                    'relative.district_id' => ['nullable', 'integer'],
+                    'relative.sub_district_id' => ['nullable', 'integer'],
+                    'relative.zipcode' => ['nullable', 'string', 'max:20'],
+                    'relative.phone' => ['nullable', 'string', 'max:20'],
                 ]);
+
+                $client = Client::forUser(auth()->user())
+                    ->where('id', $validated['client_id'])
+                    ->firstOrFail();
+
+                $clientId = $client->id;
+                $activeTab = $validated['active_tab'] ?? 'father-tab';
+
+                $this->saveFamilyGroup(Father::class, $clientId, $validated['father'] ?? []);
+                $this->saveFamilyGroup(Mother::class, $clientId, $validated['mother'] ?? []);
+                $this->saveFamilyGroup(Spouse::class, $clientId, $validated['spouse'] ?? []);
+                $this->saveFamilyGroup(Relative::class, $clientId, $validated['relative'] ?? []);
+
+                CaseActivity::where('client_id', $client->id)
+                    ->where('module', 'family')
+                    ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $client->id,
+                    'module'      => 'family',
+                    'type'        => 'success',
+                    'title'       => 'บันทึกข้อมูลครอบครัว',
+                    'description' => 'มีการบันทึกหรือปรับปรุงข้อมูลครอบครัวของผู้รับบริการ',
+                    'occurred_at' => now(),
+                    'icon'        => 'bi-people',
+                    'url'         => url('/client/family/add/' . $client->id),
+                ]);
+
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'บันทึกข้อมูลครอบครัวเรียบร้อยแล้ว',
+                        'active_tab' => $activeTab,
+                    ]);
+                }
+
+                return redirect()
+                    ->back()
+                    ->with('success', 'บันทึกข้อมูลครอบครัวเรียบร้อยแล้ว')
+                    ->with('active_tab', $activeTab);
+
+            } catch (ValidationException $e) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'กรุณาตรวจสอบข้อมูลที่กรอกอีกครั้ง',
+                        'errors' => $e->errors(),
+                        'active_tab' => $request->input('active_tab', 'father-tab'),
+                    ], 422);
+                }
+
+                throw $e;
+            } catch (Throwable $e) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage(),
+                        'active_tab' => $request->input('active_tab', 'father-tab'),
+                    ], 500);
+                }
+
+                return redirect()
+                    ->back()
+                    ->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage())
+                    ->with('active_tab', $request->input('active_tab', 'father-tab'));
             }
-
-            return redirect()
-                ->back()
-                ->with('success', 'บันทึกข้อมูลครอบครัวเรียบร้อยแล้ว')
-                ->with('active_tab', $activeTab);
-
-        } catch (ValidationException $e) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'กรุณาตรวจสอบข้อมูลที่กรอกอีกครั้ง',
-                    'errors' => $e->errors(),
-                    'active_tab' => $request->input('active_tab', 'father-tab'),
-                ], 422);
-            }
-
-            throw $e;
-        } catch (Throwable $e) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage(),
-                    'active_tab' => $request->input('active_tab', 'father-tab'),
-                ], 500);
-            }
-
-            return redirect()
-                ->back()
-                ->with('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' . $e->getMessage())
-                ->with('active_tab', $request->input('active_tab', 'father-tab'));
         }
-    }
-
     private function saveFamilyGroup(string $modelClass, int $clientId, array $data): void
     {
         $payload = $this->normalizeFamilyPayload($data);

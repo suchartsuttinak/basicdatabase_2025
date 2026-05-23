@@ -221,53 +221,187 @@
             margin: 10mm;
         }
 
-        @media (max-width: 767.98px){
-            .medical-report-page .medical-report-body{
-                padding: 16px;
-            }
+    @page{
+    size:A4 landscape;
+    margin:10mm 14mm;
+}
 
-            .medical-report-page .medical-report-title{
-                font-size: 1.45rem;
-            }
+@media print{
 
-            .medical-report-page .medical-report-meta{
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
+    html,
+    body{
+        width:297mm !important;
+        min-height:210mm !important;
+        margin:0 !important;
+        padding:0 !important;
+        background:#fff !important;
+        font-family:"TH Sarabun New","Sarabun",sans-serif !important;
+        overflow:visible !important;
+        -webkit-print-color-adjust:exact !important;
+        print-color-adjust:exact !important;
+    }
 
-            .medical-report-page .medical-report-toolbar-left,
-            .medical-report-page .medical-report-toolbar-right{
-                width: 100%;
-            }
+    .navbar,
+    .sidebar,
+    .footer,
+    .page-title-box,
+    .medical-report-page .medical-report-toolbar,
+    header,
+    footer{
+        display:none !important;
+    }
 
-            .medical-report-page .medical-btn{
-                width: 100%;
-            }
-        }
+    .container-fluid,
+    .medical-report-page{
+        width:100% !important;
+        max-width:100% !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        background:#fff !important;
+        overflow:visible !important;
+    }
 
-        @media print{
-            .medical-report-page .medical-report-toolbar{
-                display: none;
-            }
+    .medical-report-page .medical-report-shell{
+        width:100% !important;
+        max-width:100% !important;
+        min-height:auto !important;
+        margin:0 auto !important;
+        padding:0 !important;
+        border:none !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#fff !important;
+        overflow:visible !important;
+        page-break-after:avoid !important;
+        break-after:avoid !important;
+    }
 
-            .medical-report-page .medical-report-shell{
-                border: none;
-                box-shadow: none;
-                margin: 0;
-                max-width: 100%;
-            }
+    .medical-report-page .medical-report-body{
+        padding:0 !important;
+        margin:0 !important;
+    }
 
-            .medical-report-page .medical-report-body{
-                padding: 0;
-            }
+    .medical-report-page .medical-report-header{
+        text-align:center !important;
+        border-bottom:1px solid #cbd5e1 !important;
+        padding:0 0 5px !important;
+        margin:0 0 6px !important;
+    }
 
-            .medical-report-page .medical-report-table thead th,
-            .medical-report-page .medical-report-table tbody td{
-                font-size: 13px;
-                padding: 6px;
-            }
-        }
+    .medical-report-page .medical-report-title{
+        font-size:20px !important;
+        font-weight:900 !important;
+        line-height:1.1 !important;
+        color:#0f172a !important;
+        margin:0 !important;
+    }
+
+    .medical-report-page .medical-report-subtitle{
+        font-size:11px !important;
+        color:#64748b !important;
+        margin-top:2px !important;
+        line-height:1.1 !important;
+        font-weight:600 !important;
+    }
+
+    .medical-report-page .medical-report-meta{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:flex-start !important;
+        flex-wrap:wrap !important;
+        flex-direction:row !important;
+        gap:4px 22px !important;
+        margin:0 0 6px !important;
+        padding:0 0 5px 4px !important;
+        border-bottom:1px solid #dbe4f0 !important;
+    }
+
+    .medical-report-page .medical-report-meta > *{
+        border:none !important;
+        background:none !important;
+        box-shadow:none !important;
+        padding:0 !important;
+        margin:0 !important;
+        min-width:auto !important;
+        width:auto !important;
+        flex:none !important;
+        font-size:12.5px !important;
+        font-weight:800 !important;
+        color:#2563eb !important;
+        line-height:1.1 !important;
+    }
+
+    .medical-report-page .medical-report-table-wrap{
+        width:100% !important;
+        max-width:100% !important;
+        overflow:visible !important;
+        border:none !important;
+        border-radius:0 !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .medical-report-page .medical-report-table{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+        margin:0 !important;
+        table-layout:fixed !important;
+        border-collapse:collapse !important;
+        border-spacing:0 !important;
+        background:#fff !important;
+        page-break-inside:auto !important;
+    }
+
+    .medical-report-page .medical-report-table thead{
+        display:table-header-group !important;
+    }
+
+    .medical-report-page .medical-report-table tr{
+        page-break-inside:avoid !important;
+        break-inside:avoid !important;
+    }
+
+    .medical-report-page .medical-report-table thead th{
+        background:#eef4ff !important;
+        color:#0f172a !important;
+        border:1px solid #111827 !important;
+        text-align:center !important;
+        vertical-align:middle !important;
+        padding:3px 3px !important;
+        font-size:10px !important;
+        font-weight:900 !important;
+        line-height:1.08 !important;
+        white-space:normal !important;
+    }
+
+    .medical-report-page .medical-report-table tbody td{
+        border:1px solid #111827 !important;
+        padding:3px 3px !important;
+        font-size:9.8px !important;
+        font-weight:600 !important;
+        color:#111827 !important;
+        line-height:1.08 !important;
+        vertical-align:middle !important;
+        white-space:normal !important;
+        word-break:break-word !important;
+        overflow-wrap:anywhere !important;
+        text-align:center !important;
+    }
+
+    .medical-report-page .medical-report-table tbody tr:nth-child(even){
+        background:#fcfdff !important;
+    }
+
+    .medical-report-page .medical-report-empty{
+        border:1px dashed #94a3b8 !important;
+        border-radius:0 !important;
+        padding:14px !important;
+        text-align:center !important;
+        color:#475569 !important;
+        font-size:12px !important;
+    }
+}
     </style>
 
     <div class="medical-report-shell">

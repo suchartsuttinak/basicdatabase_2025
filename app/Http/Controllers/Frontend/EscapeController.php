@@ -8,6 +8,7 @@ use App\Models\Escape;
 use App\Models\Retire;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\CaseActivity;
 
 class EscapeController extends Controller
 {
@@ -42,41 +43,55 @@ class EscapeController extends Controller
     }
 
     // บันทึก Escape ใหม่
-    public function StoreEscape(Request $request)
-    {
-       $data = $request->validate([
-        'client_id'   => 'required|exists:clients,id',
-        'retire_date' => [
-            'required',
-            'date',
-            Rule::unique('escapes')->where(function ($query) use ($request) {
-                return $query->where('client_id', $request->client_id);
-            }),
-            ],
-            'retire_id'   => 'required|exists:retires,id',
-            'stories'     => 'nullable|string',
-        ], [
-            'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
-            'client_id.exists'     => 'รหัสผู้รับบริการไม่ถูกต้อง',
-            'retire_date.required' => 'กรุณาระบุวันที่เกษียณ',
-            'retire_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'retire_date.unique'   => 'วันที่เกษียณนี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
-            'retire_id.required'   => 'กรุณาเลือกประเภทการเกษียณ',
-            'retire_id.exists'     => 'รหัสการเกษียณไม่ถูกต้อง',
-            'stories.string'       => 'เรื่องราวต้องเป็นข้อความ',
-        ]);
+   public function StoreEscape(Request $request)
+        {
+            $data = $request->validate([
+                'client_id'   => 'required|exists:clients,id',
+                'retire_date' => [
+                    'required',
+                    'date',
+                    Rule::unique('escapes')->where(function ($query) use ($request) {
+                        return $query->where('client_id', $request->client_id);
+                    }),
+                ],
+                'retire_id'   => 'required|exists:retires,id',
+                'stories'     => 'nullable|string',
+            ], [
+                'client_id.required'   => 'กรุณาเลือกผู้รับบริการ',
+                'client_id.exists'     => 'รหัสผู้รับบริการไม่ถูกต้อง',
+                'retire_date.required' => 'กรุณาระบุวันที่เกษียณ',
+                'retire_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+                'retire_date.unique'   => 'วันที่เกษียณนี้ถูกบันทึกแล้วสำหรับผู้รับบริการรายนี้',
+                'retire_id.required'   => 'กรุณาเลือกประเภทการเกษียณ',
+                'retire_id.exists'     => 'รหัสการเกษียณไม่ถูกต้อง',
+                'stories.string'       => 'เรื่องราวต้องเป็นข้อความ',
+            ]);
 
-        // =========================
-        // PATCH: กันยิง request เปลี่ยน client_id
-        // =========================
-        Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            $client = Client::forUser(auth()->user())->findOrFail($data['client_id']);
+            $data['client_id'] = $client->id;
 
-        $escape = Escape::create($data);
+            $escape = Escape::create($data);
 
-        return redirect()
-            ->route('escape.edit', $escape->id)
-            ->with(['message' => 'บันทึกข้อมูลการออกเรียบร้อย', 'alert-type' => 'success']);
-    }
+            CaseActivity::where('client_id', $client->id)
+                ->where('module', 'escape')
+                ->delete();
+
+            CaseActivity::record([
+                'client_id'   => $client->id,
+                'module'      => 'escape',
+                'type'        => 'danger',
+                'title'       => 'บันทึกการออก/หลบหนีจากที่พักพิง',
+                'description' => 'วันที่ออก/หลบหนี: ' . ($data['retire_date'] ?? '-') .
+                                ' | รายละเอียด: ' . ($data['stories'] ?? '-'),
+                'occurred_at' => now(),
+                'icon'        => 'bi-box-arrow-right',
+                'url'         => route('escape.edit', $escape->id),
+            ]);
+
+            return redirect()
+                ->route('escape.edit', $escape->id)
+                ->with(['message' => 'บันทึกข้อมูลการออกเรียบร้อย', 'alert-type' => 'success']);
+        }
 
     // หน้า EditEscape (ฟอร์มแก้ไข)
     public function EditEscape($id)
@@ -156,6 +171,22 @@ class EscapeController extends Controller
 
         $escape->update($data);
 
+        CaseActivity::where('client_id', $escape->client_id)
+            ->where('module', 'escape')
+            ->delete();
+
+        CaseActivity::record([
+            'client_id'   => $escape->client_id,
+            'module'      => 'escape',
+            'type'        => 'danger',
+            'title'       => 'แก้ไขการออก/หลบหนีจากที่พักพิง',
+            'description' => 'วันที่ออก/หลบหนี: ' . ($data['retire_date'] ?? '-') .
+                            ' | รายละเอียด: ' . ($data['stories'] ?? '-'),
+            'occurred_at' => now(),
+            'icon'        => 'bi-box-arrow-right',
+            'url'         => route('escape.edit', $escape->id),
+        ]);
+
         return redirect()
             ->route('escape.edit', $escape->id)
             ->with(['message' => 'แก้ไขข้อมูลการออกเรียบร้อย', 'alert-type' => 'success']);
@@ -178,6 +209,11 @@ class EscapeController extends Controller
         Client::forUser(auth()->user())->findOrFail($escape->client_id);
 
         $client_id = $escape->client_id;
+
+        CaseActivity::where('client_id', $client_id)
+            ->where('module', 'escape')
+            ->delete();
+
         $escape->delete();
 
         return redirect()

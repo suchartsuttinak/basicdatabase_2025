@@ -589,17 +589,21 @@
                     </div>
                 </div>
 
-                <div class="col-xl-5 col-lg-5">
+             <div class="col-xl-5 col-lg-5">
                     <div class="operation-top-actions">
-                        <a href="{{ route('operations.report.daily') }}" class="op-btn op-btn-report">
+
+                        <a href="{{ route('operations.report.daily', request()->only(['keyword', 'start_date', 'end_date'])) }}"
+                        class="op-btn op-btn-report">
                             <i class="bi bi-file-earmark-text"></i>
                             <span>รายงานรายวัน</span>
                         </a>
 
-                        <a href="{{ route('operations.create') }}" class="op-btn op-btn-create">
+                        <a href="{{ route('operations.create') }}"
+                        class="op-btn op-btn-create">
                             <i class="bi bi-plus-circle"></i>
                             <span>เพิ่มรายงาน</span>
                         </a>
+
                     </div>
                 </div>
             </div>
@@ -613,32 +617,48 @@
                 </div>
             @endif
 
-           <form method="GET" action="{{ route('operations.index') }}" class="operation-filter-box">
-    <div class="row g-3 align-items-end">
+       <form method="GET" action="{{ route('operations.index') }}" class="operation-filter-box">
+                <div class="row g-3 align-items-end">
 
-        <div class="col-lg-5 col-md-6">
-            <label class="operation-filter-label">ค้นหาคำสำคัญ</label>
+                <div class="col-lg-4 col-md-6">
+                <label class="operation-filter-label">
+                    <i class="bi bi-search me-1"></i>
+                    ค้นหาคำสำคัญ
+                </label>
+
+                <input
+                    type="text"
+                    name="keyword"
+                    value="{{ request('keyword') }}"
+                    class="form-control operation-input"
+                    placeholder="ค้นหาเรื่อง / ผล / หมายเหตุ / ชื่อผู้ดำเนินงาน"
+                >
+
+                <small class="text-muted mt-1 d-block">
+                    ค้นหาได้จากชื่อผู้ดำเนินงาน เรื่อง ผลการดำเนินงาน หรือหมายเหตุ
+                </small>
+            </div>
+        <div class="col-lg-3 col-md-6">
+            <label class="operation-filter-label">ตั้งแต่วันที่</label>
             <input
-                type="text"
-                name="keyword"
-                value="{{ request('keyword') }}"
+                type="date"
+                name="start_date"
+                value="{{ request('start_date') }}"
                 class="form-control operation-input"
-                placeholder="เรื่องที่ดำเนินงาน / ผล / หมายเหตุ"
             >
         </div>
 
         <div class="col-lg-3 col-md-6">
-            <label class="operation-filter-label">วันที่</label>
+            <label class="operation-filter-label">ถึงวันที่</label>
             <input
                 type="date"
-                name="date"
-                value="{{ request('date') }}"
+                name="end_date"
+                value="{{ request('end_date') }}"
                 class="form-control operation-input"
             >
         </div>
 
-        <!-- 🔥 ปุ่ม -->
-        <div class="col-lg-4 col-md-12">
+        <div class="col-lg-2 col-md-6">
             <div class="operation-filter-btn-group">
                 <button type="submit" class="btn op-btn-search">
                     <i class="bi bi-search"></i>
@@ -654,7 +674,6 @@
 
     </div>
 </form>
-
             <div class="operation-table-shell">
                 <div class="operation-table-scroll">
                     <table class="table operation-table align-middle">
@@ -724,16 +743,19 @@
                                                 <span>แก้ไข</span>
                                             </a>
 
-                                            <form action="{{ route('operations.delete', $item->id) }}"
-                                                  method="POST"
-                                                  class="operation-delete-form"
-                                                  onsubmit="return confirm('ยืนยันการลบรายการนี้หรือไม่ ?')">
+                                        <form action="{{ route('operations.delete', $item->id) }}"
+                                                method="POST"
+                                                class="operation-delete-form delete-operation-form">
+
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn operation-row-btn operation-row-btn-delete">
+
+                                                <button type="submit"
+                                                        class="btn operation-row-btn operation-row-btn-delete">
                                                     <i class="bi bi-trash"></i>
                                                     <span>ลบ</span>
                                                 </button>
+
                                             </form>
                                         </div>
                                     </td>
@@ -762,3 +784,44 @@
     </div>
 </div>
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const deleteForms = document.querySelectorAll('.delete-operation-form');
+
+    deleteForms.forEach(form => {
+
+        form.addEventListener('submit', function (e) {
+
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'ยืนยันการลบรายการ ?',
+                text: 'เมื่อดำเนินการแล้วจะไม่สามารถกู้คืนข้อมูลได้',
+                icon: 'warning',
+
+                showCancelButton: true,
+
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+
+                confirmButtonText: '<i class="bi bi-trash me-1"></i> ลบข้อมูล',
+                cancelButtonText: 'ยกเลิก',
+
+                reverseButtons: true,
+                focusCancel: true,
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+
+            });
+
+        });
+
+    });
+
+});
+</script>

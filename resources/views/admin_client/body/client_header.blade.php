@@ -16,14 +16,15 @@
     Request::routeIs('statistics.index'); // หน้าสถิติ
 
     $isHistoryActive =
-        Request::routeIs('client.edit') ||
-        Request::routeIs('factfinding.add') ||
-        Request::routeIs('family.add') ||
-        Request::routeIs('visitFamily.create') ||
-        Request::routeIs('member.create') ||
-        Request::routeIs('client_files.index') ||
-        Request::routeIs('client.report');
-
+    Request::routeIs('client.edit') ||
+    Request::routeIs('factfinding.add') ||
+    Request::routeIs('family.add') ||
+    Request::routeIs('visitFamily.create') ||
+    Request::routeIs('member.create') ||
+    Request::routeIs('client_files.index') ||
+    Request::routeIs('client.report') ||
+    Request::routeIs('client.report.*');
+   
     $isEducationActive =
         Request::routeIs('education_record.add') ||
         Request::routeIs('education_record.store') ||
@@ -41,14 +42,15 @@
         Request::routeIs('school_followup_add') ||
         Request::routeIs('absent.add');
 
-    $isHealthActive =
-        Request::routeIs('accident.add') ||
-        Request::routeIs('check_body.add') ||
-        Request::routeIs('medical.add') ||
-        Request::routeIs('vaccine.index') ||
-        Request::routeIs('psychiatric.create') ||
-        Request::routeIs('addictive.create') ||
-        Request::routeIs('healthc_heckups.index');
+   $isHealthActive =
+    Request::routeIs('accident.add') ||
+    Request::routeIs('check_body.add') ||
+    Request::routeIs('medical.add') ||
+    Request::routeIs('vaccine.index') ||
+    Request::routeIs('psychiatric.create') ||
+    Request::routeIs('addictive.create') ||
+    Request::routeIs('healthc_heckups.index') ||
+    Request::routeIs('behavior-screenings.*');
 
     $isSocialActive =
         Request::routeIs('observe.create') ||
@@ -57,7 +59,8 @@
         Request::routeIs('refers.index') ||
         Request::routeIs('job_agencies.show') ||
         Request::routeIs('help_sessions.show') ||
-        Request::routeIs('followup.index');
+        Request::routeIs('followup.index') ||
+        Request::routeIs('case-activities.index');
 @endphp
 
 <style>
@@ -215,6 +218,7 @@
                                         รายงานผู้รับบริการ
                                     </a>
                                 </li>
+            
                             @endif
                         </ul>
                     </li>
@@ -307,6 +311,14 @@
                                         การตรวจสารเสพติด
                                     </a>
                                 </li>
+
+                                    <li>
+                                        <a class="dropdown-item {{ Request::routeIs('behavior-screenings.*') ? 'active' : '' }}"
+                                        href="{{ route('behavior-screenings.index', $clientId) }}">
+                                            แบบสังเกตพฤติกรรม 4 โรค
+                                        </a>
+                                    </li>
+
                                 <li>
                                     <a class="dropdown-item {{ Request::routeIs('healthc_heckups.index') ? 'active' : '' }}"
                                        href="{{ route('healthc_heckups.index', $clientId) }}">
@@ -370,6 +382,12 @@
                                     <a class="dropdown-item {{ Request::routeIs('followup.index') ? 'active' : '' }}"
                                        href="{{ route('followup.index', $clientId) }}">
                                         บันทึกการติดตามผล
+                                    </a>
+                                </li>
+
+                                 <a class="dropdown-item {{ Request::routeIs('case-activities.*') ? 'active' : '' }}"
+                                    href="{{ route('case-activities.index', $clientId) }}">
+                                        ความเคลื่อนไหวผู้รับบริการ
                                     </a>
                                 </li>
                             @endif

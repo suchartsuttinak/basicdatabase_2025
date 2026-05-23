@@ -8,6 +8,7 @@ use App\Models\HelpSession;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Models\CaseActivity;
 
 class HelpSessionController extends Controller
 {
@@ -44,73 +45,92 @@ class HelpSessionController extends Controller
         return view('frontend.client.helping.help_sessions_create', compact('client'));
     }
 
-    public function store(Request $request, Client $client)
-    {
-        $client = Client::forUser(auth()->user())->findOrFail($client->id);
+   public function store(Request $request, Client $client)
+        {
+            $client = Client::forUser(auth()->user())->findOrFail($client->id);
 
-        $validated = $request->validate([
-            'help_date' => [
-                'required',
-                'date',
-                Rule::unique('help_sessions', 'help_date')
-                    ->where(fn ($query) => $query->where('client_id', $client->id)),
-            ],
+            $validated = $request->validate([
+                'help_date' => [
+                    'required',
+                    'date',
+                    Rule::unique('help_sessions', 'help_date')
+                        ->where(fn ($query) => $query->where('client_id', $client->id)),
+                ],
 
-            'items' => 'required|array|min:1',
-            'items.*.item_name'  => 'required|string',
-            'items.*.quantity'   => 'required|integer|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
-        ], [
-            'help_date.required' => 'กรุณากรอกวันที่',
-            'help_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
-            'help_date.unique'   => 'วันนี้มีการบันทึกช่วยเหลือแล้ว ห้ามซ้ำ',
+                'items' => 'required|array|min:1',
+                'items.*.item_name'  => 'required|string',
+                'items.*.quantity'   => 'required|integer|min:1',
+                'items.*.unit_price' => 'required|numeric|min:0',
+            ], [
+                'help_date.required' => 'กรุณากรอกวันที่',
+                'help_date.date'     => 'รูปแบบวันที่ไม่ถูกต้อง',
+                'help_date.unique'   => 'วันนี้มีการบันทึกช่วยเหลือแล้ว ห้ามซ้ำ',
 
-            'items.required' => 'กรุณาเพิ่มรายการช่วยเหลืออย่างน้อย 1 รายการ',
-            'items.array'    => 'รูปแบบรายการช่วยเหลือไม่ถูกต้อง',
-            'items.min'      => 'กรุณาเพิ่มรายการช่วยเหลืออย่างน้อย 1 รายการ',
+                'items.required' => 'กรุณาเพิ่มรายการช่วยเหลืออย่างน้อย 1 รายการ',
+                'items.array'    => 'รูปแบบรายการช่วยเหลือไม่ถูกต้อง',
+                'items.min'      => 'กรุณาเพิ่มรายการช่วยเหลืออย่างน้อย 1 รายการ',
 
-            'items.*.item_name.required'  => 'กรุณากรอกชื่อรายการ',
-            'items.*.quantity.required'   => 'กรุณากรอกจำนวน',
-            'items.*.quantity.integer'    => 'จำนวนต้องเป็นตัวเลขจำนวนเต็ม',
-            'items.*.quantity.min'        => 'จำนวนต้องไม่น้อยกว่า 1',
-            'items.*.unit_price.required' => 'กรุณากรอกราคา/หน่วย',
-            'items.*.unit_price.numeric'  => 'ราคา/หน่วยต้องเป็นตัวเลข',
-            'items.*.unit_price.min'      => 'ราคา/หน่วยต้องไม่น้อยกว่า 0',
-        ]);
-
-        DB::transaction(function () use ($validated, $client) {
-            $session = HelpSession::create([
-                'client_id'    => $client->id,
-                'help_date'    => $validated['help_date'],
-                'total_amount' => 0,
+                'items.*.item_name.required'  => 'กรุณากรอกชื่อรายการ',
+                'items.*.quantity.required'   => 'กรุณากรอกจำนวน',
+                'items.*.quantity.integer'    => 'จำนวนต้องเป็นตัวเลขจำนวนเต็ม',
+                'items.*.quantity.min'        => 'จำนวนต้องไม่น้อยกว่า 1',
+                'items.*.unit_price.required' => 'กรุณากรอกราคา/หน่วย',
+                'items.*.unit_price.numeric'  => 'ราคา/หน่วยต้องเป็นตัวเลข',
+                'items.*.unit_price.min'      => 'ราคา/หน่วยต้องไม่น้อยกว่า 0',
             ]);
 
-            $total = 0;
-
-            foreach ($validated['items'] as $item) {
-                $itemTotal = $item['quantity'] * $item['unit_price'];
-
-                $session->items()->create([
-                    'item_name'   => $item['item_name'],
-                    'quantity'    => $item['quantity'],
-                    'unit_price'  => $item['unit_price'],
-                    'total_price' => $itemTotal,
+            DB::transaction(function () use ($validated, $client) {
+                $session = HelpSession::create([
+                    'client_id'    => $client->id,
+                    'help_date'    => $validated['help_date'],
+                    'total_amount' => 0,
                 ]);
 
-                $total += $itemTotal;
-            }
+                $total = 0;
+                $itemNames = [];
 
-            $session->update([
-                'total_amount' => $total,
-            ]);
-        });
+                foreach ($validated['items'] as $item) {
+                    $itemTotal = $item['quantity'] * $item['unit_price'];
 
-        return redirect()->route('help_sessions.show', $client->id)
-            ->with([
-                'message' => 'บันทึกข้อมูลเรียบร้อย',
-                'alert-type' => 'success',
-            ]);
-    }
+                    $session->items()->create([
+                        'item_name'   => $item['item_name'],
+                        'quantity'    => $item['quantity'],
+                        'unit_price'  => $item['unit_price'],
+                        'total_price' => $itemTotal,
+                    ]);
+
+                    $total += $itemTotal;
+                    $itemNames[] = $item['item_name'];
+                }
+
+                $session->update([
+                    'total_amount' => $total,
+                ]);
+
+                CaseActivity::where('client_id', $client->id)
+                ->where('module', 'help_session')
+                ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $client->id,
+                    'module'      => 'help_session',
+                    'type'        => 'success',
+                    'title'       => 'บันทึกการช่วยเหลือสิ่งของ/เครื่องใช้',
+                    'description' => 'รายการ: ' . implode(', ', array_slice($itemNames, 0, 3)) .
+                                    (count($itemNames) > 3 ? ' และรายการอื่น ๆ' : '') .
+                                    ' | มูลค่ารวม: ' . number_format($total, 2) . ' บาท',
+                   'occurred_at' => now(),
+                    'icon'        => 'bi-box-seam',
+                    'url'         => route('help_sessions.show', $client->id),
+                ]);
+            });
+
+            return redirect()->route('help_sessions.show', $client->id)
+                ->with([
+                    'message' => 'บันทึกข้อมูลเรียบร้อย',
+                    'alert-type' => 'success',
+                ]);
+        }
 
     public function edit(Client $client, HelpSession $session)
     {
@@ -184,10 +204,30 @@ class HelpSessionController extends Controller
                 $total += $itemTotal;
             }
 
-            $session->update([
-                'total_amount' => $total,
-            ]);
-        });
+                        $session->update([
+                    'total_amount' => $total,
+                ]);
+
+                $itemNames = collect($validated['items'])->pluck('item_name')->toArray();
+
+                CaseActivity::where('client_id', $session->client_id)
+                    ->where('module', 'help_session')
+                    ->delete();
+
+                CaseActivity::record([
+                    'client_id'   => $session->client_id,
+                    'module'      => 'help_session',
+                    'type'        => 'success',
+                    'title'       => 'แก้ไขการช่วยเหลือสิ่งของ/เครื่องใช้',
+                    'description' => 'วันที่ช่วยเหลือ: ' . ($validated['help_date'] ?? '-') .
+                                    ' | รายการ: ' . implode(', ', array_slice($itemNames, 0, 3)) .
+                                    (count($itemNames) > 3 ? ' และรายการอื่น ๆ' : '') .
+                                    ' | มูลค่ารวม: ' . number_format($total, 2) . ' บาท',
+                    'occurred_at' => now(),
+                    'icon'        => 'bi-box-seam',
+                    'url'         => route('help_sessions.show', $session->client_id),
+                ]);
+                        });
 
         return redirect()->route('help_sessions.show', $client->id)
             ->with([
@@ -203,6 +243,10 @@ class HelpSessionController extends Controller
         if ($session->client_id !== $client->id) {
             abort(403);
         }
+
+       CaseActivity::where('client_id', $client->id)
+            ->where('module', 'help_session')
+            ->delete();
 
         $session->delete();
 
