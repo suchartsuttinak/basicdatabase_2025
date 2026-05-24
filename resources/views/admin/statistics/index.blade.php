@@ -1282,49 +1282,63 @@
                         <div class="filter-divider"></div>
 
                        <div class="row g-3">
+                
+                         {{-- บ้าน --}}
+                                <div class="col-12 col-md-3 col-lg-3">
+                                    <label class="form-label">บ้าน</label>
+
+                                    <select name="house_id" class="form-select">
+                                        <option value="">ทั้งหมด</option>
+
+                                        @foreach ($houses as $house)
+                                            <option value="{{ $house->id }}"
+                                                {{ (string)($houseId ?? '') === (string)$house->id ? 'selected' : '' }}>
+                                                {{ $house->house_name ?? '-' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                                 {{-- เพศ --}}
-                            <div class="col-12 col-md-4 col-lg-4">
-                                <label class="form-label">เพศ</label>
+                                <div class="col-12 col-md-3 col-lg-3">
+                                    <label class="form-label">เพศ</label>
 
-                                <select name="gender" class="form-select">
-                                    <option value="">ทั้งหมด</option>
+                                    <select name="gender" class="form-select">
+                                        <option value="">ทั้งหมด</option>
 
-                                    <option value="male"
-                                        {{ ($gender ?? '') == 'male' ? 'selected' : '' }}>
-                                        ชาย
-                                    </option>
+                                        <option value="male" {{ ($gender ?? '') == 'male' ? 'selected' : '' }}>
+                                            ชาย
+                                        </option>
 
-                                    <option value="female"
-                                        {{ ($gender ?? '') == 'female' ? 'selected' : '' }}>
-                                        หญิง
-                                    </option>
-                                </select>
-                            </div>
+                                        <option value="female" {{ ($gender ?? '') == 'female' ? 'selected' : '' }}>
+                                            หญิง
+                                        </option>
+                                    </select>
+                                </div>
 
-                            {{-- อายุต่ำสุด --}}
-                            <div class="col-6 col-md-4 col-lg-4">
-                                <label class="form-label">อายุต่ำสุด</label>
+                                {{-- อายุต่ำสุด --}}
+                                <div class="col-6 col-md-3 col-lg-3">
+                                    <label class="form-label">อายุต่ำสุด</label>
 
-                                <input type="number"
-                                    name="age_min"
-                                    class="form-control"
-                                    value="{{ $ageMin ?? 0 }}"
-                                    min="0"
-                                    max="99">
-                            </div>
+                                    <input type="number"
+                                        name="age_min"
+                                        class="form-control"
+                                        value="{{ $ageMin ?? 0 }}"
+                                        min="0"
+                                        max="99">
+                                </div>
 
-                            {{-- อายุสูงสุด --}}
-                            <div class="col-6 col-md-4 col-lg-4">
-                                <label class="form-label">อายุสูงสุด</label>
+                                {{-- อายุสูงสุด --}}
+                                <div class="col-6 col-md-3 col-lg-3">
+                                    <label class="form-label">อายุสูงสุด</label>
 
-                                <input type="number"
-                                    name="age_max"
-                                    class="form-control"
-                                    value="{{ $ageMax ?? 99 }}"
-                                    min="0"
-                                    max="99">
-                            </div>
+                                    <input type="number"
+                                        name="age_max"
+                                        class="form-control"
+                                        value="{{ $ageMax ?? 99 }}"
+                                        min="0"
+                                        max="99">
+                                </div>
 
                             {{-- สถานศึกษา --}}
                             <div class="col-12 col-md-4 col-lg-4">
@@ -1494,11 +1508,22 @@
                             </div>
                         </div>
 
-                        <div class="filter-actions mt-4">
+                       <div class="filter-actions mt-4">
                             <button type="submit" class="btn btn-primary filter-submit-btn shadow-sm">
                                 <i data-feather="search"></i>
                                 <span>ประมวลผลข้อมูล</span>
                             </button>
+
+                          <a href="{{ route('statistics.report', request()->query()) }}"
+                                    class="btn filter-submit-btn shadow-sm"
+                                    style="
+                                        background:linear-gradient(135deg,#0f766e,#14b8a6);
+                                        color:#fff;
+                                        border:0;
+                                    ">
+                                        <i class="bi bi-printer"></i>
+                                        <span>พิมพ์รายงาน</span>
+                                </a>
                         </div>
                     </form>
                 </div>

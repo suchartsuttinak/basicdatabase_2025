@@ -13,6 +13,7 @@ use App\Models\Medical;
 use App\Models\Psychiatric;
 use App\Models\Refer;
 use App\Models\Project;
+use App\Models\House;
 use App\Models\CaseActivity;
 use Carbon\Carbon;
 
@@ -32,6 +33,7 @@ class StatisticsController extends Controller
         $releaseStatus  = $request->input('release_status', 'show');
         $problemId      = $request->input('problem');
         $projectId      = $request->input('project_id');
+        $houseId        = $request->input('house_id');
 
         $startMonth = $request->input('start_month');
         $startYear  = $request->input('start_year');
@@ -66,10 +68,17 @@ class StatisticsController extends Controller
                 'problems',
             ]);
 
+            // กรองตามโครงการ (project_id) ถ้ามีการเลือก
         if (!empty($projectId) && $projectId !== 'all') {
             $query->where('project_id', $projectId);
         }
 
+        // กรองตามบ้าน (house_id) ถ้ามีการเลือก
+        if (!empty($houseId) && $houseId !== 'all') {
+            $query->where('house_id', $houseId);
+        }
+
+        // กรองตามช่วงวันที่สร้างข้อมูล ถ้ามีการเลือก
         if ($startMonth && $startYear && $endMonth && $endYear) {
             $startDate = Carbon::createFromDate($startYear - 543, $startMonth, 1)->startOfMonth();
             $endDate   = Carbon::createFromDate($endYear - 543, $endMonth, 1)->endOfMonth();
@@ -274,8 +283,9 @@ class StatisticsController extends Controller
         $educations = Education::orderBy('id')->get();
         $problems   = Problem::orderBy('problem_name')->get();
         $projects   = Project::orderBy('project_name')->get();
+        $houses = House::orderBy('id', 'asc')->get();
 
-        return view('admin.index', [
+        return view('admin.statistics.index', [
             'clients'               => $clients,
             'yearMin'               => $yearMin ?? '',
             'yearMax'               => $yearMax ?? '',
@@ -289,7 +299,9 @@ class StatisticsController extends Controller
             'releaseStatus'         => $releaseStatus ?? 'show',
             'problem'               => $problemId ?? '',
             'projectId'             => $projectId ?? '',
+            'houseId'               => $houseId ?? '',
             'projects'              => $projects,
+            'houses'                => $houses,
             'maleCount'             => $maleCount,
             'femaleCount'           => $femaleCount,
             'educationCounts'       => $educationCounts,
@@ -312,4 +324,174 @@ class StatisticsController extends Controller
             'latestCaseActivities'  => $latestCaseActivities,
         ]);
     }
-}
+
+
+
+         // สรุปรายงานสถิติ/ผลลัพธ์ตามเงื่อนไขที่เลือก
+     public function report(Request $request)
+        {
+            $gender         = $request->input('gender');
+            $ageMin         = $request->input('age_min', 0);
+            $ageMax         = $request->input('age_max', 99);
+            $educationStart = $request->input('education_start');
+            $educationEnd   = $request->input('education_end');
+            $institutionId  = $request->input('institution_id');
+            $releaseStatus  = $request->input('release_status', 'show');
+            $problemId      = $request->input('problem');
+            $projectId = $request->input('project_id');
+            $houseId   = $request->input('house_id');
+
+            $startMonth = $request->input('start_month');
+            $startYear  = $request->input('start_year');
+            $endMonth   = $request->input('end_month');
+            $endYear    = $request->input('end_year');
+
+            $query = Client::forUser(auth()->user())
+                ->with([
+                    'educationRecords' => function ($q) use ($educationStart, $educationEnd, $institutionId) {
+                        if ($educationStart && $educationEnd) {
+                            $start = min((int) $educationStart, (int) $educationEnd);
+                            $end   = max((int) $educationStart, (int) $educationEnd);
+
+                            $q->whereBetween('education_id', [$start, $end]);
+                        } elseif ($educationStart) {
+                            $q->where('education_id', (int) $educationStart);
+                        } elseif ($educationEnd) {
+                            $q->where('education_id', (int) $educationEnd);
+                        }
+
+                        if ($institutionId) {
+                            $q->where('institution_id', $institutionId);
+                        }
+
+                        $q->with(['education', 'semester', 'institution'])
+                            ->orderByDesc('record_date')
+                            ->orderByDesc('id');
+                    },
+                    'problems',
+                    'project',
+                    'house',
+                ]);
+
+            if (!empty($projectId) && $projectId !== 'all') {
+                $query->where('project_id', $projectId);
+            }
+
+            if (!empty($houseId) && $houseId !== 'all') {
+                $query->where('house_id', $houseId);
+            }
+
+            if ($startMonth && $startYear && $endMonth && $endYear) {
+                $startDate = Carbon::createFromDate($startYear - 543, $startMonth, 1)->startOfMonth();
+                $endDate   = Carbon::createFromDate($endYear - 543, $endMonth, 1)->endOfMonth();
+
+                $query->whereBetween('created_at', [$startDate, $endDate]);
+            }
+
+            if ($gender) {
+                $query->where('gender', $gender);
+            }
+
+            if ($ageMin !== null && $ageMax !== null) {
+                $query->whereBetween('birth_date', [
+                    now()->subYears((int) $ageMax)->startOfDay(),
+                    now()->subYears((int) $ageMin)->endOfDay(),
+                ]);
+            }
+
+            if ($educationStart && $educationEnd) {
+                $start = min((int) $educationStart, (int) $educationEnd);
+                $end   = max((int) $educationStart, (int) $educationEnd);
+
+                $query->whereHas('educationRecords', function ($q) use ($start, $end) {
+                    $q->whereBetween('education_id', [$start, $end]);
+                });
+            } elseif ($educationStart) {
+                $query->whereHas('educationRecords', function ($q) use ($educationStart) {
+                    $q->where('education_id', (int) $educationStart);
+                });
+            } elseif ($educationEnd) {
+                $query->whereHas('educationRecords', function ($q) use ($educationEnd) {
+                    $q->where('education_id', (int) $educationEnd);
+                });
+            }
+
+            if ($institutionId) {
+                $query->whereHas('educationRecords', function ($q) use ($institutionId) {
+                    $q->where('institution_id', $institutionId);
+                });
+            }
+
+            if ($problemId) {
+                $query->whereHas('problems', function ($q) use ($problemId) {
+                    $q->where('problems.id', $problemId);
+                });
+            }
+
+            if (!empty($releaseStatus) && $releaseStatus !== 'all') {
+                $query->where('release_status', $releaseStatus);
+            }
+
+            $clients = $query->get();
+
+            $maleCount   = $clients->where('gender', 'male')->count();
+            $femaleCount = $clients->where('gender', 'female')->count();
+
+            $educationSummary = [];
+            $problemSummary = [];
+            $institutionSummary = [];
+            $projectSummary = [];
+            $houseSummary   = [];
+
+           foreach ($clients as $client) {
+                $latestEducation = $client->educationRecords->first();
+
+                $eduName = $latestEducation?->education?->education_name ?? 'ไม่ระบุ';
+                $educationSummary[$eduName] = ($educationSummary[$eduName] ?? 0) + 1;
+
+                $schoolName = $latestEducation?->institution?->institution_name
+                    ?? $latestEducation?->school_name
+                    ?? 'ไม่ระบุ';
+
+                $institutionSummary[$schoolName] = ($institutionSummary[$schoolName] ?? 0) + 1;
+
+              foreach ($client->problems as $problem) {
+                    $problemName = $problem->problem_name ?? $problem->name ?? 'ไม่ระบุ';
+                    $problemSummary[$problemName] = ($problemSummary[$problemName] ?? 0) + 1;
+                }
+
+                $projectName = $client->project->project_name
+                    ?? $client->project->name
+                    ?? 'ไม่ระบุ';
+
+                $projectSummary[$projectName] = ($projectSummary[$projectName] ?? 0) + 1;
+
+                $houseName = $client->house->house_name
+                    ?? $client->house->name
+                    ?? 'ไม่ระบุ';
+
+                $houseSummary[$houseName] = ($houseSummary[$houseName] ?? 0) + 1;
+            }
+
+
+            return view('admin.statistics.report', compact(
+                'clients',
+                'maleCount',
+                'femaleCount',
+                'educationSummary',
+                'problemSummary',
+                'institutionSummary',
+                'projectSummary',
+                'houseSummary',
+                'gender',
+                'ageMin',
+                'ageMax',
+                'houseId',
+                'releaseStatus',
+                'startMonth',
+                'startYear',
+                'endMonth',
+                'endYear'
+            ));
+        }
+        }

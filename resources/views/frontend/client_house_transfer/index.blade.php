@@ -93,8 +93,8 @@
                                     @endif
                                 </td>
 
-                                <td>
-                                    {{ auth()->user()->project?->name ?? '-' }}
+                               <td>
+                                    {{ $client->project?->project_name ?? '-' }}
                                 </td>
 
                                 <td>
@@ -153,13 +153,14 @@
                                                            readonly>
                                                 </div>
 
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">หน่วยงาน</label>
-                                                    <input type="text"
-                                                           class="form-control rounded-3 bg-light"
-                                                           value="{{ auth()->user()->project?->name ?? '-' }}"
-                                                           readonly>
-                                                </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">หน่วยงาน</label>
+
+                                                <input type="text"
+                                                    class="form-control rounded-3 bg-light"
+                                                    value="{{ $client->project?->project_name ?? '-' }}"
+                                                    readonly>
+                                            </div>
 
                                                 <div class="mb-3">
                                                     <label class="form-label fw-semibold">

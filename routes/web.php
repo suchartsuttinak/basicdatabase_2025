@@ -52,12 +52,16 @@
         | Dashboard & Statistics
         |--------------------------------------------------------------------------
         */
-
         Route::middleware(['auth', 'role:admin,executive,social_worker'])
-            ->controller(StatisticsController::class)
+        ->controller(StatisticsController::class)
             ->group(function () {
                 Route::get('/dashboard', 'index')->name('dashboard');
-                Route::get('/statistics', 'index')->name('statistics.index');
+
+                Route::get('/statistics', 'index')
+                    ->name('statistics.index');
+
+                Route::get('/statistics/report', 'report')
+                    ->name('statistics.report');
             });
 
 

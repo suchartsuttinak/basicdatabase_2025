@@ -15,11 +15,14 @@ class ClientHouseTransferController extends Controller
     public function index()
     {
         $clients = Client::forUser(auth()->user())
-            ->with('house')
+            ->with(['house', 'project'])
+            ->orderBy('house_id')
             ->orderBy('first_name')
             ->get();
 
-        $houses = House::orderBy('house_name')->get();
+       $houses = House::orderByRaw('CAST(REGEXP_REPLACE(house_name, "[^0-9]", "") AS UNSIGNED)')
+        ->orderBy('house_name')
+        ->get();
 
         $caregivers = User::query()
             ->with('houses:id,house_name')
